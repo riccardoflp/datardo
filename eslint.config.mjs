@@ -10,7 +10,7 @@ import tseslint from 'typescript-eslint';
 const pureFolders = ['src/shared/**/*.{ts,tsx}', 'src/features/**/*.{ts,tsx}'];
 
 export default tseslint.config(
-  { ignores: ['out/**', 'release/**', 'node_modules/**', 'test-results/**', '.data/**', 'coverage/**'] },
+  { ignores: ['out/**', 'release/**', 'node_modules/**', 'test-results/**', '.data/**', 'coverage/**', '.claude/**'] },
   js.configs.recommended,
   ...tseslint.configs.strictTypeChecked,
   {
