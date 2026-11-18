@@ -1,0 +1,174 @@
+/*
+ * window.top-bar: 40 px high, on the window's background. Its empty part drags the window; its controls do not. The
+ * Go to field is centered in the window, 480 px wide, narrowing with the window down to 200 px; below that only the
+ * button Go to is left (Datardo's choices).
+ */
+.bar {
+  display: grid;
+  grid-template-columns: minmax(var(--top-bar-side), 1fr) minmax(0, var(--go-to-width)) minmax(var(--top-bar-side), 1fr);
+  flex-shrink: 0;
+  align-items: center;
+  width: 100%;
+  height: var(--top-bar-height);
+  background: var(--color-canvas);
+  color: var(--color-text);
+  user-select: none;
+  app-region: drag;
+}
+
+.start,
+.end {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  height: 100%;
+}
+
+.start {
+  padding-left: var(--space-3);
+}
+
+.end {
+  justify-content: flex-end;
+  padding-right: var(--space-2);
+}
+
+.name {
+  overflow: hidden;
+  font-weight: var(--font-weight-strong);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.appIcon {
+  flex-shrink: 0;
+  width: var(--app-icon-size);
+  height: var(--app-icon-size);
+  color: var(--color-accent);
+}
+
+.appIconLarge {
+  flex-shrink: 0;
+  width: var(--about-icon-size);
+  height: var(--about-icon-size);
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+  container-type: inline-size;
+}
+
+.goTo,
+.goToButton,
+.mcp,
+.windowButton {
+  font: inherit;
+  cursor: pointer;
+  app-region: no-drag;
+}
+
+.goTo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  min-width: 0;
+  padding: var(--space-1) var(--space-3);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-medium);
+  background: var(--color-island);
+  color: var(--color-text-muted);
+}
+
+.placeholder {
+  flex: 1;
+  overflow: hidden;
+  text-align: left;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.key {
+  flex-shrink: 0;
+  padding: 0 var(--space-1);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-small);
+  font-family: var(--font-family-ui);
+  font-size: var(--font-size-small);
+}
+
+.goToButton {
+  display: none;
+  padding: var(--space-1) var(--space-2);
+  border: none;
+  border-radius: var(--radius-small);
+  background: transparent;
+  color: var(--color-text);
+}
+
+@container (width < 200px) {
+  .goTo {
+    display: none;
+  }
+
+  .goToButton {
+    display: inline-flex;
+  }
+}
+
+.mcp {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  border: none;
+  border-radius: var(--radius-small);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-small);
+}
+
+.dot {
+  width: var(--space-2);
+  height: var(--space-2);
+  border-radius: var(--radius-round);
+  background: var(--color-text-muted);
+}
+
+.goTo:disabled,
+.goToButton:disabled,
+.mcp:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.goTo:hover:not(:disabled),
+.goToButton:hover:not(:disabled),
+.mcp:hover:not(:disabled) {
+  background: var(--color-hover);
+}
+
+.windowButtons {
+  display: flex;
+  align-self: stretch;
+}
+
+.windowButton {
+  width: var(--window-button-width);
+  height: var(--top-bar-height);
+  border: none;
+  background: transparent;
+  color: var(--color-text);
+}
+
+.windowButton:hover {
+  background: var(--color-hover);
+}
+
+.closeButton:hover {
+  background: var(--color-danger);
+  color: var(--color-danger-text);
+}

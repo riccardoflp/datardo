@@ -1,0 +1,66 @@
+{
+  "isWritablePrimary": true,
+  "msg": "isdbgrid",
+  "topologyVersion": {
+    "processId": {
+      "$oid": "6afd5024976ee3212e43983c"
+    },
+    "counter": {
+      "$numberLong": "0"
+    }
+  },
+  "maxBsonObjectSize": {
+    "$numberInt": "16777216"
+  },
+  "maxMessageSizeBytes": {
+    "$numberInt": "48000000"
+  },
+  "maxWriteBatchSize": {
+    "$numberInt": "100000"
+  },
+  "localTime": {
+    "$date": {
+      "$numberLong": "1794986022153"
+    }
+  },
+  "logicalSessionTimeoutMinutes": {
+    "$numberInt": "30"
+  },
+  "connectionId": {
+    "$numberInt": "8"
+  },
+  "maxWireVersion": {
+    "$numberInt": "27"
+  },
+  "minWireVersion": {
+    "$numberInt": "0"
+  },
+  "ok": {
+    "$numberDouble": "1.0"
+  },
+  "$clusterTime": {
+    "clusterTime": {
+      "$timestamp": {
+        "t": 1794986022,
+        "i": 50
+      }
+    },
+    "signature": {
+      "hash": {
+        "$binary": {
+          "base64": "AAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+          "subType": "00"
+        }
+      },
+      "keyId": {
+        "$numberLong": "0"
+      }
+    }
+  },
+  "operationTime": {
+    "$timestamp": {
+      "t": 1794986022,
+      "i": 50
+    }
+  }
+}

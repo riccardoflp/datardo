@@ -1,0 +1,574 @@
+# Decisions
+
+The choices that shape Datardo, each with why, what was rejected and what it costs. A decision is never edited away:
+when it changes, a new one replaces it and the old one says *Replaced by*. A decision marked *to confirm* was taken
+while writing these documents and waits for the author's word; one the author confirmed says so, with the date. The
+open questions are at the end.
+
+## D1 — A desktop application of its own, on Electron
+
+Datardo is one desktop application for Windows, macOS and Linux, built on Electron. It is not a VS Code extension and
+does not imitate one. Electron is what Mongoster's desktop app already runs on, so Mongoster's core (the driver code,
+mongosh syntax, the undo history, backups, the MCP server) is ported instead of rewritten, and the window is drawn by
+the same browser engine on the three systems. Rejected: Tauri 2 with a Rust core (an installer of 10 to 15 MB and less
+memory, but nothing of Mongoster reused, two to three times the work, and three different system web views to test);
+Tauri 2 with the core in a Node process beside it (two runtimes to package and update for a small gain); a native Rust
+interface with egui, as Gitardo Desktop (the lightest, but tables, editors with autocomplete, charts and diagrams would
+be written by hand). The cost: an installer of about 100 MB, and more memory than a native program.
+
+## D2 — TypeScript everywhere; Mongoster is ported, not rewritten in a clean room
+
+Every part is TypeScript. Mongoster 0.8.0 belongs to the same author: whoever builds a feature may read its code, and
+the cards name where Mongoster does the same thing (**Ported from**). What is ported is behavior and the pure code
+that already has the right shape (parsing and formatting values, the archive format, schedules, comparisons). The
+design is not ported: Mongoster's host classes mix decisions with VS Code calls, and Datardo's features are functions
+([D9](#d9--every-feature-is-a-function-and-the-runner-carries-it-out)). The cost: a ported file must be reshaped to
+the rules of this repository before it is committed, not pasted.
+
+## D3 — React for the window, styles from tokens, no component library
+
+The window is written with React and TypeScript. It has the widest set of well-tested pieces for what Datardo needs
+(lists of a million rows drawn a screen at a time, accessible menus and dialogs, the editor's bindings). Styles are
+plain CSS: one file of tokens (colors, radii, spaces, font sizes) and one CSS module per component; themes and the
+color of a connection are a change of tokens. Menus, dialogs, popovers and tooltips are built on headless accessible
+primitives (Radix Primitives), which bring behavior and no look. Rejected: Svelte 5 and SolidJS (less code or finer
+updates, but more components to write by hand); no framework, as Mongoster's webviews (its largest views are files of
+two thousand lines); Tailwind (a build dependency and noisier markup for no gain here); a component library with its
+own look (the islands would be styled against it). This replaces Mongoster's choice of plain DOM, whose reason was
+never recorded.
+
+## D4 — CodeMirror 6 wherever code is typed
+
+Filters, sorts, projections, pipelines, documents, playgrounds and the Redis console all use one editor, CodeMirror 6,
+with Datardo's own highlighting and autocomplete for mongosh syntax and for Redis commands. It is light, many small
+instances cost little, and its look comes from the tokens. Rejected: Monaco, which Mongoster's desktop app uses (about
+5 MB, made for one large editor, awkward in a one-line field and rigid to theme); both (two editors, two themes and two
+autocompletes to keep alike).
+
+## D5 — The window draws its own frame
+
+There is no title bar of the operating system. The top bar is part of the window and drags it. On Windows the
+system's own minimize, maximize and close buttons are drawn over the top bar's right end, so that snap layouts and
+the system's behavior are kept; on macOS the traffic lights are inset at its left and the system's menu bar stays; on
+Linux Datardo draws its three buttons. On Windows and Linux there is no menu bar: everything is in the window and in
+Go to. The cost: per-platform code for the frame, and keyboard access to what a menu bar would have given, which Go to
+provides.
+
+## D6 — Islands, a rail outside them, one connection at a time
+
+The layout is the sketch called A1: the top bar, the rail and the status line sit on the window's background; the
+connection island, the tree island, the main island and the inspector island float on it. The explorer shows one
+connection, the current one, and follows the active tab; every connection is on Home and in the connection switcher;
+the tabs of all connections stay in the tab strip, grouped and colored by connection. Rejected, from the sketches: one
+tree of every connection, as Mongoster (it grows without bound and mixes engines); a single focused column; tiled
+panes; one space per connection with a dashboard; columns that open to the right; a notebook of cells; and projects
+with environments, of which only **Open on another connection** was kept. The main island is one: no split in the
+first release ([Q7](#open-questions)).
+
+## D7 — Home is the first page
+
+Datardo opens on Home: the places used last, and every connection as a card. With the explorer showing one connection
+at a time, something must show them all, and the first run needs a place that says what to do. Rejected: opening on
+the last tab only (nothing to show the first time), and a tree of every connection (D6).
+
+*Confirmed by the author on 2026-11-18, with this precision, which answers Q1*: Home is what Datardo opens on at the
+first start, when there is no tab to restore, and when `datardo.tab.restore` is off. When tabs are restored, they come
+back as they were and the one that was active is active again (`tab.restore`); Home is one `Ctrl+K` or one click on
+the rail away.
+
+## D8 — Engines behind one interface; MongoDB and Redis first
+
+An engine is a module of the main process that connects, tests, runs a request and runs a step for one kind of
+database, and says what the connected server can do. Everything that is not about one engine is written once: the
+window, connections with folders, colors, read-only, TLS and SSH tunnels, the runner, the undo history, the Log,
+scheduled tasks, the MCP server, settings. The areas of the catalog belong to the app or to one engine. Another engine
+later is a new module and new areas, with no change to the others. Rejected: one product per engine; a common query
+language over the engines ([D10](#d10--the-user-reads-and-writes-the-engines-own-language)).
+
+## D9 — Every feature is a function, and the runner carries it out
+
+A feature is one pure function that returns what it needs next: a question, a read, a refusal with a code, or a plan
+of steps. The runner asks, reads, refuses, confirms, records the undo, runs the steps, logs and publishes
+([feature contract](feature-contract.md)). Features are tested without a window, a server or a disk, a write is shown
+before it runs exactly as it will be sent, and the Log names the feature of every step. This is the target Mongoster's
+documents proposed for its new code (its open question Q1), adopted here from the first line. The cost: a feature
+cannot simply call the driver, and what it needs to know must be named as a read.
+
+## D10 — The user reads and writes the engine's own language
+
+For MongoDB, filters, documents, pipelines and values are mongosh syntax (`ObjectId("…")`, `ISODate("…")`, `/re/i`),
+parsed by Datardo and never evaluated; it is what MongoDB users know, and it keeps the BSON types that JSON loses. For
+Redis, commands are written as in `redis-cli`, and values are text, JSON or bytes in hexadecimal. Datardo does not
+invent a language over them.
+
+## D11 — The official drivers, and the oldest servers they serve
+
+MongoDB through the `mongodb` package, 4.2 or later; Redis through the `redis` package (node-redis), 6.2 or later
+(`COPY`, `SCAN … TYPE`, ACL users, RESP3); SSH tunnels through `ssh2`. An older server is refused when connecting, with
+its version in the message. Rejected: `ioredis` (as capable, but node-redis is the client Redis itself maintains and
+documents first); Mongoster's own small RESP client (enough to publish events, not for a Redis client).
+
+## D12 — Redis in the first release: one server
+
+A Redis connection reaches a standalone server or one replica, with a password or an ACL user, TLS and an SSH tunnel.
+Redis Cluster and Sentinel are not in the first release: a server in cluster mode is refused when connecting. Keys of a
+module's type (RedisJSON, time series, search) are listed and can be renamed, expired and deleted, but their values
+are not shown. The cost: no use against a cluster until that work is done ([Q6](#open-questions)).
+
+## D13 — An undo history of Datardo's own, for documents and for keys
+
+Neither engine has an undo. Before a write to documents, Datardo saves the documents as they were; before a write to
+keys, each key as `DUMP` returns it, with its expiry. They are kept in compressed files in the data folder, with
+limits on size, age and count (`datardo.undo.*`, Mongoster's defaults). Undoing writes them back and is itself
+recorded. The cost: disk space, a second read before every write, and writes over the limits that cannot be undone,
+which the confirmation says.
+
+## D14 — Read-only is a safeguard of Datardo, not a permission
+
+A connection marked read-only makes Datardo refuse every write through it; the server's user is not changed or
+checked. It protects against a mistake on a production connection, not against someone who means harm. The check is
+made when a write is about to run, not when a tab was opened, so that a connection made read-only stops the tabs that
+were already open.
+
+## D15 — A dangerous write shows its plan; what is lost for good is confirmed by typing its name
+
+A plan whose danger is *Confirm* is shown in a confirmation with its steps as they will be sent, how much they touch
+and whether they can be undone, and one button named after the action. A plan whose danger is *Destructive* asks the
+user to type the name of what is lost: a collection, a database, a pattern of keys. The same holds wherever the plan
+comes from, so dropping a collection through a structure comparison asks what dropping it from the tree asks (this
+settles Mongoster's open question Q11).
+
+## D16 — The MCP server is read-only, local and behind a token
+
+The MCP server listens on `127.0.0.1` only, needs a bearer token kept in the secret storage, has no tool that writes,
+kills an operation or changes a server setting, and gives documents and values to the AI only with
+`datardo.mcp.readData`. It is off until the user turns it on. Its default port is 37018, so that Mongoster's server on
+37017 can run beside it. The tools for MongoDB keep Mongoster's names; the tools for Redis start with `redis_`, and
+none runs a command the assistant writes.
+
+## D17 — redis-oplog through a linked Redis connection
+
+Meteor apps using `cultofcoders:redis-oplog` see only the writes announced on Redis. A MongoDB connection can be linked
+to a saved Redis connection, and Datardo then publishes its writes to documents there, as the package does. A Redis
+error does not stop the write. The link takes the place of Mongoster's Redis URL kept per connection: the Redis server
+is a connection like any other, shown under the MongoDB one, and its Pub/Sub page shows the events arriving.
+
+## D18 — Backups in mongodump's formats, written by Datardo
+
+Backups and restores read and write the formats of `mongodump` and `mongorestore` (folders of `.bson` and
+`.metadata.json`, and the archive format, gzipped or not) with Datardo's own code, ported from Mongoster, not by
+running the MongoDB Database Tools. Backups move both ways between Datardo and the tools, and nothing needs to be
+installed. The cost: what the tools do and Datardo does not is left out and said.
+
+## D19 — Scheduled tasks run inside Datardo, which is one instance
+
+Scheduled backups and exports run while Datardo is open, in its window or in the tray; nothing is installed in the
+operating system's scheduler. Datardo runs as one instance with one window: starting it again brings the window to the
+front. The files of the data folder then have one writer, and Mongoster's lock between windows has no place. The cost:
+no run while Datardo is closed (missed runs can run at the next start), and no second window.
+
+## D20 — Datardo keeps its own data and starts empty
+
+Datardo's data folder is its own. It does not read Mongoster's storage, in VS Code or in its desktop app. Connections
+come over by exporting them from Mongoster and importing the file, which Datardo reads as Mongoster wrote it; saved
+queries *in the folder* use Mongoster's file format, so one folder serves both. Rejected: reading Mongoster's storage
+at the first start (its secrets are held by VS Code's keychain entry, and its formats carry no version).
+
+## D21 — Every stored format carries a version from the first release
+
+Each file Datardo writes for itself has a `version`. An older one is migrated by a function with a test that reads a
+recorded old file; a newer one is never overwritten; a damaged one is kept aside under another name, the user is told,
+and nothing else is deleted because of it. This answers the two ways Mongoster can lose its undo history and its
+scheduled tasks to one unreadable file.
+
+## D22 — Dependencies from a list, with their licenses checked
+
+What runs in the product is what `package.json` lists and nothing else, bundled into the application. Adding a
+dependency is a decision recorded here. Every dependency, direct or not, has a license of the allowed list (MIT, ISC,
+BSD-2-Clause, BSD-3-Clause, Apache-2.0, 0BSD, BlueOak-1.0.0, CC0-1.0, and CC-BY-4.0 for the icons; the Unlicense
+since [D47](#d47--the-unlicense-joins-the-allowed-licenses)), comes from the npm registry, and is pinned by the
+lockfile; the notices of what is bundled are written into the installer. The list at the start: `mongodb`, `redis`, `ssh2`, `json5`, `acorn`, `chart.js`, `react`, `react-dom`, Radix Primitives, the
+CodeMirror 6 packages, `@tanstack/react-virtual`, `@vscode/codicons`.
+
+## D23 — Codicons for every icon
+
+The icons are Codicons (`@vscode/codicons`), the set Gitardo Desktop uses, so the sibling applications look alike. They
+are licensed CC BY 4.0: the About page and the notices credit them.
+
+## D24 — Tests against real servers, and the built application driven through its window
+
+Unit tests (Vitest) for every feature, since features are pure. Integration tests against a real `mongod` (a standalone
+and a single-node replica set, started by `mongodb-memory-server`) and a real Redis server, with no mock of a driver.
+Tests of the window drive the built application with Playwright, find controls by role and name and by their
+`data-feature`, and run axe-core on every page. The cost: a Redis server must be found on the machine that runs the
+integration tests ([testing](testing.md#throwaway-servers)).
+
+## D25 — Windows first, then macOS and Linux
+
+The three systems are built and tested by the CI from the first milestone, so that nothing is written for one only.
+A milestone is done when its exit criteria pass on Windows; macOS and Linux are brought to the same criteria in the
+milestone before the first release.
+
+## D26 — Secrets are encrypted with a key of the system's keychain, or not kept
+
+The secret storage is a file encrypted with Electron's `safeStorage` (DPAPI on Windows, Keychain on macOS, the secret
+service on Linux). When the system offers no keychain, Datardo says so and keeps secrets in memory until it quits; it
+never writes them in clear text. No secret is sent to the window process: a form shows an empty field, and an empty
+field means "keep the saved one".
+
+## D27 — The window process is a sandbox
+
+The window process has no access to Node, to the disk or to the network. It talks to the main process through one
+typed bridge, shows values from deployments as text, loads nothing from the network, and cannot navigate away. A value
+in a database can therefore not run code or make Datardo write.
+
+## D28 — These documents, and the rules they chose
+
+The documents follow the layout of the project-spec skill, in English: product, architecture, code rules, feature
+contract, platform, testing, roadmap, decisions, glossary, security, stored data, quality, risks, and the catalog of
+features with one card per feature. The rules that cost work on every change were all chosen: controls carry the
+identifier of their feature, every command has a card, every card has a test named after it, refusals have codes, the
+Log names the feature, the settings declared are the settings documented, accessibility is checked by a test, and the
+licenses of dependencies are checked. There is no `SECURITY.md` until the private channel for reports is named
+([Q5](#open-questions)). *This last sentence is replaced by
+[D46](#d46--a-public-repository-the-mit-license-reports-through-github), which names the channel.*
+
+## D29 — Saved queries for me, or in the queries folder of a connection
+
+A saved query is kept *for me*, in the data folder, or *in the folder*: a JSON file of the queries folder the user
+gave the connection, one file per query, in Mongoster's format and layout, with nothing secret in it, so that a team
+shares the folder through git. Datardo has no workspace, so the folder belongs to the connection.
+
+## D30 — Numbers that are Datardo's own
+
+Limits, defaults and timeouts are Mongoster's where it has them. The numbers Mongoster never had are chosen by Datardo
+and marked *(Datardo's choice)* on their cards; they are listed together in
+[features/settings.md](features/settings.md#numbers-that-are-datardos-own) so that they can be reviewed at once.
+
+## D31 — A step says what happens when it fails
+
+A plan stops at the first step that fails, unless that step says otherwise: *go on*, or *instead* with other steps for
+the errors it names; and steps may be in groups, where a failure stops its group only. The confirmation shows all of
+it. Needed by cards that Mongoster runs this way: `index.edit` (the old index is created again when the new definition
+is refused), `monitor.clear-profiler`, `monitor.set-collection-balancing`, `structure.apply` (a failed step stops its
+own difference), `gridfs.upload` (one file at a time). Rejected: the runner always stopping (these features would lose
+their recovery), and features catching errors themselves (a feature decides, it does not run).
+*Confirmed by the author on 2026-11-18.*
+
+## D32 — Types are kept apart in the table and in what is copied
+
+A value keeps its BSON type from the driver to the cell and back: the window holds canonical Extended JSON,
+`query.format` writes `Double(5)` and `NumberLong(5)` where a plain `5` would read back as Int32, and `query.parse`
+reads every constructor it writes. A document copied from the table and pasted into the insert dialog is inserted with
+its types. Mongoster's table holds relaxed Extended JSON and loses them; that is its known weakness, not ported.
+Rejected: keeping Mongoster's behavior for the sake of shorter text in a copy. *Confirmed by the author on 2026-11-18.*
+
+## D33 — Closing and quitting ask about unsaved changes; drafts are for crashes
+
+A document tab or a playground tab with unsaved changes asks before it closes, and quitting asks once for all of them
+(`tab.close`, `window.quit`). The unsaved text is also kept aside as a draft, which comes back only when Datardo did
+not close by itself: a crash, a kill, a forced shutdown (`tab.restore`, `window.recover`). Rejected: never asking and
+always restoring (a restored edit of a document may be stale by the time it is saved).
+*Confirmed by the author on 2026-11-18.*
+
+## D34 — Removing a connection removes what Datardo keeps about it
+
+`connection.remove` deletes the connection's secrets, its remembered state (recent queries, columns' layouts, the
+console's history, playground targets), its queries saved for me, its pins and its operations of the undo history, and
+its confirmation says so. Files in the user's places stay: the queries folder, backups, exports. Scheduled tasks stay
+and say the connection was removed. Mongoster leaves the state behind. For a collection: a rename carries its state
+along, a drop leaves it. *Confirmed by the author on 2026-11-18.*
+
+## D35 — One line on undo, and one more question when it turns out too large
+
+Every confirmation of a write carries the line `undo.note` gives. When what must be kept turns out over a limit while
+it is read, `undo.record` asks whether to go on without the possibility to undo, before anything is written (for a
+plan in batches, before the batch that passes the limit). So the user never learns after the fact that a write was not
+recorded. This is Mongoster's behavior for Update many and Delete many, made the rule for every write.
+
+## D36 — What is destructive
+
+A plan is *destructive* (the user types a name) when it loses, beyond the undo history, something that has a name:
+a database, a collection, a bucket, an index, every key matching a pattern, the destination of a copy or a restore
+that drops first, the collections a structure comparison drops. Mongoster asks for several of these with one button
+(`index.drop`, `index.drop-search`, `gridfs.drop-bucket`, `transfer.copy-collection`, `backup.restore`,
+`structure.apply`). Writes to documents that cannot be undone only because of their size stay *confirm*, with the
+line that says so. *Confirmed by the author on 2026-11-18. Its last sentence is replaced, for a write with an empty
+filter, by [D39](#d39--an-empty-filter-that-cannot-be-undone-asks-for-the-collections-name).*
+
+## D37 — Keys are exported as Redis commands
+
+`key.export` writes a text file of Redis commands (`SET`, `HSET`, `RPUSH`, `SADD`, `ZADD`, `XADD`, `PEXPIREAT`,
+and `RESTORE` for what has no command), with the extension `.redis`, which `redis-cli` can also run. It keeps the bytes
+and the expiry of every key; it does not keep a stream's consumer groups. Rejected: JSON Lines (no other tool reads
+it) and dumps only (tied to the server's version). *Confirmed by the author on 2026-11-18.*
+
+## D38 — What the Redis console confirms, and what read-only refuses there
+
+The console runs ordinary writes at once (`DEL`, `SET`): it is where the user types commands on purpose, and they are
+not recorded in the undo history, which the tab says. It confirms what loses data wholesale or changes the server
+(`FLUSHDB`, `FLUSHALL`, `SHUTDOWN`, `CONFIG SET`, `KEYS` on a large database), the worst by typing. On a read-only
+connection it refuses every command the server flags as a write, those that change the server or other clients
+without writing a key (`PUBLISH`, `CONFIG SET`, `CLIENT KILL`, `SCRIPT FLUSH`, every script), and any command it
+cannot classify (`console.classify`). Datardo's own publishing for redis-oplog through a linked connection is not a
+command of the user and is not stopped by that connection being read-only (`oplog.publish`).
+*Confirmed by the author on 2026-11-18.*
+
+## D39 — An empty filter that cannot be undone asks for the collection's name
+
+A write to documents is *destructive*, and the collection's name is typed, when both hold: its filter is empty, so it
+takes every document of the collection, and it will not be recorded in the undo history, because the undo history is
+off in the settings or for the connection, or because what must be kept is over a limit. It concerns Update many,
+Delete many and the column actions (`document.update-many`, `document.delete-many`, `field.rename`, `field.remove`,
+`field.convert-type`). The cards decide it from what `undo.note` says before the confirmation; when the write was to
+be recorded and turns out too large while it is read, the question of `undo.record` asks for the name in the same
+way. A filter is empty when, parsed, it is `{}`: the rule reads the filter as written in the query bar, not what it
+matches; a column action adds its condition on the field to it, and still reaches every document that has the field.
+A pipeline
+that ends with `$out` onto a collection that exists replaces it whole, and asks for that collection's name
+(`aggregate.write-output`); `$merge` stays *confirm*. Every other case stays as
+[D36](#d36--what-is-destructive) left it: an empty filter that will be recorded is *confirm*, and so is a filter that
+is not empty, with the line that says it cannot be undone. Mongoster asks for all of these with one button. Rejected:
+typing the name for every empty filter (the undo history already gives the documents back), and for every write that
+cannot be undone (a filter that names its documents is a choice already made).
+*Decided by the author on 2026-11-18; answers Q12.*
+
+## D40 — The playground asks before it drops
+
+A playground runs what its script says, and Datardo neither confirms its writes nor records them in the undo history:
+the tab says so. One exception: when the script calls `dropDatabase()` or the `drop()` of a collection, also through
+`runCommand` or on a database reached with `getSiblingDB`, the run waits at that call and the user types the name of
+what is dropped, as for any destructive plan. Cancelled, the call is not sent and throws in the script. Every call is
+asked about by itself. So the promise that what is lost for good is shown before it runs holds in the playground for
+what loses the most, and a script stays a script for the rest: `deleteMany({})`, a `renameCollection` that drops its
+target and a pipeline with `$out` run as written. Mongoster confirms
+nothing here. Rejected: confirming every write (a script of a hundred writes would ask a hundred times), and one
+confirmation of the whole script before it starts (what a script will do cannot be known without running it).
+*Decided by the author on 2026-11-18; answers the first part of Q13.*
+
+## D41 — A new user's password passes through the window, once
+
+The password of a server user that Datardo creates or changes is typed or generated in the dialog, sent once to the
+main process, and shown once after the write with **Copy password**; it is kept nowhere when the dialog and its
+notification are closed, and it is written `***` in the steps, the confirmation and the Log (`user.create`,
+`user.change-password`). This is the one exception to R14.3, which says so: a password the user is choosing has to be
+typed somewhere, and a saved secret still never reaches the window. The threat is T21, accepted. Rejected: generating
+every password in the main process and never showing it (the user must hand it to whoever will use it).
+*Decided by the author on 2026-11-18; answers the first part of Q31.*
+
+## D42 — A GridFS file opens in the system's program, for a list of extensions
+
+**Open** writes a temporary copy of the file and hands it to the program the system has for it, only when its
+extension is in the list of 22 that `gridfs.open` gives: documents, pictures, sound and archives, never a program or
+a script. Every other file is downloaded where the user says, and opened by the user. The copies are deleted at
+quit. An SVG is previewed as an image, where nothing runs. A document can still exploit its viewer: T20, accepted in
+part, as for a file received by mail. Rejected: **Download** only (a picture stored in a bucket is opened many times
+a day). *Decided by the author on 2026-11-18; answers the first part of Q32.*
+
+## D43 — The console's history is kept on disk
+
+The commands typed in a Redis console are remembered for each connection across starts, in the connection's state
+file, up to `datardo.console.historySize` (500; 0 keeps none). Secret arguments are never written
+(`console.secret-arguments`), **Clear history** empties it (`console.clear-history`), and it is deleted with the
+connection ([D34](#d34--removing-a-connection-removes-what-datardo-keeps-about-it)). It holds the values the user
+typed, in clear text, in the user's profile, like the undo history: T22, accepted. Rejected: memory only (the history
+of a console is what makes it quick the next day).
+*Decided by the author on 2026-11-18; answers the first part of Q33.*
+
+## D44 — Datardo says when a newer version exists, and installs nothing by itself
+
+At start, and once a day while it stays open, Datardo asks GitHub for the latest release of its repository and, when
+it is newer than the one running, shows a notification with **Download**, which opens the release's page in the
+system's browser (`window.check-update`). The user downloads and runs the installer. The request carries Datardo's
+version and nothing about the user, the connections or the machine. It is the only call to the network that Datardo
+makes by itself, and the setting `datardo.window.checkForUpdates`, on by default, turns it off (R14.9, T15); **Check
+for updates** in About asks once, whatever the setting. Rejected: updating in place, which needs signed installers
+([D45](#d45--the-installers-are-not-signed)); and nothing at all (a client of databases that is never updated keeps
+its security fixes waiting). *Decided by the author on 2026-11-18; answers Q2.*
+
+## D45 — The installers are not signed
+
+No certificate is bought for now: the Windows installer is not signed, and the macOS application carries only the
+ad-hoc signature that Apple silicon needs to run it, without notarization. Windows SmartScreen and macOS Gatekeeper
+therefore warn at the first start, and the page of each release says how to open Datardo all the same and gives the
+SHA-256 of every installer, so that a download can be checked against it. Updating in place is not possible without
+signatures, and is not built (D44). The cost is known: some users will not get past the warning, and an installer
+that was altered cannot be told from the real one except by its checksum (RS8, and
+[what is not defended](security.md#what-is-not-defended)). Signing is taken up again by a new decision when Datardo
+has users who ask for it. Rejected for now: signing from the first public release, and from M0.
+*Decided by the author on 2026-11-18; answers Q3.*
+
+## D46 — A public repository, the MIT license, reports through GitHub
+
+Datardo's source is public on GitHub under the MIT license, like Mongoster's (`LICENSE`). A vulnerability is reported
+in private through GitHub's private vulnerability reporting, the **Report a vulnerability** button of the
+repository's **Security** page, as [`SECURITY.md`](../SECURITY.md) says; that file replaces the last sentence of
+[D28](#d28--these-documents-and-the-rules-they-chose). The licenses allowed for dependencies
+([D22](#d22--dependencies-from-a-list-with-their-licenses-checked)) all let Datardo be distributed under MIT, with
+their notices in the installer. The address of the repository is given by [D48](#d48--the-repository-is-githubcomriccardoflpdatardo). Rejected: a private
+repository until a release, and a license that shows the source without letting it be shared.
+*Decided by the author on 2026-11-18; answers Q5.*
+
+## D47 — The Unlicense joins the allowed licenses
+
+`ssh2`, which D22 lists, needs `tweetnacl`, whose license is the Unlicense: a dedication to the public domain, with
+no condition to meet. It is added to the licenses allowed for what Datardo bundles, and its notice ships with the
+others. This adds to the list of [D22](#d22--dependencies-from-a-list-with-their-licenses-checked), which is otherwise
+unchanged. Rejected: replacing `ssh2` (no other SSH client for Node does tunnels as well), and allowing `tweetnacl`
+alone by name (a license allowed once is a license allowed).
+*Decided while building M0, on 2026-11-18: to confirm.*
+
+## D48 — The repository is github.com/riccardoflp/datardo
+
+Datardo's repository is `https://github.com/riccardoflp/datardo` (its origin is
+`https://github.com/riccardoflp/datardo.git`). **Documentation** and **Report an issue** in About, the check for a
+newer version (`window.check-update`, which asks this repository's latest release) and `SECURITY.md` point to it. It
+is written once, in `src/shared/product.ts`. This completes
+[D46](#d46--a-public-repository-the-mit-license-reports-through-github), whose address was still to be given.
+*Decided by the author on 2026-11-18; answers Q21.*
+
+## D49 — A changed password of the connection's own user can be saved in the connection
+
+When `user.change-password` changes the password of the user a connection signs in as, its notification offers
+**Save in the connection**, which keeps the new password in that connection's secrets
+([D26](#d26--secrets-are-encrypted-with-a-key-of-the-systems-keychain-or-not-kept)) without asking for it again. It is
+offered, not done: the user may be changing it for another reason. The password still passes through the window once
+([D41](#d41--a-new-users-password-passes-through-the-window-once)) and nowhere else. Rejected: leaving the saved
+connection alone, which makes the next connect fail.
+*Decided by the author on 2026-11-18; answers what was left of Q31.*
+
+## D50 — A GridFS file is replaced after the new one is uploaded
+
+**Replace** in `gridfs.upload` finds the files with the same name first, uploads the new file, and deletes the old
+revisions only once the new one is complete. If the upload fails or is cancelled, the old revisions stay. For a moment
+both exist, and reading by name gives the newest, which is the new one. Rejected: Mongoster's order (delete, then
+upload), which loses the file when the upload fails.
+*Decided by the author on 2026-11-18; answers what was left of Q32.*
+
+## D51 — One playground at a time, and console replies as the server sends them
+
+Two answers the cards already gave are confirmed. One playground runs at a time, in its own process, with no memory
+limit of Datardo's (`playground.run`): a script that exhausts the memory ends its process and nothing else. The Redis
+console shows a reply as the server sends it, secrets included (`CONFIG GET requirepass`): the user asked for it; it
+is never written in the Log, in the console's history on disk or in a notification (`console.reply`,
+`console.secret-arguments`). Rejected: one run per tab, a memory limit, and masking replies on screen.
+*Decided by the author on 2026-11-18; answers what was left of Q13 and Q33.*
+
+## D52 — Electron stays, after M4
+
+Once M0 to M4 were built, the author weighed again Tauri 2 with a Rust core, the stack of Agentardo, and kept
+Electron ([D1](#d1--a-desktop-application-of-its-own-on-electron) and
+[D2](#d2--typescript-everywhere-mongoster-is-ported-not-rewritten-in-a-clean-room) stand). What was built is reused
+whole, Mongoster's Node core (its backups and archive format, the playground's process, the MCP server) is still ported
+rather than rewritten, and the UI tests drive the window on the three systems. Rejected: Tauri 2 with the window in
+TypeScript and the core in Rust (about a quarter of what was built rewritten, and every later area that is not a view
+written in Rust), and Tauri 2 with everything in Rust. The cost stays D1's: an installer of about 100 MB.
+*Decided by the author on 2026-11-19.*
+
+## Open questions
+
+- **Q1** — *Answered on 2026-11-18 by [D7](#d7--home-is-the-first-page)*: the last active tab when tabs are restored,
+  Home otherwise.
+- **Q2** — *Answered on 2026-11-18 by
+  [D44](#d44--datardo-says-when-a-newer-version-exists-and-installs-nothing-by-itself)*: Datardo says that a newer
+  version exists, and the user installs it.
+- **Q3** — *Answered on 2026-11-18 by [D45](#d45--the-installers-are-not-signed)*: not signed for now.
+- **Q4** — Which writes are not published for redis-oplog. Mongoster's README lists import, generated documents, copy,
+  restore, the comparison's writes, GridFS, `$out` and `$merge`, `runCommand` and drops as not published, while its
+  promise says every write to documents is. Datardo keeps the README's list until this is answered (`oplog.publish`).
+- **Q5** — *Answered on 2026-11-18 by [D46](#d46--a-public-repository-the-mit-license-reports-through-github)*:
+  public, MIT, reports through GitHub's private vulnerability reporting.
+- **Q6** — Redis Cluster and Sentinel: in which order after the first release, and whether values of module types
+  (RedisJSON first) come before them.
+- **Q7** — A second main island beside the first (two tabs side by side), which the layout leaves room for.
+- **Q8** — Projects with environments (the same database on Local, Staging and Production, switched in one place), of
+  which only **Open on another connection** exists.
+- **Q9** — Letting the user change the keys of commands.
+- **Q10** — Scheduled tasks for Redis (an export of keys at set times). A stored task already carries its engine
+  (`task.edit`).
+
+Raised while the catalog was written; each names the cards that hold the current answer.
+
+- **Q11** — Is every *(Datardo's choice)* number acceptable? They are listed in
+  [features/settings.md](features/settings.md#numbers-that-are-datardos-own) and tuned by the performance suite
+  (RS5).
+- **Q12** — *Answered on 2026-11-18 by
+  [D39](#d39--an-empty-filter-that-cannot-be-undone-asks-for-the-collections-name)*: the collection's name is typed
+  when the filter is empty and the write cannot be undone, and for `$out` onto a collection that exists.
+- **Q13** — *Answered on 2026-11-18 by [D40](#d40--the-playground-asks-before-it-drops) and
+  [D51](#d51--one-playground-at-a-time-and-console-replies-as-the-server-sends-them)*: the playground asks before it
+  drops; one runs at a time, with no memory limit.
+- **Q14** — Undo of a key: the whole key is dumped even for a write to one field; a key over the limit asks to go on
+  without undo; undoing gives back the time the key had left, not its original moment of expiry; the details show
+  type, size and expiry, not the value. Should large keys be asked for their size first (`MEMORY USAGE`, RS13)?
+  (`undo.record`, `undo.revert-plan`, `undo.details`, `value.edit-field`).
+- **Q15** — Writes to one element of a list compare and then write in two commands; should they be one script that
+  does both at once? (`value.edit-element`, `value.remove-elements`, `value.add-field`, `key.new`).
+- **Q16** — With no keychain, secrets live in memory and connecting at the next start asks again. Or should saving a
+  connection be refused there? (`connection.secrets`, `connection.connect`).
+- **Q17** — The connection form replaces Mongoster's quick add; **Save** does not try the connection, **Save and
+  connect** does. Names of connections may repeat. **Copy connection string** copies the password. There is no way
+  to forget a known host. (`connection.save`, `connection.copy-string`, `connection.trust-host-key`).
+- **Q18** — Connections are exported in Datardo's format, not in Mongoster's, which is still read. Importing a
+  Mongoster file with a Redis address adds or links a Redis connection. (`connection.export`, `connection.import`).
+- **Q19** — Switching to a connection with no tab opens its Overview. At start only the restored active tab connects.
+  One collection tab for each collection, one console tab for each connection. (`nav.current-connection`,
+  `tab.restore`, `tab.same-target`).
+- **Q20** — The keys chosen for commands, their macOS column, and the prefixes of Go to (`palette.commands`,
+  `palette.sources`); `Ctrl+F` focuses the filter of the place that has the focus (`table.navigate`, `tree.filter`).
+- **Q21** — *Answered on 2026-11-18 by [D48](#d48--the-repository-is-githubcomriccardoflpdatardo)*:
+  `https://github.com/riccardoflp/datardo`.
+- **Q22** — A file given to a second start is ignored: should a playground file open in a tab? On a Linux desktop
+  without a tray a hidden window has no icon. The smallest window is 640 × 400. (`window.single-instance`,
+  `window.tray`, `window.frame`).
+- **Q23** — The tree: an estimated count beside each collection; a click on a Redis database opens its keys tab and
+  only the arrow expands it; databases without keys are folded under one line; a prefix with one key is not a
+  namespace. (`tree.count`, `tree.redis`, `tree.namespaces`).
+- **Q24** — Skip and Limit are fields of the query bar and paging happens inside their result. An empty filter shows
+  the estimated count, marked by a tooltip. The time limit of a query is a setting. Cells show mongosh text with its
+  quotes, where the sketch shows plain text. (`query.bar`, `query.count`, `query.run`, `table.cell-text`).
+- **Q25** — Changes to what a tab shows (sorting from a header, switching mode, expanding a column) are written as
+  Derivations in the query and table areas and as Operations with an app step in the aggregate area. One convention?
+  (`table.sort`, `aggregate.sort-column`).
+- **Q26** — Schema, Chart and Explain read from the server each time their section is shown; Schema analyzes the
+  filter's documents also in Aggregate; a chart needs MongoDB 5.0 for histograms and dates by unit. (`schema.sample`,
+  `chart.draw`, `explain.run`).
+- **Q27** — Saved query files keep Mongoster's format with no version; the queries folder is the folder itself;
+  **Reveal file** replaces Open File. (`saved-query.file-format`, `saved-query.choose-folder`).
+- **Q28** — No notification after an edit in a cell or a save of a document tab, as in Mongoster, or one with
+  **Undo**? Should a time series collection hide editing? (`document.inline-edit`, `document.save`, `table.show`).
+- **Q29** — Watch changes: a restored tab comes back stopped; the filter takes a list of stages, not only a `$match`;
+  the type toggles hide lines without narrowing the stream; the resume token is not kept across starts; the buttons
+  keep **Copy event**. The document history's bounds stay constants. (`watch.show`, `watch.pipeline`, `watch.resume`,
+  `history.read-writes`).
+- **Q30** — Creating the index a slow query suggests: the advisor opens the index dialog filled in, the Monitor page
+  has an operation of its own. The advisor's **Turn on** for the profiler overlaps the Monitor's control. On a
+  read-only connection some pages hide the buttons that write and one disables them with a text. One rule for each.
+  (`advisor.show`, `monitor.create-suggested-index`, `advisor.turn-on-profiler`, `monitor.set-profiler`).
+- **Q31** — *Answered on 2026-11-18 by
+  [D41](#d41--a-new-users-password-passes-through-the-window-once) and
+  [D49](#d49--a-changed-password-of-the-connections-own-user-can-be-saved-in-the-connection)*: the one exception to
+  R14.3; the new password of the connection's own user can be saved in the connection.
+- **Q32** — *Answered on 2026-11-18 by
+  [D42](#d42--a-gridfs-file-opens-in-the-systems-program-for-a-list-of-extensions) and
+  [D50](#d50--a-gridfs-file-is-replaced-after-the-new-one-is-uploaded)*: **Open** stays for a list of extensions;
+  replacing uploads first.
+- **Q33** — *Answered on 2026-11-18 by [D43](#d43--the-consoles-history-is-kept-on-disk) and
+  [D51](#d51--one-playground-at-a-time-and-console-replies-as-the-server-sends-them)*: the history is on disk;
+  replies are shown as the server sends them.
+- **Q34** — Pub/Sub: one row for the messages of one redis-oplog event; 10,000 messages kept where Watch changes
+  keeps 1,000; an empty channel prefix follows every message of the server. The Server page shows the configuration
+  without changing it, and says *master* and *replica*. (`pubsub.event-rows`, `pubsub.keep`, `pubsub.follow-oplog`,
+  `server.config`, `server.replication`).
+- **Q35** — MCP: with `datardo.mcp.readData` off, names of Redis keys are still returned, as structure; the tools
+  about Datardo's writes are named `datardo_writes` and `datardo_write_details`; `redis_oplog_status` keeps its name;
+  the JSON field named after read-only keeps Mongoster's spelling in what an assistant receives. (`mcp.read-data`,
+  `mcp.debugging-tools`, `mcp.data-model-tools`).
+- **Q36** — Comparisons read the documents to copy before the confirmation, so that the plan shown is the plan run;
+  with very many differences that is a large read before asking. Search has no time limit, only **Stop**. The
+  interface says *relations* where the glossary says reference for one kind of them. (`compare.make-like`,
+  `search.scan`, `relation.diagram`).
+- **Q37** — Scheduled tasks: retention deletes old outputs without a confirmation, as in Mongoster. Confirm once when
+  a task that keeps a number of outputs is saved? (`task.retention`).
+- **Q38** — The texts that are new in Datardo (where Mongoster had none, or where its words named VS Code) need a
+  reading by the author: each card marks them in **Ported from**.

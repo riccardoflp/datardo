@@ -1,0 +1,56 @@
+/* window.about: the content of the dialog; the dialog itself is nav.dialog's. */
+.heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-accent);
+}
+
+.name {
+  margin: 0;
+  color: var(--color-text);
+  font-size: var(--font-size-large);
+  font-weight: var(--font-weight-strong);
+}
+
+.line {
+  margin: 0;
+}
+
+.muted {
+  color: var(--color-text-muted);
+}
+
+.folder {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.path {
+  font-family: var(--font-family-code);
+  font-size: var(--font-size-small);
+  overflow-wrap: anywhere;
+  user-select: text;
+}
+
+.links {
+  display: flex;
+  gap: var(--space-4);
+  margin: 0;
+}
+
+.link {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-accent);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.link:hover {
+  color: var(--color-focus);
+}

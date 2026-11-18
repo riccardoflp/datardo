@@ -1,0 +1,26 @@
+[
+  {
+    "name": "fs.files",
+    "type": "collection"
+  },
+  {
+    "name": "order_items",
+    "type": "collection"
+  },
+  {
+    "name": "orders",
+    "type": "collection"
+  },
+  {
+    "name": "system.views",
+    "type": "collection"
+  },
+  {
+    "name": "fs.chunks",
+    "type": "collection"
+  },
+  {
+    "name": "big_orders",
+    "type": "view"
+  }
+]

@@ -1,0 +1,9 @@
+* text=auto eol=lf
+*.png binary
+*.ico binary
+*.icns binary
+*.gz binary
+*.bson binary
+
+# Replies recorded from real servers keep their bytes (CRLF included, R11.3).
+test/fixtures/** -text

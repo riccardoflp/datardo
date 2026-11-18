@@ -1,0 +1,33 @@
+/**
+ * What each area does in the main process when Datardo starts, before the window opens: load its stored files, start
+ * its timers. Each area that has something to do writes `start` in `src/main/<area>.ts`; a new one adds a line below.
+ */
+import type { MainServices } from './services';
+import { start as startNav } from './nav';
+import { start as startSettings } from './settings';
+import { start as startCheckUpdate } from './check-update';
+import { start as startConnections } from './connections';
+import { start as startTabs } from './tabs';
+import { start as startPing } from './ping';
+import { start as startPalette } from './palette';
+
+/** What one area does at start. */
+export type AreaStart = (services: MainServices) => Promise<void>;
+
+/** The areas that do something at start, in this order. */
+const starts: readonly AreaStart[] = [
+  startSettings,
+  startConnections,
+  startNav,
+  startTabs,
+  startPalette,
+  startPing,
+  startCheckUpdate,
+];
+
+/** Starts every area, one after the other. */
+export async function startAreas(services: MainServices): Promise<void> {
+  for (const start of starts) {
+    await start(services);
+  }
+}

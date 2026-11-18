@@ -1,0 +1,158 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Datardo's settings",
+  "description": "Every setting of Datardo, by its full name. Each is a row of docs/features/settings.md (R8.4).",
+  "type": "object",
+  "properties": {
+    "datardo.window.theme": {
+      "type": "string",
+      "enum": ["system", "dark", "light"],
+      "default": "system",
+      "title": "Theme",
+      "x-group": "Window",
+      "description": "The theme of the window."
+    },
+    "datardo.window.zoom": {
+      "type": "integer",
+      "minimum": 50,
+      "maximum": 200,
+      "default": 100,
+      "title": "Zoom",
+      "x-group": "Window",
+      "description": "The size of everything in the window, in percent."
+    },
+    "datardo.window.checkForUpdates": {
+      "type": "boolean",
+      "default": true,
+      "title": "Check for a newer version",
+      "x-group": "Window",
+      "description": "Whether Datardo asks GitHub, at start and once a day, if a newer version exists. Nothing is downloaded."
+    },
+    "datardo.tab.restore": {
+      "type": "boolean",
+      "default": true,
+      "title": "Restore tabs at start",
+      "x-group": "Tabs",
+      "description": "Whether the tabs open at quit come back at the next start."
+    },
+    "datardo.runner.systemNotifications": {
+      "type": "boolean",
+      "default": true,
+      "title": "Notify when long work ends",
+      "x-group": "Notifications",
+      "description": "Whether long work that ends while the window is not in front shows a notification of the system."
+    },
+    "datardo.query.timeLimitSeconds": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 3600,
+      "default": 60,
+      "title": "Time limit of a query, in seconds",
+      "x-group": "Queries",
+      "description": "How long the server may work on one query before it is stopped."
+    },
+    "datardo.relation.detect": {
+      "type": "boolean",
+      "default": true,
+      "title": "Find references between collections",
+      "x-group": "Relationships",
+      "description": "Whether references between collections are found when a database is opened."
+    },
+    "datardo.undo.enabled": {
+      "type": "boolean",
+      "default": true,
+      "title": "Keep the undo history",
+      "x-group": "Undo history",
+      "description": "Whether writes to documents and keys are kept in the undo history."
+    },
+    "datardo.undo.maxSizeMb": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 100,
+      "title": "Disk space, in MB",
+      "x-group": "Undo history",
+      "description": "The most disk space the undo history takes, in MB."
+    },
+    "datardo.undo.maxDays": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 7,
+      "title": "Days to keep",
+      "x-group": "Undo history",
+      "description": "How many days an operation is kept."
+    },
+    "datardo.undo.maxOperations": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 200,
+      "title": "Operations to keep",
+      "x-group": "Undo history",
+      "description": "How many operations are kept."
+    },
+    "datardo.undo.maxDocumentsPerOperation": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 10000,
+      "title": "Documents or keys in one operation",
+      "x-group": "Undo history",
+      "description": "The most documents or keys one operation keeps; a larger write is not recorded."
+    },
+    "datardo.undo.maxOperationSizeMb": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 20,
+      "title": "Data in one operation, in MB",
+      "x-group": "Undo history",
+      "description": "The most data one operation keeps, in MB; a larger write is not recorded."
+    },
+    "datardo.task.keepRunningInTray": {
+      "type": "boolean",
+      "default": false,
+      "title": "Keep running in the tray",
+      "x-group": "Scheduled tasks",
+      "description": "Whether closing the window keeps Datardo in the tray while a scheduled task is enabled."
+    },
+    "datardo.mcp.enabled": {
+      "type": "boolean",
+      "default": false,
+      "title": "Run the MCP server",
+      "x-group": "MCP server",
+      "description": "Whether the MCP server runs."
+    },
+    "datardo.mcp.port": {
+      "type": "integer",
+      "minimum": 1024,
+      "maximum": 65535,
+      "default": 37018,
+      "title": "Port",
+      "x-group": "MCP server",
+      "description": "The port of the MCP server on 127.0.0.1."
+    },
+    "datardo.mcp.readData": {
+      "type": "boolean",
+      "default": true,
+      "title": "Let assistants read data",
+      "x-group": "MCP server",
+      "description": "Whether the tools of the MCP server may return documents and the values of keys."
+    },
+    "datardo.key.separator": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 8,
+      "default": ":",
+      "title": "Separator of namespaces",
+      "x-group": "Redis keys",
+      "description": "The text key names are split at to make namespaces."
+    },
+    "datardo.console.historySize": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 5000,
+      "default": 500,
+      "title": "Commands remembered",
+      "x-group": "Redis console",
+      "description": "How many commands of the console are remembered for each connection."
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,33 @@
+.islands {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.row {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.rail-column {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+}
+
+.gap {
+  flex: none;
+  cursor: col-resize;
+  touch-action: none;
+}
+
+.gap:hover,
+.gap:focus-visible {
+  background: var(--color-border);
+}
+
+.gap:focus-visible {
+  outline-offset: 0;
+}

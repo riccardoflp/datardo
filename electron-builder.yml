@@ -1,0 +1,42 @@
+# The installers of Datardo (platform.md). Everything is bundled by electron-vite: no node_modules are shipped.
+# Nothing is signed (D45): the macOS build carries the ad-hoc signature Apple silicon needs, without notarization.
+appId: dev.datardo.app
+productName: Datardo
+copyright: Copyright © Riccardo Filippozzi
+artifactName: ${productName}-${version}-${os}-${arch}.${ext}
+
+directories:
+  output: release
+  buildResources: resources
+
+files:
+  - out/**
+  - package.json
+  - '!**/*.map'
+  - '!node_modules'
+extraResources:
+  - from: resources/notices.txt
+    to: notices.txt
+  - from: LICENSE
+    to: LICENSE.txt
+npmRebuild: false
+
+win:
+  target: nsis
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+mac:
+  category: public.app-category.developer-tools
+  target:
+    - target: dmg
+      arch: [universal]
+  identity: '-'
+  hardenedRuntime: false
+  notarize: false
+linux:
+  category: Development
+  target:
+    - AppImage
+    - deb

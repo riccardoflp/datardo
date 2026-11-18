@@ -1,0 +1,111 @@
+{
+  "topologyVersion": {
+    "processId": {
+      "$oid": "6afd50071719fae07dd06dea"
+    },
+    "counter": {
+      "$numberInt": "6"
+    }
+  },
+  "hosts": ["127.0.0.1:52480"],
+  "setName": "testset",
+  "setVersion": {
+    "$numberInt": "1"
+  },
+  "isWritablePrimary": true,
+  "secondary": false,
+  "primary": "127.0.0.1:52480",
+  "me": "127.0.0.1:52480",
+  "electionId": {
+    "$oid": "7fffffff0000000000000001"
+  },
+  "lastWrite": {
+    "opTime": {
+      "ts": {
+        "$timestamp": {
+          "t": 1794985992,
+          "i": 16
+        }
+      },
+      "t": {
+        "$numberInt": "1"
+      }
+    },
+    "lastWriteDate": {
+      "$date": {
+        "$numberLong": "1794985992000"
+      }
+    },
+    "majorityOpTime": {
+      "ts": {
+        "$timestamp": {
+          "t": 1794985992,
+          "i": 16
+        }
+      },
+      "t": {
+        "$numberInt": "1"
+      }
+    },
+    "majorityWriteDate": {
+      "$date": {
+        "$numberLong": "1794985992000"
+      }
+    }
+  },
+  "maxBsonObjectSize": {
+    "$numberInt": "16777216"
+  },
+  "maxMessageSizeBytes": {
+    "$numberInt": "48000000"
+  },
+  "maxWriteBatchSize": {
+    "$numberInt": "100000"
+  },
+  "localTime": {
+    "$date": {
+      "$numberLong": "1794985993886"
+    }
+  },
+  "logicalSessionTimeoutMinutes": {
+    "$numberInt": "30"
+  },
+  "connectionId": {
+    "$numberInt": "4"
+  },
+  "minWireVersion": {
+    "$numberInt": "0"
+  },
+  "maxWireVersion": {
+    "$numberInt": "27"
+  },
+  "readOnly": false,
+  "ok": {
+    "$numberInt": "1"
+  },
+  "$clusterTime": {
+    "clusterTime": {
+      "$timestamp": {
+        "t": 1794985992,
+        "i": 16
+      }
+    },
+    "signature": {
+      "hash": {
+        "$binary": {
+          "base64": "AAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+          "subType": "00"
+        }
+      },
+      "keyId": {
+        "$numberInt": "0"
+      }
+    }
+  },
+  "operationTime": {
+    "$timestamp": {
+      "t": 1794985992,
+      "i": 16
+    }
+  }
+}

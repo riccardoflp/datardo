@@ -1,0 +1,48 @@
+# Every check, the three kinds of tests, the installer and a start of the packaged application, on the three systems
+# (testing.md, RS10). The integration tests never skip Redis here.
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: npm ci
+      - run: npm run check
+      - name: Redis for the integration tests (Linux, macOS)
+        if: runner.os != 'Windows'
+        run: |
+          if [ "$RUNNER_OS" = "Linux" ]; then sudo apt-get install -y redis-server; else brew install redis; fi
+      - name: Redis for the integration tests (Windows, Memurai)
+        if: runner.os == 'Windows'
+        run: |
+          choco install memurai-developer -y
+          echo "DATARDO_TEST_REDIS_URL=redis://127.0.0.1:6379" >> $env:GITHUB_ENV
+      - run: npm run test:integration
+      - name: UI tests
+        if: runner.os != 'Linux'
+        run: npm run test:ui
+      - name: UI tests (Linux, with a display)
+        if: runner.os == 'Linux'
+        run: xvfb-run --auto-servernum npm run test:ui
+      - run: npm run package
+      - uses: actions/upload-artifact@v4
+        with:
+          name: installers-${{ matrix.os }}
+          path: release/*.*
+          if-no-files-found: error

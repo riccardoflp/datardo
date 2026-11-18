@@ -1,0 +1,96 @@
+// Who may use whom (architecture.md, R1.3, R1.4, R2.2, R5.1, R15.4). Each rule names the folders and the rule it keeps.
+/** @type {import('dependency-cruiser').IConfiguration} */
+module.exports = {
+  forbidden: [
+    {
+      name: 'shared-is-pure',
+      comment: 'R1.3: src/shared imports nothing of the project, and only pure libraries.',
+      severity: 'error',
+      from: { path: '^src/shared' },
+      to: { path: '^src/(?!shared)' },
+    },
+    {
+      name: 'features-use-shared-only',
+      comment: 'R1.3, R2.2: src/features imports src/shared only.',
+      severity: 'error',
+      from: { path: '^src/features' },
+      to: { path: '^src/(?!shared|features)' },
+    },
+    {
+      name: 'engines-use-shared-only',
+      comment: 'R1.3: src/engines imports src/shared only, and an engine never imports another.',
+      severity: 'error',
+      from: { path: '^src/engines' },
+      to: { path: '^src/(?!shared|engines)' },
+    },
+    {
+      name: 'one-engine-never-uses-another',
+      comment: 'R1.3: an engine never imports another engine.',
+      severity: 'error',
+      from: { path: '^src/engines/(mongodb|redis)/' },
+      to: { path: '^src/engines/(mongodb|redis)/', pathNot: '^src/engines/$1/' },
+    },
+    {
+      name: 'storage-uses-shared-only',
+      comment: 'R1.3: src/storage imports src/shared only.',
+      severity: 'error',
+      from: { path: '^src/storage' },
+      to: { path: '^src/(?!shared|storage)' },
+    },
+    {
+      name: 'runner-uses-four',
+      comment: 'R1.3: src/runner imports shared, features, engines and storage.',
+      severity: 'error',
+      from: { path: '^src/runner' },
+      to: { path: '^src/(?!shared|features|engines|storage|runner)' },
+    },
+    {
+      name: 'ui-uses-features-and-shared',
+      comment: 'R1.3: the window process imports features and shared, and reaches the rest through the bridge.',
+      severity: 'error',
+      from: { path: '^src/ui' },
+      to: { path: '^src/(?!shared|features|ui)' },
+    },
+    {
+      name: 'preload-uses-shared-types',
+      comment: 'R1.3: the bridge uses the types and messages of src/shared only.',
+      severity: 'error',
+      from: { path: '^src/preload' },
+      to: { path: '^src/(?!shared|preload)' },
+    },
+    {
+      name: 'drivers-in-engines',
+      comment: 'R1.4: a driver is imported only in src/engines.',
+      severity: 'error',
+      from: { path: '^src/(?!engines)' },
+      to: { path: 'node_modules/(mongodb|redis|@redis|ssh2)/' },
+    },
+    {
+      name: 'electron-in-main-and-preload',
+      comment: 'R1.4: electron only in src/main and src/preload.',
+      severity: 'error',
+      from: { path: '^src/(?!main|preload)' },
+      to: { path: '^electron$|node_modules/electron/' },
+    },
+    {
+      name: 'react-in-ui',
+      comment: 'R1.4: React, Radix and CodeMirror only in src/ui.',
+      severity: 'error',
+      from: { path: '^src/(?!ui)' },
+      to: { path: 'node_modules/(react|react-dom|@radix-ui|@codemirror|@lezer|@tanstack|chart\\.js)/' },
+    },
+    {
+      name: 'no-circular',
+      comment: 'Modules do not import each other in a circle (imports of types alone are erased, and do not count).',
+      severity: 'error',
+      from: {},
+      to: { circular: true, viaOnly: { dependencyTypesNot: ['type-only'] } },
+    },
+  ],
+  options: {
+    doNotFollow: { path: 'node_modules' },
+    tsPreCompilationDeps: true,
+    tsConfig: { fileName: 'tsconfig.json' },
+    enhancedResolveOptions: { exportsFields: ['exports'], conditionNames: ['import', 'require', 'node', 'default'] },
+  },
+};

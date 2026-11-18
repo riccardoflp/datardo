@@ -1,0 +1,65 @@
+.rail {
+  display: flex;
+  flex-direction: column;
+  flex: none;
+  min-height: 0;
+}
+
+.entries {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-1) 0;
+}
+
+.top,
+.bottom {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.entry {
+  display: grid;
+  place-items: center;
+  width: var(--space-6);
+  height: var(--space-6);
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-medium);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-large);
+  cursor: pointer;
+}
+
+.entry:hover {
+  background: var(--color-hover);
+  color: var(--color-text);
+}
+
+.entry[data-marked='true'] {
+  background: var(--color-selected);
+  color: var(--color-text);
+}
+
+.entry[aria-disabled='true'] {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.entry[aria-disabled='true']:hover {
+  background: transparent;
+  color: var(--color-text-muted);
+}
+
+.tooltip {
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-small);
+  background: var(--color-raised);
+  color: var(--color-text);
+  font-size: var(--font-size-small);
+}
