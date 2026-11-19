@@ -19,16 +19,8 @@
   "check-hget": {
     "args": {
       "commands": [
-        [
-          "HGET",
-          "user:7",
-          "nickname"
-        ],
-        [
-          "HEXISTS",
-          "user:7",
-          "email"
-        ]
+        ["HGET", "user:7", "nickname"],
+        ["HEXISTS", "user:7", "email"]
       ]
     },
     "replies": [
@@ -42,15 +34,11 @@
     "args": {
       "type": "hash"
     },
-    "replies": [
-      3
-    ]
+    "replies": [3]
   },
   "string-length": {
     "args": {},
-    "replies": [
-      5
-    ]
+    "replies": [5]
   },
   "string-whole": {
     "args": {
@@ -126,12 +114,7 @@
         }
       ]
     },
-    "replies": [
-      [
-        599954,
-        -1
-      ]
-    ]
+    "replies": [[599954, -1]]
   },
   "set-scan": {
     "args": {},

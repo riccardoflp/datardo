@@ -3,7 +3,7 @@
  * copied command and an exported file show it, so that `redis-cli` and the console read the same bytes back.
  */
 import { groupThousands } from '../../shared/text-units';
-import { byteUnits, type ByteUnit } from './types';
+import { byteUnits, type ByteUnit } from '../../shared/utf8';
 
 /** Where an argument is written: in a step shown to the user, where long ones are cut; or whole, in a file or on the clipboard. */
 export type QuoteWhere = 'step' | 'whole';
