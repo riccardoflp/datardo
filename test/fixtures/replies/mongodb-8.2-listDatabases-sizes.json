@@ -1,0 +1,41 @@
+{
+  "databases": [
+    {
+      "name": "admin",
+      "sizeOnDisk": {
+        "$numberInt": "8192"
+      },
+      "empty": false
+    },
+    {
+      "name": "config",
+      "sizeOnDisk": {
+        "$numberInt": "12288"
+      },
+      "empty": false
+    },
+    {
+      "name": "local",
+      "sizeOnDisk": {
+        "$numberInt": "8192"
+      },
+      "empty": false
+    },
+    {
+      "name": "tree_shop",
+      "sizeOnDisk": {
+        "$numberInt": "53248"
+      },
+      "empty": false
+    }
+  ],
+  "totalSize": {
+    "$numberInt": "81920"
+  },
+  "totalSizeMb": {
+    "$numberInt": "0"
+  },
+  "ok": {
+    "$numberInt": "1"
+  }
+}

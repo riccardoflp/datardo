@@ -1,0 +1,12 @@
+{
+  "$map": [
+    [
+      {
+        "$bytes": "ZGF0YWJhc2Vz"
+      },
+      {
+        "$bytes": "MTY="
+      }
+    ]
+  ]
+}
