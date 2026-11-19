@@ -1,0 +1,571 @@
+{
+  "explainVersion": "2",
+  "stages": [
+    {
+      "$cursor": {
+        "queryPlanner": {
+          "namespace": "explain-record.sorted",
+          "parsedQuery": {
+            "status": {
+              "$eq": "paid"
+            }
+          },
+          "indexFilterSet": false,
+          "queryHash": "E670EDF2",
+          "planCacheShapeHash": "E670EDF2",
+          "planCacheKey": "9460FA20",
+          "optimizationTimeMillis": {
+            "$numberInt": "0"
+          },
+          "maxIndexedOrSolutionsReached": false,
+          "maxIndexedAndSolutionsReached": false,
+          "maxScansToExplodeReached": false,
+          "prunedSimilarIndexes": false,
+          "winningPlan": {
+            "isCached": false,
+            "queryPlan": {
+              "stage": "GROUP",
+              "planNodeId": {
+                "$numberInt": "4"
+              },
+              "inputStage": {
+                "stage": "FETCH",
+                "planNodeId": {
+                  "$numberInt": "2"
+                },
+                "inputStage": {
+                  "stage": "IXSCAN",
+                  "planNodeId": {
+                    "$numberInt": "1"
+                  },
+                  "keyPattern": {
+                    "status": {
+                      "$numberInt": "1"
+                    }
+                  },
+                  "indexName": "status_1",
+                  "isMultiKey": false,
+                  "multiKeyPaths": {
+                    "status": []
+                  },
+                  "isUnique": false,
+                  "isSparse": false,
+                  "isPartial": false,
+                  "indexVersion": {
+                    "$numberInt": "2"
+                  },
+                  "direction": "forward",
+                  "indexBounds": {
+                    "status": ["[\"paid\", \"paid\"]"]
+                  }
+                }
+              }
+            },
+            "slotBasedPlan": {
+              "slots": "$$RESULT=s13 env: { s5 = {\"status\" : 1} }",
+              "stages": "[4] project [s13 = newObj(\"_id\", s10, \"n\", s12)] \n[4] project [s12 = (convert ( s11, int32) ?: s11)] \n[4] group [s10] [s11 = count()] spillSlots[s9] mergingExprs[sum(s9)] \n[4] project [s10 = (s8 ?: null)] \n[2] nlj inner [] [s1, s4, s2, s3, s5] \n    left \n        [1] ixseek KS(3C706169640001) KS(3C7061696400FE) s3 s1 s4 s2 [] @\"cfd2e10e-a207-4a84-99de-722559e2b5a4\" @\"status_1\" true \n    right \n        [2] limit 1ll \n        [2] seek s1 s6 s7 s4 s2 s3 s5 none none [s8 = customer] @\"cfd2e10e-a207-4a84-99de-722559e2b5a4\" true false \n"
+            }
+          },
+          "rejectedPlans": []
+        },
+        "executionStats": {
+          "executionSuccess": true,
+          "nReturned": {
+            "$numberInt": "4"
+          },
+          "executionTimeMillis": {
+            "$numberInt": "1"
+          },
+          "totalKeysExamined": {
+            "$numberInt": "120"
+          },
+          "totalDocsExamined": {
+            "$numberInt": "120"
+          },
+          "executionStages": {
+            "stage": "project",
+            "planNodeId": {
+              "$numberInt": "4"
+            },
+            "nReturned": {
+              "$numberInt": "4"
+            },
+            "executionTimeMillisEstimate": {
+              "$numberInt": "0"
+            },
+            "opens": {
+              "$numberInt": "1"
+            },
+            "closes": {
+              "$numberInt": "1"
+            },
+            "saveState": {
+              "$numberInt": "2"
+            },
+            "restoreState": {
+              "$numberInt": "1"
+            },
+            "isEOF": {
+              "$numberInt": "1"
+            },
+            "projections": {
+              "13": "newObj(\"_id\", s10, \"n\", s12) "
+            },
+            "inputStage": {
+              "stage": "project",
+              "planNodeId": {
+                "$numberInt": "4"
+              },
+              "nReturned": {
+                "$numberInt": "4"
+              },
+              "executionTimeMillisEstimate": {
+                "$numberInt": "0"
+              },
+              "opens": {
+                "$numberInt": "1"
+              },
+              "closes": {
+                "$numberInt": "1"
+              },
+              "saveState": {
+                "$numberInt": "2"
+              },
+              "restoreState": {
+                "$numberInt": "1"
+              },
+              "isEOF": {
+                "$numberInt": "1"
+              },
+              "projections": {
+                "12": "(convert ( s11, int32) ?: s11) "
+              },
+              "inputStage": {
+                "stage": "group",
+                "planNodeId": {
+                  "$numberInt": "4"
+                },
+                "nReturned": {
+                  "$numberInt": "4"
+                },
+                "executionTimeMillisEstimate": {
+                  "$numberInt": "0"
+                },
+                "opens": {
+                  "$numberInt": "1"
+                },
+                "closes": {
+                  "$numberInt": "1"
+                },
+                "saveState": {
+                  "$numberInt": "2"
+                },
+                "restoreState": {
+                  "$numberInt": "1"
+                },
+                "isEOF": {
+                  "$numberInt": "1"
+                },
+                "groupBySlots": [
+                  {
+                    "$numberInt": "10"
+                  }
+                ],
+                "expressions": {
+                  "11": "count() ",
+                  "initExprs": {
+                    "11": null
+                  }
+                },
+                "mergingExprs": {
+                  "9": "sum(s9) "
+                },
+                "usedDisk": false,
+                "spills": {
+                  "$numberInt": "0"
+                },
+                "spilledBytes": {
+                  "$numberInt": "0"
+                },
+                "spilledRecords": {
+                  "$numberInt": "0"
+                },
+                "spilledDataStorageSize": {
+                  "$numberInt": "0"
+                },
+                "inputStage": {
+                  "stage": "project",
+                  "planNodeId": {
+                    "$numberInt": "4"
+                  },
+                  "nReturned": {
+                    "$numberInt": "120"
+                  },
+                  "executionTimeMillisEstimate": {
+                    "$numberInt": "0"
+                  },
+                  "opens": {
+                    "$numberInt": "1"
+                  },
+                  "closes": {
+                    "$numberInt": "1"
+                  },
+                  "saveState": {
+                    "$numberInt": "2"
+                  },
+                  "restoreState": {
+                    "$numberInt": "1"
+                  },
+                  "isEOF": {
+                    "$numberInt": "1"
+                  },
+                  "projections": {
+                    "10": "(s8 ?: null) "
+                  },
+                  "inputStage": {
+                    "stage": "nlj",
+                    "planNodeId": {
+                      "$numberInt": "2"
+                    },
+                    "nReturned": {
+                      "$numberInt": "120"
+                    },
+                    "executionTimeMillisEstimate": {
+                      "$numberInt": "0"
+                    },
+                    "opens": {
+                      "$numberInt": "1"
+                    },
+                    "closes": {
+                      "$numberInt": "1"
+                    },
+                    "saveState": {
+                      "$numberInt": "2"
+                    },
+                    "restoreState": {
+                      "$numberInt": "1"
+                    },
+                    "isEOF": {
+                      "$numberInt": "1"
+                    },
+                    "totalDocsExamined": {
+                      "$numberInt": "120"
+                    },
+                    "totalKeysExamined": {
+                      "$numberInt": "120"
+                    },
+                    "collectionScans": {
+                      "$numberInt": "0"
+                    },
+                    "collectionSeeks": {
+                      "$numberInt": "120"
+                    },
+                    "indexScans": {
+                      "$numberInt": "0"
+                    },
+                    "indexSeeks": {
+                      "$numberInt": "1"
+                    },
+                    "indexesUsed": ["status_1"],
+                    "innerOpens": {
+                      "$numberInt": "120"
+                    },
+                    "innerCloses": {
+                      "$numberInt": "1"
+                    },
+                    "outerProjects": [],
+                    "outerCorrelated": [
+                      {
+                        "$numberInt": "1"
+                      },
+                      {
+                        "$numberInt": "4"
+                      },
+                      {
+                        "$numberInt": "2"
+                      },
+                      {
+                        "$numberInt": "3"
+                      },
+                      {
+                        "$numberInt": "5"
+                      }
+                    ],
+                    "outerStage": {
+                      "stage": "ixseek",
+                      "planNodeId": {
+                        "$numberInt": "1"
+                      },
+                      "nReturned": {
+                        "$numberInt": "120"
+                      },
+                      "executionTimeMillisEstimate": {
+                        "$numberInt": "0"
+                      },
+                      "opens": {
+                        "$numberInt": "1"
+                      },
+                      "closes": {
+                        "$numberInt": "1"
+                      },
+                      "saveState": {
+                        "$numberInt": "2"
+                      },
+                      "restoreState": {
+                        "$numberInt": "1"
+                      },
+                      "isEOF": {
+                        "$numberInt": "1"
+                      },
+                      "indexName": "status_1",
+                      "keysExamined": {
+                        "$numberInt": "120"
+                      },
+                      "seeks": {
+                        "$numberInt": "1"
+                      },
+                      "numReads": {
+                        "$numberInt": "121"
+                      },
+                      "indexKeySlot": {
+                        "$numberInt": "3"
+                      },
+                      "recordIdSlot": {
+                        "$numberInt": "1"
+                      },
+                      "snapshotIdSlot": {
+                        "$numberInt": "4"
+                      },
+                      "indexIdentSlot": {
+                        "$numberInt": "2"
+                      },
+                      "outputSlots": [],
+                      "indexKeysToInclude": "00000000000000000000000000000000",
+                      "seekKeyLow": "KS(3C706169640001) ",
+                      "seekKeyHigh": "KS(3C7061696400FE) "
+                    },
+                    "innerStage": {
+                      "stage": "limit",
+                      "planNodeId": {
+                        "$numberInt": "2"
+                      },
+                      "nReturned": {
+                        "$numberInt": "120"
+                      },
+                      "executionTimeMillisEstimate": {
+                        "$numberInt": "0"
+                      },
+                      "opens": {
+                        "$numberInt": "120"
+                      },
+                      "closes": {
+                        "$numberInt": "1"
+                      },
+                      "saveState": {
+                        "$numberInt": "2"
+                      },
+                      "restoreState": {
+                        "$numberInt": "1"
+                      },
+                      "isEOF": {
+                        "$numberInt": "1"
+                      },
+                      "limit": {
+                        "$numberInt": "1"
+                      },
+                      "inputStage": {
+                        "stage": "seek",
+                        "planNodeId": {
+                          "$numberInt": "2"
+                        },
+                        "nReturned": {
+                          "$numberInt": "120"
+                        },
+                        "executionTimeMillisEstimate": {
+                          "$numberInt": "0"
+                        },
+                        "opens": {
+                          "$numberInt": "120"
+                        },
+                        "closes": {
+                          "$numberInt": "1"
+                        },
+                        "saveState": {
+                          "$numberInt": "2"
+                        },
+                        "restoreState": {
+                          "$numberInt": "1"
+                        },
+                        "isEOF": {
+                          "$numberInt": "0"
+                        },
+                        "numReads": {
+                          "$numberInt": "120"
+                        },
+                        "recordSlot": {
+                          "$numberInt": "6"
+                        },
+                        "recordIdSlot": {
+                          "$numberInt": "7"
+                        },
+                        "seekRecordIdSlot": {
+                          "$numberInt": "1"
+                        },
+                        "snapshotIdSlot": {
+                          "$numberInt": "4"
+                        },
+                        "indexIdentSlot": {
+                          "$numberInt": "2"
+                        },
+                        "indexKeySlot": {
+                          "$numberInt": "3"
+                        },
+                        "indexKeyPatternSlot": {
+                          "$numberInt": "5"
+                        },
+                        "scanFieldNames": ["customer"],
+                        "scanFieldSlots": [
+                          {
+                            "$numberInt": "8"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "nReturned": {
+        "$numberInt": "4"
+      },
+      "executionTimeMillisEstimate": {
+        "$numberInt": "2"
+      }
+    },
+    {
+      "$sort": {
+        "sortKey": {
+          "_id": {
+            "$numberInt": "1"
+          }
+        }
+      },
+      "totalDataSizeSortedBytesEstimate": {
+        "$numberInt": "980"
+      },
+      "usedDisk": false,
+      "spills": {
+        "$numberInt": "0"
+      },
+      "spilledDataStorageSize": {
+        "$numberInt": "0"
+      },
+      "nReturned": {
+        "$numberInt": "4"
+      },
+      "executionTimeMillisEstimate": {
+        "$numberInt": "2"
+      }
+    }
+  ],
+  "queryShapeHash": "D1607CAC980089F883D0F296ADACFB5B67FACC854C744F17AF9A3E72AC98506C",
+  "serverInfo": {
+    "host": "recorder",
+    "port": {
+      "$numberInt": "53474"
+    },
+    "version": "8.2.5",
+    "gitVersion": "a471a13094434666c48a1f75451f2efa49f8f5df"
+  },
+  "serverParameters": {
+    "internalQueryFacetBufferSizeBytes": {
+      "$numberInt": "104857600"
+    },
+    "internalQueryFacetMaxOutputDocSizeBytes": {
+      "$numberInt": "104857600"
+    },
+    "internalLookupStageIntermediateDocumentMaxSizeBytes": {
+      "$numberInt": "104857600"
+    },
+    "internalDocumentSourceGroupMaxMemoryBytes": {
+      "$numberInt": "104857600"
+    },
+    "internalQueryMaxBlockingSortMemoryUsageBytes": {
+      "$numberInt": "104857600"
+    },
+    "internalQueryProhibitBlockingMergeOnMongoS": {
+      "$numberInt": "0"
+    },
+    "internalQueryMaxAddToSetBytes": {
+      "$numberInt": "104857600"
+    },
+    "internalDocumentSourceSetWindowFieldsMaxMemoryBytes": {
+      "$numberInt": "104857600"
+    },
+    "internalQueryFrameworkControl": "trySbeRestricted",
+    "internalQueryPlannerIgnoreIndexWithCollationForRegex": {
+      "$numberInt": "1"
+    }
+  },
+  "command": {
+    "aggregate": "sorted",
+    "pipeline": [
+      {
+        "$match": {
+          "status": "paid"
+        }
+      },
+      {
+        "$group": {
+          "_id": "$customer",
+          "n": {
+            "$sum": {
+              "$numberInt": "1"
+            }
+          }
+        }
+      },
+      {
+        "$sort": {
+          "_id": {
+            "$numberInt": "1"
+          }
+        }
+      }
+    ],
+    "cursor": {},
+    "allowDiskUse": true,
+    "$db": "explain-record"
+  },
+  "ok": {
+    "$numberInt": "1"
+  },
+  "$clusterTime": {
+    "clusterTime": {
+      "$timestamp": {
+        "t": 1795050902,
+        "i": 18
+      }
+    },
+    "signature": {
+      "hash": {
+        "$binary": {
+          "base64": "AAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+          "subType": "00"
+        }
+      },
+      "keyId": {
+        "$numberInt": "0"
+      }
+    }
+  },
+  "operationTime": {
+    "$timestamp": {
+      "t": 1795050902,
+      "i": 18
+    }
+  }
+}

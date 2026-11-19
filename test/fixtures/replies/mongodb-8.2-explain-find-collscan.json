@@ -1,0 +1,162 @@
+{
+  "explainVersion": "1",
+  "queryPlanner": {
+    "namespace": "explain-record.orders",
+    "parsedQuery": {
+      "status": {
+        "$eq": "paid"
+      }
+    },
+    "indexFilterSet": false,
+    "queryHash": "F7CB0027",
+    "planCacheShapeHash": "F7CB0027",
+    "planCacheKey": "05441C6E",
+    "optimizationTimeMillis": {
+      "$numberInt": "0"
+    },
+    "maxIndexedOrSolutionsReached": false,
+    "maxIndexedAndSolutionsReached": false,
+    "maxScansToExplodeReached": false,
+    "prunedSimilarIndexes": false,
+    "winningPlan": {
+      "isCached": false,
+      "stage": "COLLSCAN",
+      "filter": {
+        "status": {
+          "$eq": "paid"
+        }
+      },
+      "direction": "forward"
+    },
+    "rejectedPlans": []
+  },
+  "executionStats": {
+    "executionSuccess": true,
+    "nReturned": {
+      "$numberInt": "3"
+    },
+    "executionTimeMillis": {
+      "$numberInt": "0"
+    },
+    "totalKeysExamined": {
+      "$numberInt": "0"
+    },
+    "totalDocsExamined": {
+      "$numberInt": "1000"
+    },
+    "executionStages": {
+      "isCached": false,
+      "stage": "COLLSCAN",
+      "filter": {
+        "status": {
+          "$eq": "paid"
+        }
+      },
+      "nReturned": {
+        "$numberInt": "3"
+      },
+      "executionTimeMillisEstimate": {
+        "$numberInt": "0"
+      },
+      "works": {
+        "$numberInt": "1001"
+      },
+      "advanced": {
+        "$numberInt": "3"
+      },
+      "needTime": {
+        "$numberInt": "997"
+      },
+      "needYield": {
+        "$numberInt": "0"
+      },
+      "saveState": {
+        "$numberInt": "0"
+      },
+      "restoreState": {
+        "$numberInt": "0"
+      },
+      "isEOF": {
+        "$numberInt": "1"
+      },
+      "direction": "forward",
+      "docsExamined": {
+        "$numberInt": "1000"
+      }
+    }
+  },
+  "queryShapeHash": "7E74E22CAF4053CBCAD7AA734E58EB10CB0E5F400ED82C9ED962FD71A41AA615",
+  "command": {
+    "find": "orders",
+    "filter": {
+      "status": "paid"
+    },
+    "$db": "explain-record"
+  },
+  "serverInfo": {
+    "host": "recorder",
+    "port": {
+      "$numberInt": "53474"
+    },
+    "version": "8.2.5",
+    "gitVersion": "a471a13094434666c48a1f75451f2efa49f8f5df"
+  },
+  "serverParameters": {
+    "internalQueryFacetBufferSizeBytes": {
+      "$numberInt": "104857600"
+    },
+    "internalQueryFacetMaxOutputDocSizeBytes": {
+      "$numberInt": "104857600"
+    },
+    "internalLookupStageIntermediateDocumentMaxSizeBytes": {
+      "$numberInt": "104857600"
+    },
+    "internalDocumentSourceGroupMaxMemoryBytes": {
+      "$numberInt": "104857600"
+    },
+    "internalQueryMaxBlockingSortMemoryUsageBytes": {
+      "$numberInt": "104857600"
+    },
+    "internalQueryProhibitBlockingMergeOnMongoS": {
+      "$numberInt": "0"
+    },
+    "internalQueryMaxAddToSetBytes": {
+      "$numberInt": "104857600"
+    },
+    "internalDocumentSourceSetWindowFieldsMaxMemoryBytes": {
+      "$numberInt": "104857600"
+    },
+    "internalQueryFrameworkControl": "trySbeRestricted",
+    "internalQueryPlannerIgnoreIndexWithCollationForRegex": {
+      "$numberInt": "1"
+    }
+  },
+  "ok": {
+    "$numberInt": "1"
+  },
+  "$clusterTime": {
+    "clusterTime": {
+      "$timestamp": {
+        "t": 1795050902,
+        "i": 18
+      }
+    },
+    "signature": {
+      "hash": {
+        "$binary": {
+          "base64": "AAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+          "subType": "00"
+        }
+      },
+      "keyId": {
+        "$numberInt": "0"
+      }
+    }
+  },
+  "operationTime": {
+    "$timestamp": {
+      "t": 1795050902,
+      "i": 18
+    }
+  }
+}
