@@ -45,9 +45,23 @@ function documents(value: unknown): Document[] {
   return Array.isArray(value) ? value.map(document) : [];
 }
 
+/**
+ * A number of the options as the driver wants it: the driver reads `skip`, `limit`, `maxTimeMS` and the like only as
+ * numbers of JavaScript, and ignores an Int32, a Double or a Long. Only the first level is changed; a document of the
+ * options (a hint, a collation, a projection) keeps its types.
+ */
+function optionValue(value: unknown): unknown {
+  return value instanceof BSON.Int32 || value instanceof BSON.Double || value instanceof BSON.Long
+    ? value instanceof BSON.Long
+      ? value.toNumber()
+      : value.valueOf()
+    : value;
+}
+
 /** The options a request gives a method, with the signal and the time limit. */
 function merged(given: unknown, options: Options): Options {
-  return { ...document(given), ...options };
+  const entries = Object.entries(document(given)).map(([name, value]) => [name, optionValue(value)] as const);
+  return { ...Object.fromEntries(entries), ...options };
 }
 
 function collectionMethod(

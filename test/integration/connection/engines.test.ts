@@ -117,6 +117,13 @@ describe('connection.connect', () => {
       );
       const found = await send({ collection: 'types', method: 'find', arguments: [{}], limit: 2 });
       expect(found).toHaveLength(2);
+      // Options arrive as Extended JSON too: an Int32 skip and limit are numbers to the driver.
+      const page = await send({
+        collection: 'types',
+        method: 'find',
+        arguments: [{}, { sort: { _id: { $numberInt: '1' } }, skip: { $numberInt: '2' }, limit: { $numberInt: '1' } }],
+      });
+      expect(page).toEqual([{ _id: { $numberInt: '3' } }]);
     } finally {
       await engines.disconnectAll();
     }
