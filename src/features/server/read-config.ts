@@ -10,20 +10,15 @@ import type { Context, ReadRequest } from '../../shared/feature';
 import { connectionId } from '../../shared/ids';
 import { partOf } from './unavailable';
 import { pairsOf, serverCommand, textArg, textOf, type PartRead } from './types';
+import { isSecretParameter } from '../console/secret-arguments';
+
+export { isSecretParameter };
 
 /** The command as the page sends it, for `server.unavailable`. */
 export const configCommand = 'CONFIG GET';
 
 /** What a secret's value is written as. */
 export const maskedValue = '***';
-
-/**
- * Whether a parameter is a secret, by the rule of `console.secret-arguments` for `CONFIG SET`: `requirepass`, or a name
- * that ends with `pass`, `password`, `auth` or `secret` (`masterauth`, `tls-key-file-pass`), without case.
- */
-export function isSecretParameter(parameter: string): boolean {
-  return /(pass|password|auth|secret)$/u.test(parameter.toLowerCase());
-}
 
 /** A parameter of the server and its value as text; a secret that is set is `***`. */
 export interface ConfigParameter {

@@ -7,13 +7,14 @@
  * requirepass` and `MIGRATE … AUTH` with their password.
  */
 import type { Json, RedisRequest } from '../../shared/engine-request';
-import { redisCommand } from '../../shared/engine-request';
 import type { Context, ReadRequest } from '../../shared/feature';
 import { connectionId } from '../../shared/ids';
-import { stepText } from '../runner/step-text';
-import { isSecretParameter } from './read-config';
-import { partOf } from './unavailable';
+import { maskedArguments } from '../console/secret-arguments';
+import { commandLine } from '../runner/step-text';
 import { numberOfReply, pairsOf, serverCommand, textArg, textOf, type PartRead } from './types';
+import { partOf } from './unavailable';
+
+export { commandLine };
 
 /** How many entries are read, the newest first (Datardo's choice). */
 export const slowLogEntriesRead = 1000;
@@ -76,57 +77,6 @@ export function slowLogRequests(part: SlowLogPart): readonly RedisRequest[] {
 export function request(_context: Context, args: Json): ReadRequest {
   const connection = connectionId(textArg(args, 'connection'));
   return { kind: 'engine', requests: slowLogRequests(partOfArgs(args)).map((each) => ({ connection, request: each })) };
-}
-
-function upper(words: readonly Uint8Array[]): readonly string[] {
-  return words.map((word) => textOf(word).toUpperCase());
-}
-
-function afterWord(words: readonly string[], from: number, rule: (word: string, index: number) => number[]): number[] {
-  return words.flatMap((word, index) => (index >= from ? rule(word, index) : []));
-}
-
-/**
- * The positions of the arguments that hold a password, by the rules of `console.secret-arguments`: `AUTH`, `HELLO …
- * AUTH`, `MIGRATE … AUTH` and `AUTH2`, `CONFIG SET` of a secret parameter, `ACL SETUSER` rules of a password.
- */
-export function secretPositions(command: readonly Uint8Array[]): ReadonlySet<number> {
-  const words = upper(command);
-  const [name = '', second = ''] = words;
-  const keys = name === 'MIGRATE' && words.includes('KEYS') ? words.indexOf('KEYS') : words.length;
-  const positions: number[] =
-    name === 'AUTH'
-      ? [words.length > 2 ? 2 : 1]
-      : name === 'HELLO'
-        ? afterWord(words, 2, (word, index) => (word === 'AUTH' ? [index + 2] : []))
-        : name === 'MIGRATE'
-          ? afterWord(words.slice(0, keys), 6, (word, index) =>
-              word === 'AUTH' ? [index + 1] : word === 'AUTH2' ? [index + 2] : [],
-            )
-          : name === 'CONFIG' && second === 'SET'
-            ? afterWord(words, 2, (word, index) => (index % 2 === 0 && isSecretParameter(word) ? [index + 1] : []))
-            : name === 'ACL' && second === 'SETUSER'
-              ? afterWord(words, 3, (word, index) => (/^[><#!]/u.test(word) ? [index] : []))
-              : [];
-  return new Set(positions.filter((position) => position > 0 && position < words.length));
-}
-
-const maskedBytes = new TextEncoder().encode('***');
-
-/** The arguments with each secret written `***`. */
-export function maskedArguments(command: readonly Uint8Array[]): readonly Uint8Array[] {
-  const secrets = secretPositions(command);
-  return command.map((argument, index) => (secrets.has(index) ? maskedBytes : argument));
-}
-
-/** Arguments on one line, as the runner writes a Redis step: `LRANGE queue 0 -1`, `SET "a b" "\x00"`. */
-export function commandLine(command: readonly Uint8Array[]): string {
-  return stepText({
-    kind: 'engine',
-    connection: connectionId(''),
-    request: redisCommand(0, ...command),
-    writes: false,
-  });
 }
 
 /** One entry of `SLOWLOG GET`, its secrets masked; `undefined` for a reply that is not an entry. */
