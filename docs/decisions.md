@@ -713,3 +713,13 @@ Raised while the catalog was written; each names the cards that hold the current
   wrong kind of tab asks to pick instead of refusing; the references found for a database are not forgotten until
   relations exist; notices after a field change count what was planned, not what was modified. (`manage.read-options`,
   `manage.create-database`, `manage.definition`, `manage.drop-database`, `field.rename`).
+- **Q58** — *Proposed, to be decided by the author before M11 is built.* Many cards say what follows a write from
+  the server's reply ("Deleted 2 of 3 documents; the others were already gone", the `_id` an insert was given, "2
+  clients received it", the key that was not there any more), but a plan's **After** is fixed before its steps run.
+  The proposal: an Operation may also export `afterReplies(context, answers, replies)`, pure, which the runner calls
+  with the replies of the plan's engine steps, in order, once they have all run; it returns the **After** that
+  replaces the plan's own, or a refusal shown as a warning. The pure cores of documents, keys, values, the Server page,
+  Pub/Sub and indexes already export it (some as `afterReply` of one reply). Rejected so far: an **After** that names
+  a field of a reply (a small language of its own), and a second plan started after the first (a confirmation per
+  write). It changes [the feature contract](feature-contract.md) and the runner. (`runner.run`, `document.delete`,
+  `key.delete`, `pubsub.publish`, `server.kill-client`).
