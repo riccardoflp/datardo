@@ -1,0 +1,19 @@
+[
+  {
+    "name": "recent",
+    "type": "view",
+    "options": {
+      "viewOn": "orders",
+      "pipeline": [
+        {
+          "$match": {
+            "status": "paid"
+          }
+        }
+      ]
+    },
+    "info": {
+      "readOnly": true
+    }
+  }
+]
