@@ -8,6 +8,7 @@ import { switcherView, type SwitcherRow } from '../../features/nav/switch-connec
 import { text } from '../../features/nav/text';
 import type { NavInput } from '../../features/nav/types';
 import { ConnectionContextMenu } from '../connection/connection-menu';
+import { FolderMenuButton } from '../connection/folder-menu';
 import { startFeature } from './intent';
 import styles from './explorer.module.css';
 
@@ -42,6 +43,36 @@ function openRowMenu(row: SwitcherRow | undefined): void {
     const at = { bubbles: true, cancelable: true, clientX: rect.left + 16, clientY: rect.bottom };
     element.dispatchEvent(new MouseEvent('contextmenu', at));
   }
+}
+
+/** A line of the switcher: a saved connection, with its menu. */
+function Row(props: {
+  readonly row: SwitcherRow;
+  readonly active: boolean;
+  readonly choose: (row: SwitcherRow) => void;
+  readonly onClose: () => void;
+}): React.JSX.Element {
+  const { row } = props;
+  return (
+    <ConnectionContextMenu connection={row.connection.id} place="connection-switcher" onChosen={props.onClose}>
+      <div
+        id={`connection-${row.connection.id}`}
+        role="option"
+        aria-selected={props.active}
+        className={styles['row']}
+        onClick={() => {
+          props.choose(row);
+        }}
+      >
+        <span className={styles['color']} data-color={row.connection.color} aria-hidden="true" />
+        <span className={styles['dot']} data-dot={row.dot} aria-hidden="true" />
+        <span className={styles['name']}>{row.connection.name}</span>
+        <span className={styles['muted']}>{row.engine}</span>
+        {row.connection.readOnly ? <span className={styles['muted']}>{text.connection.readOnly}</span> : null}
+        {row.current ? <span className="codicon codicon-check" aria-hidden="true" /> : null}
+      </div>
+    </ConnectionContextMenu>
+  );
 }
 
 /** The connection switcher, open until it is closed. */
@@ -120,30 +151,19 @@ export function ConnectionSwitcher(props: {
         {shown.empty === undefined ? null : <p className={styles['empty']}>{shown.empty}</p>}
         {shown.groups.map((group) => (
           <div key={group.folder ?? ''} role="group" aria-label={group.folder ?? text.switcher.question}>
-            {group.folder === undefined ? null : <div className={styles['heading']}>{group.folder}</div>}
+            {group.folder === undefined ? null : (
+              <div className={styles['folder-heading']}>
+                <div className={styles['heading']}>{group.folder}</div>
+                <FolderMenuButton
+                  folder={group.folder}
+                  place="connection-switcher"
+                  className={styles['small-button']}
+                  onChosen={onClose}
+                />
+              </div>
+            )}
             {group.rows.map((row) => (
-              <ConnectionContextMenu
-                key={row.connection.id}
-                connection={row.connection.id}
-                place="connection-switcher"
-                onChosen={onClose}
-              >
-                <div
-                  id={`connection-${row.connection.id}`}
-                  role="option"
-                  aria-selected={rows[active] === row}
-                  className={styles['row']}
-                  onClick={() => {
-                    choose(row);
-                  }}
-                >
-                  <span className={styles['dot']} data-dot={row.dot} aria-hidden="true" />
-                  <span className={styles['name']}>{row.connection.name}</span>
-                  <span className={styles['muted']}>{row.engine}</span>
-                  {row.connection.readOnly ? <span className={styles['muted']}>{text.connection.readOnly}</span> : null}
-                  {row.current ? <span className="codicon codicon-check" aria-hidden="true" /> : null}
-                </div>
-              </ConnectionContextMenu>
+              <Row key={row.connection.id} row={row} active={rows[active] === row} choose={choose} onClose={onClose} />
             ))}
           </div>
         ))}

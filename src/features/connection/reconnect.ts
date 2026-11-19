@@ -39,7 +39,7 @@ export function plan(context: Context, _answers: Answers): Outcome {
   }
   return run({
     title: `Reconnect ${connection.name}`,
-    steps: [disconnectStep(connection), connectStep(connection)],
+    steps: [disconnectStep(connection), connectStep(connection, context.startedBy)],
     danger: noDanger,
     undo: { cannot: planText.nothingToUndo },
     publishes: false,

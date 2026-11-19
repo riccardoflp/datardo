@@ -105,7 +105,14 @@ export interface Harness {
 export function harness(connections: readonly ConnectionView[] = [local, cacheLocal], dataFolder = ''): Harness {
   const holder = new AppStateHolder();
   holder.dispatch({ slice: 'connections', type: 'loaded', saved: connections, keychain: true, readOnlyFile: false });
-  const services: MainServices = { state: holder, dataFolder, window: () => undefined, onQuit: () => undefined };
+  const services: MainServices = {
+    state: holder,
+    dataFolder,
+    window: () => undefined,
+    onQuit: () => undefined,
+    dialogs: { ask: () => Promise.resolve(undefined), confirm: () => Promise.resolve(false) },
+    platform: 'windows',
+  };
   const area = actions(services);
   const skipped: string[] = [];
   const titleMap = (): ReadonlyMap<string, string> => titledTabs(holder.get().tabs.tabs);

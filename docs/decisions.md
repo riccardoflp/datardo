@@ -478,6 +478,17 @@ Rejected: an exact `countDocuments` per collection (a scan of each collection wh
 database's name is clicked, every database listed whatever it holds, and a namespace for every prefix.
 *Built in M8 on 2026-11-19 as the cards say; answers Q23 unless the author decides otherwise.*
 
+## D54 — Connections are exported in Datardo's format; Mongoster's files are still read
+
+**Export connections…** writes Datardo's own format, Compass's, or a list of connection strings; never Mongoster's
+(`connection.export`, `connection.write-file`). **Import connections…** still reads the files Mongoster 0.8.0 exports,
+and a MongoDB connection of such a file with a Redis address for redis-oplog (`redisOplog.url`) is linked to the saved
+Redis connection with the same host, port and user name, or to a Redis connection added for that address, named
+`<host>:<port>` and put in the same folder (`connection.import`, `connection.read-file`). Rejected: writing
+Mongoster's format too, which Datardo would then have to keep writing, and importing the Redis address as settings
+of the MongoDB connection, which Datardo's link by id (D17) has no place for.
+*Built in M7 on 2026-11-19 as Q18 proposes; answers Q18 unless the author decides otherwise.*
+
 ## Open questions
 
 - **Q1** — *Answered on 2026-11-18 by [D7](#d7--home-is-the-first-page)*: the last active tab when tabs are restored,
@@ -522,8 +533,9 @@ Raised while the catalog was written; each names the cards that hold the current
 - **Q17** — The connection form replaces Mongoster's quick add; **Save** does not try the connection, **Save and
   connect** does. Names of connections may repeat. **Copy connection string** copies the password. There is no way
   to forget a known host. (`connection.save`, `connection.copy-string`, `connection.trust-host-key`).
-- **Q18** — Connections are exported in Datardo's format, not in Mongoster's, which is still read. Importing a
-  Mongoster file with a Redis address adds or links a Redis connection. (`connection.export`, `connection.import`).
+- **Q18** — *Answered on 2026-11-19 by
+  [D54](#d54--connections-are-exported-in-datardos-format-mongosters-files-are-still-read)*: exported in Datardo's
+  format; Mongoster's files are still read, and a Redis address in one adds or links a Redis connection.
 - **Q19** — Switching to a connection with no tab opens its Overview. At start only the restored active tab connects.
   One collection tab for each collection, one console tab for each connection. (`nav.current-connection`,
   `tab.restore`, `tab.same-target`).

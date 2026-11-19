@@ -23,3 +23,28 @@ body {
   outline: var(--focus-width) solid var(--color-focus);
   outline-offset: var(--focus-width);
 }
+
+/* The color of a connection (connection.set-color): drawn with the token of its name. */
+[data-color='red'] {
+  --connection-color: var(--color-connection-red);
+}
+
+[data-color='orange'] {
+  --connection-color: var(--color-connection-orange);
+}
+
+[data-color='yellow'] {
+  --connection-color: var(--color-connection-yellow);
+}
+
+[data-color='green'] {
+  --connection-color: var(--color-connection-green);
+}
+
+[data-color='blue'] {
+  --connection-color: var(--color-connection-blue);
+}
+
+[data-color='purple'] {
+  --connection-color: var(--color-connection-purple);
+}

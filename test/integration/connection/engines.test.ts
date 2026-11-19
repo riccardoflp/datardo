@@ -176,13 +176,6 @@ describe('connection.connect', () => {
       proxy.close();
     }
   });
-
-  it('MongoDB: an SSH tunnel is refused until tunnels exist (M7)', async () => {
-    const ssh = { host: 'bastion', port: 22, username: 'ada', authentication: 'agent' as const };
-    await expect(createEngines().open(settings('mongodb', servers.mongoStandalone, { ssh }), signal())).rejects.toThrow(
-      /SSH tunnels are not supported yet/,
-    );
-  });
 });
 
 describe.runIf(redisUrl !== undefined)('connection.connect on Redis', () => {
@@ -258,12 +251,11 @@ describe.runIf(redisUrl !== undefined)('connection.connect on Redis', () => {
         resolve(`${connection}: ${reason}`);
       });
     });
+    // Only this test's client is closed: other tests and other runs share the Redis server.
+    const own = await engines.send({ connection: id, request: redisCommand(0, 'CLIENT', 'ID') }, signal());
     const killer = createEngines();
     await killer.connect(id, settings('redis', url), signal());
-    await killer.send(
-      { connection: id, request: redisCommand(0, 'CLIENT', 'KILL', 'USER', 'default', 'SKIPME', 'yes') },
-      signal(),
-    );
+    await killer.send({ connection: id, request: redisCommand(0, 'CLIENT', 'KILL', 'ID', String(own)) }, signal());
     await killer.disconnectAll();
     expect(await dropped).toBe('c-test: The connection to Redis was closed.');
     expect(engines.isConnected(id)).toBe(false);

@@ -2,12 +2,15 @@
  * The questions a feature asks the user, in the four forms of `runner.ask`: text, pick one, pick many, and a form of
  * several fields of the other three.
  */
+import type { ConnectionColor } from './connection';
 
 /** One item of a list to pick from. */
 export interface Choice {
   readonly value: string;
   readonly label: string;
   readonly description?: string;
+  /** A circle of a connection's color before the label (connection.set-color). */
+  readonly color?: ConnectionColor;
 }
 
 /** A line of text, with what makes it valid. */
@@ -60,6 +63,8 @@ export interface Question {
   /** The button that answers, named by what it does (never **OK**). */
   readonly button: string;
   readonly fields: readonly Field[];
+  /** The identifier of the button that answers, when the feature's card lists the place `@dialog`. */
+  readonly element?: string;
 }
 
 /** Whether a text keeps every rule of its field, and the message of the first it breaks. */

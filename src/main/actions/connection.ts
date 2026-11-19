@@ -295,7 +295,12 @@ function connect(services: MainServices): AppAction {
   return async (args, signal) => {
     const id = idOf(args);
     const connection = needConnection(id);
-    const settings = clientSettings(connection, timeoutOf(connection));
+    const startedBy = jsonFields(args)['startedBy'];
+    const settings = clientSettings(
+      connection,
+      timeoutOf(connection),
+      startedBy === 'task' || startedBy === 'mcp' ? startedBy : 'user',
+    );
     if (settings === undefined) {
       const keychain = connectionsOf(services.state.get()).keychain;
       failed(

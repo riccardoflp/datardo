@@ -26,6 +26,14 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
   and the databases and key namespaces of a Redis connection, scanned with `SCAN` only, 10,000 keys at a time with
   **Load more**; it is filtered with `Ctrl+F`, refreshed with `F5`, used from the keyboard alone, shows pinned items
   and pages, and opens the context menus of its nodes.
+- Connections reach their servers through an SSH tunnel, with a password, a private key or the SSH agent; the host
+  key of an SSH server is confirmed the first time, and a key that changed is a warning.
+- Connections are duplicated, their connection string is copied, they are moved between folders and given a color,
+  and folders are renamed and removed from their own menu; a MongoDB connection is linked to a Redis connection for
+  redis-oplog, and unlinked.
+- Connections are imported from a file or the clipboard (Datardo, Mongoster and Compass exports, lists of connection
+  strings), with their encrypted passwords when the passphrase is given, and exported for Datardo, for Compass or as
+  a list, without passwords, with them encrypted, or in clear text.
 
 ### Security
 

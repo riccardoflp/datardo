@@ -3,6 +3,8 @@
  * area that carries out app steps receives these in `src/main/actions/<area>.ts`.
  */
 import type { BrowserWindow } from 'electron';
+import type { Platform } from '../shared/feature';
+import type { Dialogs } from '../runner/ports';
 import type { AppStateHolder } from './app-state';
 
 /** The pieces of the main process an area's actions may use. */
@@ -14,4 +16,7 @@ export interface MainServices {
   readonly window: () => BrowserWindow | undefined;
   /** Saves every store that waits to be written: at quit (data.md, "How it is written"). */
   readonly onQuit: (flush: () => Promise<void>) => void;
+  /** The runner's questions and confirmations in the window, for what asks outside a plan (the SSH host keys). */
+  readonly dialogs: Dialogs;
+  readonly platform: Platform;
 }

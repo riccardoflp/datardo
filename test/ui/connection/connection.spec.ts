@@ -335,6 +335,10 @@ test('the menu of the current connection, from the … button of the connection 
     'Disconnect',
     'Open overview',
     'Edit connection…',
+    'Duplicate',
+    'Copy connection string',
+    'Move to folder…',
+    'Set color…',
     'Allow changes',
     'Remove connection',
   ]);

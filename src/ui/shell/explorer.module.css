@@ -226,3 +226,26 @@
 .linked:hover {
   background: var(--color-hover);
 }
+
+/* The color of the current connection, and of a connection in the switcher (connection.set-color). */
+.connection-island[data-color] {
+  box-shadow: inset var(--space-1) 0 0 var(--connection-color);
+}
+
+.color {
+  flex: none;
+  width: var(--space-1);
+  align-self: stretch;
+  border-radius: var(--radius-small);
+  background: var(--connection-color, transparent);
+}
+
+.folder-heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.folder-heading > :first-child {
+  flex: 1;
+}

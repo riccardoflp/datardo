@@ -3,7 +3,7 @@
  * settings and through its SSH tunnel, and learns what the server is.
  */
 import type { ConnectionView, ServerInfo } from '../../shared/connection';
-import type { AppStep, Answers, Context, Outcome } from '../../shared/feature';
+import type { Answers, AppStep, Context, Outcome, StartedBy } from '../../shared/feature';
 import { noDanger, refuse, run } from '../../shared/feature';
 import { connectionState } from '../../shared/state/connections';
 import { isVersionAtLeast } from './server-info';
@@ -44,9 +44,16 @@ export function serverRefusal(info: ServerInfo): ServerRefusal | undefined {
     : { code: 'connection.connect/unsupported', message: connectText.tooOld(info.redisVersion) };
 }
 
-/** The step that connects: `connect <name>`. */
-export function connectStep(connection: ConnectionView): AppStep {
-  return appStep('engine.connect', { connection: connection.id }, planText.connect(connection.name));
+/**
+ * The step that connects: `connect <name>`. Started by a scheduled task or a tool of the MCP server, an SSH host key
+ * that is not known is refused without asking (connection.trust-host-key).
+ */
+export function connectStep(connection: ConnectionView, startedBy: StartedBy = 'user'): AppStep {
+  return appStep(
+    'engine.connect',
+    { connection: connection.id, ...(startedBy === 'user' ? {} : { startedBy }) },
+    planText.connect(connection.name),
+  );
 }
 
 /** Why a connection cannot be connected before anything is tried: its secrets are not there. */
@@ -76,7 +83,7 @@ export function plan(context: Context, _answers: Answers): Outcome {
   }
   return run({
     title,
-    steps: [connectStep(connection)],
+    steps: [connectStep(connection, context.startedBy)],
     danger: noDanger,
     undo: { cannot: planText.nothingToUndo },
     publishes: false,

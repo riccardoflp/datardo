@@ -51,7 +51,12 @@ export function QuestionDialog({ question, kind, onAnswer }: QuestionDialogProps
           >
             {runnerText.cancel}
           </DialogButton>
-          <DialogButton feature="runner.ask@dialog" look="primary" disabled={!shown.buttonEnabled} onClick={answer}>
+          <DialogButton
+            feature={question.element ?? 'runner.ask@dialog'}
+            look="primary"
+            disabled={!shown.buttonEnabled}
+            onClick={answer}
+          >
             {shown.button}
           </DialogButton>
         </>

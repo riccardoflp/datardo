@@ -6,7 +6,7 @@ import type { EngineName, Json } from '../../shared/engine-request';
 import { noDanger, type After, type Answers, type AppStep, type Plan } from '../../shared/feature';
 import type { ConnectionId, TabId } from '../../shared/ids';
 import type { AppState } from '../../shared/state';
-import type { ServerInfo } from '../../shared/connection';
+import type { ConnectionColor, ServerInfo } from '../../shared/connection';
 import type { ConnectionsState, LiveConnection } from '../../shared/state/connections';
 import type { NavState } from '../../shared/state/nav';
 import { activeTabOf, tabConnectionOf, type TabShows } from '../../shared/state/tabs';
@@ -37,6 +37,8 @@ export interface SavedConnection {
   readonly name: string;
   readonly engine: EngineName;
   readonly folder?: string;
+  /** Its color (`connection.set-color`), on the connection island and in the connection switcher. */
+  readonly color?: ConnectionColor;
   readonly readOnly: boolean;
   readonly status: ConnectionStatus;
   /** The Redis connection this MongoDB connection publishes its writes to (`connection.link-redis`). */
@@ -124,6 +126,7 @@ export function navConnections(connections: ConnectionsState): readonly SavedCon
     readOnly: saved.readOnly,
     status: statusOf(connections.live[saved.id]),
     ...(saved.folder === undefined ? {} : { folder: saved.folder }),
+    ...(saved.color === undefined ? {} : { color: saved.color }),
     ...(saved.publishesTo === undefined ? {} : { publishesTo: saved.publishesTo }),
   }));
 }

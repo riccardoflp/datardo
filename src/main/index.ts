@@ -21,6 +21,7 @@ import { startAreas } from './areas';
 import { islandFields, islandsOf } from './nav';
 import { connectionEngines, connectionName, isConnected, isReadOnly } from './connections';
 import { WindowDialogs } from './dialogs';
+import { fileWriter } from './files';
 import type { MainServices } from './services';
 import { guardTheSession } from './window-guard';
 import { windowHost } from './window-host';
@@ -60,6 +61,8 @@ const services: MainServices = {
   dataFolder: app.getPath('userData'),
   window: () => windowHost.current(),
   onQuit: (flush) => flushes.push(flush),
+  dialogs,
+  platform,
 };
 
 function runnerPorts(): RunnerPorts {
@@ -67,7 +70,7 @@ function runnerPorts(): RunnerPorts {
     features: runnableFeatures(),
     engines: connectionEngines(),
     appActions: appActions(services),
-    files: () => Promise.reject(new Error('Datardo writes no file yet.')),
+    files: fileWriter,
     dialogs,
     state,
     platform,
