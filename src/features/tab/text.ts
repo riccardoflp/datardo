@@ -42,6 +42,7 @@ export const text = {
     unpin: 'Unpin',
     copyPath: 'Copy path',
     openOnAnother: 'Open on another connection…',
+    saveAs: 'Save as…',
     collapseGroup: 'Collapse group',
     expandGroup: 'Expand group',
   },

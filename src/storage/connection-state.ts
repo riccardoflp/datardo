@@ -3,7 +3,8 @@
  *
  * This module reads and writes the recent queries of each collection (`saved-query.recent`), under
  * `collections.<database>.<collection>.recentQueries`, and the columns' layout and the expanded field paths
- * (`table.columns`), under `.layout` and `.expanded` beside them, and keeps every other field of the file as it found it, so that
+ * (`table.columns`), under `.layout` and `.expanded` beside them, the default database of each playground file under
+ * `playgrounds.<path>.database` (`playground.save`), and keeps every other field of the file as it found it, so that
  * the other parts data.md lists for this file (the columns' layout, the console's last commands, …) can be added
  * beside them without a new version. The content is the file's object without `version`.
  */
@@ -206,4 +207,29 @@ export function withColumns(
   const databaseAfter = withField(database, where.collection, emptyToUndefined(collection));
   const collectionsAfter = withField(collections, where.database, emptyToUndefined(databaseAfter));
   return withField(state, 'collections', emptyToUndefined(collectionsAfter));
+}
+
+/** What the file keeps of a playground file (`playground.save`, `playground.open-file`): its default database. */
+export interface StoredPlaygroundTarget {
+  readonly database: string;
+}
+
+/** The default database a playground file had on this connection, by the file's full path; none when not kept. */
+export function playgroundTargetIn(state: ConnectionStateFile, path: string): StoredPlaygroundTarget | undefined {
+  const database = field(field(state, 'playgrounds'), path)['database'];
+  return typeof database === 'string' ? { database } : undefined;
+}
+
+/** The state with the target of a playground file set, or removed when `target` is `undefined`. */
+export function withPlaygroundTarget(
+  state: ConnectionStateFile,
+  path: string,
+  target: StoredPlaygroundTarget | undefined,
+): ConnectionStateFile {
+  const playgrounds = withField(
+    field(state, 'playgrounds'),
+    path,
+    target === undefined ? undefined : { database: target.database },
+  );
+  return withField(state, 'playgrounds', emptyToUndefined(playgrounds));
 }

@@ -31,6 +31,8 @@ import { suggestions, type Suggestion, type Suggestions, type TextKind } from '.
 export interface SuggestionSource {
   readonly kind: TextKind;
   readonly fields: readonly FieldHint[];
+  /** Suggests in place of `query.suggestions`: a playground's (`playground.autocomplete`). */
+  readonly suggest?: (text: string, cursor: number) => Suggestions | undefined;
 }
 
 /** The list of an editor and what it is read from. */
@@ -56,7 +58,10 @@ function suggestedAt(tr: Transaction, source: SuggestionSource): Suggestions | u
   if (!selection.empty) {
     return undefined;
   }
-  return suggestions(tr.newDoc.toString(), selection.head, source.kind, { fields: source.fields });
+  const text = tr.newDoc.toString();
+  return source.suggest === undefined
+    ? suggestions(text, selection.head, source.kind, { fields: source.fields })
+    : source.suggest(text, selection.head);
 }
 
 /** The one character a transaction typed, if it typed one. */
@@ -85,7 +90,9 @@ function afterEdit(list: AutocompleteState, tr: Transaction, source: SuggestionS
   }
   const cursor = tr.newSelection.main.head;
   const lastBefore = tr.newDoc.sliceString(0, cursor).trimEnd().slice(-1);
-  return opensOnTyping(typed, lastBefore, found?.prefix ?? '') ? opened(found) : closedList;
+  // In a playground the list also opens after a `.`: the members of what it follows (`playground.autocomplete`).
+  const afterDot = source.suggest !== undefined && typed === '.';
+  return afterDot || opensOnTyping(typed, lastBefore, found?.prefix ?? '') ? opened(found) : closedList;
 }
 
 /** The list read again with new fields, the selection kept where it can be. */

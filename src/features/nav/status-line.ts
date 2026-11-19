@@ -33,6 +33,8 @@ export type WorkPart =
       readonly progress?: string;
       readonly cancel: string;
       readonly element: 'runner.progress@status-line';
+      /** **Cancel** of a playground's run stops it, as **Stop** does (`playground.stop`). */
+      readonly cancelElement?: 'playground.stop@status-line';
     }
   | { readonly kind: 'several'; readonly text: string; readonly element: 'runner.progress@status-line' };
 
@@ -95,6 +97,7 @@ function workPart(work: readonly Work[]): WorkPart | undefined {
     ...(progress === undefined ? {} : { progress }),
     cancel: text.statusLine.cancel,
     element: 'runner.progress@status-line',
+    ...(first.feature === 'playground.run' ? { cancelElement: 'playground.stop@status-line' as const } : {}),
   };
 }
 

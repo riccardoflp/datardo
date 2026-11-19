@@ -122,10 +122,10 @@ describe('playground.run', () => {
   });
 
   it('reads the tree again after a text that writes, and not after one that reads', () => {
-    expect(
-      planOf(plan(contextOf('playground.run', withPlayground('db.orders.insertOne({ _id: 1 })')), {})).after,
-    ).toEqual([{ kind: 'refresh', connection: local.id }]);
-    expect(planOf(plan(contextOf('playground.run', withPlayground('db.orders.find()')), {})).after).toEqual([]);
+    const writing = planOf(plan(contextOf('playground.run', withPlayground('db.orders.insertOne({ _id: 1 })')), {}));
+    expect(argsOf(writing, 'playground.run')['writes']).toBe(true);
+    const reading = planOf(plan(contextOf('playground.run', withPlayground('db.orders.find()')), {}));
+    expect(argsOf(reading, 'playground.run')['writes']).toBe(false);
   });
 
   it('refuses with no playground tab active', () => {

@@ -46,7 +46,7 @@ export interface ShownList {
 const optionsSlot = new Compartment();
 
 /** Reads the list and where it goes: under the start of what it completes. Only in a measure phase. */
-function measuredList(view: EditorView): ShownList | undefined {
+export function measuredList(view: EditorView): ShownList | undefined {
   const list = listOf(view.state);
   const shown = listView(list);
   if (shown === undefined) {

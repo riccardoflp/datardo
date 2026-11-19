@@ -67,6 +67,15 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
   and a click on a header sorts the output.
 - A pipeline ending with `$out` or `$merge` runs only after a confirmation, which asks to type the name of a collection
   that `$out` replaces, and never on a read-only connection; a pipeline is saved as a view.
+- Playgrounds run mongosh code against a MongoDB connection and database: the whole script with `Ctrl+Enter`, the
+  selected lines, or one statement from its **Run** button or `Ctrl+Shift+Enter`, each run in a process of its own
+  that **Stop** ends at once, even a script that never waits. A script has `db`, `use`, its collections and cursors,
+  sessions and transactions with `withTransaction`, the BSON types, `print` and `printjson`; its results show the
+  documents as a table or as JSON, the value of its last expression, what it printed and its error with a link to the
+  line. Dropping a collection or a database is confirmed first, a read-only connection refuses every write, and the
+  writes are published for redis-oplog on a linked connection. The editor colors the script and suggests the
+  collections, the methods and the fields; playgrounds are opened from the tree, Go to and Home, saved as
+  `.mongodb.js` files that remember their connection and database, and opened again.
 
 ### Fixed
 

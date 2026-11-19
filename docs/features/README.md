@@ -497,20 +497,20 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`playground.show`](playground.md#playgroundshow--the-playground-tab) | The playground tab | View | M28 | Specified |
-| [`playground.open`](playground.md#playgroundopen--new-playground) | New playground | Operation | M28 | Specified |
-| [`playground.open-file`](playground.md#playgroundopen-file--open-a-playground-file) | Open a playground file… | Operation | M28 | Specified |
-| [`playground.save`](playground.md#playgroundsave--save-a-playground) | Save a playground | Operation | M28 | Specified |
-| [`playground.target`](playground.md#playgroundtarget--the-connection-and-database-of-a-playground) | The connection and database of a playground | Operation | M28 | Specified |
-| [`playground.run`](playground.md#playgroundrun--run-a-playground) | Run a playground | Operation | M28 | Specified |
-| [`playground.statements`](playground.md#playgroundstatements--the-statements-of-a-script) | The statements of a script | Derivation | M28 | Specified |
-| [`playground.rewrite`](playground.md#playgroundrewrite--await-the-calls-of-a-script) | Await the calls of a script | Derivation | M28 | Specified |
-| [`playground.runtime`](playground.md#playgroundruntime--what-a-script-can-use) | What a script can use | Derivation | M28 | Specified |
-| [`playground.sessions`](playground.md#playgroundsessions--sessions-and-transactions-in-a-script) | Sessions and transactions in a script | Derivation | M28 | Specified |
-| [`playground.results`](playground.md#playgroundresults--the-results-of-a-run) | The results of a run | View | M28 | Specified |
-| [`playground.stop`](playground.md#playgroundstop--stop-a-run) | Stop a run | Operation | M28 | Specified |
-| [`playground.autocomplete`](playground.md#playgroundautocomplete--autocomplete-in-a-playground) | Autocomplete in a playground | Derivation | M28 | Specified |
-| [`playground.writes`](playground.md#playgroundwrites--the-writes-of-a-playground) | The writes of a playground | Derivation | M28 | Specified |
+| [`playground.show`](playground.md#playgroundshow--the-playground-tab) | The playground tab | View | M28 | Built |
+| [`playground.open`](playground.md#playgroundopen--new-playground) | New playground | Operation | M28 | Built |
+| [`playground.open-file`](playground.md#playgroundopen-file--open-a-playground-file) | Open a playground file… | Operation | M28 | Built |
+| [`playground.save`](playground.md#playgroundsave--save-a-playground) | Save a playground | Operation | M28 | Built |
+| [`playground.target`](playground.md#playgroundtarget--the-connection-and-database-of-a-playground) | The connection and database of a playground | Operation | M28 | Built |
+| [`playground.run`](playground.md#playgroundrun--run-a-playground) | Run a playground | Operation | M28 | Built |
+| [`playground.statements`](playground.md#playgroundstatements--the-statements-of-a-script) | The statements of a script | Derivation | M28 | Built |
+| [`playground.rewrite`](playground.md#playgroundrewrite--await-the-calls-of-a-script) | Await the calls of a script | Derivation | M28 | Built |
+| [`playground.runtime`](playground.md#playgroundruntime--what-a-script-can-use) | What a script can use | Derivation | M28 | Built |
+| [`playground.sessions`](playground.md#playgroundsessions--sessions-and-transactions-in-a-script) | Sessions and transactions in a script | Derivation | M28 | Built |
+| [`playground.results`](playground.md#playgroundresults--the-results-of-a-run) | The results of a run | View | M28 | Built |
+| [`playground.stop`](playground.md#playgroundstop--stop-a-run) | Stop a run | Operation | M28 | Built |
+| [`playground.autocomplete`](playground.md#playgroundautocomplete--autocomplete-in-a-playground) | Autocomplete in a playground | Derivation | M28 | Built |
+| [`playground.writes`](playground.md#playgroundwrites--the-writes-of-a-playground) | The writes of a playground | Derivation | M28 | Built |
 
 ## Pub/Sub
 

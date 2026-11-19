@@ -1,0 +1,273 @@
+/*
+ * The playground page: the toolbar, then the editor and the results, one over the other, with the line between them
+ * that can be moved. The editor scrolls with its Run buttons; the results scroll on their own.
+ */
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.toolbar,
+.results-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  align-items: center;
+  padding: var(--space-1) var(--space-3);
+}
+
+.toolbar {
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.results-toolbar {
+  padding: var(--space-1) 0;
+}
+
+.button {
+  display: inline-flex;
+  gap: var(--space-1);
+  align-items: center;
+  min-height: var(--space-5);
+  padding: var(--space-0) var(--space-2);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-small);
+  background: var(--color-island);
+  color: var(--color-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.button:hover {
+  background: var(--color-hover);
+}
+
+.button[aria-pressed='true'] {
+  background: var(--color-selected);
+}
+
+.button[aria-disabled='true'] {
+  color: var(--color-text-muted);
+  cursor: default;
+}
+
+.button[aria-disabled='true']:hover {
+  background: var(--color-island);
+}
+
+.split {
+  display: grid;
+  flex: 1;
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 0;
+}
+
+.editor-scroller {
+  position: relative;
+  display: flex;
+  min-height: 0;
+  overflow: auto;
+  background: var(--color-canvas);
+  color: var(--color-text);
+  font-size: var(--font-size-body);
+}
+
+.editor-scroller:focus-within {
+  outline: var(--focus-width) solid var(--color-focus);
+  outline-offset: calc(var(--focus-width) * -1);
+}
+
+/* Each Run button is as tall as a line of the editor, whose lines are 24 px apart: a target of 24 px. */
+.run-column {
+  position: relative;
+  flex: none;
+  width: calc(var(--space-5) + var(--space-1));
+}
+
+.run-button {
+  position: absolute;
+  left: var(--space-0);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-5);
+  height: var(--space-5);
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-small);
+  background: none;
+  color: var(--color-success);
+  cursor: pointer;
+}
+
+.run-button:hover {
+  background: var(--color-hover);
+}
+
+.run-button[aria-disabled='true'] {
+  color: var(--color-text-muted);
+  cursor: default;
+}
+
+.editor {
+  flex: 1;
+  min-width: 0;
+}
+
+.failed-line {
+  background: var(--color-hover);
+  box-shadow: inset var(--space-0) 0 0 var(--color-danger);
+}
+
+/* The line between the editor and the results: 24 px to take hold of, drawn as a thin bar in its middle. */
+.split-line {
+  position: relative;
+  height: var(--space-5);
+  border-top: var(--border-width) solid var(--color-border);
+  background: var(--color-island);
+  cursor: row-resize;
+}
+
+.split-line::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--space-6);
+  height: var(--space-1);
+  border-radius: var(--radius-small);
+  background: var(--color-border);
+  content: '';
+  transform: translate(-50%, -50%);
+}
+
+.split-line:hover {
+  background: var(--color-hover);
+}
+
+.results {
+  min-height: 0;
+  padding: 0 var(--space-3) var(--space-2);
+  overflow: auto;
+}
+
+.before {
+  padding: var(--space-4) 0;
+}
+
+.muted,
+.message,
+.note {
+  color: var(--color-text-muted);
+}
+
+.running {
+  color: var(--color-text-muted);
+}
+
+.dimmed {
+  opacity: 0.5;
+}
+
+.summary {
+  margin: var(--space-1) 0;
+  color: var(--color-text-muted);
+}
+
+.error {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: var(--space-1) 0;
+  color: var(--color-danger);
+}
+
+.link {
+  min-height: var(--space-5);
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-accent);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.output-title {
+  margin: var(--space-2) 0 var(--space-1);
+  font-size: var(--font-size-body);
+}
+
+.text {
+  margin: var(--space-1) 0;
+  font-family: var(--font-family-code);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.table-scroller {
+  max-width: 100%;
+  overflow: auto;
+}
+
+.table {
+  border-collapse: collapse;
+  font-family: var(--font-family-code);
+}
+
+.heading,
+.number,
+.cell {
+  padding: var(--space-0) var(--space-2);
+  border: var(--border-width) solid var(--color-border);
+  text-align: left;
+  vertical-align: top;
+  white-space: pre;
+}
+
+.heading,
+.number {
+  background: var(--color-island);
+  color: var(--color-text-muted);
+  font-weight: normal;
+}
+
+.cell[data-content='missing'] {
+  background: var(--color-hover);
+}
+
+.cell[data-syntax='string'] {
+  color: var(--color-syntax-string);
+}
+
+.cell[data-syntax='number'] {
+  color: var(--color-syntax-number);
+}
+
+.cell[data-syntax='bool'] {
+  color: var(--color-syntax-bool);
+}
+
+.cell[data-syntax='oid'] {
+  color: var(--color-syntax-oid);
+}
+
+.cell[data-syntax='date'] {
+  color: var(--color-syntax-date);
+}
+
+.cell[data-syntax='regex'] {
+  color: var(--color-syntax-regex);
+}
+
+/* The focus of every control of the page, last so that it is drawn over their other states. */
+.button:focus-visible,
+.run-button:focus-visible,
+.link:focus-visible,
+.split-line:focus-visible,
+.table-scroller:focus-visible,
+.text:focus-visible {
+  outline: var(--focus-width) solid var(--color-focus);
+  outline-offset: calc(var(--focus-width) * -1);
+}

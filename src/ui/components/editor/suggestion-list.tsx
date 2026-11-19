@@ -24,6 +24,8 @@ export interface SuggestionListProps {
   readonly shown: AutocompleteView;
   readonly anchor: ListAnchor;
   readonly onPick: (index: number) => void;
+  /** Its `data-feature`: `query.autocomplete@editor` unless said. */
+  readonly element?: 'query.autocomplete@editor' | 'playground.autocomplete@editor';
 }
 
 const kindIcons: Readonly<Record<SuggestionKind, string>> = {
@@ -31,6 +33,8 @@ const kindIcons: Readonly<Record<SuggestionKind, string>> = {
   operator: 'codicon codicon-symbol-operator',
   stage: 'codicon codicon-symbol-structure',
   value: 'codicon codicon-symbol-constant',
+  collection: 'codicon codicon-symbol-class',
+  method: 'codicon codicon-symbol-method',
 };
 
 function Label({ line }: { readonly line: SuggestionLine }): React.JSX.Element {
@@ -73,7 +77,13 @@ function useActiveInView(elementRef: React.RefObject<HTMLDivElement | null>, act
 }
 
 /** The list box of the suggestions, in a layer over the window. */
-export function SuggestionList({ id, shown, anchor, onPick }: SuggestionListProps): React.JSX.Element {
+export function SuggestionList({
+  id,
+  shown,
+  anchor,
+  onPick,
+  element = 'query.autocomplete@editor',
+}: SuggestionListProps): React.JSX.Element {
   const elementRef = useRef<HTMLDivElement>(null);
   usePlacement(elementRef, anchor);
   useActiveInView(elementRef, shown.active);
@@ -84,7 +94,7 @@ export function SuggestionList({ id, shown, anchor, onPick }: SuggestionListProp
       className={styles.list}
       role={shown.role}
       aria-label={shown.name}
-      data-feature="query.autocomplete@editor"
+      data-feature={element}
       onMouseDown={(event) => {
         // The editor keeps the focus.
         event.preventDefault();

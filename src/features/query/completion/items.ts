@@ -22,7 +22,8 @@ import {
 } from './vocabulary';
 
 /** The kinds of suggestion, each with its mark in the list. */
-export type SuggestionKind = 'field' | 'operator' | 'stage' | 'value';
+/** The kind of a suggestion, whose mark the list shows; `collection` and `method` are a playground's (`playground.autocomplete`). */
+export type SuggestionKind = 'field' | 'operator' | 'stage' | 'value' | 'collection' | 'method';
 
 /** One suggestion. */
 export interface Suggestion {

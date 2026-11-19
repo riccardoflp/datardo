@@ -67,10 +67,11 @@ describe('window.app-menu', () => {
   });
 
   it('disables an entry whose command is not registered or not offered', () => {
-    const menus = view(stateWith({ settings: { 'datardo.window.zoom': 200 } }), commands, { repository });
+    const withoutPlayground = commands.filter((each) => each.id !== 'playground.open');
+    const menus = view(stateWith({ settings: { 'datardo.window.zoom': 200 } }), withoutPlayground, { repository });
     expect(find(menus, 'Zoom in')?.enabled).toBe(false);
     expect(find(menus, 'New playground')?.enabled).toBe(false);
-    const withPlayground = [...commands, command('playground.open', 'New playground')];
+    const withPlayground = [...withoutPlayground, command('playground.open', 'New playground')];
     expect(find(view(stateWith(), withPlayground, { repository }), 'New playground')?.enabled).toBe(true);
   });
 

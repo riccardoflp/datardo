@@ -9,6 +9,7 @@ import type { FileWriter } from '../runner/ports';
 import { connectionsToText, type ExportFormat, type ExportSecrets } from '../features/connection/write-file';
 import { fileOfConnection, isFileProblem, jsonFields } from '../features/connection/types';
 import { transferText } from '../features/connection/text';
+import { saveFailedMessage } from '../features/playground/save';
 import { writeAtomically } from '../storage/store';
 import { notify } from '../runner/notify';
 import { whenRunnerReady } from './bridge';
@@ -37,9 +38,16 @@ async function connectionsFile(args: Json): Promise<string> {
   return written.text;
 }
 
+/** playground.text { text }: the script of a playground, as the editor has it (playground.save). */
+function playgroundText(args: Json): Promise<string> {
+  const text = jsonFields(args)['text'];
+  return Promise.resolve(typeof text === 'string' ? text : '');
+}
+
 /** The writers of the content of a file, by name. */
 const writers: Readonly<Record<string, (args: Json) => Promise<string>>> = {
   'connection.write-file': connectionsFile,
+  'playground.text': playgroundText,
 };
 
 /**
@@ -50,6 +58,15 @@ async function writeKeys(step: FileStep, args: Json, signal: AbortSignal): Promi
   const done = await writeKeyExport(connectionEngines(), keyExportOf(step.path, args), signal);
   const ports = await whenRunnerReady();
   notify(ports, { feature: 'key.export', level: 'success', text: done.message });
+}
+
+/** Writes a playground's file; what fails says *Could not save <file>: <error>* (playground.save). */
+async function writePlayground(path: string, content: string): Promise<void> {
+  try {
+    await writeAtomically(path, content);
+  } catch (error: unknown) {
+    throw new Error(saveFailedMessage(path, error instanceof Error ? error.message : String(error)));
+  }
 }
 
 /** Carries out a file step: writes, deletes or creates the folder at its path. */
@@ -87,7 +104,10 @@ export const fileWriter: FileWriter = async (step: FileStep, signal: AbortSignal
       if (content === undefined || writer === undefined) {
         throw new Error(`Datardo has no writer for ${step.path}.`);
       }
-      await writeAtomically(step.path, await writer(content.args));
+      const written = await writer(content.args);
+      await (content.writer === 'playground.text'
+        ? writePlayground(step.path, written)
+        : writeAtomically(step.path, written));
     }
   }
 };

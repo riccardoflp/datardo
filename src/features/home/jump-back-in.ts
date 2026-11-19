@@ -28,6 +28,8 @@ export interface JumpItem {
   readonly path: string;
   /** What a click or `Enter` opens: `tab.open` on the section it had (its tab, when it is open). */
   readonly opens: OpenTarget;
+  /** A playground's file that is not open: opened by `playground.open-file` with its path, and no dialog. */
+  readonly file?: { readonly path: string; readonly element: 'playground.open-file@home' };
   /** What a screen reader says of it. */
   readonly spoken: string;
   readonly menuLabel: string;
@@ -63,8 +65,14 @@ export function view(state: AppState): JumpBackIn | undefined {
               ...(entry.place.section === undefined ? {} : { section: entry.place.section }),
             }
           : { kind: 'tab', tab };
+      const shows = entry.place.shows;
+      const file =
+        tab === undefined && shows.kind === 'playground' && shows.file !== undefined
+          ? { file: { path: shows.file, element: 'playground.open-file@home' as const } }
+          : {};
       return {
         key: entry.key,
+        ...file,
         icon: entry.icon,
         title: entry.title,
         connection: entry.connection.name,

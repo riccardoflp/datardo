@@ -15,6 +15,7 @@ import { isTableCommand, runTableCommand } from '../table/table-commands';
 import { runTreeCommand } from '../tree/tree-commands';
 import { openAbout } from '../window/about';
 import { openGoTo } from './go-to-store';
+import { flushPlaygrounds } from '../pages/playground/playground-store';
 
 let switcherOpener: (() => void) | undefined;
 
@@ -61,6 +62,8 @@ function withWindowArgs(intent: Intent): Intent {
 
 /** Runs a command now; a command not offered in this state does nothing. */
 export function runCommand(id: string, state: AppState): void {
+  // A command of a playground reads its text in the main process: what the editor has not sent yet goes first.
+  flushPlaygrounds();
   if (id === 'tree.refresh' || id === 'tree.filter') {
     runTreeCommand(id, state);
     return;

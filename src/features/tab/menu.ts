@@ -1,3 +1,12 @@
+/** The last part, for a playground tab: **Save as…** (`playground.save`). */
+function playgroundEntries(state: AppState, tab: TabId): readonly MenuEntry[] {
+  if (findTab(state.tabs, tab)?.shows.kind !== 'playground') {
+    return [];
+  }
+  const ids = { element: 'playground.save@tab-menu', feature: 'playground.save' };
+  return [separator, item(text.menu.saveAs, ids, { tab, as: true }, { key: 'Ctrl+Shift+S' })];
+}
+
 /**
  * Feature: tab.menu
  *
@@ -81,7 +90,8 @@ function navEntries(state: AppState, tab: TabId): readonly MenuEntry[] {
  * Feature: tab.menu
  *
  * The entries of the context menu of a tab, in this order: **Close**; **Close others**, **Close tabs of
- * \<connection\>**, **Close all**; **Reopen closed tab**; **Pin**, **Copy path**, **Open on another connection…**.
+ * \<connection\>**, **Close all**; **Reopen closed tab**; **Pin**, **Copy path**, **Open on another connection…**; and
+ * for a playground tab **Save as…**.
  */
 export function view(state: AppState, tab: TabId): readonly MenuEntry[] {
   const own = findTab(state.tabs, tab);
@@ -106,6 +116,7 @@ export function view(state: AppState, tab: TabId): readonly MenuEntry[] {
       disabled: !isReopenOffered(state),
     }),
     ...navEntries(state, tab),
+    ...playgroundEntries(state, tab),
   ];
 }
 

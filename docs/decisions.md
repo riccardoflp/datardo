@@ -852,3 +852,32 @@ Raised while the catalog was written; each names the cards that hold the current
   and the Chart section for their milestones. (`aggregate.show`, `aggregate.run`, `aggregate.write-output`,
   `aggregate.clear`, `aggregate.show-stage`, `aggregate.drop-condition`, `aggregate.sort-column`,
   `aggregate.stage-marks`, `aggregate.from-text`).
+- **Q67** — Playgrounds as built in M28, the run: Datardo chose the least surprising behavior where the cards are
+  silent, to be confirmed. The script runs in a `node:vm` context inside the process of the run, whose environment
+  holds only the system's temporary folders: the vm keeps the runtime's names apart, and the boundary of T6 is the
+  process, not the vm. `playground.run` returns once the run has started: the run is its own work on the status line,
+  so that the runner's queue is free for the questions the run asks (a drop) and for **Stop**. The process is a
+  utility process of Electron (`utilityProcess`), started for each run with no memory limit (D51). (`playground.run`,
+  `playground.runtime`, `playground.stop`).
+- **Q68** — Playgrounds as built in M28, the values: an integral double a script reads stays a double when it is
+  written back (`Double`), while a number typed in the script is written as an `Int32` when it is integral, as mongosh
+  writes it; `NumberLong`, `NumberDecimal`, dates, `ObjectId` and binary values cross between the process and Datardo
+  as canonical Extended JSON. (`playground.runtime`, `playground.results`).
+- **Q69** — Playgrounds as built in M28, publishing: for redis-oplog a `bulkWrite` reads, before and after it, the
+  documents whose `_id` its operations name or its reply gives; an operation by filter in a bulk write is not
+  published. An insert without an `_id` is given one in Datardo before it is sent, so that its `_id` is known.
+  (`oplog.playground-writes`, `playground.writes`).
+- **Q70** — Playgrounds as built in M28, saving: before the file step, `playground.save` tries the file (opened to
+  append, or made then removed in its folder) and refuses with `/save-failed` when it cannot be written; a write that
+  fails after that check is reported as failed with the same message. Quitting Datardo does not yet ask about the
+  playgrounds with unsaved changes, because `window.quit` asks nothing about tabs yet (its card's question comes with
+  `tab.close` in M4); the draft of such a playground is kept, so its text comes back at the next start. A playground
+  never saved that comes back with no draft opens with the example script on `test`. (`playground.save`,
+  `window.quit`, `tab.restore`).
+- **Q71** — Playgrounds as built in M28, the page: the editor's lines are 24 px apart, so that each **Run** button is a
+  target of 24 px (R10.5); the text typed goes to the main process 300 ms after the last key, and at once before a
+  run, a save or a command of Go to; the list of autocomplete also opens after a `.`; a playground file in **Jump
+  back in** opens through `playground.open-file`; the menu of a playground tab ends with **Save as…**; **Cancel** of a
+  run on the status line carries `playground.stop@status-line`. `Ctrl+Enter` of a playground is a key of its editor
+  (the window's `Ctrl+Enter` is `query.run`'s), and `Ctrl+Shift+Enter` in the editor runs the statement at the caret.
+  (`playground.show`, `playground.autocomplete`, `playground.open-file`, `playground.save`, `playground.stop`).

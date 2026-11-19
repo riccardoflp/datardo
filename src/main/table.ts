@@ -38,8 +38,14 @@ async function opened(services: MainServices, connection: ConnectionId): Promise
   return store;
 }
 
-/** The store of a connection's state file, read the first time it is needed. */
-function storeOf(services: MainServices, connection: ConnectionId): Promise<Store<ConnectionStateFile>> {
+/**
+ * The store of a connection's state file, read the first time it is needed; the one store of that file, which the
+ * playgrounds use too (playground.save).
+ */
+export function connectionStateStore(
+  services: MainServices,
+  connection: ConnectionId,
+): Promise<Store<ConnectionStateFile>> {
   const known = stores.get(connection);
   if (known !== undefined) {
     return known;
@@ -55,7 +61,7 @@ function rememberedOf(layout: JsonObject, expanded: readonly string[]): Remember
 
 /** Loads the columns a connection's file remembers into the app's state. */
 async function loadColumns(services: MainServices, connection: ConnectionId): Promise<void> {
-  const store = await storeOf(services, connection);
+  const store = await connectionStateStore(services, connection);
   const columns = Object.fromEntries(
     columnsIn(store.get()).map((each) => [
       columnsKey(connection, each.database, each.collection),
@@ -116,6 +122,6 @@ export async function saveColumns(services: MainServices, args: Json): Promise<v
   };
   const key = columnsKey(where.connection, where.database, where.collection);
   services.state.dispatch({ slice: 'table', type: 'columns-saved', key, columns: after });
-  const store = await storeOf(services, connectionId(where.connection));
+  const store = await connectionStateStore(services, connectionId(where.connection));
   store.set(withColumns(store.get(), where, { layout: after.layout as JsonObject, expanded: after.expanded }));
 }

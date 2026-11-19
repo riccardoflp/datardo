@@ -13,6 +13,7 @@ import type { Dialogs, StateHolder } from '../runner/ports';
 export class WindowDialogs implements Dialogs {
   private next = 1;
   private readonly waiting = new Map<QuestionId, (answers: Answers | undefined) => void>();
+  private readonly features = new Map<QuestionId, FeatureId>();
 
   /** Opens dialogs through `state`. */
   constructor(private readonly state: StateHolder) {}
@@ -30,9 +31,19 @@ export class WindowDialogs implements Dialogs {
       return;
     }
     this.waiting.delete(answer.id);
+    this.features.delete(answer.id);
     this.state.dispatch({ slice: 'runner', type: 'dialog-closed', id: answer.id });
     resolve(answer.answers);
   }
+
+  /** Cancels the dialogs a feature has open: a run stopped while it waits for the answer to a drop. */
+  readonly dismiss = (feature: FeatureId): void => {
+    for (const [id, opener] of [...this.features]) {
+      if (opener === feature) {
+        this.answer({ id, answers: undefined });
+      }
+    }
+  };
 
   /** Cancels every dialog still open: the window was closed or reloaded. */
   cancelAll(): void {
@@ -43,9 +54,11 @@ export class WindowDialogs implements Dialogs {
 
   private open(dialog: (id: QuestionId) => OpenDialog): Promise<Answers | undefined> {
     const id = `dialog-${String(this.next++)}` as QuestionId;
+    const opened = dialog(id);
     return new Promise((resolve) => {
       this.waiting.set(id, resolve);
-      this.state.dispatch({ slice: 'runner', type: 'dialog-opened', dialog: dialog(id) });
+      this.features.set(id, opened.feature);
+      this.state.dispatch({ slice: 'runner', type: 'dialog-opened', dialog: opened });
     });
   }
 }

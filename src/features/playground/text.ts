@@ -21,6 +21,13 @@ export const text = {
     save: 'Save',
     run: 'Run',
     runStatement: (line: number): string => `Run the statement at line ${String(line)}`,
+    toolbar: 'Playground',
+    editor: 'Script',
+    runButtons: 'Statements',
+    results: 'Results',
+    resultsToolbar: 'Results',
+    split: 'Resize the script and the results',
+    failedLine: (line: number): string => `The run failed at line ${String(line)}`,
   },
   results: {
     beforeFirstRun: 'Run a playground with Ctrl+Enter.',

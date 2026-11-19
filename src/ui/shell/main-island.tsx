@@ -1,6 +1,7 @@
 /**
  * The main island: the tab strip (`tab.strip`), the scope bar (`nav.scope-bar`, `nav.path`, `nav.back`,
- * `nav.copy-path`, `nav.pin`, `nav.open-on-another-connection`) and the page of the active tab. With no tab open it
+ * `nav.copy-path`, `nav.pin`, `nav.open-on-another-connection`) and the page of the active tab: an app page, a
+ * collection (`table.show`) or a playground (`playground.show`). With no tab open it
  * stands for Home, which M5 brings.
  */
 import { shortenedPath, type PathSegment } from '../../features/nav/path';
@@ -11,6 +12,7 @@ import { useLayoutEffect, useRef, useState } from 'react';
 import { pages, tabPages } from '../pages';
 import { CollectionPage } from '../pages/collection/collection-page';
 import { KeysPathSegment } from '../pages/keys/keys-path';
+import { PlaygroundPage } from '../pages/playground/playground-page';
 import { startFeature } from './intent';
 import { TabStrip } from './tab-strip';
 import styles from './bars.module.css';
@@ -165,6 +167,8 @@ export function MainIsland({
           <Page />
         ) : shown.kind === 'collection' && shown.tab !== undefined ? (
           <CollectionPage key={shown.tab} tab={shown.tab} shows={shown} />
+        ) : shown.kind === 'playground' && shown.tab !== undefined ? (
+          <PlaygroundPage key={shown.tab} tab={shown.tab} />
         ) : null}
       </div>
     </section>

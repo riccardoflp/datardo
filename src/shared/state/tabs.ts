@@ -203,6 +203,13 @@ export type TabsEvent =
     }
   | {
       readonly slice: 'tabs';
+      /** What a tab shows changed: a playground saved under a new name, or given another connection (playground.target). */
+      readonly type: 'shows-changed';
+      readonly tab: TabId;
+      readonly shows: TabShows;
+    }
+  | {
+      readonly slice: 'tabs';
       readonly type: 'connection-removed';
       readonly connection: ConnectionId;
       readonly at: number;
@@ -378,6 +385,25 @@ function changed(state: TabsState, event: Extract<TabsEvent, { type: 'changed' }
   return { ...state, tabs: state.tabs.map((tab) => (tab.id === event.tab ? change(tab) : tab)) };
 }
 
+/** A tab that shows something else: in the group of its connection, at the end of it when the connection changed. */
+function showsChanged(state: TabsState, id: TabId, shows: TabShows): TabsState {
+  const tab = state.tabs.find((each) => each.id === id);
+  if (tab === undefined) {
+    return state;
+  }
+  const changedTab: Tab = { ...tab, shows };
+  if (connectionOfShows(shows) === tabConnectionOf(tab)) {
+    return { ...state, tabs: state.tabs.map((each) => (each.id === id ? changedTab : each)) };
+  }
+  return {
+    ...state,
+    tabs: withTabAdded(
+      state.tabs.filter((each) => each.id !== id),
+      changedTab,
+    ),
+  };
+}
+
 /** Changes this part of the state. */
 export function reduceTabs(state: TabsState, event: TabsEvent): TabsState {
   switch (event.type) {
@@ -397,6 +423,8 @@ export function reduceTabs(state: TabsState, event: TabsEvent): TabsState {
     }
     case 'changed':
       return changed(state, event);
+    case 'shows-changed':
+      return showsChanged(state, event.tab, event.shows);
     case 'connection-removed': {
       const gone = (tab: Tab): boolean => tabConnectionOf(tab) === event.connection;
       const after = withoutTabs(state, gone, event.at);

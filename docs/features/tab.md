@@ -238,14 +238,15 @@ What can be done to a tab from the strip.
   2. **Close others**, **Close tabs of \<connection\>**, **Close all** (`tab.close-many`);
   3. a separator, then **Reopen closed tab** `Ctrl+Shift+T` (`tab.reopen`);
   4. a separator, then **Pin** or **Unpin** (`nav.pin`), **Copy path** (`nav.copy-path`), **Open on another
-     connection…** (`nav.open-on-another-connection`).
+     connection…** (`nav.open-on-another-connection`);
+  5. on a playground tab, a separator, then **Save as…** `Ctrl+Shift+S` (`playground.save`).
 - **States**: the entries act on the tab the menu was opened on, which is not made active by opening the menu; **Open
   on another connection…** makes it active first. **Close others** is disabled when it is the only tab. **Close tabs
   of \<connection\>** names the connection of the tab and is not shown on a tab of the app. **Reopen closed tab** is
   disabled when no closed tab can be reopened. The entries of the fourth part are shown only where their own cards
   offer them.
 - **Uses**: `tab.close`, `tab.close-many`, `tab.reopen`, `nav.pin`, `nav.copy-path`,
-  `nav.open-on-another-connection`.
+  `nav.open-on-another-connection`, `playground.save`.
 - **Ported from**: *New in Datardo*. For reference, the menu of a tab of Mongoster's desktop app has **Close**,
   **Close others** and **Close all**: `src/standalone/main.ts` (`tabContext`).
 

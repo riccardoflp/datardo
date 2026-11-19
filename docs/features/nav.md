@@ -868,7 +868,7 @@ progress, and whether the connection is read-only.
   | Connection | the dot in the connection's color, its name, its state as `connection.state` words it and, while connected, its latency: `Local · connected · 4 ms`, `Local · not connected`, `Local · connecting…`, `Local · reconnecting…`, `Local · failed`; **No connection** when none is current | opens the connection switcher (`nav.switch-connection`) |
   | Reconnect | **Reconnect**, right after the connection part, while the current connection is reconnecting or failed | tries to connect again at once (`connection.reconnect`) |
   | Count | what the page of the active tab counts, in the words of its feature: `2 of 1,204 documents · 38 ms`, `500 keys scanned` | starts what the page names for it: on a collection tab, the exact count (`query.count`). Not a button when the page names nothing |
-  | Work in progress | with one: its title, how far it is, and **Cancel**; with several: `3 running` | **Cancel** cancels it (`runner.cancel`); a click on the title or on the number opens the list of the work in progress, each with its own **Cancel** (`runner.progress`) |
+  | Work in progress | with one: its title, how far it is, and **Cancel**; with several: `3 running` | **Cancel** cancels it (`runner.cancel`), and stops a playground's run (`playground.stop`); a click on the title or on the number opens the list of the work in progress, each with its own **Cancel** (`runner.progress`) |
   | Zoom | the percentage, while it is not 100%: `125%` | resets the zoom (`window.zoom`) |
   | Read-only | **Read-only**, while the current connection is a read-only connection | starts `connection.allow-changes`, which asks before anything changes |
 

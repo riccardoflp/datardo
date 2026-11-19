@@ -6,7 +6,7 @@
  * (`playground.open-file`). Saving runs nothing and sends nothing to the deployment.
  */
 import type { Answers, Context, FileStep, Outcome, ReadFeature, ReadRequest } from '../../shared/feature';
-import { needRead } from '../../shared/feature';
+import { needRead, refuse } from '../../shared/feature';
 import { featureId } from '../../shared/ids';
 import { stepText } from '../runner/step-text';
 import { fileName } from './open-file';
@@ -34,6 +34,17 @@ export const fileRead: ReadFeature = {
       filters: [{ name: text.save.filter, extensions: ['mongodb.js'] }],
     },
   }),
+  parse: (replies) => (typeof replies[0] === 'string' ? replies[0] : null),
+};
+
+/** The read that tries the file before it is written: null when it can be written, or why it cannot. */
+export const writableReadId = 'playground.save:writable';
+
+/** `playground.save:writable`: an app read that opens the file for writing without changing it. */
+export const writableRead: ReadFeature = {
+  kind: 'read',
+  id: featureId(writableReadId),
+  request: (_context, args): ReadRequest => ({ kind: 'app', action: 'playground.writable', args }),
   parse: (replies) => (typeof replies[0] === 'string' ? replies[0] : null),
 };
 
@@ -69,7 +80,8 @@ function asked(answers: Answers): boolean {
 
 /**
  * Feature: playground.save — `write <path>`, then `remember the connection and the database of <path>`. A playground
- * without a file, and **Save as…** (`args` `as`), ask for the file first; a dialog closed saves nothing.
+ * without a file, and **Save as…** (`args` `as`), ask for the file first; a dialog closed saves nothing. The file is
+ * tried first: one that cannot be written is refused with why (`/save-failed`), and nothing is written.
  */
 export function plan(context: Context, answers: Answers): Outcome {
   const tab = startedTab(context, startArgs(answers));
@@ -90,6 +102,14 @@ export function plan(context: Context, answers: Answers): Outcome {
     return appPlan(title, [], text.save.cannotUndo);
   }
   const path = withExtension(chosen);
+  const writable = answers['writable'];
+  if (writable === undefined) {
+    return needRead('writable', writableReadId, { path });
+  }
+  if (typeof writable === 'string') {
+    // The text stays in the tab, with its dot; a close or a quit that asked for the save stops here.
+    return refuse('playground.save/save-failed', saveFailedMessage(path, writable));
+  }
   const remember = appStep(text.save.remember(path), 'playground.remember', {
     tab: tab.id,
     path,
