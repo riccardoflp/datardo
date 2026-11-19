@@ -1,0 +1,192 @@
+[
+  {
+    "_id": {
+      "$numberInt": "1"
+    },
+    "string": "paid",
+    "multiline": "line one\nline two",
+    "int32": {
+      "$numberInt": "5"
+    },
+    "int32Negative": {
+      "$numberInt": "-2147483648"
+    },
+    "int64": {
+      "$numberLong": "5"
+    },
+    "int64Big": {
+      "$numberLong": "9007199254740993"
+    },
+    "int64Negative": {
+      "$numberLong": "-9223372036854775808"
+    },
+    "double": {
+      "$numberDouble": "5.0"
+    },
+    "doubleFraction": {
+      "$numberDouble": "42.5"
+    },
+    "doubleBig": {
+      "$numberDouble": "1e+21"
+    },
+    "doubleWhole": {
+      "$numberDouble": "3000000000.0"
+    },
+    "doubleSmall": {
+      "$numberDouble": "1.5e-7"
+    },
+    "doubleNegativeZero": {
+      "$numberDouble": "-0.0"
+    },
+    "doubleNaN": {
+      "$numberDouble": "NaN"
+    },
+    "doubleInfinity": {
+      "$numberDouble": "Infinity"
+    },
+    "doubleMinusInfinity": {
+      "$numberDouble": "-Infinity"
+    },
+    "decimal": {
+      "$numberDecimal": "12.50"
+    },
+    "decimalNaN": {
+      "$numberDecimal": "NaN"
+    },
+    "boolean": true,
+    "null": null,
+    "objectId": {
+      "$oid": "65f1c0de65f1c0de65f1c0de"
+    },
+    "date": {
+      "$date": {
+        "$numberLong": "1710498600000"
+      }
+    },
+    "dateBefore1970": {
+      "$date": {
+        "$numberLong": "-1000"
+      }
+    },
+    "dateFar": {
+      "$date": {
+        "$numberLong": "253402300800000"
+      }
+    },
+    "dateBeyondJavaScript": {
+      "$date": {
+        "$numberLong": "0"
+      }
+    },
+    "regex": {
+      "$regularExpression": {
+        "pattern": "^mario",
+        "options": "i"
+      }
+    },
+    "regexSlash": {
+      "$regularExpression": {
+        "pattern": "a/b",
+        "options": "i"
+      }
+    },
+    "uuid": {
+      "$binary": {
+        "base64": "D4+tW9nLRp+hZXCGdyiVDg==",
+        "subType": "04"
+      }
+    },
+    "binary": {
+      "$binary": {
+        "base64": "aGVsbG8=",
+        "subType": "00"
+      }
+    },
+    "binaryUuidOld": {
+      "$binary": {
+        "base64": "BwcHBwcHBwcHBwcHBwcHBw==",
+        "subType": "03"
+      }
+    },
+    "binaryMd5": {
+      "$binary": {
+        "base64": "CQkJCQkJCQkJCQkJCQkJCQ==",
+        "subType": "05"
+      }
+    },
+    "timestamp": {
+      "$timestamp": {
+        "t": 1700000000,
+        "i": 1
+      }
+    },
+    "minKey": {
+      "$minKey": 1
+    },
+    "maxKey": {
+      "$maxKey": 1
+    },
+    "undefined": null,
+    "symbol": {
+      "$symbol": "x"
+    },
+    "code": {
+      "$code": "function () { return 1 }"
+    },
+    "codeWithScope": {
+      "$code": "x + 1",
+      "$scope": {
+        "x": {
+          "$numberInt": "1"
+        }
+      }
+    },
+    "dbRef": {
+      "$ref": "users",
+      "$id": {
+        "$oid": "65f1c0de65f1c0de65f1c0de"
+      }
+    },
+    "dbRefWithDatabase": {
+      "$ref": "users",
+      "$id": {
+        "$numberInt": "7"
+      },
+      "$db": "shop"
+    },
+    "array": [
+      {
+        "$numberInt": "1"
+      },
+      {
+        "$numberLong": "1"
+      },
+      {
+        "$numberDouble": "2.0"
+      }
+    ],
+    "emptyArray": [],
+    "document": {
+      "city": "Milano",
+      "zip": "20100",
+      "geo": {
+        "lat": {
+          "$numberDouble": "41.9"
+        }
+      }
+    },
+    "emptyDocument": {},
+    "keys": {
+      "status": {
+        "$numberInt": "1"
+      },
+      "$gte": {
+        "$numberInt": "5"
+      },
+      "address.city": {
+        "$numberInt": "1"
+      },
+      "2fa": true
+    }
+  }
+]

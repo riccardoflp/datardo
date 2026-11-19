@@ -1,0 +1,127 @@
+[
+  {
+    "_id": {
+      "$numberInt": "4"
+    },
+    "status": "new",
+    "total": {
+      "$numberInt": "30"
+    },
+    "items": [
+      {
+        "sku": "A3",
+        "qty": {
+          "$numberInt": "1"
+        }
+      }
+    ],
+    "vector": [
+      {
+        "$numberDouble": "0.5"
+      },
+      {
+        "$numberDouble": "0.25"
+      }
+    ]
+  },
+  {
+    "_id": {
+      "$numberInt": "5"
+    },
+    "status": "shipped",
+    "total": {
+      "$numberDouble": "40.5"
+    },
+    "items": [
+      {
+        "sku": "A4",
+        "qty": {
+          "$numberInt": "1"
+        }
+      }
+    ],
+    "vector": [
+      {
+        "$numberDouble": "0.5"
+      },
+      {
+        "$numberDouble": "0.25"
+      }
+    ]
+  },
+  {
+    "_id": {
+      "$numberInt": "2"
+    },
+    "status": "paid",
+    "total": {
+      "$numberInt": "10"
+    },
+    "items": [
+      {
+        "sku": "A1",
+        "qty": {
+          "$numberInt": "1"
+        }
+      }
+    ],
+    "vector": [
+      {
+        "$numberDouble": "0.5"
+      },
+      {
+        "$numberDouble": "0.25"
+      }
+    ]
+  },
+  {
+    "_id": {
+      "$numberInt": "1"
+    },
+    "status": "paid",
+    "total": {
+      "$numberDouble": "0.5"
+    },
+    "items": [
+      {
+        "sku": "A0",
+        "qty": {
+          "$numberInt": "1"
+        }
+      }
+    ],
+    "vector": [
+      {
+        "$numberDouble": "0.5"
+      },
+      {
+        "$numberDouble": "0.25"
+      }
+    ]
+  },
+  {
+    "_id": {
+      "$numberInt": "3"
+    },
+    "status": "paid",
+    "total": {
+      "$numberDouble": "20.5"
+    },
+    "items": [
+      {
+        "sku": "A2",
+        "qty": {
+          "$numberInt": "1"
+        }
+      }
+    ],
+    "vector": [
+      {
+        "$numberDouble": "0.5"
+      },
+      {
+        "$numberDouble": "0.25"
+      }
+    ]
+  }
+]

@@ -1,0 +1,130 @@
+/**
+ * Feature: table.column-menu
+ *
+ * What can be done with a column and with its field in the documents: the context menu of a column header.
+ */
+import { view as dragView, type Zone } from '../query/drag';
+import type { QueryTexts } from '../query/types';
+import { topOf } from './arrange-columns';
+import { expandEntries } from './cell-menu';
+import { text } from './text';
+import {
+  canWrite,
+  isIdKey,
+  menuOf,
+  type ColumnLayout,
+  type ColumnNode,
+  type MenuEntry,
+  type TableTarget,
+} from './types';
+
+/** What the menu of a header is drawn from: its column (`'#'` for the row number column), the layout and the query. */
+export interface ColumnMenuState {
+  readonly column: ColumnNode | '#';
+  readonly layout: ColumnLayout;
+  readonly texts: QueryTexts;
+  readonly target: TableTarget;
+  /** The path of the expanded array the column is in. */
+  readonly within?: string;
+}
+
+function zoneEntries(label: string, element: string, zones: readonly Zone[]): MenuEntry {
+  return {
+    kind: 'entry',
+    label,
+    element,
+    submenu: zones.map((zone) => ({
+      kind: 'entry',
+      label: zone.label,
+      tip: zone.tip,
+      element,
+      args: zone.action,
+    })),
+  };
+}
+
+function queryEntries(state: ColumnMenuState, column: ColumnNode): readonly MenuEntry[] {
+  const dragged = {
+    kind: 'header',
+    field: column.key,
+    ...(state.within === undefined ? {} : { within: state.within }),
+  } as const;
+  const zones = dragView({ dragged, texts: state.texts });
+  const find = state.target.mode === 'find';
+  return [
+    ...(find ? [zoneEntries(text.columnMenu.sort, 'query.add-sort@column-menu', zones.sort)] : []),
+    zoneEntries(text.columnMenu.addToFilter, 'query.add-condition@column-menu', zones.filter),
+    ...(find ? [zoneEntries(text.columnMenu.project, 'query.add-projection@column-menu', zones.project)] : []),
+    { kind: 'entry', label: text.cellMenu.copyPath, element: 'table.copy-path@column-menu', args: { key: column.key } },
+  ];
+}
+
+function arrangeEntries(state: ColumnMenuState, column: ColumnNode): readonly MenuEntry[] {
+  const { key } = column;
+  const top = topOf(key);
+  const pinned = (state.layout.pinned ?? []).includes(top);
+  const sized = state.layout.widths?.[key] !== undefined;
+  const element = 'table.arrange-columns@column-menu';
+  return [
+    { kind: 'entry', label: text.arrange.hide(key), element, args: { change: { kind: 'hide', key } } },
+    pinned
+      ? { kind: 'entry', label: text.arrange.unpin(top), element, args: { change: { kind: 'unpin', key } } }
+      : { kind: 'entry', label: text.arrange.pin(top), element, args: { change: { kind: 'pin', key } } },
+    ...(sized
+      ? [
+          {
+            kind: 'entry',
+            label: text.arrange.resetWidth,
+            element,
+            args: { change: { kind: 'reset-width', key } },
+          } as const,
+        ]
+      : []),
+  ];
+}
+
+const columnsEntries: readonly MenuEntry[] = [
+  { kind: 'entry', label: text.columns.menuEntry, element: 'table.columns@column-menu' },
+  {
+    kind: 'entry',
+    label: text.arrange.resetAll,
+    element: 'table.arrange-columns@column-menu',
+    args: { change: { kind: 'reset' } },
+  },
+];
+
+function fieldEntries(state: ColumnMenuState, column: ColumnNode): readonly MenuEntry[] {
+  if (!canWrite(state.target) || isIdKey(column.key)) {
+    return [];
+  }
+  return [
+    { kind: 'entry', label: text.columnMenu.rename, element: 'field.rename@column-menu', args: { key: column.key } },
+    { kind: 'entry', label: text.columnMenu.remove, element: 'field.remove@column-menu', args: { key: column.key } },
+    {
+      kind: 'entry',
+      label: text.columnMenu.convert,
+      element: 'field.convert-type@column-menu',
+      args: { key: column.key },
+    },
+  ];
+}
+
+/**
+ * Feature: table.column-menu
+ *
+ * **Sort**, **Add to filter**, **Project**, **Copy field path**; the expand entries; **Hide**, **Pin** or **Unpin**,
+ * **Reset width**, **Columns…**, **Reset all columns**; the entries of the field area in Find on a collection that can
+ * be changed, not on `_id`. The row number column has **Columns…** and **Reset all columns** only; Aggregate has no
+ * **Sort** and no **Project**.
+ */
+export function view(state: ColumnMenuState): readonly MenuEntry[] {
+  const { column } = state;
+  if (column === '#') {
+    return columnsEntries;
+  }
+  return menuOf([
+    queryEntries(state, column),
+    [...expandEntries(column, 'column-menu'), ...arrangeEntries(state, column), ...columnsEntries],
+    fieldEntries(state, column),
+  ]);
+}
