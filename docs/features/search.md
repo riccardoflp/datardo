@@ -29,6 +29,8 @@ that contain it, grouped by collection, while the collections are still being re
 - **After**: the tab is titled **Search documents** in the group of its connection; a second request for the same
   connection makes the open tab active and, when it came from a node of the tree, sets the scope to that node without
   starting a search or stopping the one that runs.
+- **Refuses**: a text the tool `open_search` gives that cannot be searched, with the message of `search.text` (*Type
+  something to search.*, *Invalid regular expression: …*), opening nothing (`/text`).
 - **Commands**: `search.show`.
 - **Uses**: `search.collections`, `search.scan`, `search.text`, `search.match`, `search.open-in-collection`,
   `search.copy-id`, `document.inspect`, `document.open`, `runner.progress`, `runner.cancel`, `tab.open`,

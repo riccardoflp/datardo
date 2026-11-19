@@ -1,0 +1,38 @@
+[
+  [
+    {
+      "name": "customers",
+      "type": "collection",
+      "options": {},
+      "info": { "readOnly": false, "uuid": { "$binary": { "base64": "UxdEW+T0SpmwpGmrf0gSUQ==", "subType": "04" } } },
+      "idIndex": { "v": { "$numberInt": "2" }, "key": { "_id": { "$numberInt": "1" } }, "name": "_id_" }
+    },
+    {
+      "name": "products",
+      "type": "collection",
+      "options": {},
+      "info": { "readOnly": false, "uuid": { "$binary": { "base64": "cFe9Y6eLSaaHcptIlRY4JA==", "subType": "04" } } },
+      "idIndex": { "v": { "$numberInt": "2" }, "key": { "_id": { "$numberInt": "1" } }, "name": "_id_" }
+    },
+    {
+      "name": "orders",
+      "type": "collection",
+      "options": {},
+      "info": { "readOnly": false, "uuid": { "$binary": { "base64": "zwtoOGsFR/+OqTRhBpe4KQ==", "subType": "04" } } },
+      "idIndex": { "v": { "$numberInt": "2" }, "key": { "_id": { "$numberInt": "1" } }, "name": "_id_" }
+    },
+    {
+      "name": "system.views",
+      "type": "collection",
+      "options": {},
+      "info": { "readOnly": false, "uuid": { "$binary": { "base64": "3XY9NaZWSeuWh8XE/iGIBA==", "subType": "04" } } },
+      "idIndex": { "v": { "$numberInt": "2" }, "key": { "_id": { "$numberInt": "1" } }, "name": "_id_" }
+    },
+    {
+      "name": "recent",
+      "type": "view",
+      "options": { "viewOn": "orders", "pipeline": [] },
+      "info": { "readOnly": true }
+    }
+  ]
+]

@@ -1,0 +1,397 @@
+[
+  [
+    {
+      "name": "users",
+      "type": "collection",
+      "options": {
+        "capped": true,
+        "size": {
+          "$numberInt": "8192"
+        },
+        "max": {
+          "$numberInt": "10"
+        }
+      },
+      "info": {
+        "readOnly": false,
+        "uuid": {
+          "$binary": {
+            "base64": "C/FRTTVORU+J34oJiB9puw==",
+            "subType": "04"
+          }
+        }
+      },
+      "idIndex": {
+        "v": {
+          "$numberInt": "2"
+        },
+        "key": {
+          "_id": {
+            "$numberInt": "1"
+          }
+        },
+        "name": "_id_"
+      }
+    },
+    {
+      "name": "orders",
+      "type": "collection",
+      "options": {
+        "validator": {
+          "total": {
+            "$exists": true
+          }
+        },
+        "validationLevel": "moderate"
+      },
+      "info": {
+        "readOnly": false,
+        "uuid": {
+          "$binary": {
+            "base64": "Qulk9YgySfud76K7Tue57A==",
+            "subType": "04"
+          }
+        }
+      },
+      "idIndex": {
+        "v": {
+          "$numberInt": "2"
+        },
+        "key": {
+          "_id": {
+            "$numberInt": "1"
+          }
+        },
+        "name": "_id_"
+      }
+    },
+    {
+      "name": "system.views",
+      "type": "collection",
+      "options": {},
+      "info": {
+        "readOnly": false,
+        "uuid": {
+          "$binary": {
+            "base64": "fadFq4FvT22y7A000Ri09A==",
+            "subType": "04"
+          }
+        }
+      },
+      "idIndex": {
+        "v": {
+          "$numberInt": "2"
+        },
+        "key": {
+          "_id": {
+            "$numberInt": "1"
+          }
+        },
+        "name": "_id_"
+      }
+    },
+    {
+      "name": "metrics",
+      "type": "timeseries",
+      "options": {
+        "expireAfterSeconds": {
+          "$numberLong": "60"
+        },
+        "timeseries": {
+          "timeField": "t",
+          "metaField": "m",
+          "granularity": "hours",
+          "bucketMaxSpanSeconds": {
+            "$numberInt": "2592000"
+          }
+        }
+      },
+      "info": {
+        "readOnly": false
+      }
+    },
+    {
+      "name": "system.buckets.metrics",
+      "type": "collection",
+      "options": {
+        "validator": {
+          "$jsonSchema": {
+            "bsonType": "object",
+            "required": ["_id", "control", "data"],
+            "properties": {
+              "_id": {
+                "bsonType": "objectId"
+              },
+              "control": {
+                "bsonType": "object",
+                "required": ["version", "min", "max"],
+                "properties": {
+                  "version": {
+                    "bsonType": "number"
+                  },
+                  "min": {
+                    "bsonType": "object",
+                    "required": ["t"],
+                    "properties": {
+                      "t": {
+                        "bsonType": "date"
+                      }
+                    }
+                  },
+                  "max": {
+                    "bsonType": "object",
+                    "required": ["t"],
+                    "properties": {
+                      "t": {
+                        "bsonType": "date"
+                      }
+                    }
+                  },
+                  "closed": {
+                    "bsonType": "bool"
+                  },
+                  "count": {
+                    "bsonType": "number",
+                    "minimum": {
+                      "$numberInt": "1"
+                    }
+                  }
+                },
+                "additionalProperties": false
+              },
+              "data": {
+                "bsonType": "object"
+              },
+              "meta": {}
+            },
+            "additionalProperties": false
+          }
+        },
+        "clusteredIndex": true,
+        "expireAfterSeconds": {
+          "$numberLong": "60"
+        },
+        "timeseries": {
+          "timeField": "t",
+          "metaField": "m",
+          "granularity": "hours",
+          "bucketMaxSpanSeconds": {
+            "$numberInt": "2592000"
+          }
+        }
+      },
+      "info": {
+        "readOnly": false,
+        "uuid": {
+          "$binary": {
+            "base64": "0ZKeXVWnT/ag/IqJe2qHQA==",
+            "subType": "04"
+          }
+        }
+      }
+    },
+    {
+      "name": "recent",
+      "type": "view",
+      "options": {
+        "viewOn": "orders",
+        "pipeline": [
+          {
+            "$sort": {
+              "date": {
+                "$numberInt": "-1"
+              }
+            }
+          }
+        ]
+      },
+      "info": {
+        "readOnly": true
+      }
+    },
+    {
+      "name": "big",
+      "type": "view",
+      "options": {
+        "viewOn": "recent",
+        "pipeline": [
+          {
+            "$match": {
+              "total": {
+                "$gt": {
+                  "$numberInt": "100"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "info": {
+        "readOnly": true
+      }
+    }
+  ],
+  {
+    "isWritablePrimary": true,
+    "topologyVersion": {
+      "processId": {
+        "$oid": "6afe52dee7f5e26d912fa35f"
+      },
+      "counter": {
+        "$numberInt": "0"
+      }
+    },
+    "maxBsonObjectSize": {
+      "$numberInt": "16777216"
+    },
+    "maxMessageSizeBytes": {
+      "$numberInt": "48000000"
+    },
+    "maxWriteBatchSize": {
+      "$numberInt": "100000"
+    },
+    "localTime": {
+      "$date": {
+        "$numberLong": "1795052265627"
+      }
+    },
+    "logicalSessionTimeoutMinutes": {
+      "$numberInt": "30"
+    },
+    "connectionId": {
+      "$numberInt": "3"
+    },
+    "minWireVersion": {
+      "$numberInt": "0"
+    },
+    "maxWireVersion": {
+      "$numberInt": "27"
+    },
+    "readOnly": false,
+    "ok": {
+      "$numberInt": "1"
+    }
+  },
+  [
+    {
+      "v": {
+        "$numberInt": "2"
+      },
+      "key": {
+        "m": {
+          "$numberInt": "1"
+        },
+        "t": {
+          "$numberInt": "1"
+        }
+      },
+      "name": "m_1_t_1"
+    }
+  ],
+  [
+    {
+      "v": {
+        "$numberInt": "2"
+      },
+      "key": {
+        "_id": {
+          "$numberInt": "1"
+        }
+      },
+      "name": "_id_"
+    },
+    {
+      "v": {
+        "$numberInt": "2"
+      },
+      "key": {
+        "status": {
+          "$numberInt": "1"
+        }
+      },
+      "name": "status_1"
+    },
+    {
+      "v": {
+        "$numberInt": "2"
+      },
+      "key": {
+        "date": {
+          "$numberInt": "-1"
+        }
+      },
+      "name": "byDate",
+      "expireAfterSeconds": {
+        "$numberInt": "3600"
+      }
+    },
+    {
+      "v": {
+        "$numberInt": "2"
+      },
+      "key": {
+        "email": {
+          "$numberInt": "1"
+        }
+      },
+      "name": "email_fr",
+      "unique": true,
+      "collation": {
+        "locale": "fr",
+        "caseLevel": false,
+        "caseFirst": "off",
+        "strength": {
+          "$numberInt": "3"
+        },
+        "numericOrdering": false,
+        "alternate": "non-ignorable",
+        "maxVariable": "punct",
+        "normalization": false,
+        "backwards": false,
+        "version": "57.1"
+      }
+    },
+    {
+      "v": {
+        "$numberInt": "2"
+      },
+      "key": {
+        "_fts": "text",
+        "_ftsx": {
+          "$numberInt": "1"
+        }
+      },
+      "name": "search_text",
+      "weights": {
+        "body": {
+          "$numberInt": "1"
+        },
+        "title": {
+          "$numberInt": "5"
+        }
+      },
+      "default_language": "english",
+      "language_override": "language",
+      "textIndexVersion": {
+        "$numberInt": "3"
+      }
+    }
+  ],
+  [
+    {
+      "v": {
+        "$numberInt": "2"
+      },
+      "key": {
+        "_id": {
+          "$numberInt": "1"
+        }
+      },
+      "name": "_id_"
+    }
+  ],
+  {
+    "kind": "error",
+    "message": "Using Atlas Search Database Commands and the $listSearchIndexes aggregation stage requires additional configuration. Please connect to Atlas or an AtlasCLI local deployment to enable. For more information on how to connect, see https://dochub.mongodb.org/core/atlas-cli-deploy-local-reqs."
+  }
+]

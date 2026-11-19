@@ -1,0 +1,77 @@
+[
+  {
+    "_id": {
+      "$numberInt": "1"
+    },
+    "status": "new",
+    "total": {
+      "$numberInt": "10"
+    }
+  },
+  {
+    "_id": {
+      "$numberInt": "2"
+    },
+    "a": {
+      "$numberInt": "1"
+    },
+    "b": {
+      "$numberInt": "2"
+    }
+  },
+  {
+    "_id": {
+      "$numberInt": "3"
+    },
+    "n": {
+      "$numberInt": "1"
+    }
+  },
+  {
+    "_id": {
+      "a": {
+        "$numberInt": "1"
+      },
+      "b": {
+        "$numberInt": "2"
+      }
+    },
+    "x": "sub"
+  },
+  {
+    "_id": {
+      "$numberInt": "4"
+    },
+    "only": "left"
+  },
+  {
+    "_id": {
+      "$numberInt": "5"
+    },
+    "items": [
+      {
+        "sku": "A",
+        "qty": {
+          "$numberInt": "1"
+        }
+      },
+      {
+        "sku": "B",
+        "qty": {
+          "$numberInt": "2"
+        }
+      }
+    ],
+    "price": {
+      "$numberDecimal": "1"
+    }
+  },
+  {
+    "_id": {
+      "$numberInt": "6"
+    },
+    "n": {
+      "$numberInt": "1"
+    }
+  }
+]
