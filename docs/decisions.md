@@ -723,3 +723,16 @@ Raised while the catalog was written; each names the cards that hold the current
   a field of a reply (a small language of its own), and a second plan started after the first (a confirmation per
   write). It changes [the feature contract](feature-contract.md) and the runner. (`runner.run`, `document.delete`,
   `key.delete`, `pubsub.publish`, `server.kill-client`).
+- **Q59** — Users and GridFS: **Copy password** carries the generated password in the button of the notification, so
+  it stays in the window's state until the notification closes, where a handle held by the main process would be
+  safer (T21); the step text writes `db.getCollection("fs.files")` where the cards write `db.fs.files`; the folder of
+  an opened GridFS copy is named from the whole key when it is short, else a part of it and a digest, so that two
+  files with one name never share it; the old revisions replaced by an upload are read before the plan; each uploaded
+  file is a group of its own; user commands and bucket requests have 30 seconds. (`user.generate-password`,
+  `gridfs.drop-bucket`, `gridfs.open`, `gridfs.upload`).
+- **Q60** — Search, relations, comparisons and structures: a search in Contains mode uses the `u` flag; a boolean
+  matches only as a whole value; a reference that leads nowhere plans nothing; the documents to copy are read before
+  the confirmation; rule 7 of `structure.steps` is followed where its example disagrees on `{ name: "status_1" }`;
+  search indexes are taken as unsupported on the codes 31082, 59, 115, 40324 and 6047401; reads of several requests
+  are written in two styles, to make one. (`search.match`, `relation.follow`, `compare.make-like`, `structure.steps`,
+  `structure.read`).
