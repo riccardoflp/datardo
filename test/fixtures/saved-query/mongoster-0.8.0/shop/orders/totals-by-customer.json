@@ -1,0 +1,26 @@
+{
+  "name": "Totals by customer",
+  "connection": "Production",
+  "database": "shop",
+  "collection": "orders",
+  "pipeline": [
+    {
+      "stage": "$match",
+      "body": "{ status: \"paid\" }"
+    },
+    {
+      "stage": "$group",
+      "body": [
+        "{",
+        "  _id: \"$customer\",",
+        "  total: { $sum: \"$total\" }",
+        "}"
+      ]
+    },
+    {
+      "stage": "$sort",
+      "body": "{ total: -1 }",
+      "enabled": false
+    }
+  ]
+}

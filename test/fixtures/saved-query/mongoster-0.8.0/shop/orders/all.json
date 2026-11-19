@@ -1,0 +1,6 @@
+{
+  "name": "All",
+  "database": "shop",
+  "collection": "orders",
+  "filter": "{}"
+}

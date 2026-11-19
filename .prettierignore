@@ -8,3 +8,5 @@ package-lock.json
 docs
 *.md
 .claude
+# Saved query files recorded from Mongoster keep their bytes: they are compared byte for byte.
+test/fixtures/saved-query
