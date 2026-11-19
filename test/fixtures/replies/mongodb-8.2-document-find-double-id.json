@@ -1,0 +1,8 @@
+[
+  {
+    "_id": {
+      "$numberDouble": "1.0"
+    },
+    "name": "Double id"
+  }
+]

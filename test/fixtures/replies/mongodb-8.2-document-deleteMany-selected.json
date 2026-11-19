@@ -1,0 +1,6 @@
+{
+  "acknowledged": true,
+  "deletedCount": {
+    "$numberInt": "2"
+  }
+}
