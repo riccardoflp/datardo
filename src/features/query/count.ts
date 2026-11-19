@@ -9,7 +9,7 @@ import type { Context, ReadRequest } from '../../shared/feature';
 import { connectionId } from '../../shared/ids';
 import { formattedValue } from './format';
 import { isJsonObject, numberOf, type JsonObject } from './mongosh/ejson';
-import { checkedQuery, collectionText, queryTimeLimitMs } from './run';
+import { checkedQuery, collectionText, failureOf, queryTimeLimitMs } from './run';
 import { emptyTexts } from './types';
 
 /** How long a count started with a query may take, in ms (Mongoster's 10 seconds). */
@@ -32,11 +32,8 @@ export interface CountArgs {
   readonly exact: boolean;
 }
 
-/** A total: how many documents, and whether it is the estimate a collection keeps of itself. */
-export interface Count {
-  readonly count: number;
-  readonly estimated: boolean;
-}
+/** A total: how many documents, and whether it is the estimate a collection keeps of itself; or why it is not known. */
+export type Count = { readonly count: number; readonly estimated: boolean } | { readonly failure: string };
 
 function textOf(value: Json | undefined): string {
   return typeof value === 'string' ? value : '';
@@ -92,12 +89,21 @@ export function request(context: Context, args: Json): ReadRequest {
     throw new Error('query.count is started only with a filter query.run has read.');
   }
   const count = countRequest(asked, checked.query.filter, queryTimeLimitMs(context));
-  return { kind: 'engine', requests: [{ connection: connectionId(asked.connection), request: count }] };
+  return {
+    kind: 'engine',
+    requests: [{ connection: connectionId(asked.connection), request: count }],
+    // A count that fails shows the total as `?`, with no message: the documents stay.
+    failedRequests: 'are-replies',
+  };
 }
 
 /** Feature: query.count — the total of the reply, and whether it is an estimate. */
 export function parse(replies: readonly unknown[], args: Json): Count {
   const [reply] = replies;
+  const failure = failureOf(reply);
+  if (failure !== undefined) {
+    return { failure };
+  }
   const count = numberOf(reply as Json);
   const asked = countArgs(args);
   const checked = checkedQuery({ ...emptyTexts, filter: asked.filter }, asked.at);

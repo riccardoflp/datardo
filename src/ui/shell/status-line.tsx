@@ -6,6 +6,7 @@ import { currentOf } from '../../features/nav/current-connection';
 import { view } from '../../features/nav/status-line';
 import type { NavInput } from '../../features/nav/types';
 import type { Target } from '../../shared/target';
+import { countTab } from '../query/collection-reads';
 import { startFeature } from './intent';
 import styles from './bars.module.css';
 
@@ -57,7 +58,9 @@ export function StatusLine(props: { readonly input: NavInput; readonly openSwitc
           className={`${styles['part'] ?? ''} ${styles['cut'] ?? ''}`}
           data-feature={line.count.element}
           onClick={() => {
-            startFeature('query.count', { place: 'status-line', ...onCurrent });
+            if (props.input.activeTab.tab !== undefined) {
+              countTab(props.input.activeTab.tab, 'status-line');
+            }
           }}
         >
           {line.count.text}

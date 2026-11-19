@@ -5,6 +5,7 @@
 import { BSON, type AbstractCursor, type Collection, type Db, type Document } from 'mongodb';
 import type { Json, MongoRequest } from '../../shared/engine-request';
 import { EngineError } from '../engine';
+import { documentOfBytes } from './document-bytes';
 
 /** How many documents a method that returns many gives at most when the request names no limit (R9.2). */
 export const mostDocuments = 1000;
@@ -17,6 +18,20 @@ export function fromExtendedJson(value: Json): unknown {
 /** A value of the driver as canonical Extended JSON. */
 export function toExtendedJson(value: unknown): Json {
   return (BSON.EJSON.serialize({ value }, { relaxed: false }) as { value: Json }).value;
+}
+
+/**
+ * A reply of the driver as canonical Extended JSON. A document asked for as BSON bytes (`raw: true`) is read from its
+ * bytes, so that a BSON undefined and a date beyond JavaScript survive; with values not promoted, the driver gives
+ * bytes for nothing else.
+ */
+function replyOf(value: unknown): Json {
+  return value instanceof Uint8Array ? documentOfBytes(value) : toExtendedJson(value);
+}
+
+/** The options of a method that returns documents, which the driver then gives as BSON bytes (see `replyOf`). */
+function asBytes(options: Options): Options {
+  return { ...options, raw: true };
 }
 
 async function readCursor(cursor: AbstractCursor, limit: number): Promise<unknown[]> {
@@ -73,7 +88,7 @@ function collectionMethod(
   const [first, second, third] = args;
   switch (method) {
     case 'findOne':
-      return collection.findOne(document(first), merged(second, options));
+      return collection.findOne(document(first), asBytes(merged(second, options)));
     case 'countDocuments':
       return collection.countDocuments(document(first), merged(second, options));
     case 'estimatedDocumentCount':
@@ -117,11 +132,11 @@ function cursorOf(
   const collection = request.collection === undefined ? undefined : db.collection(request.collection);
   switch (request.method) {
     case 'find':
-      return collection?.find(document(first), merged(second, options));
+      return collection?.find(document(first), asBytes(merged(second, options)));
     case 'aggregate':
       return collection === undefined
-        ? db.aggregate(documents(first), merged(second, options))
-        : collection.aggregate(documents(first), merged(second, options));
+        ? db.aggregate(documents(first), asBytes(merged(second, options)))
+        : collection.aggregate(documents(first), asBytes(merged(second, options)));
     case 'listCollections':
       return db.listCollections(document(first), merged(second, options));
     case 'listIndexes':
@@ -131,19 +146,19 @@ function cursorOf(
   }
 }
 
-/** Carries out a request on a database of the client and returns the driver's reply, not yet as Extended JSON. */
-export async function callMethod(db: Db, request: MongoRequest, signal: AbortSignal): Promise<unknown> {
+/** Carries out a request on a database of the client and returns the reply as canonical Extended JSON. */
+export async function callMethod(db: Db, request: MongoRequest, signal: AbortSignal): Promise<Json> {
   const args = request.arguments.map(fromExtendedJson);
   const options: Options = {
     signal,
     ...(request.timeLimitMs === undefined ? {} : { timeoutMS: request.timeLimitMs }),
   };
   if (request.method === 'runCommand') {
-    return db.command(document(args[0]), options);
+    return toExtendedJson(await db.command(document(args[0]), options));
   }
   const cursor = cursorOf(db, request, args, options);
   if (cursor !== undefined) {
-    return readCursor(cursor, request.limit ?? mostDocuments);
+    return (await readCursor(cursor, request.limit ?? mostDocuments)).map(replyOf);
   }
   const reply =
     request.collection === undefined
@@ -152,5 +167,5 @@ export async function callMethod(db: Db, request: MongoRequest, signal: AbortSig
   if (reply === undefined) {
     throw new EngineError(`Datardo cannot call ${request.method} on MongoDB yet.`);
   }
-  return reply;
+  return replyOf(await reply);
 }

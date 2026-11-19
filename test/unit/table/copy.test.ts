@@ -108,13 +108,11 @@ describe('table.copy-text', () => {
   });
 
   it('gives mongosh that query.parse reads back with every type (M10)', () => {
-    const { dateBeyondJavaScript, undefined: _undefined, ...kept } = everyType;
-    const document = kept as unknown as Json;
-    expect(parsedValue(copyText([kept as never], 'mongosh', 'orders'), 0, () => '')).toEqual({
+    const document = everyType as unknown as Json;
+    expect(parsedValue(copyText([everyType as never], 'mongosh', 'orders'), 0, () => '')).toEqual({
       ok: true,
       value: document,
     });
-    expect(dateBeyondJavaScript).toBeDefined();
   });
 });
 

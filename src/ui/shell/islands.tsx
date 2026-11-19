@@ -10,6 +10,7 @@ import { isInspectorWanted } from '../../features/nav/inspector';
 import { layout, railWidth, rightMargin, type Layout } from '../../features/nav/layout';
 import { dragged, widthLimits, type ResizedIsland } from '../../features/nav/resize';
 import { navInput, type NavInput } from '../../features/nav/types';
+import { useCollectionStatus } from '../query/collection-status';
 import { useAppState } from '../state/store';
 import { ConnectionSwitcher } from './connection-switcher';
 import { Explorer } from './explorer';
@@ -75,7 +76,7 @@ function useFocusKeptWhenHidden(shown: boolean): void {
 /** The islands. */
 export function Islands(): React.JSX.Element {
   const state = useAppState();
-  const input = navInput(state);
+  const input = useCollectionStatus(state, navInput(state));
   const windowWidth = useWindowWidth();
   const [drag, setDrag] = useState<Drag | undefined>(undefined);
   const [switcherOpen, setSwitcherOpen] = useState(false);

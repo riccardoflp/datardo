@@ -18,6 +18,7 @@ import { initialNavState, reduceNav, type NavEvent, type NavState } from './nav'
 import { initialPaletteState, reducePalette, type PaletteEvent, type PaletteState } from './palette';
 import { initialRunnerState, reduceRunner, type RunnerEvent, type RunnerState } from './runner';
 import { initialSettingsState, reduceSettings, type SettingsEvent, type SettingsState } from './settings';
+import { initialTableState, reduceTable, type TableEvent, type TableState } from './table';
 import { initialTabsState, reduceTabs, type TabsEvent, type TabsState } from './tabs';
 import { initialWindowState, reduceWindow, type WindowEvent, type WindowState } from './window';
 
@@ -31,11 +32,20 @@ export interface AppState {
   readonly connections: ConnectionsState;
   readonly tabs: TabsState;
   readonly palette: PaletteState;
+  readonly table: TableState;
 }
 
 /** Every change to the app's state. */
 export type AppEvent =
-  AppInfoEvent | SettingsEvent | RunnerEvent | WindowEvent | NavEvent | ConnectionsEvent | TabsEvent | PaletteEvent;
+  | AppInfoEvent
+  | SettingsEvent
+  | RunnerEvent
+  | WindowEvent
+  | NavEvent
+  | ConnectionsEvent
+  | TabsEvent
+  | PaletteEvent
+  | TableEvent;
 
 /** The state at start, before anything is loaded. */
 export const initialState: AppState = {
@@ -47,6 +57,7 @@ export const initialState: AppState = {
   connections: initialConnectionsState,
   tabs: initialTabsState,
   palette: initialPaletteState,
+  table: initialTableState,
 };
 
 /** The one function that changes the app's state. */
@@ -68,5 +79,7 @@ export function reduce(state: AppState, event: AppEvent): AppState {
       return { ...state, tabs: reduceTabs(state.tabs, event) };
     case 'palette':
       return { ...state, palette: reducePalette(state.palette, event) };
+    case 'table':
+      return { ...state, table: reduceTable(state.table, event) };
   }
 }

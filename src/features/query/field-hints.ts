@@ -66,6 +66,8 @@ export function request(context: Context, args: Json): ReadRequest {
   return {
     kind: 'engine',
     requests: [{ connection: connectionId(connection), request: sampleRequest(database, collection) }],
+    // A sample that fails gives no fields and shows no error: the suggestions are then operators only.
+    failedRequests: 'are-replies',
   };
 }
 

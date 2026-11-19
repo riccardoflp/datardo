@@ -489,6 +489,18 @@ Mongoster's format too, which Datardo would then have to keep writing, and impor
 of the MongoDB connection, which Datardo's link by id (D17) has no place for.
 *Built in M7 on 2026-11-19 as Q18 proposes; answers Q18 unless the author decides otherwise.*
 
+## D55 — Skip and Limit are fields of the bar, an empty filter shows an estimate, and the time limit is a setting
+
+The query bar is built as its cards say (M9). **Skip** and **Limit** are fields of their own, and the paging moves
+inside their result (`query.bar`, `query.run`, `table.page-window`). An empty filter on a collection shows the count
+the collection keeps of itself (`estimatedDocumentCount()`), marked as an estimate by its tooltip, and a click counts
+exactly; a filter, a view or a time series collection is counted with `countDocuments` (`query.count`). The time
+limit of a query is the setting `datardo.query.timeLimitSeconds`, 60 by default, and a query the server stops at it
+says so with the number of the setting (`query.run`). Cells show mongosh text with its quotes (`table.cell-text`).
+Rejected: the page size and the page as the only way to skip documents, as Mongoster had; an exact count of every
+collection, which scans it; a fixed time limit.
+*Built in M9 on 2026-11-19 as the cards say; answers Q24 unless the author decides otherwise.*
+
 ## Open questions
 
 - **Q1** — *Answered on 2026-11-18 by [D7](#d7--home-is-the-first-page)*: the last active tab when tabs are restored,
@@ -551,7 +563,9 @@ Raised while the catalog was written; each names the cards that hold the current
   estimated count beside each collection; a click on a Redis database opens its keys tab and only the arrow expands
   it; databases without keys are folded under one line; a prefix with one key is not a namespace. (`tree.count`,
   `tree.redis`, `tree.namespaces`).
-- **Q24** — Skip and Limit are fields of the query bar and paging happens inside their result. An empty filter shows
+- **Q24** — *Answered on 2026-11-19 by
+  [D55](#d55--skip-and-limit-are-fields-of-the-bar-an-empty-filter-shows-an-estimate-and-the-time-limit-is-a-setting)*:
+  Skip and Limit are fields of the query bar and paging happens inside their result. An empty filter shows
   the estimated count, marked by a tooltip. The time limit of a query is a setting. Cells show mongosh text with its
   quotes, where the sketch shows plain text. (`query.bar`, `query.count`, `query.run`, `table.cell-text`).
 - **Q25** — Changes to what a tab shows (sorting from a header, switching mode, expanding a column) are written as

@@ -118,7 +118,7 @@ describe('query.run', () => {
     expect(back['int64Big']).toEqual({ $numberLong: '9007199254740993' });
     expect(bsonType(back['dateBefore1970'] as Json)).toBe('date');
     expect(bsonType(back['dateFar'] as Json)).toBe('date');
-    for (const key of Object.keys(everyType).filter((each) => !['undefined', 'dateBeyondJavaScript'].includes(each))) {
+    for (const key of Object.keys(everyType)) {
       expect(back[key], key).toEqual(everyType[key]);
     }
   });

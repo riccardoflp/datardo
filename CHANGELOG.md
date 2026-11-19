@@ -34,6 +34,11 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
 - Connections are imported from a file or the clipboard (Datardo, Mongoster and Compass exports, lists of connection
   strings), with their encrypted passwords when the passphrase is given, and exported for Datardo, for Compass or as
   a list, without passwords, with them encrypted, or in clear text.
+- A collection tab has its query bar: a filter, a sort, a projection, **Skip** and **Limit** in mongosh syntax, colored
+  as they are typed, with suggestions of the collection's fields, operators and values; the query builder writes the
+  filter from rows of fields, operators and values. The tab runs its query when it opens, keeps the query last run for the next start, counts the
+  matching documents (an estimate for an empty filter, exact on a click), stops a query at the time limit of the
+  settings and says so, and **Cancel** stops a query that runs. `Ctrl+F` goes to **Filter** and `Ctrl+Enter` runs.
 
 ### Security
 

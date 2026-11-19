@@ -11,6 +11,7 @@ import { start as startKnownHosts } from './known-hosts';
 import { start as startTabs } from './tabs';
 import { start as startPing } from './ping';
 import { start as startPalette } from './palette';
+import { start as startTable } from './table';
 
 /** What one area does at start. */
 export type AreaStart = (services: MainServices) => Promise<void>;
@@ -23,6 +24,7 @@ const starts: readonly AreaStart[] = [
   startNav,
   startTabs,
   startPalette,
+  startTable,
   startPing,
   startCheckUpdate,
 ];

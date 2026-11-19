@@ -539,25 +539,25 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`query.bar`](query.md#querybar--the-query-bar) | The query bar | View | M9 | Specified |
-| [`query.mode`](query.md#querymode--switch-between-find-and-aggregate) | Switch between Find and Aggregate | Derivation | M9 | Specified |
-| [`query.run`](query.md#queryrun--run-the-query) | Run the query | Read | M9 | Specified |
-| [`query.count`](query.md#querycount--count-the-matching-documents) | Count the matching documents | Read | M9 | Specified |
-| [`query.reset`](query.md#queryreset--reset-the-query) | Reset the query | Derivation | M9 | Specified |
-| [`query.restore`](query.md#queryrestore--the-query-a-tab-remembers) | The query a tab remembers | Derivation | M9 | Specified |
-| [`query.parse`](query.md#queryparse--read-mongosh-syntax-into-values) | Read mongosh syntax into values | Derivation | M9 | Specified |
-| [`query.format`](query.md#queryformat--write-values-as-mongosh-syntax) | Write values as mongosh syntax | Derivation | M9 | Specified |
-| [`query.highlight`](query.md#queryhighlight--the-syntax-colors-of-mongosh-text) | The syntax colors of mongosh text | Derivation | M9 | Specified |
-| [`query.builder`](query.md#querybuilder--the-query-builder) | The query builder | View | M9 | Specified |
-| [`query.builder-filter`](query.md#querybuilder-filter--the-filter-of-the-builders-rows) | The filter of the builder's rows | Derivation | M9 | Specified |
-| [`query.builder-rows`](query.md#querybuilder-rows--the-builders-rows-of-a-filter) | The builder's rows of a filter | Derivation | M9 | Specified |
-| [`query.autocomplete`](query.md#queryautocomplete--suggestions-while-typing) | Suggestions while typing | View | M9 | Specified |
-| [`query.suggestions`](query.md#querysuggestions--what-is-suggested-where-the-cursor-is) | What is suggested where the cursor is | Derivation | M9 | Specified |
-| [`query.field-hints`](query.md#queryfield-hints--the-fields-and-frequent-values-of-a-collection) | The fields and frequent values of a collection | Read | M9 | Specified |
-| [`query.drag`](query.md#querydrag--drag-a-field-or-a-value-into-the-bar) | Drag a field or a value into the bar | View | M9 | Specified |
-| [`query.add-condition`](query.md#queryadd-condition--add-a-condition-to-the-filter) | Add a condition to the filter | Derivation | M9 | Specified |
-| [`query.add-sort`](query.md#queryadd-sort--add-a-field-to-the-sort) | Add a field to the sort | Derivation | M9 | Specified |
-| [`query.add-projection`](query.md#queryadd-projection--add-a-field-to-the-projection) | Add a field to the projection | Derivation | M9 | Specified |
+| [`query.bar`](query.md#querybar--the-query-bar) | The query bar | View | M9 | Built |
+| [`query.mode`](query.md#querymode--switch-between-find-and-aggregate) | Switch between Find and Aggregate | Derivation | M9 | Built |
+| [`query.run`](query.md#queryrun--run-the-query) | Run the query | Read | M9 | Built |
+| [`query.count`](query.md#querycount--count-the-matching-documents) | Count the matching documents | Read | M9 | Built |
+| [`query.reset`](query.md#queryreset--reset-the-query) | Reset the query | Derivation | M9 | Built |
+| [`query.restore`](query.md#queryrestore--the-query-a-tab-remembers) | The query a tab remembers | Derivation | M9 | Built |
+| [`query.parse`](query.md#queryparse--read-mongosh-syntax-into-values) | Read mongosh syntax into values | Derivation | M9 | Built |
+| [`query.format`](query.md#queryformat--write-values-as-mongosh-syntax) | Write values as mongosh syntax | Derivation | M9 | Built |
+| [`query.highlight`](query.md#queryhighlight--the-syntax-colors-of-mongosh-text) | The syntax colors of mongosh text | Derivation | M9 | Built |
+| [`query.builder`](query.md#querybuilder--the-query-builder) | The query builder | View | M9 | Built |
+| [`query.builder-filter`](query.md#querybuilder-filter--the-filter-of-the-builders-rows) | The filter of the builder's rows | Derivation | M9 | Built |
+| [`query.builder-rows`](query.md#querybuilder-rows--the-builders-rows-of-a-filter) | The builder's rows of a filter | Derivation | M9 | Built |
+| [`query.autocomplete`](query.md#queryautocomplete--suggestions-while-typing) | Suggestions while typing | View | M9 | Built |
+| [`query.suggestions`](query.md#querysuggestions--what-is-suggested-where-the-cursor-is) | What is suggested where the cursor is | Derivation | M9 | Built |
+| [`query.field-hints`](query.md#queryfield-hints--the-fields-and-frequent-values-of-a-collection) | The fields and frequent values of a collection | Read | M9 | Built |
+| [`query.drag`](query.md#querydrag--drag-a-field-or-a-value-into-the-bar) | Drag a field or a value into the bar | View | M9 | Built |
+| [`query.add-condition`](query.md#queryadd-condition--add-a-condition-to-the-filter) | Add a condition to the filter | Derivation | M9 | Built |
+| [`query.add-sort`](query.md#queryadd-sort--add-a-field-to-the-sort) | Add a field to the sort | Derivation | M9 | Built |
+| [`query.add-projection`](query.md#queryadd-projection--add-a-field-to-the-projection) | Add a field to the projection | Derivation | M9 | Built |
 
 ## References
 

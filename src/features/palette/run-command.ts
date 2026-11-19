@@ -76,6 +76,16 @@ function isOfferedByItsCard(state: AppState, id: string): boolean {
       return active !== undefined && isCloseOffered(state, active);
     case 'settings.reset':
       return isResetOffered(state.settings);
+    case 'query.bar':
+    case 'query.run':
+    case 'query.reset':
+    case 'query.mode:find':
+    case 'query.builder':
+      // The query bar is a collection tab's: with none active, there is no query.
+      return active?.shows.kind === 'collection';
+    case 'query.mode:aggregate':
+      // Aggregate is built in M19.
+      return false;
     case 'tree.refresh':
     case 'tree.filter':
       // The tree island shows the current connection: with none, there is nothing to refresh or filter.

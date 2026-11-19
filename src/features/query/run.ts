@@ -43,9 +43,11 @@ export interface RunArgs {
   readonly at?: number;
 }
 
-/** What a page of the result gives. */
+/** What a page of the result gives: its documents, or the failure of the server, for the error line. */
 export interface RunResult {
   readonly documents: readonly Document[];
+  /** The server's message when the `find` failed: the error line shows it, and the table keeps what it showed. */
+  readonly failure?: string;
 }
 
 function objectOf(written: string, now: number): JsonObject | undefined | 'invalid' {
@@ -196,14 +198,32 @@ export function request(context: Context, args: Json): ReadRequest | Outcome {
   }
   const window = runWindow(checked.query, asked.page, asked.pageSize);
   const find = findRequest(asked, checked.query, window, queryTimeLimitMs(context));
-  return { kind: 'engine', requests: [{ connection: connectionId(asked.connection), request: find }] };
+  return {
+    kind: 'engine',
+    requests: [{ connection: connectionId(asked.connection), request: find }],
+    // A failure of the server is shown on the error line of the bar, in the server's words, not as a notification.
+    failedRequests: 'are-replies',
+  };
 }
 
 /** Feature: query.run — the documents of the page, as the server gave them, every type kept. */
 export function parse(replies: readonly unknown[]): RunResult {
   const [reply] = replies;
+  const failure = failureOf(reply);
+  if (failure !== undefined) {
+    return { documents: [], failure };
+  }
   const documents = Array.isArray(reply) ? reply.filter((each): each is Document => isJsonObject(each as Json)) : [];
   return { documents };
+}
+
+/** The message of a request that failed, as the runner gives it to a Read that takes failures as replies. */
+export function failureOf(reply: unknown): string | undefined {
+  if (typeof reply !== 'object' || reply === null || Array.isArray(reply)) {
+    return undefined;
+  }
+  const fields = reply as Readonly<Record<string, unknown>>;
+  return fields['kind'] === 'error' && typeof fields['message'] === 'string' ? fields['message'] : undefined;
 }
 
 /** Whether a failure of the server is the time limit: `MaxTimeMSExpired` (code 50) or the driver's timeout. */

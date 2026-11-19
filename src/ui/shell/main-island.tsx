@@ -9,6 +9,7 @@ import { pageTitle, text } from '../../features/nav/text';
 import type { NavInput } from '../../features/nav/types';
 import { useLayoutEffect, useRef, useState } from 'react';
 import { pages } from '../pages';
+import { CollectionPage } from '../pages/collection/collection-page';
 import { startFeature } from './intent';
 import { TabStrip } from './tab-strip';
 import styles from './bars.module.css';
@@ -154,7 +155,11 @@ export function MainIsland({
         aria-label={pageTitle(page)}
         role="region"
       >
-        {Page === undefined ? null : <Page />}
+        {Page !== undefined ? (
+          <Page />
+        ) : shown.kind === 'collection' && shown.tab !== undefined ? (
+          <CollectionPage key={shown.tab} tab={shown.tab} shows={shown} />
+        ) : null}
       </div>
     </section>
   );

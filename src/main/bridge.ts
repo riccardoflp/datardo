@@ -20,6 +20,7 @@ import type { RunnerPorts } from '../runner/ports';
 import { writeAtomically } from '../storage/store';
 import type { AppStateHolder } from './app-state';
 import type { WindowDialogs } from './dialogs';
+import { keepTabQuery } from './query';
 import { withTestFeatures } from './test-features';
 
 let readyPorts: (ports: RunnerPorts) => void = () => undefined;
@@ -41,6 +42,7 @@ export function answerTheBridge(given: RunnerPorts, state: AppStateHolder, dialo
   ipcMain.handle(bridgeChannel.start, async (_event, intent: Intent) => {
     const started = Date.now();
     const result = await start(ports, intent);
+    keepTabQuery(state, intent, result);
     tellTheSystem(state, Date.now() - started, result.kind === 'failed' ? result.message : undefined);
     return result;
   });

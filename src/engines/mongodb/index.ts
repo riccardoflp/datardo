@@ -7,7 +7,7 @@ import type { EngineRequest } from '../../shared/engine-request';
 import { EngineError, type ClientSettings, type ClientTls, type Engine, type EngineClient } from '../engine';
 import { maskedError, secretsOf } from '../transport/mask';
 import { openDirectOrThrough } from '../transport/tunnel';
-import { callMethod, toExtendedJson } from './methods';
+import { callMethod } from './methods';
 
 /** The name the server sees for Datardo's clients (connection.connect). */
 export const appName = 'datardo';
@@ -66,7 +66,7 @@ function clientOf(client: MongoClient, secrets: readonly string[]): EngineClient
         throw new EngineError('A Redis command cannot be sent to MongoDB.');
       }
       try {
-        return toExtendedJson(await callMethod(client.db(request.database), request, signal));
+        return await callMethod(client.db(request.database), request, signal);
       } catch (error: unknown) {
         throw maskedError(error, secrets);
       }

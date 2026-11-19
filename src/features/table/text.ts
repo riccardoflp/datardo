@@ -96,6 +96,7 @@ export const text = {
     descending: 'sorted descending',
   },
   paging: {
+    label: 'Paging',
     range: (first: string, last: string, total: string) => `${first}–${last} of ${total}`,
     previous: 'Previous page',
     next: 'Next page',
