@@ -76,6 +76,10 @@ function isOfferedByItsCard(state: AppState, id: string): boolean {
       return active !== undefined && isCloseOffered(state, active);
     case 'settings.reset':
       return isResetOffered(state.settings);
+    case 'tree.refresh':
+    case 'tree.filter':
+      // The tree island shows the current connection: with none, there is nothing to refresh or filter.
+      return state.nav.current !== undefined;
     default:
       return isWindowCommandOffered(state, id);
   }

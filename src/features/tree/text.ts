@@ -84,6 +84,8 @@ export const text = {
     keys: (count: string) => `${count} keys`,
   },
   menu: {
+    moreActions: 'More actions',
+    move: 'Move',
     open: 'Open',
     pin: 'Pin',
     unpin: 'Unpin',

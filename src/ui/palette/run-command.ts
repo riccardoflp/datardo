@@ -1,12 +1,13 @@
 /**
  * Runs a command in the window (`palette.run-command`), the same way for its key and for its row in Go to. The
  * commands that only change the window (open Go to, move the focus between islands, open the connection switcher,
- * open About) are carried out here; every other starts its feature through the bridge on what the user is looking at.
+ * open About, refresh or filter the tree) are carried out here; every other starts its feature through the bridge on what the user is looking at.
  */
 import { intentOf } from '../../features/palette/run-command';
 import type { AppState } from '../../shared/state';
 import { focusNextIsland } from '../shell/focus';
 import { startIntent } from '../shell/top-bar/start';
+import { runTreeCommand } from '../tree/tree-commands';
 import { openAbout } from '../window/about';
 import { openGoTo } from './go-to-store';
 
@@ -42,6 +43,10 @@ const windowOnly: Readonly<Record<string, () => void>> = {
 
 /** Runs a command now; a command not offered in this state does nothing. */
 export function runCommand(id: string, state: AppState): void {
+  if (id === 'tree.refresh' || id === 'tree.filter') {
+    runTreeCommand(id, state);
+    return;
+  }
   const local = windowOnly[id];
   if (local !== undefined) {
     local();

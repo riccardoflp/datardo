@@ -4,10 +4,13 @@ import {
   cancelled,
   freshScan,
   keysOfRun,
+  loadingMore,
   loadMore,
   nextCall,
   parse,
   request,
+  scanningAfter,
+  scanStopped,
   type ScanPage,
 } from '../../../src/features/tree/scan-namespaces';
 import { bytes, contextOf, recordedRedis } from './context';
@@ -79,5 +82,26 @@ describe('tree.scan-namespaces', () => {
 
   it('a call that fails fails the scan with the message of the server', () => {
     expect(() => parse([{ kind: 'error', message: 'NOPERM' }])).toThrow('NOPERM');
+  });
+
+  it('the island keeps scanning while the run goes on, Load more scans again, and a stop keeps what was seen', () => {
+    const scanning = { scan: freshScan, scanning: { since: 100 } };
+    const going = scanningAfter(scanning, page('7', 3));
+    expect([going.scan.keys.length, going.scanning]).toEqual([3, { since: 100 }]);
+    expect(scanningAfter(going, page('0', 2, 3))).toEqual({ scan: afterPage(going.scan, page('0', 2, 3)) });
+    const stopped = scanStopped(going, 'BUSY Redis is busy running a script');
+    expect(stopped).toEqual({
+      scan: { ...going.scan, ended: 'paused' },
+      failed: 'BUSY Redis is busy running a script',
+    });
+    expect(scanStopped(going)).toEqual({ scan: { ...going.scan, ended: 'paused' } });
+    const more = loadingMore(stopped, 200);
+    expect([more.scan.keys.length, more.scan.cursor, more.scan.ended, more.scanning]).toEqual([
+      3,
+      '7',
+      undefined,
+      { since: 200 },
+    ]);
+    expect(loadingMore(undefined, 300)).toEqual({ scan: { ...freshScan, returned: 0 }, scanning: { since: 300 } });
   });
 });

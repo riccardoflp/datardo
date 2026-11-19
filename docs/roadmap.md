@@ -607,7 +607,7 @@ connection.
 and namespaces of a Redis connection, the pages of the connection and the pins; it is filtered, refreshed and used
 from the keyboard.
 **Depends on**: M6.
-**Status**: planned
+**Status**: done
 
 ### Features
 
@@ -650,14 +650,14 @@ from the keyboard.
 
 ### Exit criteria
 
-- [ ] On a Redis database of 5 million keys, expanding it sends `SCAN` calls only and shows namespaces in under 1
+- [x] On a Redis database of 5 million keys, expanding it sends `SCAN` calls only and shows namespaces in under 1
       second (QA7, the tree's part).
-- [ ] A MongoDB connection with 300 collections is filtered by a text and moved through with the arrows.
-- [ ] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
+- [x] A MongoDB connection with 300 collections is filtered by a text and moved through with the arrows.
+- [x] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
       `npm run test:integration`, `npm run test:ui`; `catalog.py --tests` reports none missing for these cards.
-- [ ] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
+- [x] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
       the keyboard alone (QA15, QA16).
-- [ ] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
+- [x] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
       and this milestone's **Status** is *done*.
 
 ### Not in this milestone

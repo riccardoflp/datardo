@@ -118,6 +118,30 @@ export function pinControl(connection: ConnectionId, pin: Pin, pins: readonly Pi
   });
 }
 
+/**
+ * Moving a pinned item (`nav.pin`) from the tree: dragged onto another pinned item, it takes that item's place;
+ * `Alt+Up` and `Alt+Down` move it by one. Nothing when it would not move, or the lines are not pinned items.
+ */
+export function moveControl(
+  input: TreeInput,
+  item: string,
+  onto: { readonly item: string } | 'up' | 'down',
+): Control | undefined {
+  const connection = currentConnection(input.state);
+  const pins = pinsOf(input);
+  const placeOf = (id: string): number => pins.findIndex((pin) => nodeId({ kind: 'pin', pin }) === id);
+  const from = placeOf(item);
+  const to = onto === 'up' ? from - 1 : onto === 'down' ? from + 1 : placeOf(onto.item);
+  const pin = pins[from];
+  if (connection === undefined || pin === undefined || to < 0 || to >= pins.length || to === from) {
+    return undefined;
+  }
+  return startControl(text.menu.move, 'nav.pin@tree', 'nav.pin', {
+    connection: connection.id,
+    args: { action: 'move', connection: connection.id, pin: pin as unknown as Json, to },
+  });
+}
+
 /** The pins of the current connection, in their order. */
 export function pinsOf(input: TreeInput): readonly Pin[] {
   const connection = currentConnection(input.state);

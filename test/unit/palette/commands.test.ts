@@ -117,6 +117,18 @@ describe('palette.run-command', () => {
     expect(ids.filter((id) => id.includes('index'))).toEqual([]);
   });
 
+  it('Refresh the tree and Filter the tree are offered while a connection is current, for both engines', () => {
+    const h = harness();
+    const treeIds = () =>
+      offeredCommands(registeredCommands, h.state(), 'windows')
+        .map((entry) => entry.id)
+        .filter((id) => id.startsWith('tree.'));
+    expect(treeIds()).toEqual([]);
+    h.connect(cacheLocal.id);
+    h.makeCurrent(cacheLocal.id);
+    expect(treeIds()).toEqual(['tree.refresh', 'tree.filter']);
+  });
+
   it('a command not offered now is not listed, and its key does nothing', () => {
     const h = harness();
     expect(intentOf(h.state(), 'nav.back:back')).toBeUndefined();

@@ -377,7 +377,10 @@ export function openControl(label: string, element: string, shows: TabShows): Co
   return { kind: 'start', label, element, feature: 'tab.open', target, args: { shows: shows as unknown as Json } };
 }
 
-/** The accessible name of a node: its name, its kind, its count when it has one, and whether it is expanded. */
+/**
+ * The accessible name of a node: its name, its count when it has one, its kind, and whether it is expanded. The count
+ * comes right after the name, as the line shows it, so that the words seen are the first words of the name heard.
+ */
 export function nodeLabel(parts: {
   readonly name: string;
   readonly kind: string;
@@ -385,5 +388,5 @@ export function nodeLabel(parts: {
   readonly expanded?: boolean;
 }): string {
   const state = parts.expanded === undefined ? [] : [parts.expanded ? text.label.expanded : text.label.collapsed];
-  return [parts.name, parts.kind, ...(parts.count === undefined ? [] : [parts.count]), ...state].join(', ');
+  return [parts.name, ...(parts.count === undefined ? [] : [parts.count]), parts.kind, ...state].join(', ');
 }

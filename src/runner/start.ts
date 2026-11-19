@@ -2,7 +2,7 @@
  * Carries out an intent (architecture, "From an action to its effect"): builds the context, calls the feature again
  * and again with what has been learned, asks, reads, refuses or runs, as the feature says.
  */
-import { errorMessage } from '../features/runner/error';
+import { errorMessage, withoutSecrets } from '../features/runner/error';
 import { runnerText } from '../features/runner/text';
 import type { Intent, IntentResult } from '../shared/bridge';
 import type {
@@ -16,7 +16,7 @@ import type {
   ReadRequest,
   StartedBy,
 } from '../shared/feature';
-import type { Json } from '../shared/engine-request';
+import type { ConnectionRequest, Json } from '../shared/engine-request';
 import type { RefusalCode } from '../shared/ids';
 import { carryOutAfter } from './after';
 import { Cancelled, unlessCancelled } from './cancel';
@@ -198,7 +198,27 @@ async function sendRead(ports: RunnerPorts, request: ReadRequest, signal: AbortS
   }
   const replies: unknown[] = [];
   for (const each of request.requests) {
-    replies.push(await ports.engines.send(each, signal));
+    replies.push(
+      request.failedRequests === 'are-replies'
+        ? await replyOrFailure(ports, each, signal)
+        : await ports.engines.send(each, signal),
+    );
   }
   return replies;
+}
+
+/**
+ * The reply of one request, or its failure as `{ kind: 'error', message }` for a Read that takes failures as replies
+ * (`failedRequests: 'are-replies'`): the server's message, without secrets. A cancelled read still ends.
+ */
+async function replyOrFailure(ports: RunnerPorts, request: ConnectionRequest, signal: AbortSignal): Promise<unknown> {
+  try {
+    return await ports.engines.send(request, signal);
+  } catch (error: unknown) {
+    if (signal.aborted) {
+      throw new Cancelled();
+    }
+    // The read asked for its failures: its `parse` says what each one means, and the next request goes on.
+    return { kind: 'error', message: withoutSecrets(error instanceof Error ? error.message : String(error)) };
+  }
 }

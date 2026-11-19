@@ -149,9 +149,9 @@ describe('tree.mongodb', () => {
     expect(lines.slice(2)).toEqual(['shop', 'No collections']);
   });
 
-  it('each node says its name, its kind, its count and whether it is expanded', () => {
+  it('each node says its name, its count or size, its kind and whether it is expanded', () => {
     const nodes = nodesOf(view(inputOf({ island: island() }), mongoConnection()));
-    expect(nodes.find((node) => node.name === 'shop')?.label).toBe('shop, database, expanded');
-    expect(nodes.find((node) => node.name === 'orders')?.label).toBe('orders, collection, 1,204 documents');
+    expect(nodes.find((node) => node.name === 'shop')?.label).toBe('shop, 1.5 KB, database, expanded');
+    expect(nodes.find((node) => node.name === 'orders')?.label).toBe('orders, 1,204 documents, collection');
   });
 });

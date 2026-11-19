@@ -28,7 +28,12 @@ export function redisDatabasesRequests(): readonly RedisRequest[] {
 /** Feature: tree.redis-databases — the requests for `args.connection`. */
 export function request(_context: Context, args: Json): ReadRequest {
   const connection = connectionId(textArg(args, 'connection'));
-  return { kind: 'engine', requests: redisDatabasesRequests().map((each) => ({ connection, request: each })) };
+  // `CONFIG` refused (an ACL, a hosted service) gives the number from `INFO keyspace`, with no error shown (`parse`).
+  return {
+    kind: 'engine',
+    requests: redisDatabasesRequests().map((each) => ({ connection, request: each })),
+    failedRequests: 'are-replies',
+  };
 }
 
 const decoder = new TextDecoder();

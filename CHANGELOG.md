@@ -22,3 +22,7 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
   connections by folder and the places used last.
 - MongoDB and Redis connections are added in the connection form, tested, saved with their passwords in the secret
   storage, connected and disconnected, made read-only, and shown in their Overview.
+- The tree island lists the databases and collections of a MongoDB connection with their estimated counts and sizes,
+  and the databases and key namespaces of a Redis connection, scanned with `SCAN` only, 10,000 keys at a time with
+  **Load more**; it is filtered with `Ctrl+F`, refreshed with `F5`, used from the keyboard alone, shows pinned items
+  and pages, and opens the context menus of its nodes.

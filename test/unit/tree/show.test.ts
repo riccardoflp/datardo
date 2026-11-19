@@ -1,5 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { nodeOfTab, revealedFor, view } from '../../../src/features/tree/show';
+import { view as mongoMenu } from '../../../src/features/tree/menu-mongodb';
+import { view as redisMenu } from '../../../src/features/tree/menu-redis';
+import {
+  collapsedAll,
+  menuOfItem,
+  nodeOfTab,
+  revealedFor,
+  toggled,
+  view,
+  withoutReads,
+} from '../../../src/features/tree/show';
 import { freshIsland, type MongoTreeData, type TreeItem } from '../../../src/features/tree/types';
 import { connectionId } from '../../../src/shared/ids';
 import { inputOf, linesOf, mongoConnection, nodesOf, redisConnection } from './context';
@@ -143,5 +153,51 @@ describe('tree.show', () => {
     expect(
       nodeOfTab({ kind: 'keys', connection: connectionId('c-cache'), database: 0, separator: ':', namespace: 'ab:' }),
     ).toBe('namespace:0:61623a');
+  });
+});
+
+describe('tree.show: the island of a connection', () => {
+  it('each line opens the menu of its engine; a line without a menu opens none', () => {
+    const shown = items({ island: { mongodb: data, expanded: ['database:shop'] } });
+    const shop = shown.find((item) => item.kind === 'node' && item.name === 'shop');
+    const input = inputOf({ island: { mongodb: data } });
+    expect(shop === undefined ? [] : menuOfItem(input, shop)).toEqual(
+      mongoMenu(input, { kind: 'database', database: 'shop' }),
+    );
+    const cache = redisConnection();
+    const redisInput = inputOf({ connections: [cache] });
+    const heading = items({ connections: [cache] }).find(
+      (item) => item.kind === 'heading' && item.part === 'databases',
+    );
+    expect(heading === undefined ? [] : menuOfItem(redisInput, heading)).toEqual(
+      redisMenu(redisInput, { kind: 'heading', part: 'databases' }),
+    );
+    expect(menuOfItem(input, { kind: 'line', id: 'line', level: 2, text: 'No collections', tone: 'quiet' })).toEqual(
+      [],
+    );
+  });
+
+  it('Collapse all collapses the databases and namespaces; the parts and what was read stay', () => {
+    const island = {
+      ...freshIsland,
+      mongodb: data,
+      expanded: ['database:shop', 'redis-database:0', 'namespace:0:61', 'empty-databases'],
+      collapsedParts: ['pages' as const],
+    };
+    expect(collapsedAll(island)).toEqual({ ...island, expanded: [] });
+  });
+
+  it('a heading expands and collapses its part; a node its own line', () => {
+    const collapsed = toggled(freshIsland, 'heading:pages', 'collapse');
+    expect(collapsed.collapsedParts).toEqual(['pages']);
+    expect(toggled(collapsed, 'heading:pages', 'expand').collapsedParts).toEqual([]);
+    const opened = toggled(freshIsland, 'database:shop', 'expand');
+    expect(opened.expanded).toEqual(['database:shop']);
+    expect(toggled(opened, 'database:shop', 'collapse').expanded).toEqual([]);
+  });
+
+  it('a connection no longer connected forgets what was read and keeps what was expanded and selected', () => {
+    const island = { ...freshIsland, mongodb: data, expanded: ['database:shop'], selected: 'database:shop' };
+    expect(withoutReads(island)).toEqual({ ...island, mongodb: freshIsland.mongodb });
   });
 });

@@ -51,4 +51,10 @@ describe('tree.redis-databases', () => {
       Array.from({ length: 16 }, (_, index) => `${String(index)}:0`),
     );
   });
+
+  it('a refused CONFIG GET is given to parse, which goes on with the keyspace alone', () => {
+    expect(request(contextOf('tree.redis-databases'), { connection: 'c-cache' })).toMatchObject({
+      failedRequests: 'are-replies',
+    });
+  });
 });

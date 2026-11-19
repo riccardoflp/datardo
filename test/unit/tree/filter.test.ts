@@ -4,8 +4,8 @@ import { contentsOf } from '../../../src/features/tree/list-collections';
 import { expandedByFilter, view as mongodbView } from '../../../src/features/tree/mongodb';
 import { view as redisView } from '../../../src/features/tree/redis';
 import { afterPage, freshScan } from '../../../src/features/tree/scan-namespaces';
-import { view as showView } from '../../../src/features/tree/show';
-import type { MongoTreeData, RedisTreeData, TreeIsland } from '../../../src/features/tree/types';
+import { databasesToList, view as showView, withFilterText } from '../../../src/features/tree/show';
+import { freshIsland, type MongoTreeData, type RedisTreeData, type TreeIsland } from '../../../src/features/tree/types';
 import { bytes, inputOf, linesOf, mongoConnection, redisConnection } from './context';
 
 const names = (list: readonly string[]) => list.map((name) => ({ name, type: 'collection' }));
@@ -144,5 +144,23 @@ describe('tree.filter', () => {
     const lines = shown.kind === 'tree' ? linesOf(shown.items) : [];
     expect(lines).toContain('zebra');
     expect(lines).toContain('Monitor');
+  });
+
+  it('the text applied is kept; emptied, the databases it showed expanded stay expanded', () => {
+    const typed = withFilterText(inputOf({ island: { mongodb: mongo } }), 'ord');
+    expect([typed.filter.text, typed.expanded]).toEqual(['ord', []]);
+    const emptied = withFilterText(inputOf({ island: typed }), '');
+    expect([emptied.filter.text, emptied.expanded]).toEqual(['', ['database:shop']]);
+  });
+
+  it('asks for the collections of every database not read yet, and none without a text', () => {
+    const island: TreeIsland = {
+      ...freshIsland,
+      mongodb: { ...mongo, contents: { shop: mongo.contents['shop']!, secret: mongo.contents['secret']! } },
+      filter: { open: true, text: 'ord' },
+    };
+    expect(databasesToList(island)).toEqual(['admin', 'media']);
+    expect(databasesToList({ ...island, filter: { open: true, text: ' ' } })).toEqual([]);
+    expect(databasesToList({ ...freshIsland, filter: { open: true, text: 'ord' } })).toEqual([]);
   });
 });

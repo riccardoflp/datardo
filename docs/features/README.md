@@ -765,24 +765,24 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`tree.show`](tree.md#treeshow--the-tree-island) | The tree island | View | M8 | Specified |
-| [`tree.pinned`](tree.md#treepinned--pinned-items) | Pinned items | View | M8 | Specified |
-| [`tree.pages`](tree.md#treepages--pages-of-the-connection) | Pages of the connection | View | M8 | Specified |
-| [`tree.mongodb`](tree.md#treemongodb--the-mongodb-nodes) | The MongoDB nodes | View | M8 | Specified |
-| [`tree.list-databases`](tree.md#treelist-databases--list-the-databases) | List the databases | Read | M8 | Specified |
-| [`tree.list-collections`](tree.md#treelist-collections--list-the-collections-of-a-database) | List the collections of a database | Read | M8 | Specified |
-| [`tree.count`](tree.md#treecount--counts-and-sizes-beside-the-nodes) | Counts and sizes beside the nodes | Read | M8 | Specified |
-| [`tree.redis`](tree.md#treeredis--the-redis-nodes) | The Redis nodes | View | M8 | Specified |
-| [`tree.redis-databases`](tree.md#treeredis-databases--list-the-redis-databases) | List the Redis databases | Read | M8 | Specified |
-| [`tree.scan-namespaces`](tree.md#treescan-namespaces--scan-the-keys-of-a-database-for-its-namespaces) | Scan the keys of a database for its namespaces | Read | M8 | Specified |
-| [`tree.namespaces`](tree.md#treenamespaces--namespaces-from-key-names) | Namespaces from key names | Derivation | M8 | Specified |
-| [`tree.refresh`](tree.md#treerefresh--refresh-the-tree) | Refresh the tree | Read | M8 | Specified |
-| [`tree.filter`](tree.md#treefilter--filter-the-tree) | Filter the tree | View | M8 | Specified |
-| [`tree.match`](tree.md#treematch--whether-a-node-matches-the-filter) | Whether a node matches the filter | Derivation | M8 | Specified |
-| [`tree.keyboard`](tree.md#treekeyboard--moving-in-the-tree-with-the-keyboard) | Moving in the tree with the keyboard | View | M8 | Specified |
-| [`tree.node-states`](tree.md#treenode-states--loading-empty-and-failed-nodes) | Loading, empty and failed nodes | View | M8 | Specified |
-| [`tree.menu-mongodb`](tree.md#treemenu-mongodb--the-context-menu-of-a-mongodb-node) | The context menu of a MongoDB node | View | M8 | Specified |
-| [`tree.menu-redis`](tree.md#treemenu-redis--the-context-menu-of-a-redis-node) | The context menu of a Redis node | View | M8 | Specified |
+| [`tree.show`](tree.md#treeshow--the-tree-island) | The tree island | View | M8 | Built |
+| [`tree.pinned`](tree.md#treepinned--pinned-items) | Pinned items | View | M8 | Built |
+| [`tree.pages`](tree.md#treepages--pages-of-the-connection) | Pages of the connection | View | M8 | Built |
+| [`tree.mongodb`](tree.md#treemongodb--the-mongodb-nodes) | The MongoDB nodes | View | M8 | Built |
+| [`tree.list-databases`](tree.md#treelist-databases--list-the-databases) | List the databases | Read | M8 | Built |
+| [`tree.list-collections`](tree.md#treelist-collections--list-the-collections-of-a-database) | List the collections of a database | Read | M8 | Built |
+| [`tree.count`](tree.md#treecount--counts-and-sizes-beside-the-nodes) | Counts and sizes beside the nodes | Read | M8 | Built |
+| [`tree.redis`](tree.md#treeredis--the-redis-nodes) | The Redis nodes | View | M8 | Built |
+| [`tree.redis-databases`](tree.md#treeredis-databases--list-the-redis-databases) | List the Redis databases | Read | M8 | Built |
+| [`tree.scan-namespaces`](tree.md#treescan-namespaces--scan-the-keys-of-a-database-for-its-namespaces) | Scan the keys of a database for its namespaces | Read | M8 | Built |
+| [`tree.namespaces`](tree.md#treenamespaces--namespaces-from-key-names) | Namespaces from key names | Derivation | M8 | Built |
+| [`tree.refresh`](tree.md#treerefresh--refresh-the-tree) | Refresh the tree | Read | M8 | Built |
+| [`tree.filter`](tree.md#treefilter--filter-the-tree) | Filter the tree | View | M8 | Built |
+| [`tree.match`](tree.md#treematch--whether-a-node-matches-the-filter) | Whether a node matches the filter | Derivation | M8 | Built |
+| [`tree.keyboard`](tree.md#treekeyboard--moving-in-the-tree-with-the-keyboard) | Moving in the tree with the keyboard | View | M8 | Built |
+| [`tree.node-states`](tree.md#treenode-states--loading-empty-and-failed-nodes) | Loading, empty and failed nodes | View | M8 | Built |
+| [`tree.menu-mongodb`](tree.md#treemenu-mongodb--the-context-menu-of-a-mongodb-node) | The context menu of a MongoDB node | View | M8 | Built |
+| [`tree.menu-redis`](tree.md#treemenu-redis--the-context-menu-of-a-redis-node) | The context menu of a Redis node | View | M8 | Built |
 
 ## Undo history
 

@@ -57,4 +57,10 @@ describe('tree.list-databases', () => {
     const reply = { databases: [{ name: 'shop', sizeOnDisk: { $numberLong: '3221225472' }, shards: { a: 1, b: 2 } }] };
     expect(parse([reply])).toEqual([{ name: 'shop', sizeOnDisk: 3_221_225_472 }]);
   });
+
+  it('a refused listDatabases is given to parse, which falls back to the database of the address', () => {
+    expect(request(contextOf('tree.list-databases'), { connection: 'c-local' })).toMatchObject({
+      failedRequests: 'are-replies',
+    });
+  });
 });

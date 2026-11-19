@@ -11,7 +11,7 @@ import type { Json, RedisRequest } from '../../shared/engine-request';
 import { redisCommand } from '../../shared/engine-request';
 import type { Context, ReadRequest } from '../../shared/feature';
 import { connectionId } from '../../shared/ids';
-import { failureOf, hexOf, textArg, wholeArg, type KeyScan } from './types';
+import { failureOf, hexOf, textArg, wholeArg, type KeyScan, type ScanState } from './types';
 
 /** What each `SCAN` asks the server to look at (Datardo's choice). */
 export const scanCount = 1000;
@@ -99,4 +99,21 @@ export function loadMore(scan: KeyScan): KeyScan {
 /** The arguments of the next call of a scan, or `undefined` when the run has ended. */
 export function nextCall(scan: KeyScan, connection: string, database: number): Json | undefined {
   return scan.ended === undefined ? { connection, database, cursor: scan.cursor } : undefined;
+}
+
+/** The scan of a database after one more call: still scanning while its run goes on. */
+export function scanningAfter(state: ScanState, page: ScanPage): ScanState {
+  const scan = afterPage(state.scan, page);
+  return scan.ended === undefined && state.scanning !== undefined ? { scan, scanning: state.scanning } : { scan };
+}
+
+/** The scan of a database once **Load more** was chosen: scanning again from the cursor kept. */
+export function loadingMore(state: ScanState | undefined, now: number): ScanState {
+  return { scan: loadMore(state?.scan ?? freshScan), scanning: { since: now } };
+}
+
+/** The scan of a database whose call was cancelled, or failed with the server's message: what was seen stays. */
+export function scanStopped(state: ScanState, message?: string): ScanState {
+  const scan = cancelled(state.scan);
+  return message === undefined ? { scan } : { scan, failed: message };
 }
