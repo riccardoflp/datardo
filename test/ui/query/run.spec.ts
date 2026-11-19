@@ -17,6 +17,7 @@ import {
   setEditor,
   startWithMongo,
   testMongo,
+  documentRows,
 } from './collection-app';
 
 const mongo = testMongo();
@@ -62,7 +63,7 @@ test.describe('query.run', () => {
     test.setTimeout(120_000);
     const window = await started();
     await openCollection(window, 'shop', 'orders');
-    await expect(documentsOf(window).getByRole('listitem')).toHaveCount(3);
+    await expect(documentRows(window)).toHaveCount(3);
     await expect(statusOf(window).getByText(/^3 of 3 documents · \d+ ms$/u)).toBeVisible();
   });
 
@@ -70,16 +71,15 @@ test.describe('query.run', () => {
     test.setTimeout(120_000);
     const window = await started();
     await openCollection(window, 'shop', 'orders');
-    await expect(documentsOf(window).getByRole('listitem')).toHaveCount(3);
+    await expect(documentRows(window)).toHaveCount(3);
     await setEditor(window, 'Filter', '{ status: "paid" }');
     await setEditor(window, 'Project', '{ total: 1, _id: 0 }');
     await setEditor(window, 'Sort', '{ total: 1 }');
     await window.keyboard.press('Enter');
-    const items = documentsOf(window).getByRole('listitem');
-    await expect(items).toHaveCount(2);
-    await expect(items.nth(0)).toHaveText(/total: 20/u);
-    await expect(items.nth(1)).toHaveText(/total: 30/u);
-    await expect(items.nth(0)).not.toHaveText(/status/u);
+    await expect(documentRows(window)).toHaveCount(2);
+    const grid = documentsOf(window).getByRole('grid');
+    await expect(grid.getByRole('columnheader')).toHaveText(['#', 'total ▲']);
+    await expect(grid.locator('td[data-pos$=":0:1"] [class*="cell-text"]')).toHaveText(['20', '30']);
     await expect(statusOf(window).getByText(/^2 of 2 documents · \d+ ms$/u)).toBeVisible();
   });
 
@@ -87,7 +87,7 @@ test.describe('query.run', () => {
     test.setTimeout(120_000);
     const window = await started();
     await openCollection(window, 'shop', 'paid_orders', true);
-    await expect(documentsOf(window).getByRole('listitem')).toHaveCount(2);
+    await expect(documentRows(window)).toHaveCount(2);
     await expect(statusOf(window).getByText(/^2 of 2 documents · \d+ ms$/u)).toBeVisible();
   });
 });
@@ -107,7 +107,7 @@ test.describe('query.count', () => {
     });
     await count.click();
     await expect(count).toHaveText(/^1 of 2 documents/u);
-    await expect(documentsOf(window).getByRole('listitem')).toHaveCount(1);
+    await expect(documentRows(window)).toHaveCount(1);
     await mongo.use(async (db) => {
       await db('shop').collection('orders').deleteOne({ n: 4 });
     });
@@ -138,7 +138,7 @@ test.describe('query.bar', () => {
     test.setTimeout(120_000);
     const window = await started();
     await openCollection(window, 'shop', 'orders');
-    await expect(documentsOf(window).getByRole('listitem')).toHaveCount(3);
+    await expect(documentRows(window)).toHaveCount(3);
     await setEditor(window, 'Filter', '{ n: 1 }');
     await window.getByRole('region', { name: 'Documents' }).click();
     await window.keyboard.press('Control+F');
@@ -146,7 +146,7 @@ test.describe('query.bar', () => {
     await window.keyboard.type('{ n: 2 }');
     expect(await editorText(window, 'Filter')).toBe('{ n: 2 }');
     await window.keyboard.press('Control+Enter');
-    await expect(documentsOf(window).getByRole('listitem')).toHaveCount(1);
+    await expect(documentRows(window)).toHaveCount(1);
     await documentsOf(window).click();
     await window.keyboard.press('Control+K');
     await window.keyboard.type('>Focus filter');
@@ -194,10 +194,10 @@ test.describe('query.restore', () => {
     const first = await launch();
     await addMongo(first, mongo.uri());
     await openCollection(first, 'shop', 'orders');
-    await expect(documentsOf(first).getByRole('listitem')).toHaveCount(3);
+    await expect(documentRows(first)).toHaveCount(3);
     await setEditor(first, 'Filter', '{ status: "paid" }');
     await first.keyboard.press('Control+Enter');
-    await expect(documentsOf(first).getByRole('listitem')).toHaveCount(2);
+    await expect(documentRows(first)).toHaveCount(2);
     await setEditor(first, 'Filter', '{ status: ');
     await apps.splice(0)[0]?.close();
     const second = await launch();
@@ -205,7 +205,7 @@ test.describe('query.restore', () => {
     if (await reconnect.isVisible()) {
       await reconnect.click();
     }
-    await expect(documentsOf(second).getByRole('listitem')).toHaveCount(2);
+    await expect(documentRows(second)).toHaveCount(2);
     expect(await editorText(second, 'Filter')).toBe('{ status: "paid" }');
   });
 });

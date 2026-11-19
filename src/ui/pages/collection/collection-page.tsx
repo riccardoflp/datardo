@@ -1,13 +1,14 @@
 /**
- * The page of a collection tab: its query bar (`query.bar`) above the documents of the query (`table.show`). The
- * window keeps what each tab read; the page restores the tab's query and runs it once the connection is connected.
+ * The page of a collection tab: its Documents section (`table.show`), with the query bar (`query.bar`) above the
+ * documents of the query. The window keeps what each tab read; the page restores the tab's query and runs it once the
+ * connection is connected.
  */
 import type { TabId } from '../../../shared/ids';
-import { QueryBar } from '../../query/query-bar';
 import { useCollection } from '../../query/collection-store';
 import { useAppState } from '../../state/store';
 import { DocumentsSection } from './documents-section';
 import { collectionPageState, useCollectionRef, useCollectionStart, type CollectionShows } from './use-collection';
+import { text as tableText } from '../../../features/table/text';
 import styles from './collection-page.module.css';
 
 /** The page of a collection tab. */
@@ -25,7 +26,19 @@ export function CollectionPage({
   const collection = useCollection(tab);
   return (
     <div className={styles['page']} data-collection={shows.collection}>
-      <QueryBar collectionRef={ref} collection={collection} />
+      <div className={styles['section-bar']} role="toolbar" aria-label={tableText.names.sections}>
+        <button
+          type="button"
+          className={styles['section-button']}
+          data-feature="table.show@section-bar"
+          aria-pressed="true"
+          onClick={() => {
+            document.querySelector<HTMLElement>('[role="grid"]')?.focus();
+          }}
+        >
+          {tableText.commands.show}
+        </button>
+      </div>
       <DocumentsSection collectionRef={ref} collection={collection} page={page} />
     </div>
   );

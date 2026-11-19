@@ -9,13 +9,13 @@ import type { StartedApp } from '../app';
 import {
   barOf,
   bothThemes,
-  documentsOf,
   editorText,
   fieldOf,
   openCollection,
   setEditor,
   startWithMongo,
   testMongo,
+  documentRows,
 } from './collection-app';
 
 const mongo = testMongo();
@@ -48,12 +48,12 @@ async function openOrders(): Promise<Page> {
   const started = await startWithMongo(mongo);
   running.push(started);
   await openCollection(started.window, 'shop', 'orders');
-  await expect(documentsOf(started.window).getByRole('listitem')).toHaveCount(6);
+  await expect(documentRows(started.window)).toHaveCount(6);
   return started.window;
 }
 
 function documents(window: Page) {
-  return documentsOf(window).getByRole('listitem');
+  return documentRows(window);
 }
 
 test.describe('query.bar', () => {

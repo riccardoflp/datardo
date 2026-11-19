@@ -91,7 +91,8 @@ function isOfferedByItsCard(state: AppState, id: string): boolean {
       // The tree island shows the current connection: with none, there is nothing to refresh or filter.
       return state.nav.current !== undefined;
     default:
-      return isWindowCommandOffered(state, id);
+      // The commands of the table act on the active collection tab: with none, there is no table.
+      return id.startsWith('table.') ? active?.shows.kind === 'collection' : isWindowCommandOffered(state, id);
   }
 }
 

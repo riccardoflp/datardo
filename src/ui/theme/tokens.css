@@ -39,6 +39,10 @@
   --app-icon-size: 18px;
   --about-icon-size: 48px;
   --dialog-width: 480px;
+  --z-sticky-number: 1;
+  --z-sticky-heading: 2;
+  --z-sticky-pinned-heading: 3;
+  --z-sticky-corner: 4;
   --z-dialog: 100;
   --z-suggestions: 200;
   --duration-flash: 600ms;

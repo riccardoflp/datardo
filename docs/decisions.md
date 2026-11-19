@@ -501,6 +501,19 @@ Rejected: the page size and the page as the only way to skip documents, as Mongo
 collection, which scans it; a fixed time limit.
 *Built in M9 on 2026-11-19 as the cards say; answers Q24 unless the author decides otherwise.*
 
+## D56 — A change of what a tab shows is a Derivation; one Datardo remembers is an Operation with an app step
+
+The table is built as its cards say (M10). A change that only rewrites the query of the tab is a Derivation that the
+window carries out and then runs the query: a header clicked sorts (`table.sort`), as a drop on the bar or the
+builder writes the filter (`query.drag`, `query.builder`). A change that Datardo remembers for the collection is an
+Operation whose plan has an app step that keeps it in `state/<connection id>.json`: expanding and
+collapsing a column, hiding, showing, moving, pinning and resizing columns (`table.expand`, `table.collapse`,
+`table.arrange-columns`). The aggregate area follows the same line when it is built: `aggregate.sort-column` is an
+Operation only if what it changes is kept in a file. Rejected: every change of the view as an Operation, which would
+fill the Log with sorts, and every one as a Derivation, which would leave the remembered layout without a step that
+can fail and say so.
+*Built in M10 on 2026-11-19 as the cards say; answers Q25 unless the author decides otherwise.*
+
 ## Open questions
 
 - **Q1** — *Answered on 2026-11-18 by [D7](#d7--home-is-the-first-page)*: the last active tab when tabs are restored,
@@ -568,7 +581,9 @@ Raised while the catalog was written; each names the cards that hold the current
   Skip and Limit are fields of the query bar and paging happens inside their result. An empty filter shows
   the estimated count, marked by a tooltip. The time limit of a query is a setting. Cells show mongosh text with its
   quotes, where the sketch shows plain text. (`query.bar`, `query.count`, `query.run`, `table.cell-text`).
-- **Q25** — Changes to what a tab shows (sorting from a header, switching mode, expanding a column) are written as
+- **Q25** — *Answered on 2026-11-19 by
+  [D56](#d56--a-change-of-what-a-tab-shows-is-a-derivation-one-datardo-remembers-is-an-operation-with-an-app-step)*:
+  Changes to what a tab shows (sorting from a header, switching mode, expanding a column) are written as
   Derivations in the query and table areas and as Operations with an app step in the aggregate area. One convention?
   (`table.sort`, `aggregate.sort-column`).
 - **Q26** — Schema, Chart and Explain read from the server each time their section is shown; Schema analyzes the

@@ -9,7 +9,6 @@ import type { StartedApp } from '../app';
 import {
   barOf,
   bothThemes,
-  documentsOf,
   dragOverBar,
   dropOnZone,
   editorText,
@@ -19,6 +18,7 @@ import {
   setEditor,
   startWithMongo,
   testMongo,
+  documentRows,
 } from './collection-app';
 
 const mongo = testMongo();
@@ -53,12 +53,12 @@ async function openOrders(): Promise<Page> {
   const started = await startWithMongo(mongo);
   running.push(started);
   await openCollection(started.window, 'shop', 'orders');
-  await expect(documentsOf(started.window).getByRole('listitem')).toHaveCount(3);
+  await expect(documentRows(started.window)).toHaveCount(3);
   return started.window;
 }
 
 function documents(window: Page) {
-  return documentsOf(window).getByRole('listitem');
+  return documentRows(window);
 }
 
 function builderOf(window: Page) {

@@ -39,6 +39,12 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
   filter from rows of fields, operators and values. The tab runs its query when it opens, keeps the query last run for the next start, counts the
   matching documents (an estimate for an empty filter, exact on a click), stops a query at the time limit of the
   settings and says so, and **Cancel** stops a query that runs. `Ctrl+F` goes to **Filter** and `Ctrl+Enter` runs.
+- The documents of a query are shown in a table that draws only the rows on screen: every BSON type in its cell with
+  its color, nested fields expanded into columns and arrays into sub-rows, columns hidden, moved, pinned and resized
+  and remembered for each collection, a header that sorts, the keyboard to move between cells and select rows, the
+  menus of a row, a cell and a header, the selection bar, copying a value, a field path or documents as mongosh,
+  Extended JSON, JSON, JSON Lines, YAML, an insert command or CSV, **Refresh** (`F5`) and the paging row with its page
+  size. A cell or a header dragged onto the query bar adds a condition, a sort or a projection.
 
 ### Security
 

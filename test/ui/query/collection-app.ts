@@ -181,3 +181,8 @@ export async function endDragOutside(window: Page): Promise<void> {
     globalThis.dispatchEvent(new DragEvent('dragend', { bubbles: true }));
   });
 }
+
+/** The documents of the page in the grid: one row number per document, whatever its sub-rows. */
+export function documentRows(window: Page) {
+  return documentsOf(window).getByRole('grid').locator('tbody td[data-pos$=":0:0"]');
+}

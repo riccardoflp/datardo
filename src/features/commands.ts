@@ -12,6 +12,7 @@ import { areaCommands as paletteCommands } from './palette/commands';
 import { commands as homeCommands } from './home/commands';
 import { commands as treeCommands } from './tree/commands';
 import { commands as queryCommands } from './query/commands';
+import { commands as tableCommands } from './table/commands';
 
 import type { Command } from './command';
 
@@ -29,4 +30,5 @@ export const commands: readonly Command[] = [
   ...homeCommands,
   ...treeCommands,
   ...queryCommands,
+  ...tableCommands,
 ];

@@ -7,12 +7,14 @@ import { view } from '../../features/nav/status-line';
 import type { NavInput } from '../../features/nav/types';
 import type { Target } from '../../shared/target';
 import { countTab } from '../query/collection-reads';
+import { useCopiedFlash } from '../table/copied-flash';
 import { startFeature } from './intent';
 import styles from './bars.module.css';
 
 /** The status line. */
 export function StatusLine(props: { readonly input: NavInput; readonly openSwitcher: () => void }): React.JSX.Element {
   const line = view(props.input);
+  const copied = useCopiedFlash();
   const current = currentOf(props.input);
   const target: Target | undefined = current === undefined ? undefined : { kind: 'connection', connection: current.id };
   const onCurrent = target === undefined ? {} : { target };
@@ -68,6 +70,7 @@ export function StatusLine(props: { readonly input: NavInput; readonly openSwitc
       )}
       <span className={styles['spacer']} />
       <span role="status" className={styles['work']}>
+        {copied === undefined ? null : <span className={styles['part']}>{copied}</span>}
         {line.work === undefined ? null : line.work.kind === 'several' ? (
           <button type="button" className={styles['part']} data-feature={line.work.element}>
             {line.work.text}
