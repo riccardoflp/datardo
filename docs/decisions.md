@@ -595,3 +595,9 @@ Raised while the catalog was written; each names the cards that hold the current
   tab is a stored shape of its own; running while one stage is shown starts the run again after setting the pipeline,
   because a read cannot change the tab; the commands that move a stage need the stage that has the focus.
   (`aggregate.run`, `aggregate.write-output`, `aggregate.save-as-view`, `aggregate.move-stage`).
+- **Q43** — Redis values: `value.check` also sends the reads that compare a value before a write (from a fixed list
+  of commands that read), where the card names only `TYPE`; the text of a step cuts a long argument as `value.quote`
+  does (over 256 bytes, 64 shown) while the runner cuts at 200 characters; a stream ID not greater than the last is
+  left to the server's error, with no code; **Copy as command** writes one line per key, without the batches of
+  `key.export-text`; the shape that tells the undo history what a write keeps is to settle with M11. (`value.check`,
+  `value.quote`, `value.add-entry`, `value.copy`).
