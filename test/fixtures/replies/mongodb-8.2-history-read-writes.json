@@ -1,0 +1,566 @@
+[
+  {
+    "lsid": {
+      "id": {
+        "$binary": {
+          "base64": "ZtnkyKIJTxe5bL0t1evtGg==",
+          "subType": "04"
+        }
+      },
+      "uid": {
+        "$binary": {
+          "base64": "47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=",
+          "subType": "00"
+        }
+      }
+    },
+    "txnNumber": {
+      "$numberLong": "7"
+    },
+    "op": "d",
+    "ns": "history-record.orders",
+    "ui": {
+      "$binary": {
+        "base64": "nxzO7XI0TJK5NibQ4dJcXg==",
+        "subType": "04"
+      }
+    },
+    "o": {
+      "_id": {
+        "$oid": "65f1c0de9a7b4e00012f3a2c"
+      }
+    },
+    "stmtId": {
+      "$numberInt": "0"
+    },
+    "ts": {
+      "$timestamp": {
+        "t": 1795051291,
+        "i": 8
+      }
+    },
+    "t": {
+      "$numberLong": "1"
+    },
+    "v": {
+      "$numberLong": "2"
+    },
+    "wall": {
+      "$date": {
+        "$numberLong": "1795051291694"
+      }
+    },
+    "prevOpTime": {
+      "ts": {
+        "$timestamp": {
+          "t": 0,
+          "i": 0
+        }
+      },
+      "t": {
+        "$numberLong": "-1"
+      }
+    }
+  },
+  {
+    "lsid": {
+      "id": {
+        "$binary": {
+          "base64": "ZtnkyKIJTxe5bL0t1evtGg==",
+          "subType": "04"
+        }
+      },
+      "uid": {
+        "$binary": {
+          "base64": "47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=",
+          "subType": "00"
+        }
+      }
+    },
+    "txnNumber": {
+      "$numberLong": "6"
+    },
+    "op": "c",
+    "ns": "admin.$cmd",
+    "o": {
+      "applyOps": [
+        {
+          "op": "u",
+          "ns": "history-record.orders",
+          "ui": {
+            "$binary": {
+              "base64": "nxzO7XI0TJK5NibQ4dJcXg==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "$v": {
+              "$numberInt": "2"
+            },
+            "diff": {
+              "u": {
+                "status": "shipped"
+              }
+            }
+          },
+          "o2": {
+            "_id": {
+              "$oid": "65f1c0de9a7b4e00012f3a2c"
+            }
+          }
+        },
+        {
+          "op": "i",
+          "ns": "history-record.orders",
+          "ui": {
+            "$binary": {
+              "base64": "nxzO7XI0TJK5NibQ4dJcXg==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$oid": "6afe4f1b3e66d1896eacfd3d"
+            },
+            "status": "other"
+          },
+          "o2": {
+            "_id": {
+              "$oid": "6afe4f1b3e66d1896eacfd3d"
+            }
+          }
+        }
+      ]
+    },
+    "ts": {
+      "$timestamp": {
+        "t": 1795051291,
+        "i": 7
+      }
+    },
+    "t": {
+      "$numberLong": "1"
+    },
+    "v": {
+      "$numberLong": "2"
+    },
+    "wall": {
+      "$date": {
+        "$numberLong": "1795051291690"
+      }
+    },
+    "prevOpTime": {
+      "ts": {
+        "$timestamp": {
+          "t": 0,
+          "i": 0
+        }
+      },
+      "t": {
+        "$numberLong": "-1"
+      }
+    }
+  },
+  {
+    "lsid": {
+      "id": {
+        "$binary": {
+          "base64": "ZtnkyKIJTxe5bL0t1evtGg==",
+          "subType": "04"
+        }
+      },
+      "uid": {
+        "$binary": {
+          "base64": "47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=",
+          "subType": "00"
+        }
+      }
+    },
+    "txnNumber": {
+      "$numberLong": "5"
+    },
+    "op": "u",
+    "ns": "history-record.orders",
+    "ui": {
+      "$binary": {
+        "base64": "nxzO7XI0TJK5NibQ4dJcXg==",
+        "subType": "04"
+      }
+    },
+    "o": {
+      "_id": {
+        "$oid": "65f1c0de9a7b4e00012f3a2c"
+      },
+      "status": "replaced",
+      "qty": {
+        "$numberDouble": "1.0"
+      }
+    },
+    "o2": {
+      "_id": {
+        "$oid": "65f1c0de9a7b4e00012f3a2c"
+      }
+    },
+    "stmtId": {
+      "$numberInt": "0"
+    },
+    "ts": {
+      "$timestamp": {
+        "t": 1795051291,
+        "i": 6
+      }
+    },
+    "t": {
+      "$numberLong": "1"
+    },
+    "v": {
+      "$numberLong": "2"
+    },
+    "wall": {
+      "$date": {
+        "$numberLong": "1795051291684"
+      }
+    },
+    "prevOpTime": {
+      "ts": {
+        "$timestamp": {
+          "t": 0,
+          "i": 0
+        }
+      },
+      "t": {
+        "$numberLong": "-1"
+      }
+    }
+  },
+  {
+    "lsid": {
+      "id": {
+        "$binary": {
+          "base64": "ZtnkyKIJTxe5bL0t1evtGg==",
+          "subType": "04"
+        }
+      },
+      "uid": {
+        "$binary": {
+          "base64": "47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=",
+          "subType": "00"
+        }
+      }
+    },
+    "txnNumber": {
+      "$numberLong": "4"
+    },
+    "op": "u",
+    "ns": "history-record.orders",
+    "ui": {
+      "$binary": {
+        "base64": "nxzO7XI0TJK5NibQ4dJcXg==",
+        "subType": "04"
+      }
+    },
+    "o": {
+      "$v": {
+        "$numberInt": "2"
+      },
+      "diff": {
+        "sitems": {
+          "a": true,
+          "l": {
+            "$numberInt": "2"
+          }
+        }
+      }
+    },
+    "o2": {
+      "_id": {
+        "$oid": "65f1c0de9a7b4e00012f3a2c"
+      }
+    },
+    "stmtId": {
+      "$numberInt": "0"
+    },
+    "ts": {
+      "$timestamp": {
+        "t": 1795051291,
+        "i": 5
+      }
+    },
+    "t": {
+      "$numberLong": "1"
+    },
+    "v": {
+      "$numberLong": "2"
+    },
+    "wall": {
+      "$date": {
+        "$numberLong": "1795051291680"
+      }
+    },
+    "prevOpTime": {
+      "ts": {
+        "$timestamp": {
+          "t": 0,
+          "i": 0
+        }
+      },
+      "t": {
+        "$numberLong": "-1"
+      }
+    }
+  },
+  {
+    "lsid": {
+      "id": {
+        "$binary": {
+          "base64": "ZtnkyKIJTxe5bL0t1evtGg==",
+          "subType": "04"
+        }
+      },
+      "uid": {
+        "$binary": {
+          "base64": "47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=",
+          "subType": "00"
+        }
+      }
+    },
+    "txnNumber": {
+      "$numberLong": "3"
+    },
+    "op": "u",
+    "ns": "history-record.orders",
+    "ui": {
+      "$binary": {
+        "base64": "nxzO7XI0TJK5NibQ4dJcXg==",
+        "subType": "04"
+      }
+    },
+    "o": {
+      "$v": {
+        "$numberInt": "2"
+      },
+      "diff": {
+        "i": {
+          "address": {
+            "city": "Rome"
+          }
+        },
+        "sitems": {
+          "a": true,
+          "s1": {
+            "u": {
+              "qty": {
+                "$numberInt": "5"
+              }
+            }
+          }
+        }
+      }
+    },
+    "o2": {
+      "_id": {
+        "$oid": "65f1c0de9a7b4e00012f3a2c"
+      }
+    },
+    "stmtId": {
+      "$numberInt": "0"
+    },
+    "ts": {
+      "$timestamp": {
+        "t": 1795051291,
+        "i": 4
+      }
+    },
+    "t": {
+      "$numberLong": "1"
+    },
+    "v": {
+      "$numberLong": "2"
+    },
+    "wall": {
+      "$date": {
+        "$numberLong": "1795051291677"
+      }
+    },
+    "prevOpTime": {
+      "ts": {
+        "$timestamp": {
+          "t": 0,
+          "i": 0
+        }
+      },
+      "t": {
+        "$numberLong": "-1"
+      }
+    }
+  },
+  {
+    "lsid": {
+      "id": {
+        "$binary": {
+          "base64": "ZtnkyKIJTxe5bL0t1evtGg==",
+          "subType": "04"
+        }
+      },
+      "uid": {
+        "$binary": {
+          "base64": "47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=",
+          "subType": "00"
+        }
+      }
+    },
+    "txnNumber": {
+      "$numberLong": "2"
+    },
+    "op": "u",
+    "ns": "history-record.orders",
+    "ui": {
+      "$binary": {
+        "base64": "nxzO7XI0TJK5NibQ4dJcXg==",
+        "subType": "04"
+      }
+    },
+    "o": {
+      "$v": {
+        "$numberInt": "2"
+      },
+      "diff": {
+        "d": {
+          "note": false
+        },
+        "u": {
+          "status": "paid"
+        }
+      }
+    },
+    "o2": {
+      "_id": {
+        "$oid": "65f1c0de9a7b4e00012f3a2c"
+      }
+    },
+    "stmtId": {
+      "$numberInt": "0"
+    },
+    "ts": {
+      "$timestamp": {
+        "t": 1795051291,
+        "i": 3
+      }
+    },
+    "t": {
+      "$numberLong": "1"
+    },
+    "v": {
+      "$numberLong": "2"
+    },
+    "wall": {
+      "$date": {
+        "$numberLong": "1795051291673"
+      }
+    },
+    "prevOpTime": {
+      "ts": {
+        "$timestamp": {
+          "t": 0,
+          "i": 0
+        }
+      },
+      "t": {
+        "$numberLong": "-1"
+      }
+    }
+  },
+  {
+    "lsid": {
+      "id": {
+        "$binary": {
+          "base64": "ZtnkyKIJTxe5bL0t1evtGg==",
+          "subType": "04"
+        }
+      },
+      "uid": {
+        "$binary": {
+          "base64": "47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=",
+          "subType": "00"
+        }
+      }
+    },
+    "txnNumber": {
+      "$numberLong": "1"
+    },
+    "op": "i",
+    "ns": "history-record.orders",
+    "ui": {
+      "$binary": {
+        "base64": "nxzO7XI0TJK5NibQ4dJcXg==",
+        "subType": "04"
+      }
+    },
+    "o": {
+      "_id": {
+        "$oid": "65f1c0de9a7b4e00012f3a2c"
+      },
+      "status": "new",
+      "qty": {
+        "$numberInt": "1"
+      },
+      "note": "gift",
+      "items": [
+        {
+          "sku": "a",
+          "qty": {
+            "$numberInt": "1"
+          }
+        },
+        {
+          "sku": "b",
+          "qty": {
+            "$numberInt": "2"
+          }
+        },
+        {
+          "sku": "c"
+        }
+      ],
+      "total": {
+        "$numberLong": "250"
+      }
+    },
+    "o2": {
+      "_id": {
+        "$oid": "65f1c0de9a7b4e00012f3a2c"
+      }
+    },
+    "stmtId": {
+      "$numberInt": "0"
+    },
+    "ts": {
+      "$timestamp": {
+        "t": 1795051291,
+        "i": 2
+      }
+    },
+    "t": {
+      "$numberLong": "1"
+    },
+    "v": {
+      "$numberLong": "2"
+    },
+    "wall": {
+      "$date": {
+        "$numberLong": "1795051291669"
+      }
+    },
+    "prevOpTime": {
+      "ts": {
+        "$timestamp": {
+          "t": 0,
+          "i": 0
+        }
+      },
+      "t": {
+        "$numberLong": "-1"
+      }
+    }
+  }
+]

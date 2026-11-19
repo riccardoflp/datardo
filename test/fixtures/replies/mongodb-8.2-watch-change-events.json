@@ -1,0 +1,224 @@
+[
+  {
+    "_id": {
+      "_data": "826AFE4F1C000000012B042C0100296E5A1004AA4EB33534A24274B81DF19746B3196D463C6F7065726174696F6E54797065003C696E736572740046646F63756D656E744B657900461E5F6964002B0E000004"
+    },
+    "operationType": "insert",
+    "clusterTime": {
+      "$timestamp": {
+        "t": 1795051292,
+        "i": 1
+      }
+    },
+    "wallTime": {
+      "$date": {
+        "$numberLong": "1795051292371"
+      }
+    },
+    "fullDocument": {
+      "_id": {
+        "$numberInt": "7"
+      },
+      "status": "new",
+      "note": "gift",
+      "when": {
+        "$date": {
+          "$numberLong": "1794960000000"
+        }
+      }
+    },
+    "ns": {
+      "db": "history-record",
+      "coll": "orders"
+    },
+    "documentKey": {
+      "_id": {
+        "$numberInt": "7"
+      }
+    }
+  },
+  {
+    "_id": {
+      "_data": "826AFE4F1C000000022B042C0100296E5A1004AA4EB33534A24274B81DF19746B3196D463C6F7065726174696F6E54797065003C7570646174650046646F63756D656E744B657900461E5F6964002B0E000004"
+    },
+    "operationType": "update",
+    "clusterTime": {
+      "$timestamp": {
+        "t": 1795051292,
+        "i": 2
+      }
+    },
+    "wallTime": {
+      "$date": {
+        "$numberLong": "1795051292377"
+      }
+    },
+    "fullDocument": {
+      "_id": {
+        "$numberInt": "7"
+      },
+      "status": "paid",
+      "when": {
+        "$date": {
+          "$numberLong": "1794960000000"
+        }
+      },
+      "total": {
+        "$numberLong": "5"
+      }
+    },
+    "ns": {
+      "db": "history-record",
+      "coll": "orders"
+    },
+    "documentKey": {
+      "_id": {
+        "$numberInt": "7"
+      }
+    },
+    "updateDescription": {
+      "updatedFields": {
+        "status": "paid",
+        "total": {
+          "$numberLong": "5"
+        }
+      },
+      "removedFields": ["note"],
+      "truncatedArrays": []
+    },
+    "fullDocumentBeforeChange": {
+      "_id": {
+        "$numberInt": "7"
+      },
+      "status": "new",
+      "note": "gift",
+      "when": {
+        "$date": {
+          "$numberLong": "1794960000000"
+        }
+      }
+    }
+  },
+  {
+    "_id": {
+      "_data": "826AFE4F1C000000032B042C0100296E5A1004AA4EB33534A24274B81DF19746B3196D463C6F7065726174696F6E54797065003C7265706C6163650046646F63756D656E744B657900461E5F6964002B0E000004"
+    },
+    "operationType": "replace",
+    "clusterTime": {
+      "$timestamp": {
+        "t": 1795051292,
+        "i": 3
+      }
+    },
+    "wallTime": {
+      "$date": {
+        "$numberLong": "1795051292379"
+      }
+    },
+    "fullDocument": {
+      "_id": {
+        "$numberInt": "7"
+      },
+      "status": "replaced",
+      "tags": ["a", "b"]
+    },
+    "ns": {
+      "db": "history-record",
+      "coll": "orders"
+    },
+    "documentKey": {
+      "_id": {
+        "$numberInt": "7"
+      }
+    },
+    "fullDocumentBeforeChange": {
+      "_id": {
+        "$numberInt": "7"
+      },
+      "status": "paid",
+      "when": {
+        "$date": {
+          "$numberLong": "1794960000000"
+        }
+      },
+      "total": {
+        "$numberLong": "5"
+      }
+    }
+  },
+  {
+    "_id": {
+      "_data": "826AFE4F1C000000042B042C0100296E5A1004AA4EB33534A24274B81DF19746B3196D463C6F7065726174696F6E54797065003C64656C6574650046646F63756D656E744B657900461E5F6964002B0E000004"
+    },
+    "operationType": "delete",
+    "clusterTime": {
+      "$timestamp": {
+        "t": 1795051292,
+        "i": 4
+      }
+    },
+    "wallTime": {
+      "$date": {
+        "$numberLong": "1795051292382"
+      }
+    },
+    "ns": {
+      "db": "history-record",
+      "coll": "orders"
+    },
+    "documentKey": {
+      "_id": {
+        "$numberInt": "7"
+      }
+    },
+    "fullDocumentBeforeChange": {
+      "_id": {
+        "$numberInt": "7"
+      },
+      "status": "replaced",
+      "tags": ["a", "b"]
+    }
+  },
+  {
+    "to": {
+      "db": "history-record",
+      "coll": "orders_old"
+    },
+    "_id": {
+      "_data": "826AFE4F1C000000052B042C0100296E5A1004AA4EB33534A24274B81DF19746B3196D463C6F7065726174696F6E54797065003C72656E616D6500466F7065726174696F6E4465736372697074696F6E004646746F00463C6462003C686973746F72792D7265636F7264003C636F6C6C003C6F72646572735F6F6C640000000004"
+    },
+    "operationType": "rename",
+    "clusterTime": {
+      "$timestamp": {
+        "t": 1795051292,
+        "i": 5
+      }
+    },
+    "wallTime": {
+      "$date": {
+        "$numberLong": "1795051292386"
+      }
+    },
+    "ns": {
+      "db": "history-record",
+      "coll": "orders"
+    }
+  },
+  {
+    "_id": {
+      "_data": "826AFE4F1C000000052B042C0100296F5A1004AA4EB33534A24274B81DF19746B3196D463C6F7065726174696F6E54797065003C72656E616D6500466F7065726174696F6E4465736372697074696F6E004646746F00463C6462003C686973746F72792D7265636F7264003C636F6C6C003C6F72646572735F6F6C640000000004"
+    },
+    "operationType": "invalidate",
+    "clusterTime": {
+      "$timestamp": {
+        "t": 1795051292,
+        "i": 5
+      }
+    },
+    "wallTime": {
+      "$date": {
+        "$numberLong": "1795051292386"
+      }
+    }
+  }
+]
