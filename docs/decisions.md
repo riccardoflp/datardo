@@ -644,3 +644,9 @@ Raised while the catalog was written; each names the cards that hold the current
   **Copy as PUBLISH command** is never cut; several texts are new (the subscribe form, **Subscribe again**, **Show
   every message**, **Filter channels**); the notice of a publish needs the reply of its step. (`pubsub.subscribe`,
   `pubsub.channels`, `pubsub.filter`, `pubsub.export`, `pubsub.copy`, `pubsub.publish`).
+- **Q51** — Playgrounds: one run at a time across every tab, with no memory limit in the pure code (a process that
+  dies reads "may have run out of memory"); a file not seen before opens on the current MongoDB connection and the
+  active tab's database, else `test`; a lazy aggregate cursor with `$out` or `$merge` is refused when it is read;
+  saving a saved file with no change does nothing; the engine needs sessions, transactions, cursors kept by id and
+  more methods of a collection for the playground process. (`playground.run`, `playground.open-file`,
+  `playground.save`, `playground.runtime`).
