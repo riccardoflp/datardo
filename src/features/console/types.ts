@@ -8,7 +8,6 @@ import type { Context } from '../../shared/feature';
 import type { ConnectionId } from '../../shared/ids';
 import { connectionId } from '../../shared/ids';
 import type { AppState } from '../../shared/state';
-import { stepText } from '../runner/step-text';
 
 /** The arguments of a command, the name first, each as the bytes the server receives. */
 export type CommandArguments = readonly Uint8Array[];
@@ -183,19 +182,6 @@ export function argumentText(argument: Uint8Array | undefined): string {
 /** The words of a command in upper case, for the rules that compare names and option words without case. */
 export function upperWords(command: CommandArguments): readonly string[] {
   return command.map((argument) => argumentText(argument).toUpperCase());
-}
-
-/**
- * A command written as one line, as the runner writes the text of its step (`runner.step-text`): an argument with a
- * space, a quote or a byte that is not printable in double quotes, so that `console.parse-line` reads it back.
- */
-export function commandLine(command: CommandArguments): string {
-  return stepText({
-    kind: 'engine',
-    writes: false,
-    connection: connectionId(''),
-    request: { engine: 'redis', database: 0, command },
-  });
 }
 
 /** The commands whose second word is a subcommand (the containers of Redis 7.2). */

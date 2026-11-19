@@ -22,3 +22,8 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
   connections by folder and the places used last.
 - MongoDB and Redis connections are added in the connection form, tested, saved with their passwords in the secret
   storage, connected and disconnected, made read-only, and shown in their Overview.
+
+### Security
+
+- The text of a step, in a confirmation and in the Log, hides the passwords of `ACL SETUSER` and of every `CONFIG SET`
+  parameter that holds one, as the Redis console does.

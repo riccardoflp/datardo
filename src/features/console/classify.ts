@@ -11,7 +11,8 @@
 import { builtinFlags } from './command-docs';
 import { text } from './text';
 import type { CommandArguments, CommandFlags, ConsoleConnection, ConsoleSession, KeyCounts } from './types';
-import { argumentText, commandLine, containers, isAtLeast, upperWords } from './types';
+import { commandLine } from '../runner/step-text';
+import { argumentText, containers, isAtLeast, upperWords } from './types';
 
 /** What `console.classify` decides. */
 export type Classification =

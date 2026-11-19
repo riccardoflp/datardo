@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { commandArguments } from '../../../src/features/console/parse-line';
-import { commandLine } from '../../../src/features/console/types';
+import { commandLine } from '../../../src/features/runner/step-text';
 import { bytes, words } from './context';
 
 function argumentsOf(line: string): readonly Uint8Array[] | string {

@@ -17,13 +17,13 @@ import { classification, countNeeded, titleOf, type Classification, type Classif
 import { serverVersion } from './command-docs';
 import { savedDatabase } from './connect';
 import { commandArguments } from './parse-line';
+import { commandLine } from '../runner/step-text';
 import { maskedArguments } from './secret-arguments';
 import { openedSession } from './session';
 import { text } from './text';
 import type { CommandArguments, CommandFlags, ConsoleSession, ConsoleState, KeyCounts } from './types';
 import {
   argumentText,
-  commandLine,
   consoleClient,
   consoleConnection,
   consoleOf,

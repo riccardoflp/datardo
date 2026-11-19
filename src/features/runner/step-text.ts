@@ -10,6 +10,7 @@ import type { AppStep, EngineStep, FileStep } from '../../shared/feature';
 import type { Target } from '../../shared/target';
 import { mongoshValue, type Shortening } from '../../shared/mongosh-value';
 import { cutUnits, groupThousands } from '../../shared/text-units';
+import { secretArguments } from '../console/secret-arguments';
 
 /** A value is cut after 200 characters (Datardo's choice). */
 export const longestValue = 200;
@@ -100,9 +101,9 @@ function listText(items: readonly string[]): string {
   return `${items.slice(0, longestList).join(', ')}, … and ${groupThousands(more)} more`;
 }
 
-/** `SET "user 7" "a\x00b" KEEPTTL`, with the secrets of `AUTH`, `HELLO`, `MIGRATE` and `CONFIG SET` as `***`. */
+/** `SET "user 7" "a\x00b" KEEPTTL`, with the secrets console.secret-arguments finds as `***`. */
 function redisText(request: RedisRequest): string {
-  const secret = secretPositions(request.command);
+  const secret = new Set(secretArguments(request.command));
   const words = request.command.map((word, index) => (secret.has(index) ? masked : redisWord(word)));
   const [name, ...args] = words;
   if (name === undefined) {
@@ -111,32 +112,12 @@ function redisText(request: RedisRequest): string {
   return args.length === 0 ? name : `${name} ${listText(args).replaceAll(', ', ' ')}`;
 }
 
-/** The positions of the arguments that hold a secret. */
-function secretPositions(command: readonly Uint8Array[]): ReadonlySet<number> {
-  const words = command.map((word) => new TextDecoder().decode(word).toUpperCase());
-  const positions = new Set<number>();
-  const name = words[0] ?? '';
-  if (name === 'AUTH') {
-    positions.add(words.length > 2 ? 2 : 1);
-  }
-  words.forEach((word, index) => {
-    if (index === 0) {
-      return;
-    }
-    if (word === 'AUTH' && (name === 'HELLO' || name === 'MIGRATE')) {
-      positions.add(name === 'HELLO' ? index + 2 : index + 1);
-    } else if (word === 'AUTH2' && name === 'MIGRATE') {
-      positions.add(index + 2);
-    }
-  });
-  if (name === 'CONFIG' && words[1] === 'SET') {
-    for (let index = 2; index < words.length; index += 2) {
-      if (words[index] === 'REQUIREPASS' || words[index] === 'MASTERAUTH') {
-        positions.add(index + 1);
-      }
-    }
-  }
-  return positions;
+/**
+ * A Redis command written as one line, as the text of its step: an argument with a space, a quote or a byte that is
+ * not printable in double quotes, so that `console.parse-line` reads it back; its secrets as `***`.
+ */
+export function commandLine(command: readonly Uint8Array[]): string {
+  return redisText({ engine: 'redis', database: 0, command });
 }
 
 /** One argument of a command line: as is, or in double quotes with `\"`, `\\` and `\xNN`. */

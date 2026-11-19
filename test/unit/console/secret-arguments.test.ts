@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { commandArguments } from '../../../src/features/console/parse-line';
 import { maskedArguments, maskedLine, secretArguments } from '../../../src/features/console/secret-arguments';
-import { commandLine } from '../../../src/features/console/types';
+import { commandLine } from '../../../src/features/runner/step-text';
 
 function argumentsOf(line: string): readonly Uint8Array[] {
   const read = commandArguments(line);

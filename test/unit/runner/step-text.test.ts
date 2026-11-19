@@ -57,6 +57,8 @@ describe('runner.step-text', () => {
       redis('MIGRATE', 'h', '6379', '', '0', '5000', 'AUTH2', 'app', 's3cret', 'KEYS', 'a'),
       redis('CONFIG', 'SET', 'requirepass', 's3cret'),
       redis('CONFIG', 'SET', 'masterauth', 's3cret', 'maxmemory', '10mb'),
+      redis('CONFIG', 'SET', 'masteruser-password', 's3cret'),
+      redis('ACL', 'SETUSER', 'app', 'on', '>s3cret', '~*'),
       mongo('createUser', [{ user: 'app', pwd: 's3cret', roles: [] }], null),
       mongo('updateUser', ['app', { pwd: 's3cret' }], null),
       mongo('runCommand', [{ createUser: 'app', pwd: 's3cret', roles: [] }], null),
