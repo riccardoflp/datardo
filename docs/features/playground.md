@@ -107,7 +107,9 @@ feature wrote.
 - **Undo**: Cannot be undone, and needs none: the tab is closed.
 - **After**: the playground tab is open and active, the caret at the end of the last line of the example. The tab is
   not saved: it has no file until `playground.save`.
-- **Refuses**: no MongoDB connection saved, *Add a MongoDB connection first.* (`/no-connection`).
+- **Refuses**: no MongoDB connection saved, *Add a MongoDB connection first.* (`/no-connection`); from Go to, a
+  connection picked that cannot be reached when its databases are listed, *Could not connect to <connection>: <error>*
+  (`/not-connected`).
 - **Commands**: `playground.open`.
 - **Uses**: `playground.show`, `playground.target`, `playground.save`, `tab.open`, `structure.show`.
 - **Ported from**: `src/playground/playground.ts › Playgrounds.create`; the README's item **Playground**.
@@ -160,7 +162,9 @@ Opens a file of mongosh code as a playground, with the connection and the databa
 - **Refuses**: a file that no longer exists, *The file <path> doesn't exist.* (`/no-file`); a file over 5 MB
   *(Datardo's choice)*, *<file> is too large to open as a playground (over 5 MB).* (`/too-large`); a file that is not
   UTF-8 text, *<file> is not a text file.* (`/not-text`); a file that cannot be read, *Could not open <file>: <error>*
-  (`/open-failed`); no MongoDB connection saved, *Add a MongoDB connection first.* (`/no-connection`).
+  (`/open-failed`); no MongoDB connection saved, *Add a MongoDB connection first.* (`/no-connection`); a connection
+  picked that cannot be reached when its databases are listed, *Could not connect to <connection>: <error>*
+  (`/not-connected`).
 - **Commands**: `playground.open-file`.
 - **Uses**: `playground.show`, `playground.target`, `tab.open`, `tab.restore`, `home.show`, `runner.ask`.
 - **Ported from**: the README's section **Desktop app** (`File › Open File…`, `Ctrl+O`, which opens a playground
@@ -329,7 +333,8 @@ and shows what it returned.
 - **Refuses**: no playground tab active, when started from Go to, *Open a playground to run it: New playground creates
   one.* (`/no-playground`); a run already in progress, in this or another playground tab, *A playground is already
   running.* (`/running`); a connection that cannot be reached, *Could not connect to <connection>: <error>*
-  (`/not-connected`). A script that fails is not a refusal: its error is a result.
+  (`/not-connected`); a playground whose connection was removed, with no MongoDB connection saved, *Add a MongoDB
+  connection first.* (`/no-connection`). A script that fails is not a refusal: its error is a result.
 - **Commands**: `playground.run:all`, `playground.run:selection`, `playground.run:statement`.
 - **Uses**: `playground.statements`, `playground.rewrite`, `playground.runtime`, `playground.sessions`,
   `playground.writes`, `playground.results`, `playground.stop`, `playground.target`, `connection.connect`,
