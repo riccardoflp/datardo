@@ -1,0 +1,6 @@
+{
+  "_id": {
+    "$numberInt": "4"
+  },
+  "only": "left"
+}

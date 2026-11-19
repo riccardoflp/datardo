@@ -1,0 +1,23 @@
+[
+  [
+    {
+      "_id": { "$oid": "65f1c0a2b3d4e5f6a7b8c9d0" },
+      "name": "Mario Rossi",
+      "qty": { "$numberInt": "42" },
+      "price": { "$numberDecimal": "42.0" },
+      "total": { "$numberLong": "420" },
+      "ratio": { "$numberDouble": "1.5" },
+      "active": true,
+      "at": { "$date": { "$numberLong": "1710498600000" } },
+      "customerId": { "$oid": "65f1c0a2b3d4e5f6a7b8c9aa" },
+      "token": { "$binary": { "base64": "PyuMHl1KTnucbxorPE1ebw==", "subType": "04" } },
+      "pattern": { "$regularExpression": { "pattern": "^ma", "options": "i" } },
+      "code": { "$code": "function () { return 42; }" },
+      "deletedAt": null,
+      "items": [{ "sku": "A-17" }, { "sku": "B-02" }]
+    },
+    { "_id": "A-17", "note": "true story" },
+    { "_id": { "$numberLong": "42" }, "status": "paid" },
+    { "_id": { "a": { "$numberInt": "1" }, "b": { "$numberInt": "2" } }, "total": { "$numberInt": "1250" } }
+  ]
+]

@@ -1,0 +1,7 @@
+[
+  [
+    { "_id": { "$oid": "65f1c0a2b3d4e5f6a7b800c1" }, "email": "c1@example.com" },
+    { "_id": { "$oid": "65f1c0a2b3d4e5f6a7b800c2" }, "email": "c2@example.com" },
+    { "_id": { "$oid": "65f1c0a2b3d4e5f6a7b800c3" }, "email": "c3@example.com" }
+  ]
+]
