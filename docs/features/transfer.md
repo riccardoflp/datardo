@@ -157,6 +157,7 @@ Inserts the documents of a JSON, JSON Lines or CSV file, or of a file in mongosh
 - **Refuses**: a file that does not parse: *Can't import \<file\>: \<error\>* (`/unreadable`); a file without
   documents: *\<file\> contains no documents.* (`/empty`). An error of the server other than a write error: *Import
   failed: \<error\>*.
+  A read-only connection and a view are refused as **Read-only** says (`/read-only`, `/view`).
 - **Commands**: `transfer.import`.
 - **Settings**: `datardo.undo.enabled`, `datardo.undo.maxDocumentsPerOperation`.
 - **Uses**: `transfer.import-files`, `transfer.csv-read`, `undo.record`, `undo.note`, `undo.limits`,
@@ -343,6 +344,7 @@ any database on any MongoDB connection, for example from production to a local s
   (`tab.open`), and **Undo** when recorded.
 - **Refuses**: a destination that cannot be reached: *Could not connect to \<name\>: \<error\>* (`/not-connected`); a
   count that fails: its error. An error while copying: *Copy failed: \<error\>*.
+  A read-only destination is refused as **Read-only** says (`/read-only`).
 - **Commands**: `transfer.copy-collection`.
 - **Settings**: `datardo.undo.enabled`, `datardo.undo.maxDocumentsPerOperation`, `datardo.undo.maxOperationSizeMb`.
 - **Uses**: `undo.record`, `undo.note`, `undo.limits`, `undo.notification`, `connection.read-only`,
@@ -427,6 +429,7 @@ Inserts fake documents that look like a collection's, into it or into another co
   sample fails: *Could not analyze \<database\>.\<collection\>: \<error\>*; the destination can't be reached: *Could
   not connect to \<name\>: \<error\>* (`/not-connected`). An error while inserting: *Generating documents failed after
   \<i\> inserted: \<error\>*.
+  A read-only destination is refused as **Read-only** says (`/read-only`).
 - **Commands**: `transfer.generate`.
 - **Settings**: `datardo.undo.enabled`, `datardo.undo.maxDocumentsPerOperation`.
 - **Uses**: `transfer.generate-values`, `schema.analyze`, `schema.show`, `query.format`, `undo.record`, `undo.note`,

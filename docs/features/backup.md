@@ -157,6 +157,7 @@ or a collection.
   collection (use mongorestore)*) and, with **Add documents**, a view that exists (*a view that already exists*). A
   damaged or cut archive, or any error: *Restore into \<where\> failed: \<error\>*, followed by *Restored before the
   error: \<summary\>.* when something was.
+  A read-only connection is refused as **Read-only** says (`/read-only`).
 - **Commands**: `backup.restore`.
 - **Settings**: `datardo.undo.enabled`, `datardo.undo.maxDocumentsPerOperation`.
 - **Uses**: `backup.archive-read`, `backup.folder-layout`, `transfer.copy-collection` (the options copied),
