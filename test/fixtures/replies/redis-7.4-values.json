@@ -1,0 +1,806 @@
+{
+  "fieldExpiry": true,
+  "type-hash": {
+    "args": null,
+    "replies": [
+      {
+        "bytes": "aGFzaA=="
+      }
+    ]
+  },
+  "type-none": {
+    "args": null,
+    "replies": [
+      {
+        "bytes": "bm9uZQ=="
+      }
+    ]
+  },
+  "check-hget": {
+    "args": {
+      "commands": [
+        [
+          "HGET",
+          "user:7",
+          "nickname"
+        ],
+        [
+          "HEXISTS",
+          "user:7",
+          "email"
+        ]
+      ]
+    },
+    "replies": [
+      {
+        "bytes": "QWRh"
+      },
+      0
+    ]
+  },
+  "count-hash": {
+    "args": {
+      "type": "hash"
+    },
+    "replies": [
+      3
+    ]
+  },
+  "string-length": {
+    "args": {},
+    "replies": [
+      5
+    ]
+  },
+  "string-whole": {
+    "args": {
+      "length": 5
+    },
+    "replies": [
+      5,
+      {
+        "bytes": "aGVsbG8="
+      }
+    ]
+  },
+  "string-compact": {
+    "args": {
+      "form": "compact"
+    },
+    "replies": [
+      5,
+      {
+        "bytes": "aGVsbG8="
+      }
+    ]
+  },
+  "string-not-text": {
+    "args": {
+      "length": 3
+    },
+    "replies": [
+      3,
+      {
+        "bytes": "AP9B"
+      }
+    ]
+  },
+  "hash-scan": {
+    "args": {},
+    "replies": [
+      [
+        {
+          "bytes": "MA=="
+        },
+        [
+          {
+            "bytes": "bmlja25hbWU="
+          },
+          {
+            "bytes": "QWRh"
+          },
+          {
+            "bytes": "bmFtZQ=="
+          },
+          {
+            "bytes": "QWRhIExvdmVsYWNl"
+          },
+          {
+            "bytes": "YWdl"
+          },
+          {
+            "bytes": "MzY="
+          }
+        ]
+      ]
+    ]
+  },
+  "hash-expiry": {
+    "args": {
+      "expiryOf": [
+        {
+          "hex": "6e69636b6e616d65"
+        },
+        {
+          "hex": "6e616d65"
+        }
+      ]
+    },
+    "replies": [
+      [
+        599954,
+        -1
+      ]
+    ]
+  },
+  "set-scan": {
+    "args": {},
+    "replies": [
+      [
+        {
+          "bytes": "MA=="
+        },
+        [
+          {
+            "bytes": "cmVk"
+          },
+          {
+            "bytes": "Z3JlZW4="
+          },
+          {
+            "bytes": "Ymx1ZQ=="
+          }
+        ]
+      ]
+    ]
+  },
+  "list-head": {
+    "args": {},
+    "replies": [
+      5,
+      [
+        {
+          "bytes": "YQ=="
+        },
+        {
+          "bytes": "Yg=="
+        },
+        {
+          "bytes": "YQ=="
+        },
+        {
+          "bytes": "Yw=="
+        },
+        {
+          "bytes": "AP8="
+        }
+      ]
+    ]
+  },
+  "list-tail": {
+    "args": {
+      "from": "tail"
+    },
+    "replies": [
+      5,
+      [
+        {
+          "bytes": "YQ=="
+        },
+        {
+          "bytes": "Yg=="
+        },
+        {
+          "bytes": "YQ=="
+        },
+        {
+          "bytes": "Yw=="
+        },
+        {
+          "bytes": "AP8="
+        }
+      ]
+    ]
+  },
+  "list-index": {
+    "args": {
+      "from": "index",
+      "index": "2"
+    },
+    "replies": [
+      5,
+      [
+        {
+          "bytes": "YQ=="
+        },
+        {
+          "bytes": "Yw=="
+        },
+        {
+          "bytes": "AP8="
+        }
+      ]
+    ]
+  },
+  "zset-lowest": {
+    "args": {},
+    "replies": [
+      4,
+      [
+        [
+          {
+            "bytes": "ZGF2ZQ=="
+          },
+          {
+            "double": "-Infinity"
+          }
+        ],
+        [
+          {
+            "bytes": "Ym9i"
+          },
+          2.5
+        ],
+        [
+          {
+            "bytes": "YWxpY2U="
+          },
+          10
+        ],
+        [
+          {
+            "bytes": "Y2Fyb2w="
+          },
+          {
+            "double": "Infinity"
+          }
+        ]
+      ]
+    ]
+  },
+  "zset-highest": {
+    "args": {
+      "order": "highest"
+    },
+    "replies": [
+      4,
+      [
+        [
+          {
+            "bytes": "Y2Fyb2w="
+          },
+          {
+            "double": "Infinity"
+          }
+        ],
+        [
+          {
+            "bytes": "YWxpY2U="
+          },
+          10
+        ],
+        [
+          {
+            "bytes": "Ym9i"
+          },
+          2.5
+        ],
+        [
+          {
+            "bytes": "ZGF2ZQ=="
+          },
+          {
+            "double": "-Infinity"
+          }
+        ]
+      ]
+    ]
+  },
+  "zset-range": {
+    "args": {
+      "min": "0",
+      "max": ""
+    },
+    "replies": [
+      4,
+      [
+        [
+          {
+            "bytes": "Ym9i"
+          },
+          2.5
+        ],
+        [
+          {
+            "bytes": "YWxpY2U="
+          },
+          10
+        ],
+        [
+          {
+            "bytes": "Y2Fyb2w="
+          },
+          {
+            "double": "Infinity"
+          }
+        ]
+      ],
+      3
+    ]
+  },
+  "zset-older": {
+    "args": {
+      "older": true,
+      "order": "highest"
+    },
+    "replies": [
+      4,
+      [
+        [
+          {
+            "bytes": "Y2Fyb2w="
+          },
+          {
+            "double": "Infinity"
+          }
+        ],
+        [
+          {
+            "bytes": "YWxpY2U="
+          },
+          10
+        ],
+        [
+          {
+            "bytes": "Ym9i"
+          },
+          2.5
+        ],
+        [
+          {
+            "bytes": "ZGF2ZQ=="
+          },
+          {
+            "double": "-Infinity"
+          }
+        ]
+      ]
+    ]
+  },
+  "stream-newest": {
+    "args": {},
+    "replies": [
+      3,
+      [
+        [
+          {
+            "bytes": "MTc2MzQwMDAwMDAwMi0w"
+          },
+          [
+            {
+              "bytes": "dHlwZQ=="
+            },
+            {
+              "bytes": "Y2xpY2s="
+            },
+            {
+              "bytes": "cGFnZQ=="
+            },
+            {
+              "bytes": "Y2FydA=="
+            }
+          ]
+        ],
+        [
+          {
+            "bytes": "MTc2MzQwMDAwMDAwMS0w"
+          },
+          [
+            {
+              "bytes": "dHlwZQ=="
+            },
+            {
+              "bytes": "dmlldw=="
+            }
+          ]
+        ],
+        [
+          {
+            "bytes": "MTc2MzQwMDAwMDAwMC0w"
+          },
+          [
+            {
+              "bytes": "dHlwZQ=="
+            },
+            {
+              "bytes": "Y2xpY2s="
+            },
+            {
+              "bytes": "cGFnZQ=="
+            },
+            {
+              "bytes": "aG9tZQ=="
+            }
+          ]
+        ]
+      ]
+    ]
+  },
+  "stream-oldest": {
+    "args": {
+      "order": "oldest"
+    },
+    "replies": [
+      3,
+      [
+        [
+          {
+            "bytes": "MTc2MzQwMDAwMDAwMC0w"
+          },
+          [
+            {
+              "bytes": "dHlwZQ=="
+            },
+            {
+              "bytes": "Y2xpY2s="
+            },
+            {
+              "bytes": "cGFnZQ=="
+            },
+            {
+              "bytes": "aG9tZQ=="
+            }
+          ]
+        ],
+        [
+          {
+            "bytes": "MTc2MzQwMDAwMDAwMS0w"
+          },
+          [
+            {
+              "bytes": "dHlwZQ=="
+            },
+            {
+              "bytes": "dmlldw=="
+            }
+          ]
+        ],
+        [
+          {
+            "bytes": "MTc2MzQwMDAwMDAwMi0w"
+          },
+          [
+            {
+              "bytes": "dHlwZQ=="
+            },
+            {
+              "bytes": "Y2xpY2s="
+            },
+            {
+              "bytes": "cGFnZQ=="
+            },
+            {
+              "bytes": "Y2FydA=="
+            }
+          ]
+        ]
+      ]
+    ]
+  },
+  "groups": {
+    "args": {
+      "part": "groups",
+      "group": ""
+    },
+    "replies": [
+      {
+        "map": [
+          [
+            {
+              "bytes": "bGVuZ3Ro"
+            },
+            3
+          ],
+          [
+            {
+              "bytes": "cmFkaXgtdHJlZS1rZXlz"
+            },
+            1
+          ],
+          [
+            {
+              "bytes": "cmFkaXgtdHJlZS1ub2Rlcw=="
+            },
+            2
+          ],
+          [
+            {
+              "bytes": "bGFzdC1nZW5lcmF0ZWQtaWQ="
+            },
+            {
+              "bytes": "MTc2MzQwMDAwMDAwMi0w"
+            }
+          ],
+          [
+            {
+              "bytes": "bWF4LWRlbGV0ZWQtZW50cnktaWQ="
+            },
+            {
+              "bytes": "MC0w"
+            }
+          ],
+          [
+            {
+              "bytes": "ZW50cmllcy1hZGRlZA=="
+            },
+            3
+          ],
+          [
+            {
+              "bytes": "cmVjb3JkZWQtZmlyc3QtZW50cnktaWQ="
+            },
+            {
+              "bytes": "MTc2MzQwMDAwMDAwMC0w"
+            }
+          ],
+          [
+            {
+              "bytes": "Z3JvdXBz"
+            },
+            2
+          ],
+          [
+            {
+              "bytes": "Zmlyc3QtZW50cnk="
+            },
+            [
+              {
+                "bytes": "MTc2MzQwMDAwMDAwMC0w"
+              },
+              [
+                {
+                  "bytes": "dHlwZQ=="
+                },
+                {
+                  "bytes": "Y2xpY2s="
+                },
+                {
+                  "bytes": "cGFnZQ=="
+                },
+                {
+                  "bytes": "aG9tZQ=="
+                }
+              ]
+            ]
+          ],
+          [
+            {
+              "bytes": "bGFzdC1lbnRyeQ=="
+            },
+            [
+              {
+                "bytes": "MTc2MzQwMDAwMDAwMi0w"
+              },
+              [
+                {
+                  "bytes": "dHlwZQ=="
+                },
+                {
+                  "bytes": "Y2xpY2s="
+                },
+                {
+                  "bytes": "cGFnZQ=="
+                },
+                {
+                  "bytes": "Y2FydA=="
+                }
+              ]
+            ]
+          ]
+        ]
+      },
+      [
+        {
+          "map": [
+            [
+              {
+                "bytes": "bmFtZQ=="
+              },
+              {
+                "bytes": "aWRsZQ=="
+              }
+            ],
+            [
+              {
+                "bytes": "Y29uc3VtZXJz"
+              },
+              0
+            ],
+            [
+              {
+                "bytes": "cGVuZGluZw=="
+              },
+              0
+            ],
+            [
+              {
+                "bytes": "bGFzdC1kZWxpdmVyZWQtaWQ="
+              },
+              {
+                "bytes": "MTc2MzQwMDAwMDAwMi0w"
+              }
+            ],
+            [
+              {
+                "bytes": "ZW50cmllcy1yZWFk"
+              },
+              null
+            ],
+            [
+              {
+                "bytes": "bGFn"
+              },
+              0
+            ]
+          ]
+        },
+        {
+          "map": [
+            [
+              {
+                "bytes": "bmFtZQ=="
+              },
+              {
+                "bytes": "bWFpbGVycw=="
+              }
+            ],
+            [
+              {
+                "bytes": "Y29uc3VtZXJz"
+              },
+              1
+            ],
+            [
+              {
+                "bytes": "cGVuZGluZw=="
+              },
+              2
+            ],
+            [
+              {
+                "bytes": "bGFzdC1kZWxpdmVyZWQtaWQ="
+              },
+              {
+                "bytes": "MTc2MzQwMDAwMDAwMS0w"
+              }
+            ],
+            [
+              {
+                "bytes": "ZW50cmllcy1yZWFk"
+              },
+              2
+            ],
+            [
+              {
+                "bytes": "bGFn"
+              },
+              1
+            ]
+          ]
+        }
+      ]
+    ]
+  },
+  "group": {
+    "args": {
+      "part": "group",
+      "group": "mailers"
+    },
+    "replies": [
+      [
+        {
+          "map": [
+            [
+              {
+                "bytes": "bmFtZQ=="
+              },
+              {
+                "bytes": "d29ya2VyLTE="
+              }
+            ],
+            [
+              {
+                "bytes": "cGVuZGluZw=="
+              },
+              2
+            ],
+            [
+              {
+                "bytes": "aWRsZQ=="
+              },
+              54
+            ],
+            [
+              {
+                "bytes": "aW5hY3RpdmU="
+              },
+              54
+            ]
+          ]
+        }
+      ],
+      [
+        2,
+        {
+          "bytes": "MTc2MzQwMDAwMDAwMC0w"
+        },
+        {
+          "bytes": "MTc2MzQwMDAwMDAwMS0w"
+        },
+        [
+          [
+            {
+              "bytes": "d29ya2VyLTE="
+            },
+            {
+              "bytes": "Mg=="
+            }
+          ]
+        ]
+      ],
+      [
+        [
+          {
+            "bytes": "MTc2MzQwMDAwMDAwMC0w"
+          },
+          {
+            "bytes": "d29ya2VyLTE="
+          },
+          55,
+          1
+        ],
+        [
+          {
+            "bytes": "MTc2MzQwMDAwMDAwMS0w"
+          },
+          {
+            "bytes": "d29ya2VyLTE="
+          },
+          55,
+          1
+        ]
+      ]
+    ]
+  },
+  "consumer": {
+    "args": {
+      "part": "consumer",
+      "group": "mailers",
+      "consumer": "worker-1"
+    },
+    "replies": [
+      [
+        [
+          {
+            "bytes": "MTc2MzQwMDAwMDAwMC0w"
+          },
+          {
+            "bytes": "d29ya2VyLTE="
+          },
+          55,
+          1
+        ],
+        [
+          {
+            "bytes": "MTc2MzQwMDAwMDAwMS0w"
+          },
+          {
+            "bytes": "d29ya2VyLTE="
+          },
+          55,
+          1
+        ]
+      ]
+    ]
+  }
+}
