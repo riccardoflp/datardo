@@ -742,3 +742,11 @@ Raised while the catalog was written; each names the cards that hold the current
   is **Choose**; turning the server off and the default port are written as no value; the times of `write_history`
   keep their milliseconds, so that writes in one second stay in order; watching needs a `watch` method of the engine
   that keeps its session. (`mcp.protocol`, `mcp.data-tools`, `mcp.setup`, `mcp.change-port`, `mcp.debugging-tools`).
+- **Q62** — The Monitor page and the Index advisor: the line of slow queries counts every operation read, not those
+  the filter keeps; a group gets **An index could help** when it has a suggestion; with the server's log, or with no
+  database chosen, slow queries are read with `profile -1` on `admin` and `getLog`; reading the replica set or the
+  balancer again 1 or 1.5 seconds after a change needs an **After** that waits, which there is not; reads of several
+  steps (databases then their statistics, `hello` then the replica set) need the runner to chain them; changing the
+  balancer is refused on a connection that is not a mongos; turning on the profiler from the advisor reads the
+  threshold first. (`monitor.slow-queries`, `monitor.read-slow-queries`, `monitor.step-down`, `monitor.set-balancer`,
+  `monitor.read-database-stats`, `advisor.turn-on-profiler`).
