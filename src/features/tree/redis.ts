@@ -6,7 +6,7 @@
  * expands or collapses it without opening anything. Only expanding a database starts a scan.
  */
 import type { ConnectionView } from '../../shared/connection';
-import type { TabShows } from '../../shared/state/tabs';
+import { activeTabOf, type TabShows } from '../../shared/state/tabs';
 import { isRedisStringProblem, redisFromString } from '../connection/redis-string';
 import { setting } from '../settings/read';
 import { countText, withSeparators } from './count';
@@ -64,6 +64,19 @@ function keysTab(built: Built, database: number, namespace?: string): TabShows {
     separator: built.separator,
     ...(namespace === undefined ? {} : { namespace }),
   };
+}
+
+/**
+ * The identifier of a click on a database: `key.switch-database` while the active tab shows the keys of another
+ * database of the same connection, `key.show` otherwise. Both open the keys tab of the database, or make it active.
+ */
+function databaseElement(built: Built, database: number): string {
+  const shows = activeTabOf(built.input.state.tabs)?.shows;
+  const switches =
+    (shows?.kind === 'keys' || shows?.kind === 'key') &&
+    shows.connection === built.connection.id &&
+    shows.database !== database;
+  return switches ? 'key.switch-database@tree' : 'key.show@tree';
 }
 
 function namespaceNodes(
@@ -203,7 +216,7 @@ function databaseItems(built: Built, database: RedisDatabase, level: number): re
     expanded: looked,
     selected: built.input.island.selected === id,
     label: nodeLabel({ name, kind: text.kinds.redisDatabase, count: text.label.keys(keys), expanded: looked }),
-    click: openControl(name, 'key.show@tree', keysTab(built, database.number)),
+    click: openControl(name, databaseElement(built, database.number), keysTab(built, database.number)),
     buttons: [],
     hasMenu: true,
   };

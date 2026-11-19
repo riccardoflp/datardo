@@ -54,7 +54,12 @@ describe('key.export', () => {
         path: 'C:\\exports\\a.redis',
         content: {
           writer: 'key.export',
-          args: { connection: cache.id, database: 0, keys: [hexOf(name('session:1')), hexOf(name('user:7'))] },
+          args: {
+            connection: cache.id,
+            database: 0,
+            keys: [hexOf(name('session:1')), hexOf(name('user:7'))],
+            redisVersion: '7.4.1',
+          },
         },
         text: expect.stringContaining('C:\\exports\\a.redis') as string,
       },

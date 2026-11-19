@@ -12,6 +12,8 @@ import { tabId } from '../../../src/shared/ids';
 import type { AppState } from '../../../src/shared/state';
 import type { Tab, TabShows } from '../../../src/shared/state/tabs';
 import type { Target } from '../../../src/shared/target';
+import { bytesOfHex } from '../../../src/features/key/types';
+import { keyNameOf } from '../../../src/features/undo/types';
 import { contextOf, redisConnection, stateWith } from '../connection/context';
 
 /** Cache local, writable, keeping its undo history. */
@@ -131,4 +133,9 @@ export function recordedReplies(exchange: string): readonly RedisReply[] {
     throw new Error(`No recorded exchange ${exchange}.`);
   }
   return replies.map(decoded) as readonly RedisReply[];
+}
+
+/** The names the undo history keeps, from the hexadecimal of their bytes (`undo.record`). */
+export function undoNames(hexes: readonly string[]): string[] {
+  return hexes.map((hex) => keyNameOf(bytesOfHex(hex) ?? new Uint8Array()));
 }

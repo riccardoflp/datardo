@@ -1,0 +1,212 @@
+/* key.show, key.select, key.sort, key.inspect and the key tab: the toolbar, the selection bar, the table of keys
+   drawn a screen at a time, what the page shows in place of rows, the menus and the details of one key. */
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.toolbar,
+.selection-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.selection-bar {
+  background: var(--color-selected);
+}
+
+.pattern {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.sent {
+  position: absolute;
+  right: var(--space-2);
+  color: var(--color-text-muted);
+  font-family: var(--font-family-code);
+  pointer-events: none;
+}
+
+.input {
+  min-width: 140px;
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-small);
+  background: var(--color-canvas);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.pattern .input {
+  min-width: 320px;
+}
+
+.button {
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-small);
+  background: var(--color-island);
+  color: var(--color-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.button:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.button:hover:enabled {
+  background: var(--color-hover);
+}
+
+.notice {
+  color: var(--color-text-muted);
+}
+
+.empty {
+  margin: 0;
+  padding: var(--space-4);
+  color: var(--color-text-muted);
+}
+
+.empty p {
+  margin: 0 0 var(--space-2);
+}
+
+.grid {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  outline-offset: calc(var(--focus-width) * -1);
+}
+
+.head {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-heading, 1);
+  background: var(--color-island);
+}
+
+.head-row,
+.row {
+  display: grid;
+  grid-template-columns: minmax(200px, 3fr) minmax(90px, 1fr) minmax(110px, 1fr) minmax(80px, 1fr);
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.heading-button,
+.heading-menu {
+  padding: var(--space-1) var(--space-2);
+  border: 0;
+  background: transparent;
+  color: var(--color-text-muted);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.heading-button {
+  flex: 1;
+}
+
+.body {
+  position: relative;
+}
+
+.row {
+  position: absolute;
+  right: 0;
+  left: 0;
+  align-items: center;
+  border-bottom: var(--border-width) solid var(--color-border);
+  cursor: default;
+}
+
+.row:hover {
+  background: var(--color-hover);
+}
+
+.row[aria-selected='true'] {
+  background: var(--color-selected);
+}
+
+.row[data-gone='true'] {
+  color: var(--color-text-muted);
+}
+
+.cell {
+  overflow: hidden;
+  padding: 0 var(--space-2);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menu {
+  z-index: var(--z-dialog);
+  min-width: calc(var(--dialog-width) / 2);
+  padding: var(--space-1);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-medium);
+  background: var(--color-raised);
+  color: var(--color-text);
+}
+
+.item {
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-small);
+  outline: none;
+  cursor: default;
+}
+
+.item[data-highlighted] {
+  background: var(--color-selected);
+}
+
+.inspected {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  overflow: auto;
+}
+
+.name {
+  font-family: var(--font-family-code);
+  overflow-wrap: anywhere;
+}
+
+.lines {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--space-1) var(--space-3);
+  margin: 0;
+}
+
+.lines dt {
+  color: var(--color-text-muted);
+}
+
+.lines dd {
+  margin: 0;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}

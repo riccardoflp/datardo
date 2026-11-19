@@ -15,6 +15,7 @@ import {
   onKey,
   planOf,
   recordedReplies,
+  undoNames,
 } from './context';
 
 const context = keyContext('key.delete', onKey('orders:42'));
@@ -60,7 +61,7 @@ describe('key.delete', () => {
       plan(keyContext('key.delete', onKey('orders:42'), connected(undefined, undefined, [keysTab, keyTab])), {}),
     );
     expect(deleted.title).toBe('Delete key orders:42');
-    expect(deleted.undo).toEqual({ keeps: { engine: 'redis', database: 0, keys: [hexOf(name('orders:42'))] } });
+    expect(deleted.undo).toEqual({ keeps: { kind: 'keys', database: 0, keys: undoNames([hexOf(name('orders:42'))]) } });
     expect(deleted.after).toContainEqual(
       expect.objectContaining({ kind: 'start', feature: 'tab.close', args: { tab: 't2' } }),
     );

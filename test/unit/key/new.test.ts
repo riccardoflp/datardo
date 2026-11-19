@@ -11,6 +11,7 @@ import {
   onDatabase,
   planOf,
   recordedReplies,
+  undoNames,
 } from './context';
 
 const context = keyContext('key.new', onDatabase());
@@ -88,7 +89,7 @@ describe('key.new', () => {
     const hash = { name: 'user:7', type: 'hash', field: 'name', value: 'Ada', exists: false };
     const created = planOf(plan(context, hash));
     expect(created.title).toBe('New hash user:7');
-    expect(created.undo).toEqual({ keeps: { engine: 'redis', database: 0, keys: [hexOf(name('user:7'))] } });
+    expect(created.undo).toEqual({ keeps: { kind: 'keys', database: 0, keys: undoNames([hexOf(name('user:7'))]) } });
     expect(created.after[0]).toMatchObject({
       kind: 'notify',
       text: 'Created the hash user:7 in db0.',

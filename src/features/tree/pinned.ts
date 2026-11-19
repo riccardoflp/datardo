@@ -101,7 +101,8 @@ function openOf(
   const label = element === 'tree.pinned@tree' ? name : text.menu.open;
   const shows = showsOf(pin, connection, setting(input.state.settings, 'datardo.key.separator'));
   if (shows !== undefined) {
-    return openControl(label, element, shows);
+    // A click on a pinned key is `key.open`'s entry point in the tree, as one on a pinned namespace is `key.show`'s.
+    return openControl(label, element === 'tree.pinned@tree' && pin.kind === 'key' ? 'key.open@tree' : element, shows);
   }
   return startControl(label, element, 'saved-query.run', {
     connection,

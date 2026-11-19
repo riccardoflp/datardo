@@ -2,7 +2,17 @@ import { describe, expect, it } from 'vitest';
 import { afterReply, dateOfText, plan } from '../../../src/features/key/set-expiry';
 import { hexOf } from '../../../src/features/key/types';
 import { contextOf } from '../connection/context';
-import { cacheReadOnly, commandsOf, connected, keyContext, name, onKey, planOf, recordedReplies } from './context';
+import {
+  cacheReadOnly,
+  commandsOf,
+  connected,
+  keyContext,
+  name,
+  onKey,
+  planOf,
+  recordedReplies,
+  undoNames,
+} from './context';
 
 const context = keyContext('key.set-expiry', onKey('orders:42'));
 const durationError = 'Enter a duration, for example 90, 15m, 2h or 7d.';
@@ -54,7 +64,7 @@ describe('key.set-expiry', () => {
   it('keeps the key for the undo, which makes a key that was persistent persistent again', () => {
     const set = planOf(plan(context, { when: 'in', duration: '1h' }));
     expect(set.title).toBe('Set expiry of orders:42');
-    expect(set.undo).toEqual({ keeps: { engine: 'redis', database: 0, keys: [hexOf(name('orders:42'))] } });
+    expect(set.undo).toEqual({ keeps: { kind: 'keys', database: 0, keys: undoNames([hexOf(name('orders:42'))]) } });
   });
 
   it('gives a key of the type ReJSON-RL an expiry', () => {

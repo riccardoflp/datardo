@@ -11,6 +11,7 @@ import { featureId, type ConnectionId, type RefusalCode } from '../../shared/ids
 import { connectionState, savedConnection } from '../../shared/state/connections';
 import { stepText } from '../runner/step-text';
 import { setting } from '../settings/read';
+import { keepsJson, keyNameOf } from '../undo/types';
 import { text } from './text';
 
 /** A key's name: its bytes, never assumed to be UTF-8 (glossary, "key": `KeyRef`). */
@@ -271,8 +272,7 @@ export function stepsInBatches(
 
 /** What the undo history keeps for a plan: the keys with these names, in a database (`undo.record`). */
 export function keysKept(database: number, names: readonly KeyName[]): Undo {
-  const keeps: Json = { engine: 'redis', database, keys: names.map(hexOf) };
-  return { keeps };
+  return { keeps: keepsJson({ kind: 'keys', database, keys: names.map(keyNameOf) }) };
 }
 
 /** Whether a write of a number of keys will be recorded, and the line its confirmation says about undo. */

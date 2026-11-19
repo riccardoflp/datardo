@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { view } from '../../features/nav/inspector';
 import { text } from '../../features/nav/text';
 import type { NavInput } from '../../features/nav/types';
+import { inspectors } from '../pages';
 import { startFeature } from './intent';
 import styles from './bars.module.css';
 
@@ -22,6 +23,13 @@ function Loading({ delayMs, label }: { readonly delayMs: number; readonly label:
   return shown ? (
     <span className="codicon codicon-loading codicon-modifier-spin" role="img" aria-label={label} />
   ) : null;
+}
+
+/** The one thing selected, as the page of the active tab draws it (`key.inspect`). */
+function SelectedThing({ input }: { readonly input: NavInput }): React.JSX.Element | null {
+  const tab = input.activeTab;
+  const Drawn = inspectors[tab.kind];
+  return Drawn === undefined || tab.tab === undefined ? null : <Drawn tabId={tab.tab} />;
 }
 
 /** The inspector island, when its View shows it; `width` is the layout's. */
@@ -68,11 +76,13 @@ export function Inspector({
         </div>
       ) : body.kind === 'loading' ? (
         <Loading delayMs={body.delayMs} label={body.label} />
-      ) : body.kind === 'error' ? (
+      ) : body.kind === 'selected' ? (
+        <SelectedThing input={input} />
+      ) : (
         <div className={styles['inspector-empty']}>
           <span>{body.message}</span>
         </div>
-      ) : null}
+      )}
     </aside>
   );
 }

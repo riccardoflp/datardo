@@ -263,6 +263,7 @@ export const text = {
     ascending: 'Sort ascending',
     descending: 'Sort descending',
     scanOrder: 'Scan order',
+    menu: (column: string) => `Sort by ${column}`,
     amongLoaded: (loaded: number) =>
       `Sorted among the ${count(loaded, 'key', 'keys')} loaded: scan the rest to sort them all.`,
     tooMany: 'Too many keys to sort: narrow the pattern. The largest keys are on the Server page.',
@@ -298,6 +299,9 @@ export const text = {
     refused: '—',
   },
   show: {
+    title: 'Open keys',
+    step: (database: string, connection: string) => `open the keys tab of ${database} on ${connection}`,
+    activate: (database: string, connection: string) => `make the keys tab of ${database} on ${connection} active`,
     placeholder: 'Pattern or text, for example orders:*',
     scanMore: 'Scan more',
     everyKey: 'Every key was scanned.',
@@ -310,6 +314,10 @@ export const text = {
     importKeys: 'Import keys…',
     connect: 'Connect',
     retry: 'Retry',
+    cancel: 'Cancel',
+    pattern: 'Pattern',
+    typeFilter: 'Type',
+    table: 'Keys',
     columns: { key: 'Key', type: 'Type', expiry: 'Expiry', size: 'Size' },
     gone: 'gone',
     menu: {

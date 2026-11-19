@@ -11,6 +11,7 @@ import {
   onKey,
   planOf,
   recordedReplies,
+  undoNames,
 } from './context';
 
 const context = keyContext('key.copy', onKey('orders:42'));
@@ -76,7 +77,7 @@ describe('key.copy', () => {
 
   it('keeps the copy in db1 for the undo, and nothing of db0', () => {
     const copied = planOf(plan(context, { to: 'orders:42', database: '1', exists: false }));
-    expect(copied.undo).toEqual({ keeps: { engine: 'redis', database: 1, keys: [hexOf(name('orders:42'))] } });
+    expect(copied.undo).toEqual({ keeps: { kind: 'keys', database: 1, keys: undoNames([hexOf(name('orders:42'))]) } });
   });
 
   it('says This server has no COPY command on ERR unknown command, and on a server older than 6.2', () => {

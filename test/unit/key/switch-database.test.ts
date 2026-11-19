@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { request } from '../../../src/features/key/scan';
 import { databaseList, plan } from '../../../src/features/key/switch-database';
 import type { ReadRequest } from '../../../src/shared/feature';
+import { view as treeRedis } from '../../../src/features/tree/redis';
+import { inputOf, nodesOf } from '../tree/context';
 import { cache, connected, keyContext, onDatabase, planOf, requestWords } from './context';
 
 const databases = { count: 16, keys: { '0': 1204, '3': 7 } };
@@ -58,5 +60,36 @@ describe('key.switch-database', () => {
     expect(planOf(plan(withTab, { args: { databases }, database: '3' })).steps).toEqual([
       expect.objectContaining({ action: 'tab.activate', args: { tab: 't1' } }),
     ]);
+  });
+
+  it('a database of the tree switches while the keys tab of another database is active', () => {
+    const open = { kind: 'keys', connection: cache.id, database: 0, separator: ':' } as const;
+    const base = inputOf({ connections: [cache] });
+    const tabs = connected(cache, '7.4.1', [open]).tabs;
+    const island = {
+      redis: {
+        databases: {
+          kind: 'loaded' as const,
+          value: {
+            count: 16,
+            databases: Array.from({ length: 16 }, (_, number) => ({ number, keys: 5, expires: 0, averageTtlMs: 0 })),
+          },
+        },
+        scans: {},
+      },
+    };
+    const clicks = (active: string | undefined) =>
+      nodesOf(
+        treeRedis(
+          {
+            ...base,
+            island: { ...base.island, ...island },
+            state: { ...base.state, tabs: { ...tabs, ...(active === undefined ? {} : { active: active as never }) } },
+          },
+          cache,
+        ),
+      ).map((node) => node.click?.element);
+    expect(clicks('t1').slice(0, 2)).toEqual(['key.show@tree', 'key.switch-database@tree']);
+    expect(clicks(undefined).slice(0, 2)).toEqual(['key.show@tree', 'key.show@tree']);
   });
 });

@@ -338,31 +338,31 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`key.show`](key.md#keyshow--the-keys-tab) | The keys tab | View | M13 | Specified |
-| [`key.scan`](key.md#keyscan--scan-the-keys) | Scan the keys | Read | M13 | Specified |
-| [`key.pattern`](key.md#keypattern--from-what-is-typed-to-a-pattern) | From what is typed to a pattern | Derivation | M13 | Specified |
-| [`key.details`](key.md#keydetails--expiry-and-size-of-the-rows-on-screen) | Expiry and size of the rows on screen | Read | M13 | Specified |
-| [`key.sort`](key.md#keysort--sort-the-loaded-keys) | Sort the loaded keys | Derivation | M13 | Specified |
-| [`key.select`](key.md#keyselect--select-keys) | Select keys | View | M13 | Specified |
-| [`key.refresh`](key.md#keyrefresh--refresh-the-keys-tab) | Refresh the keys tab | Operation | M13 | Specified |
-| [`key.inspect`](key.md#keyinspect--a-key-in-the-inspector-island) | A key in the inspector island | View | M13 | Specified |
-| [`key.format-expiry`](key.md#keyformat-expiry--the-time-left-and-the-date-of-an-expiry) | The time left and the date of an expiry | Derivation | M13 | Specified |
-| [`key.parse-duration`](key.md#keyparse-duration--a-duration-as-the-user-types-it) | A duration as the user types it | Derivation | M13 | Specified |
-| [`key.open`](key.md#keyopen--open-a-key-in-a-key-tab) | Open a key in a key tab | Operation | M13 | Specified |
-| [`key.new`](key.md#keynew--new-key) | New key | Operation | M13 | Specified |
-| [`key.rename`](key.md#keyrename--rename-a-key) | Rename a key | Operation | M13 | Specified |
-| [`key.copy`](key.md#keycopy--copy-a-key) | Copy a key | Operation | M13 | Specified |
-| [`key.set-expiry`](key.md#keyset-expiry--set-the-expiry-of-a-key) | Set the expiry of a key | Operation | M13 | Specified |
-| [`key.persist`](key.md#keypersist--make-a-key-persistent) | Make a key persistent | Operation | M13 | Specified |
-| [`key.delete`](key.md#keydelete--delete-a-key) | Delete a key | Operation | M13 | Specified |
-| [`key.delete-selected`](key.md#keydelete-selected--delete-the-selected-keys) | Delete the selected keys | Operation | M13 | Specified |
-| [`key.delete-by-pattern`](key.md#keydelete-by-pattern--delete-the-keys-matching-a-pattern) | Delete the keys matching a pattern | Operation | M13 | Specified |
-| [`key.copy-name`](key.md#keycopy-name--copy-the-name-of-a-key) | Copy the name of a key | Operation | M13 | Specified |
-| [`key.export`](key.md#keyexport--export-keys-to-a-file) | Export keys to a file | Operation | M13 | Specified |
-| [`key.export-text`](key.md#keyexport-text--the-file-of-exported-keys) | The file of exported keys | Derivation | M13 | Specified |
-| [`key.import`](key.md#keyimport--import-keys-from-a-file) | Import keys from a file | Operation | M13 | Specified |
-| [`key.import-parse`](key.md#keyimport-parse--read-a-file-of-exported-keys) | Read a file of exported keys | Derivation | M13 | Specified |
-| [`key.switch-database`](key.md#keyswitch-database--switch-database) | Switch database | Operation | M13 | Specified |
+| [`key.show`](key.md#keyshow--the-keys-tab) | The keys tab | View | M13 | Built |
+| [`key.scan`](key.md#keyscan--scan-the-keys) | Scan the keys | Read | M13 | Built |
+| [`key.pattern`](key.md#keypattern--from-what-is-typed-to-a-pattern) | From what is typed to a pattern | Derivation | M13 | Built |
+| [`key.details`](key.md#keydetails--expiry-and-size-of-the-rows-on-screen) | Expiry and size of the rows on screen | Read | M13 | Built |
+| [`key.sort`](key.md#keysort--sort-the-loaded-keys) | Sort the loaded keys | Derivation | M13 | Built |
+| [`key.select`](key.md#keyselect--select-keys) | Select keys | View | M13 | Built |
+| [`key.refresh`](key.md#keyrefresh--refresh-the-keys-tab) | Refresh the keys tab | Operation | M13 | Built |
+| [`key.inspect`](key.md#keyinspect--a-key-in-the-inspector-island) | A key in the inspector island | View | M13 | Built |
+| [`key.format-expiry`](key.md#keyformat-expiry--the-time-left-and-the-date-of-an-expiry) | The time left and the date of an expiry | Derivation | M13 | Built |
+| [`key.parse-duration`](key.md#keyparse-duration--a-duration-as-the-user-types-it) | A duration as the user types it | Derivation | M13 | Built |
+| [`key.open`](key.md#keyopen--open-a-key-in-a-key-tab) | Open a key in a key tab | Operation | M13 | Built |
+| [`key.new`](key.md#keynew--new-key) | New key | Operation | M13 | Built |
+| [`key.rename`](key.md#keyrename--rename-a-key) | Rename a key | Operation | M13 | Built |
+| [`key.copy`](key.md#keycopy--copy-a-key) | Copy a key | Operation | M13 | Built |
+| [`key.set-expiry`](key.md#keyset-expiry--set-the-expiry-of-a-key) | Set the expiry of a key | Operation | M13 | Built |
+| [`key.persist`](key.md#keypersist--make-a-key-persistent) | Make a key persistent | Operation | M13 | Built |
+| [`key.delete`](key.md#keydelete--delete-a-key) | Delete a key | Operation | M13 | Built |
+| [`key.delete-selected`](key.md#keydelete-selected--delete-the-selected-keys) | Delete the selected keys | Operation | M13 | Built |
+| [`key.delete-by-pattern`](key.md#keydelete-by-pattern--delete-the-keys-matching-a-pattern) | Delete the keys matching a pattern | Operation | M13 | Built |
+| [`key.copy-name`](key.md#keycopy-name--copy-the-name-of-a-key) | Copy the name of a key | Operation | M13 | Built |
+| [`key.export`](key.md#keyexport--export-keys-to-a-file) | Export keys to a file | Operation | M13 | Built |
+| [`key.export-text`](key.md#keyexport-text--the-file-of-exported-keys) | The file of exported keys | Derivation | M13 | Built |
+| [`key.import`](key.md#keyimport--import-keys-from-a-file) | Import keys from a file | Operation | M13 | Built |
+| [`key.import-parse`](key.md#keyimport-parse--read-a-file-of-exported-keys) | Read a file of exported keys | Derivation | M13 | Built |
+| [`key.switch-database`](key.md#keyswitch-database--switch-database) | Switch database | Operation | M13 | Built |
 
 ## Databases and collections
 

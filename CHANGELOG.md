@@ -51,6 +51,15 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
   age and number, can be cleared, and can be turned off for one connection.
 - Writes to documents through a MongoDB connection linked to a Redis connection are published for redis-oplog, in the
   background, so that the Meteor apps using it see them; a failure to publish is a warning that leaves the write done.
+- A Redis database opens in a keys tab, from the tree, the rail's **Search**, the path or Go to: its keys are scanned
+  with `SCAN` only, by a pattern typed and a type chosen, a page at a time with **Scan more**, and shown with their
+  type, expiry and size, sorted by any column, selected with the mouse or the keyboard, and inspected in the inspector
+  island; **Switch database** opens the keys of another database of the server.
+- Keys are created, opened in a tab of their own, renamed, copied to another name or database, given an expiry or
+  made persistent, deleted one at a time, by selection or by pattern, and their names copied; every write is shown
+  before it runs, refused on a read-only connection, and recorded in the undo history when it fits.
+- Keys are exported to a file of Redis commands, with their values, expiries and bytes kept, and imported from it,
+  skipping, replacing or stopping at the keys that exist.
 
 ### Fixed
 

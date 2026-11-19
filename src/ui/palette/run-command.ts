@@ -4,7 +4,9 @@
  * open About, refresh or filter the tree) are carried out here; every other starts its feature through the bridge on what the user is looking at.
  */
 import { intentOf } from '../../features/palette/run-command';
+import type { Intent } from '../../shared/bridge';
 import type { AppState } from '../../shared/state';
+import { databasesArgs } from '../pages/keys/keys-path';
 import { focusNextIsland } from '../shell/focus';
 import { startIntent } from '../shell/top-bar/start';
 import { queryCommandIds, runQueryCommand } from '../query/query-commands';
@@ -43,6 +45,19 @@ const windowOnly: Readonly<Record<string, () => void>> = {
   'window.about': openAbout,
 };
 
+/**
+ * What only the window knows, added to an intent: **Switch database…** lists the databases as the tree last read
+ * them (`key.switch-database`).
+ */
+function withWindowArgs(intent: Intent): Intent {
+  const target = intent.target;
+  if (intent.feature !== 'key.switch-database' || target.kind !== 'redis-database') {
+    return intent;
+  }
+  const databases = databasesArgs(target.connection);
+  return databases === undefined ? intent : { ...intent, args: { databases } };
+}
+
 /** Runs a command now; a command not offered in this state does nothing. */
 export function runCommand(id: string, state: AppState): void {
   if (id === 'tree.refresh' || id === 'tree.filter') {
@@ -64,6 +79,6 @@ export function runCommand(id: string, state: AppState): void {
   }
   const intent = intentOf(state, id);
   if (intent !== undefined) {
-    startIntent(intent);
+    startIntent(withWindowArgs(intent));
   }
 }

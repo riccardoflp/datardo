@@ -45,6 +45,8 @@ export function request(_context: Context, args: Json): ReadRequest {
   const connection = connectionId(asked.connection);
   return {
     kind: 'engine',
+    // A server that refuses MEMORY USAGE or OBJECT ENCODING still answers the other lines: `parse` says `—`.
+    failedRequests: 'are-replies',
     requests: asked.keys.flatMap((name) => [
       scanCall(connection, asked.database, ['PTTL', name]),
       ...(asked.sizes === 'read' ? [scanCall(connection, asked.database, ['MEMORY', 'USAGE', name])] : []),
