@@ -1,0 +1,77 @@
+[
+  {
+    "_id": {
+      "$oid": "65f1c0ffee0000000000a2c1"
+    },
+    "uploadDate": {
+      "$date": {
+        "$numberLong": "1795006931000"
+      }
+    },
+    "filename": "notes.txt",
+    "metadata": {
+      "contentType": "text/plain",
+      "owner": "ada"
+    },
+    "length": {
+      "$numberLong": "15"
+    },
+    "chunkSize": {
+      "$numberInt": "8"
+    }
+  },
+  {
+    "_id": "readme",
+    "uploadDate": {
+      "$date": {
+        "$numberLong": "1794906000000"
+      }
+    },
+    "filename": "README",
+    "length": {
+      "$numberLong": "6"
+    },
+    "chunkSize": {
+      "$numberInt": "261120"
+    }
+  },
+  {
+    "_id": {
+      "$numberInt": "7"
+    },
+    "uploadDate": {
+      "$date": {
+        "$numberLong": "1794819600000"
+      }
+    },
+    "filename": "old.gif",
+    "contentType": "image/gif",
+    "length": {
+      "$numberLong": "3"
+    },
+    "chunkSize": {
+      "$numberInt": "261120"
+    }
+  },
+  {
+    "_id": {
+      "$binary": {
+        "base64": "ASNFZ4mrze8BI0VniavN7w==",
+        "subType": "04"
+      }
+    },
+    "uploadDate": {
+      "$date": {
+        "$numberLong": "1794733200000"
+      }
+    },
+    "filename": "blob",
+    "metadata": {},
+    "length": {
+      "$numberLong": "4"
+    },
+    "chunkSize": {
+      "$numberInt": "261120"
+    }
+  }
+]

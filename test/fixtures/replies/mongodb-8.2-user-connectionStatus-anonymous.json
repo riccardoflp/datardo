@@ -1,0 +1,15 @@
+{
+  "authInfo": {
+    "authenticatedUsers": [],
+    "authenticatedUserRoles": []
+  },
+  "uuid": {
+    "$binary": {
+      "base64": "g8SN+0QeQ5mWJSQWlhLbuw==",
+      "subType": "04"
+    }
+  },
+  "ok": {
+    "$numberInt": "1"
+  }
+}

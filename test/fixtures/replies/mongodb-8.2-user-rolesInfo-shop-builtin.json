@@ -1,0 +1,757 @@
+{
+  "roles": [
+    {
+      "role": "readWrite",
+      "db": "shop",
+      "isBuiltin": true,
+      "roles": [],
+      "inheritedRoles": [],
+      "privileges": [
+        {
+          "resource": {
+            "db": "shop",
+            "collection": ""
+          },
+          "actions": [
+            "changeStream",
+            "cleanupStructuredEncryptionData",
+            "collStats",
+            "compactStructuredEncryptionData",
+            "convertToCapped",
+            "createCollection",
+            "createIndex",
+            "createSearchIndexes",
+            "dbHash",
+            "dbStats",
+            "dropCollection",
+            "dropIndex",
+            "dropSearchIndex",
+            "find",
+            "insert",
+            "killCursors",
+            "listCollections",
+            "listIndexes",
+            "listSearchIndexes",
+            "updateSearchIndex",
+            "planCacheRead",
+            "performRawDataOperations",
+            "remove",
+            "renameCollectionSameDB",
+            "update"
+          ]
+        },
+        {
+          "resource": {
+            "db": "shop",
+            "collection": "system.js"
+          },
+          "actions": [
+            "changeStream",
+            "cleanupStructuredEncryptionData",
+            "collStats",
+            "compactStructuredEncryptionData",
+            "convertToCapped",
+            "createCollection",
+            "createIndex",
+            "createSearchIndexes",
+            "dbHash",
+            "dbStats",
+            "dropCollection",
+            "dropIndex",
+            "dropSearchIndex",
+            "find",
+            "insert",
+            "killCursors",
+            "listCollections",
+            "listIndexes",
+            "listSearchIndexes",
+            "updateSearchIndex",
+            "planCacheRead",
+            "performRawDataOperations",
+            "remove",
+            "renameCollectionSameDB",
+            "update"
+          ]
+        }
+      ],
+      "inheritedPrivileges": [
+        {
+          "resource": {
+            "db": "shop",
+            "collection": ""
+          },
+          "actions": [
+            "changeStream",
+            "cleanupStructuredEncryptionData",
+            "collStats",
+            "compactStructuredEncryptionData",
+            "convertToCapped",
+            "createCollection",
+            "createIndex",
+            "createSearchIndexes",
+            "dbHash",
+            "dbStats",
+            "dropCollection",
+            "dropIndex",
+            "dropSearchIndex",
+            "find",
+            "insert",
+            "killCursors",
+            "listCollections",
+            "listIndexes",
+            "listSearchIndexes",
+            "updateSearchIndex",
+            "planCacheRead",
+            "performRawDataOperations",
+            "remove",
+            "renameCollectionSameDB",
+            "update"
+          ]
+        },
+        {
+          "resource": {
+            "db": "shop",
+            "collection": "system.js"
+          },
+          "actions": [
+            "changeStream",
+            "cleanupStructuredEncryptionData",
+            "collStats",
+            "compactStructuredEncryptionData",
+            "convertToCapped",
+            "createCollection",
+            "createIndex",
+            "createSearchIndexes",
+            "dbHash",
+            "dbStats",
+            "dropCollection",
+            "dropIndex",
+            "dropSearchIndex",
+            "find",
+            "insert",
+            "killCursors",
+            "listCollections",
+            "listIndexes",
+            "listSearchIndexes",
+            "updateSearchIndex",
+            "planCacheRead",
+            "performRawDataOperations",
+            "remove",
+            "renameCollectionSameDB",
+            "update"
+          ]
+        }
+      ]
+    },
+    {
+      "role": "userAdmin",
+      "db": "shop",
+      "isBuiltin": true,
+      "roles": [],
+      "inheritedRoles": [],
+      "privileges": [
+        {
+          "resource": {
+            "db": "shop",
+            "collection": ""
+          },
+          "actions": [
+            "changeCustomData",
+            "changePassword",
+            "createRole",
+            "createUser",
+            "dropRole",
+            "dropUser",
+            "grantRole",
+            "revokeRole",
+            "setAuthenticationRestriction",
+            "viewRole",
+            "viewUser"
+          ]
+        }
+      ],
+      "inheritedPrivileges": [
+        {
+          "resource": {
+            "db": "shop",
+            "collection": ""
+          },
+          "actions": [
+            "changeCustomData",
+            "changePassword",
+            "createRole",
+            "createUser",
+            "dropRole",
+            "dropUser",
+            "grantRole",
+            "revokeRole",
+            "setAuthenticationRestriction",
+            "viewRole",
+            "viewUser"
+          ]
+        }
+      ]
+    },
+    {
+      "role": "dbAdmin",
+      "db": "shop",
+      "isBuiltin": true,
+      "roles": [],
+      "inheritedRoles": [],
+      "privileges": [
+        {
+          "resource": {
+            "db": "shop",
+            "collection": ""
+          },
+          "actions": [
+            "analyze",
+            "bypassDocumentValidation",
+            "collMod",
+            "collStats",
+            "compact",
+            "configureQueryAnalyzer",
+            "convertToCapped",
+            "createCollection",
+            "createIndex",
+            "createSearchIndexes",
+            "dbStats",
+            "dropCollection",
+            "dropDatabase",
+            "dropIndex",
+            "dropSearchIndex",
+            "enableProfiler",
+            "listCollections",
+            "listIndexes",
+            "listSearchIndexes",
+            "updateSearchIndex",
+            "planCacheIndexFilter",
+            "planCacheRead",
+            "planCacheWrite",
+            "reIndex",
+            "renameCollectionSameDB",
+            "storageDetails",
+            "validate"
+          ]
+        },
+        {
+          "resource": {
+            "db": "shop",
+            "collection": "system.profile"
+          },
+          "actions": [
+            "changeStream",
+            "collStats",
+            "convertToCapped",
+            "createCollection",
+            "dbHash",
+            "dbStats",
+            "dropCollection",
+            "find",
+            "killCursors",
+            "listCollections",
+            "listIndexes",
+            "listSearchIndexes",
+            "planCacheRead",
+            "performRawDataOperations"
+          ]
+        }
+      ],
+      "inheritedPrivileges": [
+        {
+          "resource": {
+            "db": "shop",
+            "collection": ""
+          },
+          "actions": [
+            "analyze",
+            "bypassDocumentValidation",
+            "collMod",
+            "collStats",
+            "compact",
+            "configureQueryAnalyzer",
+            "convertToCapped",
+            "createCollection",
+            "createIndex",
+            "createSearchIndexes",
+            "dbStats",
+            "dropCollection",
+            "dropDatabase",
+            "dropIndex",
+            "dropSearchIndex",
+            "enableProfiler",
+            "listCollections",
+            "listIndexes",
+            "listSearchIndexes",
+            "updateSearchIndex",
+            "planCacheIndexFilter",
+            "planCacheRead",
+            "planCacheWrite",
+            "reIndex",
+            "renameCollectionSameDB",
+            "storageDetails",
+            "validate"
+          ]
+        },
+        {
+          "resource": {
+            "db": "shop",
+            "collection": "system.profile"
+          },
+          "actions": [
+            "changeStream",
+            "collStats",
+            "convertToCapped",
+            "createCollection",
+            "dbHash",
+            "dbStats",
+            "dropCollection",
+            "find",
+            "killCursors",
+            "listCollections",
+            "listIndexes",
+            "listSearchIndexes",
+            "planCacheRead",
+            "performRawDataOperations"
+          ]
+        }
+      ]
+    },
+    {
+      "role": "enableSharding",
+      "db": "shop",
+      "isBuiltin": true,
+      "roles": [],
+      "inheritedRoles": [],
+      "privileges": [
+        {
+          "resource": {
+            "db": "",
+            "collection": ""
+          },
+          "actions": [
+            "analyzeShardKey",
+            "enableSharding",
+            "moveCollection",
+            "refineCollectionShardKey",
+            "reshardCollection",
+            "unshardCollection"
+          ]
+        }
+      ],
+      "inheritedPrivileges": [
+        {
+          "resource": {
+            "db": "",
+            "collection": ""
+          },
+          "actions": [
+            "analyzeShardKey",
+            "enableSharding",
+            "moveCollection",
+            "refineCollectionShardKey",
+            "reshardCollection",
+            "unshardCollection"
+          ]
+        }
+      ]
+    },
+    {
+      "role": "dbOwner",
+      "db": "shop",
+      "isBuiltin": true,
+      "roles": [],
+      "inheritedRoles": [],
+      "privileges": [
+        {
+          "resource": {
+            "db": "shop",
+            "collection": ""
+          },
+          "actions": [
+            "analyze",
+            "bypassDocumentValidation",
+            "changeCustomData",
+            "changePassword",
+            "changeStream",
+            "cleanupStructuredEncryptionData",
+            "collMod",
+            "collStats",
+            "compact",
+            "compactStructuredEncryptionData",
+            "configureQueryAnalyzer",
+            "convertToCapped",
+            "createCollection",
+            "createIndex",
+            "createRole",
+            "createSearchIndexes",
+            "createUser",
+            "dbHash",
+            "dbStats",
+            "dropCollection",
+            "dropDatabase",
+            "dropIndex",
+            "dropRole",
+            "dropSearchIndex",
+            "dropUser",
+            "enableProfiler",
+            "find",
+            "grantRole",
+            "insert",
+            "killCursors",
+            "listCollections",
+            "listIndexes",
+            "listSearchIndexes",
+            "updateSearchIndex",
+            "planCacheIndexFilter",
+            "planCacheRead",
+            "planCacheWrite",
+            "performRawDataOperations",
+            "reIndex",
+            "remove",
+            "renameCollectionSameDB",
+            "revokeRole",
+            "setAuthenticationRestriction",
+            "storageDetails",
+            "update",
+            "validate",
+            "viewRole",
+            "viewUser"
+          ]
+        },
+        {
+          "resource": {
+            "db": "shop",
+            "collection": "system.js"
+          },
+          "actions": [
+            "changeStream",
+            "cleanupStructuredEncryptionData",
+            "collStats",
+            "compactStructuredEncryptionData",
+            "convertToCapped",
+            "createCollection",
+            "createIndex",
+            "createSearchIndexes",
+            "dbHash",
+            "dbStats",
+            "dropCollection",
+            "dropIndex",
+            "dropSearchIndex",
+            "find",
+            "insert",
+            "killCursors",
+            "listCollections",
+            "listIndexes",
+            "listSearchIndexes",
+            "updateSearchIndex",
+            "planCacheRead",
+            "performRawDataOperations",
+            "remove",
+            "renameCollectionSameDB",
+            "update"
+          ]
+        },
+        {
+          "resource": {
+            "db": "shop",
+            "collection": "system.profile"
+          },
+          "actions": [
+            "changeStream",
+            "collStats",
+            "convertToCapped",
+            "createCollection",
+            "dbHash",
+            "dbStats",
+            "dropCollection",
+            "find",
+            "killCursors",
+            "listCollections",
+            "listIndexes",
+            "listSearchIndexes",
+            "planCacheRead",
+            "performRawDataOperations"
+          ]
+        }
+      ],
+      "inheritedPrivileges": [
+        {
+          "resource": {
+            "db": "shop",
+            "collection": ""
+          },
+          "actions": [
+            "analyze",
+            "bypassDocumentValidation",
+            "changeCustomData",
+            "changePassword",
+            "changeStream",
+            "cleanupStructuredEncryptionData",
+            "collMod",
+            "collStats",
+            "compact",
+            "compactStructuredEncryptionData",
+            "configureQueryAnalyzer",
+            "convertToCapped",
+            "createCollection",
+            "createIndex",
+            "createRole",
+            "createSearchIndexes",
+            "createUser",
+            "dbHash",
+            "dbStats",
+            "dropCollection",
+            "dropDatabase",
+            "dropIndex",
+            "dropRole",
+            "dropSearchIndex",
+            "dropUser",
+            "enableProfiler",
+            "find",
+            "grantRole",
+            "insert",
+            "killCursors",
+            "listCollections",
+            "listIndexes",
+            "listSearchIndexes",
+            "updateSearchIndex",
+            "planCacheIndexFilter",
+            "planCacheRead",
+            "planCacheWrite",
+            "performRawDataOperations",
+            "reIndex",
+            "remove",
+            "renameCollectionSameDB",
+            "revokeRole",
+            "setAuthenticationRestriction",
+            "storageDetails",
+            "update",
+            "validate",
+            "viewRole",
+            "viewUser"
+          ]
+        },
+        {
+          "resource": {
+            "db": "shop",
+            "collection": "system.js"
+          },
+          "actions": [
+            "changeStream",
+            "cleanupStructuredEncryptionData",
+            "collStats",
+            "compactStructuredEncryptionData",
+            "convertToCapped",
+            "createCollection",
+            "createIndex",
+            "createSearchIndexes",
+            "dbHash",
+            "dbStats",
+            "dropCollection",
+            "dropIndex",
+            "dropSearchIndex",
+            "find",
+            "insert",
+            "killCursors",
+            "listCollections",
+            "listIndexes",
+            "listSearchIndexes",
+            "updateSearchIndex",
+            "planCacheRead",
+            "performRawDataOperations",
+            "remove",
+            "renameCollectionSameDB",
+            "update"
+          ]
+        },
+        {
+          "resource": {
+            "db": "shop",
+            "collection": "system.profile"
+          },
+          "actions": [
+            "changeStream",
+            "collStats",
+            "convertToCapped",
+            "createCollection",
+            "dbHash",
+            "dbStats",
+            "dropCollection",
+            "find",
+            "killCursors",
+            "listCollections",
+            "listIndexes",
+            "listSearchIndexes",
+            "planCacheRead",
+            "performRawDataOperations"
+          ]
+        }
+      ]
+    },
+    {
+      "role": "read",
+      "db": "shop",
+      "isBuiltin": true,
+      "roles": [],
+      "inheritedRoles": [],
+      "privileges": [
+        {
+          "resource": {
+            "db": "shop",
+            "collection": ""
+          },
+          "actions": [
+            "changeStream",
+            "collStats",
+            "dbHash",
+            "dbStats",
+            "find",
+            "killCursors",
+            "listCollections",
+            "listIndexes",
+            "listSearchIndexes",
+            "planCacheRead",
+            "performRawDataOperations"
+          ]
+        },
+        {
+          "resource": {
+            "db": "shop",
+            "collection": "system.js"
+          },
+          "actions": [
+            "changeStream",
+            "collStats",
+            "dbHash",
+            "dbStats",
+            "find",
+            "killCursors",
+            "listCollections",
+            "listIndexes",
+            "listSearchIndexes",
+            "planCacheRead",
+            "performRawDataOperations"
+          ]
+        }
+      ],
+      "inheritedPrivileges": [
+        {
+          "resource": {
+            "db": "shop",
+            "collection": ""
+          },
+          "actions": [
+            "changeStream",
+            "collStats",
+            "dbHash",
+            "dbStats",
+            "find",
+            "killCursors",
+            "listCollections",
+            "listIndexes",
+            "listSearchIndexes",
+            "planCacheRead",
+            "performRawDataOperations"
+          ]
+        },
+        {
+          "resource": {
+            "db": "shop",
+            "collection": "system.js"
+          },
+          "actions": [
+            "changeStream",
+            "collStats",
+            "dbHash",
+            "dbStats",
+            "find",
+            "killCursors",
+            "listCollections",
+            "listIndexes",
+            "listSearchIndexes",
+            "planCacheRead",
+            "performRawDataOperations"
+          ]
+        }
+      ]
+    },
+    {
+      "_id": "shop.reader",
+      "role": "reader",
+      "db": "shop",
+      "privileges": [
+        {
+          "resource": {
+            "db": "shop",
+            "collection": "orders"
+          },
+          "actions": ["find"]
+        }
+      ],
+      "roles": [
+        {
+          "role": "read",
+          "db": "shop"
+        }
+      ],
+      "isBuiltin": false,
+      "inheritedRoles": [
+        {
+          "role": "read",
+          "db": "shop"
+        }
+      ],
+      "inheritedPrivileges": [
+        {
+          "resource": {
+            "db": "shop",
+            "collection": "orders"
+          },
+          "actions": ["find"]
+        },
+        {
+          "resource": {
+            "db": "shop",
+            "collection": ""
+          },
+          "actions": [
+            "changeStream",
+            "collStats",
+            "dbHash",
+            "dbStats",
+            "find",
+            "killCursors",
+            "listCollections",
+            "listIndexes",
+            "listSearchIndexes",
+            "planCacheRead",
+            "performRawDataOperations"
+          ]
+        },
+        {
+          "resource": {
+            "db": "shop",
+            "collection": "system.js"
+          },
+          "actions": [
+            "changeStream",
+            "collStats",
+            "dbHash",
+            "dbStats",
+            "find",
+            "killCursors",
+            "listCollections",
+            "listIndexes",
+            "listSearchIndexes",
+            "planCacheRead",
+            "performRawDataOperations"
+          ]
+        }
+      ]
+    }
+  ],
+  "ok": {
+    "$numberInt": "1"
+  }
+}

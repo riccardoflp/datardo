@@ -138,6 +138,8 @@ Acceptance:
 - **Function**: `src/features/gridfs/list.ts › request(context, args)` and `› parse(reply)`
 - **Entry points**: read by `gridfs.show`.
 - **Uses**: `gridfs.filter`. Used by `gridfs.show`, `gridfs.inspect`.
+- **Refuses**: a filter that cannot be read (`/filter`): `Filter:` followed by the error of the parser, which the
+  page shows in place of the table; nothing is sent.
 - **Ported from**: `src/gridfs.ts` (`load`, `toFile`).
 
 Sent, together, with the filter of `gridfs.filter`, the sort and the page:
@@ -641,7 +643,8 @@ Acceptance:
 - **Publishes**: nothing: the writes of GridFS are not published for redis-oplog.
 - **After**: the page is read again; *Renamed logo.png to brand.png.* (`runner.notify`).
 - **Refuses**: a read-only connection (`/read-only`): *The connection Production is read-only: files can't be
-  changed.*; a file deleted meanwhile (`/gone`): *The file no longer exists.*
+  changed.*; a file deleted meanwhile (`/gone`): *The file no longer exists.*; an empty name (`/no-name`): *Enter a
+  name*, shown under the field.
 - **Commands**: `gridfs.rename`
 - **Uses**: `runner.ask`, `runner.run`, `runner.notify`.
 - **Ported from**: `src/gridfs.ts` (`receive`, `rename`).

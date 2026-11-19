@@ -1,0 +1,81 @@
+{
+  "roles": [
+    {
+      "_id": "shop.reader",
+      "role": "reader",
+      "db": "shop",
+      "privileges": [
+        {
+          "resource": {
+            "db": "shop",
+            "collection": "orders"
+          },
+          "actions": ["find"]
+        }
+      ],
+      "roles": [
+        {
+          "role": "read",
+          "db": "shop"
+        }
+      ],
+      "isBuiltin": false,
+      "inheritedRoles": [
+        {
+          "role": "read",
+          "db": "shop"
+        }
+      ],
+      "inheritedPrivileges": [
+        {
+          "resource": {
+            "db": "shop",
+            "collection": "orders"
+          },
+          "actions": ["find"]
+        },
+        {
+          "resource": {
+            "db": "shop",
+            "collection": ""
+          },
+          "actions": [
+            "changeStream",
+            "collStats",
+            "dbHash",
+            "dbStats",
+            "find",
+            "killCursors",
+            "listCollections",
+            "listIndexes",
+            "listSearchIndexes",
+            "planCacheRead",
+            "performRawDataOperations"
+          ]
+        },
+        {
+          "resource": {
+            "db": "shop",
+            "collection": "system.js"
+          },
+          "actions": [
+            "changeStream",
+            "collStats",
+            "dbHash",
+            "dbStats",
+            "find",
+            "killCursors",
+            "listCollections",
+            "listIndexes",
+            "listSearchIndexes",
+            "planCacheRead",
+            "performRawDataOperations"
+          ]
+        }
+      ]
+    }
+  ],
+  "ok": {
+    "$numberInt": "1"
+  }
+}

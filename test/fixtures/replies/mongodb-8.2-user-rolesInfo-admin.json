@@ -1,0 +1,45 @@
+{
+  "roles": [
+    {
+      "_id": "admin.auditor",
+      "role": "auditor",
+      "db": "admin",
+      "privileges": [
+        {
+          "resource": {
+            "cluster": true
+          },
+          "actions": ["serverStatus"]
+        },
+        {
+          "resource": {
+            "db": "shop",
+            "collection": ""
+          },
+          "actions": ["find", "listIndexes"]
+        }
+      ],
+      "roles": [],
+      "isBuiltin": false,
+      "inheritedRoles": [],
+      "inheritedPrivileges": [
+        {
+          "resource": {
+            "cluster": true
+          },
+          "actions": ["serverStatus"]
+        },
+        {
+          "resource": {
+            "db": "shop",
+            "collection": ""
+          },
+          "actions": ["find", "listIndexes"]
+        }
+      ]
+    }
+  ],
+  "ok": {
+    "$numberInt": "1"
+  }
+}

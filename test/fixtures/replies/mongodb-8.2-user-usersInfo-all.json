@@ -1,0 +1,90 @@
+{
+  "users": [
+    {
+      "_id": "admin.app",
+      "userId": {
+        "$binary": {
+          "base64": "Arvzb3EAQyqKPzG//Lcy6A==",
+          "subType": "04"
+        }
+      },
+      "user": "app",
+      "db": "admin",
+      "roles": [
+        {
+          "role": "readWrite",
+          "db": "shop"
+        }
+      ],
+      "mechanisms": ["SCRAM-SHA-1", "SCRAM-SHA-256"]
+    },
+    {
+      "_id": "shop.app",
+      "userId": {
+        "$binary": {
+          "base64": "zOVgobCZTCKNj2/E8ZAXvA==",
+          "subType": "04"
+        }
+      },
+      "user": "app",
+      "db": "shop",
+      "customData": {
+        "team": "billing",
+        "since": {
+          "$date": {
+            "$numberLong": "1768003200000"
+          }
+        }
+      },
+      "roles": [
+        {
+          "role": "reader",
+          "db": "shop"
+        },
+        {
+          "role": "readWrite",
+          "db": "shop"
+        },
+        {
+          "role": "read",
+          "db": "reporting"
+        }
+      ],
+      "mechanisms": ["SCRAM-SHA-1", "SCRAM-SHA-256"]
+    },
+    {
+      "_id": "admin.bob",
+      "userId": {
+        "$binary": {
+          "base64": "hxWf7b/uRH+6ZkHS3hpUlA==",
+          "subType": "04"
+        }
+      },
+      "user": "bob",
+      "db": "admin",
+      "roles": [],
+      "mechanisms": ["SCRAM-SHA-1", "SCRAM-SHA-256"]
+    },
+    {
+      "_id": "admin.zoe",
+      "userId": {
+        "$binary": {
+          "base64": "IF+hn1haSSCZW29l11dPXA==",
+          "subType": "04"
+        }
+      },
+      "user": "zoe",
+      "db": "admin",
+      "roles": [
+        {
+          "role": "clusterMonitor",
+          "db": "admin"
+        }
+      ],
+      "mechanisms": ["SCRAM-SHA-1", "SCRAM-SHA-256"]
+    }
+  ],
+  "ok": {
+    "$numberInt": "1"
+  }
+}

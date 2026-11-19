@@ -1,0 +1,41 @@
+{
+  "users": [
+    {
+      "_id": "shop.app",
+      "userId": {
+        "$binary": {
+          "base64": "zOVgobCZTCKNj2/E8ZAXvA==",
+          "subType": "04"
+        }
+      },
+      "user": "app",
+      "db": "shop",
+      "customData": {
+        "team": "billing",
+        "since": {
+          "$date": {
+            "$numberLong": "1768003200000"
+          }
+        }
+      },
+      "roles": [
+        {
+          "role": "reader",
+          "db": "shop"
+        },
+        {
+          "role": "readWrite",
+          "db": "shop"
+        },
+        {
+          "role": "read",
+          "db": "reporting"
+        }
+      ],
+      "mechanisms": ["SCRAM-SHA-1", "SCRAM-SHA-256"]
+    }
+  ],
+  "ok": {
+    "$numberInt": "1"
+  }
+}
