@@ -52,6 +52,11 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
 - Writes to documents through a MongoDB connection linked to a Redis connection are published for redis-oplog, in the
   background, so that the Meteor apps using it see them; a failure to publish is a warning that leaves the write done.
 
+### Fixed
+
+- The window opens again with exactly the size it was left with when Windows scales the display by a fraction such as
+  125%, instead of growing by a few pixels at each start.
+
 ### Security
 
 - The text of a step, in a confirmation and in the Log, hides the passwords of `ACL SETUSER` and of every `CONFIG SET`

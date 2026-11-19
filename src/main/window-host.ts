@@ -4,7 +4,7 @@
  * tray, shown again, and brought back when its process fails (`window.recover`). The features decide; this carries
  * out what their app steps say, and starts them when the system asks.
  */
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, type Rectangle } from 'electron';
 import type { Intent, IntentResult } from '../shared/bridge';
 import type { Platform } from '../shared/feature';
 import { featureId } from '../shared/ids';
@@ -40,6 +40,43 @@ export interface WindowHostSetup {
 
 function intent(feature: string, args?: Intent['args']): Intent {
   return { feature: featureId(feature), target: appTarget, ...(args === undefined ? {} : { args }) };
+}
+
+/** The largest number of pixels the system adds to a side of a window it is given (at 125% scaling on Windows, 2). */
+const mostAdded = 3;
+
+function sameBounds(a: Rectangle, b: Rectangle): boolean {
+  return a.x === b.x && a.y === b.y && a.width === b.width && a.height === b.height;
+}
+
+/**
+ * Gives the window exactly the bounds it was left with (`window.remember`). With a scaling that is not a whole number,
+ * Windows rounds the size of a window without a frame up by a pixel or two each time it is set, so a window opened
+ * with the size it was saved with would grow at each start; the size is then set a little smaller until the window
+ * reports the size wanted, or left at the nearest one.
+ */
+function placeExactly(window: BrowserWindow, wanted: Rectangle): void {
+  if (sameBounds(window.getBounds(), wanted)) {
+    return;
+  }
+  let nearest: { readonly bounds: Rectangle; readonly off: number } | undefined;
+  for (let lessWidth = 0; lessWidth <= mostAdded; lessWidth += 1) {
+    for (let lessHeight = 0; lessHeight <= mostAdded; lessHeight += 1) {
+      const tried = { ...wanted, width: wanted.width - lessWidth, height: wanted.height - lessHeight };
+      window.setBounds(tried);
+      const got = window.getBounds();
+      if (sameBounds(got, wanted)) {
+        return;
+      }
+      const off = Math.abs(got.width - wanted.width) + Math.abs(got.height - wanted.height);
+      if (nearest === undefined || off < nearest.off) {
+        nearest = { bounds: tried, off };
+      }
+    }
+  }
+  if (nearest !== undefined) {
+    window.setBounds(nearest.bounds);
+  }
 }
 
 /** The window, from start to quit. */
@@ -80,6 +117,7 @@ export class WindowHost {
     const theme = applyTheme(setup.holder);
     const placement = setup.place.initial();
     const window = new BrowserWindow(windowOptions(setup.preload, frame(setup.platform, theme), placement));
+    placeExactly(window, { x: placement.left, y: placement.top, width: placement.width, height: placement.height });
     this.window = window;
     if (setup.platform !== 'macos') {
       window.removeMenu();
