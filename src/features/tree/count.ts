@@ -48,6 +48,8 @@ export function request(_context: Context, args: Json): ReadRequest {
     requests: textsArg(args, 'collections')
       .slice(0, mostCounted)
       .map((collection) => ({ connection, request: countRequest(database, collection) })),
+    // A count that fails leaves its collection without a count, and the others are still read (`parse`).
+    failedRequests: 'are-replies',
   };
 }
 
@@ -121,4 +123,15 @@ export function sizeText(bytes: number): string {
   const index = Math.min(sizeUnits.length - 1, Math.floor(Math.log(bytes) / Math.log(1024)));
   const unit = sizeUnits[index] ?? 'B';
   return `${(bytes / 1024 ** index).toFixed(index === 0 ? 0 : 1)} ${unit}`;
+}
+
+/** The counts of a database's collections once they arrived, beside the counts of the other databases. */
+export function withCounts(
+  counts: Readonly<Record<string, number>>,
+  database: string,
+  arrived: Readonly<Record<string, number>>,
+): Readonly<Record<string, number>> {
+  const others = Object.entries(counts).filter(([name]) => !name.startsWith(`${database}.`));
+  const ours = Object.entries(arrived).map(([collection, count]) => [`${database}.${collection}`, count] as const);
+  return Object.fromEntries([...others, ...ours]);
 }

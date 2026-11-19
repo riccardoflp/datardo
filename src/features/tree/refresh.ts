@@ -15,7 +15,18 @@ import * as listCollections from './list-collections';
 import * as listDatabases from './list-databases';
 import * as redisDatabases from './redis-databases';
 import * as scanNamespaces from './scan-namespaces';
-import { argsOf, textArg, type Loadable, type TreeIsland } from './types';
+import {
+  argsOf,
+  idle,
+  textArg,
+  wholeArg,
+  type DatabaseContents,
+  type Loadable,
+  type MongoDatabase,
+  type RedisDatabases,
+  type ScanState,
+  type TreeIsland,
+} from './types';
 
 /** What is refreshed: the whole connection, or one database of it. */
 export type RefreshScope =
@@ -50,7 +61,8 @@ export function refreshArgs(state: AppState, island: TreeIsland, connection: Con
   return { connection, engine, scope: scope as unknown as Json, expanded: inScope as Json, fallback };
 }
 
-function scopeOf(args: Json): RefreshScope {
+/** The scope of a refresh, from its arguments or those of a control that starts it: the whole connection by default. */
+export function scopeOf(args: Json): RefreshScope {
   const scope = argsOf(argsOf(args)['scope'] ?? null);
   if (scope['kind'] === 'database' && typeof scope['database'] === 'string') {
     return { kind: 'database', database: scope['database'] };
@@ -128,7 +140,8 @@ export function request(context: Context, args: Json): ReadRequest | Outcome {
     const built = reads[read.read].request(context, read.args);
     return built.kind === 'engine' ? built.requests : [];
   });
-  return { kind: 'engine', requests };
+  // A read that fails is a failure under its node; the other reads of the refresh go on (`parse`).
+  return { kind: 'engine', requests, failedRequests: 'are-replies' };
 }
 
 /** What one read of a refresh gave: its result, or the message of its failure. */
@@ -154,4 +167,162 @@ export function parse(replies: readonly unknown[], args: Json): readonly Refresh
       return { read, result: { kind: 'failed', message: error instanceof Error ? error.message : String(error) } };
     }
   });
+}
+
+/** What a read of the tree changes in the island: the databases, what one database holds, or its scan. */
+type Slot =
+  | { readonly kind: 'mongo-databases' }
+  | { readonly kind: 'contents'; readonly database: string }
+  | { readonly kind: 'redis-databases' }
+  | { readonly kind: 'scan'; readonly database: string };
+
+function slotOf(read: TreeRead): Slot {
+  switch (read.read) {
+    case 'tree.list-databases':
+      return { kind: 'mongo-databases' };
+    case 'tree.list-collections':
+      return { kind: 'contents', database: textArg(read.args, 'database') };
+    case 'tree.redis-databases':
+      return { kind: 'redis-databases' };
+    case 'tree.scan-namespaces':
+      return { kind: 'scan', database: String(wholeArg(read.args, 'database')) };
+  }
+}
+
+/** A loadable being read again: what was read stays shown meanwhile. */
+function reading<T>(loadable: Loadable<T> | undefined, now: number): Loadable<T> {
+  const previous =
+    loadable?.kind === 'loaded' ? loadable.value : loadable?.kind === 'loading' ? loadable.previous : undefined;
+  return previous === undefined ? { kind: 'loading', since: now } : { kind: 'loading', since: now, previous };
+}
+
+/** A loadable whose read did not end with a result: failed with the message, or back to what was shown before. */
+function unread<T>(loadable: Loadable<T> | undefined, message: string | undefined): Loadable<T> {
+  if (message !== undefined) {
+    return { kind: 'failed', message };
+  }
+  if (loadable?.kind !== 'loading') {
+    return loadable ?? idle;
+  }
+  return loadable.previous === undefined ? idle : { kind: 'loaded', value: loadable.previous };
+}
+
+/** The island with one slot changed. */
+function withSlot(
+  island: TreeIsland,
+  slot: Slot,
+  change: {
+    readonly loadable: (before: Loadable<never> | undefined) => Loadable<unknown>;
+    readonly scan: (before: ScanState | undefined) => ScanState;
+  },
+): TreeIsland {
+  switch (slot.kind) {
+    case 'mongo-databases':
+      return {
+        ...island,
+        mongodb: {
+          ...island.mongodb,
+          databases: change.loadable(island.mongodb.databases as Loadable<never>) as Loadable<readonly MongoDatabase[]>,
+        },
+      };
+    case 'contents': {
+      const before = island.mongodb.contents[slot.database] as Loadable<never> | undefined;
+      const contents = {
+        ...island.mongodb.contents,
+        [slot.database]: change.loadable(before) as Loadable<DatabaseContents>,
+      };
+      return { ...island, mongodb: { ...island.mongodb, contents } };
+    }
+    case 'redis-databases':
+      return {
+        ...island,
+        redis: {
+          ...island.redis,
+          databases: change.loadable(island.redis.databases as Loadable<never>) as Loadable<RedisDatabases>,
+        },
+      };
+    case 'scan':
+      return {
+        ...island,
+        redis: {
+          ...island.redis,
+          scans: { ...island.redis.scans, [slot.database]: change.scan(island.redis.scans[slot.database]) },
+        },
+      };
+  }
+}
+
+/**
+ * The island while the reads of a refresh are made: each one being read, with what it showed kept meanwhile; a scan
+ * forgets the keys it had seen and starts again from the cursor `0`. A refresh of the whole connection forgets what
+ * the collapsed databases held: it is read when each one is next expanded.
+ */
+export function whileRefreshing(island: TreeIsland, reads: readonly TreeRead[], now: number): TreeIsland {
+  const slots = new Set(reads.map((each) => JSON.stringify(slotOf(each))));
+  const isRead = (slot: Slot): boolean => slots.has(JSON.stringify(slot));
+  const whole = isRead({ kind: 'mongo-databases' }) || isRead({ kind: 'redis-databases' });
+  const kept: TreeIsland = whole
+    ? {
+        ...island,
+        mongodb: {
+          ...island.mongodb,
+          contents: Object.fromEntries(
+            Object.entries(island.mongodb.contents).filter(([database]) => isRead({ kind: 'contents', database })),
+          ),
+        },
+        redis: {
+          ...island.redis,
+          scans: Object.fromEntries(
+            Object.entries(island.redis.scans).filter(([database]) => isRead({ kind: 'scan', database })),
+          ),
+        },
+      }
+    : island;
+  return reads.reduce(
+    (changed, read) =>
+      withSlot(changed, slotOf(read), {
+        loadable: (before) => reading(before, now),
+        scan: () => ({ scan: scanNamespaces.freshScan, scanning: { since: now } }),
+      }),
+    kept,
+  );
+}
+
+/**
+ * The island once the reads of a refresh answered: each result, or the message of its failure, under its node. A scan
+ * that has not reached the end of its run stays scanning: its next call goes on from the cursor kept.
+ */
+export function refreshed(island: TreeIsland, results: readonly RefreshedRead[]): TreeIsland {
+  return results.reduce((changed, { read, result }) => {
+    const failed = result.kind === 'failed' ? result.message : undefined;
+    return withSlot(changed, slotOf(read), {
+      loadable: (before) => (result.kind === 'loaded' ? result : unread(before, failed ?? '')),
+      scan: (before) => {
+        if (result.kind !== 'loaded') {
+          return { scan: before?.scan ?? scanNamespaces.freshScan, ...(failed === undefined ? {} : { failed }) };
+        }
+        const scan = scanNamespaces.afterPage(scanNamespaces.freshScan, result.value as scanNamespaces.ScanPage);
+        const since = before?.scanning?.since ?? 0;
+        return scan.ended === undefined ? { scan, scanning: { since } } : { scan };
+      },
+    });
+  }, island);
+}
+
+/**
+ * The island when a refresh ended without results (cancelled, or connecting first): each read fails with `message`
+ * when there is one, or shows again what it showed before; a scan keeps what it saw and offers **Load more**.
+ */
+export function notRefreshed(island: TreeIsland, reads: readonly TreeRead[], message?: string): TreeIsland {
+  return reads.reduce(
+    (changed, read) =>
+      withSlot(changed, slotOf(read), {
+        loadable: (before) => unread(before, message),
+        scan: (before) => {
+          const scan = scanNamespaces.cancelled(before?.scan ?? scanNamespaces.freshScan);
+          return message === undefined ? { scan } : { scan, failed: message };
+        },
+      }),
+    island,
+  );
 }

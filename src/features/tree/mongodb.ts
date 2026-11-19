@@ -210,7 +210,12 @@ function databaseItems(built: Built, database: MongoDatabase): readonly TreeItem
     expandable: true,
     expanded,
     selected: built.input.island.selected === id,
-    label: nodeLabel({ name: database.name, kind: text.kinds.database, expanded }),
+    label: nodeLabel({
+      name: database.name,
+      kind: text.kinds.database,
+      ...(size === '' ? {} : { count: size }),
+      expanded,
+    }),
     buttons: databaseButtons(built, database.name),
     hasMenu: true,
   };

@@ -53,6 +53,8 @@ export function request(_context: Context, args: Json): ReadRequest {
   return {
     kind: 'engine',
     requests: [{ connection: connectionId(textArg(args, 'connection')), request: listDatabasesRequest() }],
+    // A user who may not list the databases gets the fallback, with no error shown (`parse`).
+    failedRequests: 'are-replies',
   };
 }
 

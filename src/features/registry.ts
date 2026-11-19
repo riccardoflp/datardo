@@ -12,6 +12,7 @@ import { features as connectionFeatures } from './connection';
 import { features as tabFeatures } from './tab';
 import { features as paletteFeatures } from './palette';
 import { features as homeFeatures } from './home';
+import { features as treeFeatures } from './tree';
 
 /** The features of every area, as each area's index lists them. */
 const areas: readonly (readonly RunnableFeature[])[] = [
@@ -23,6 +24,7 @@ const areas: readonly (readonly RunnableFeature[])[] = [
   tabFeatures,
   paletteFeatures,
   homeFeatures,
+  treeFeatures,
 ];
 
 /** The features the runner can start, by identifier. */

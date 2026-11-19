@@ -1,8 +1,18 @@
 import { describe, expect, it } from 'vitest';
-import { parse, refreshArgs, refreshReads, request } from '../../../src/features/tree/refresh';
-import { freshIsland } from '../../../src/features/tree/types';
+import {
+  notRefreshed,
+  parse,
+  refreshArgs,
+  refreshed,
+  refreshReads,
+  request,
+  scopeOf,
+  whileRefreshing,
+} from '../../../src/features/tree/refresh';
+import { afterPage, freshScan } from '../../../src/features/tree/scan-namespaces';
+import { freshIsland, type DatabaseContents, type TreeIsland } from '../../../src/features/tree/types';
 import { connectionId } from '../../../src/shared/ids';
-import { contextOf, mongoConnection, recorded, redisConnection, stateOf } from './context';
+import { bytes, contextOf, mongoConnection, recorded, redisConnection, stateOf } from './context';
 
 const local = connectionId('c-local');
 const island = { ...freshIsland, expanded: ['database:shop', 'database:media', 'collection:shop.orders'] };
@@ -48,6 +58,7 @@ describe('tree.refresh', () => {
         ? read.requests.map((each) => (each.request.engine === 'mongodb' ? each.request.method : ''))
         : [],
     ).toEqual(['runCommand', 'listCollections', 'listCollections']);
+    expect(read).toMatchObject({ failedRequests: 'are-replies' });
   });
 
   it('refreshing a connection that is not connected connects it first', () => {
@@ -85,5 +96,91 @@ describe('tree.refresh', () => {
   it('the args name the engine of the connection, and its expanded databases only', () => {
     const args = refreshArgs(stateOf({ connections: [mongoConnection()] }), island, local, { kind: 'connection' });
     expect(args).toMatchObject({ engine: 'mongodb', expanded: ['shop', 'media'] });
+  });
+
+  it('the scope comes from the args of the control that starts it; anything else refreshes the whole connection', () => {
+    expect(scopeOf({ scope: { kind: 'database', database: 'shop' } })).toEqual({ kind: 'database', database: 'shop' });
+    expect(scopeOf({ scope: { kind: 'redis-database', database: 3 } })).toEqual({
+      kind: 'redis-database',
+      database: 3,
+    });
+    expect(scopeOf({ scope: { kind: 'database', database: 3 } })).toEqual({ kind: 'connection' });
+    expect(scopeOf(null)).toEqual({ kind: 'connection' });
+  });
+});
+
+describe('tree.refresh in the island', () => {
+  const shop: DatabaseContents = { buckets: [], entries: [{ name: 'orders', kind: 'collection', system: false }] };
+  const databases = [{ name: 'shop' }, { name: 'media' }, { name: 'logs' }];
+  const loaded: TreeIsland = {
+    ...island,
+    mongodb: {
+      ...freshIsland.mongodb,
+      databases: { kind: 'loaded', value: databases },
+      contents: {
+        shop: { kind: 'loaded', value: shop },
+        logs: { kind: 'loaded', value: { buckets: [], entries: [] } },
+      },
+    },
+  };
+  const reads = refreshReads(refreshArgs(stateOf(), loaded, local, { kind: 'connection' }));
+
+  it('while it reads, what was shown stays; what a collapsed database held is forgotten', () => {
+    const during = whileRefreshing(loaded, reads, 1000);
+    expect(during.mongodb.databases).toEqual({ kind: 'loading', since: 1000, previous: databases });
+    expect(during.mongodb.contents['shop']).toEqual({ kind: 'loading', since: 1000, previous: shop });
+    expect(during.mongodb.contents['media']).toEqual({ kind: 'loading', since: 1000 });
+    expect(during.mongodb.contents['logs']).toBeUndefined();
+  });
+
+  it('each result goes under its node; a failed read shows its message there, the others their result', () => {
+    const during = whileRefreshing(loaded, reads, 1000);
+    const after = refreshed(during, [
+      { read: reads[0]!, result: { kind: 'loaded', value: [{ name: 'shop' }] } },
+      { read: reads[1]!, result: { kind: 'loaded', value: shop } },
+      { read: reads[2]!, result: { kind: 'failed', message: 'not authorized on media' } },
+    ]);
+    expect(after.mongodb.databases).toEqual({ kind: 'loaded', value: [{ name: 'shop' }] });
+    expect(after.mongodb.contents['shop']).toEqual({ kind: 'loaded', value: shop });
+    expect(after.mongodb.contents['media']).toEqual({ kind: 'failed', message: 'not authorized on media' });
+  });
+
+  it('a refresh cancelled shows again what was shown; one that failed shows its message', () => {
+    const during = whileRefreshing(loaded, reads, 1000);
+    const cancelledOne = notRefreshed(during, reads);
+    expect(cancelledOne.mongodb.contents['shop']).toEqual({ kind: 'loaded', value: shop });
+    expect(cancelledOne.mongodb.contents['media']).toEqual({ kind: 'idle' });
+    expect(notRefreshed(during, reads, 'connection refused').mongodb.databases).toEqual({
+      kind: 'failed',
+      message: 'connection refused',
+    });
+  });
+
+  it('Redis: a scan starts again from the cursor 0, and stays scanning until its run ends', () => {
+    const cache = redisConnection();
+    const state = stateOf({ connections: [cache] });
+    const seen = afterPage(freshScan, { cursor: '88', keys: bytes('old:1') });
+    const scanned: TreeIsland = {
+      ...freshIsland,
+      expanded: ['redis-database:2'],
+      redis: { ...freshIsland.redis, scans: { '2': { scan: seen } } },
+    };
+    const scans = refreshReads(refreshArgs(state, scanned, cache.id, { kind: 'redis-database', database: 2 }));
+    const during = whileRefreshing(scanned, scans, 500);
+    expect(during.redis.scans['2']).toEqual({ scan: freshScan, scanning: { since: 500 } });
+    const going = refreshed(during, [
+      { read: scans[0]!, result: { kind: 'loaded', value: { cursor: '12', keys: bytes('a:1') } } },
+    ]);
+    expect(going.redis.scans['2']?.scanning).toEqual({ since: 500 });
+    expect(going.redis.scans['2']?.scan.keys).toEqual(bytes('a:1'));
+    const ended = refreshed(during, [
+      { read: scans[0]!, result: { kind: 'loaded', value: { cursor: '0', keys: [] } } },
+    ]);
+    expect(ended.redis.scans['2']).toEqual({ scan: afterPage(freshScan, { cursor: '0', keys: [] }) });
+    const stopped = notRefreshed(during, scans, 'LOADING Redis is loading the dataset in memory');
+    expect(stopped.redis.scans['2']).toMatchObject({
+      scan: { ended: 'paused' },
+      failed: 'LOADING Redis is loading the dataset in memory',
+    });
   });
 });

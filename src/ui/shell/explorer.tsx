@@ -1,17 +1,16 @@
 /**
  * The explorer: the connection island (`nav.connection-island`, `nav.linked-connection`) and the tree island, which
- * shows the pins of the current connection (`nav.pin`) and, before any connection, what `nav.empty` says. The engine's
- * tree is `tree.show`'s (M8).
+ * is `tree.show`'s: the pins of the current connection, its engine's tree and its pages, and before any connection what
+ * `nav.empty` says.
  */
 import { islandElement, switcherElement, view as islandView } from '../../features/nav/connection-island';
 import type { CurrentConnectionView } from '../../features/nav/connection-island';
 import { currentOf } from '../../features/nav/current-connection';
-import { view as emptyView } from '../../features/nav/empty';
-import { pinLabels } from '../../features/nav/pin';
 import { text } from '../../features/nav/text';
 import type { NavInput } from '../../features/nav/types';
 import type { ConnectionId } from '../../shared/ids';
 import { ConnectionMenuButton } from '../connection/connection-menu';
+import { TreeIsland } from '../tree/tree-island';
 import { startFeature } from './intent';
 import styles from './explorer.module.css';
 
@@ -146,37 +145,6 @@ function ConnectionIsland(props: { readonly input: NavInput; readonly openSwitch
         </button>
       ) : (
         <Current island={island} input={props.input} openSwitcher={props.openSwitcher} />
-      )}
-    </section>
-  );
-}
-
-function TreeIsland(props: { readonly input: NavInput; readonly openSwitcher: () => void }): React.JSX.Element {
-  const empty = emptyView(props.input);
-  const current = currentOf(props.input);
-  const pins = current === undefined ? [] : (props.input.nav.pins[current.id] ?? []);
-  const labels = pinLabels(pins);
-  return (
-    <section className={styles['tree-island']} aria-label={text.islands.treeIsland} data-island="tree" tabIndex={-1}>
-      {empty === undefined ? null : (
-        <div className={styles['empty']}>
-          <p>{empty.line}</p>
-          {empty.kind === 'none-current' ? (
-            <button type="button" className={styles['small-button']} onClick={props.openSwitcher}>
-              {empty.choose.label}
-            </button>
-          ) : null}
-        </div>
-      )}
-      {labels.length === 0 ? null : (
-        <div role="group" aria-label={text.tree.pinned}>
-          <div className={styles['section-heading']}>{text.tree.pinned}</div>
-          {labels.map((label, index) => (
-            <div key={`${label.name} ${label.rest ?? ''} ${String(index)}`} className={styles['pin']}>
-              {label.name} {label.rest === undefined ? null : <span className={styles['muted']}>{label.rest}</span>}
-            </div>
-          ))}
-        </div>
       )}
     </section>
   );

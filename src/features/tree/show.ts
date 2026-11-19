@@ -11,7 +11,9 @@ import { connectionState } from '../../shared/state/connections';
 import type { TabShows } from '../../shared/state/tabs';
 import { view as emptyView, type EmptyTreeView } from '../nav/empty';
 import { navInput } from '../nav/types';
-import { view as filterView, type FilterView } from './filter';
+import { expandedAfterClearing, view as filterView, type FilterView } from './filter';
+import * as menuMongodb from './menu-mongodb';
+import * as menuRedis from './menu-redis';
 import * as mongodb from './mongodb';
 import { patternOf } from './namespaces';
 import * as nodeStates from './node-states';
@@ -21,10 +23,13 @@ import * as redis from './redis';
 import { text } from './text';
 import {
   currentConnection,
+  freshIsland,
   hexOf,
   nodeId,
   startControl,
   type Control,
+  type MenuEntry,
+  type NodeRef,
   type PartName,
   type TreeHeading,
   type TreeInput,
@@ -212,4 +217,77 @@ export function revealedFor(island: TreeIsland, shows: TabShows): TreeIsland {
       ? [...island.expanded, parent]
       : island.expanded;
   return { ...island, selected: node, expanded };
+}
+
+/** The context menu of a line of the tree island: of the heading **Databases**, a node, a pinned item or a page. */
+export function menuOfItem(input: TreeInput, item: TreeItem): readonly MenuEntry[] {
+  if (item.kind === 'line' || !item.hasMenu) {
+    return [];
+  }
+  const connection = currentConnection(input.state);
+  const ref: NodeRef = item.kind === 'heading' ? { kind: 'heading', part: item.part } : item.ref;
+  if (connection === undefined) {
+    return [];
+  }
+  if (ref.kind === 'pin') {
+    return pinned.menu(input, ref.pin);
+  }
+  if (ref.kind === 'page') {
+    const page = pages.pagesOf(connection).find((each) => each === ref.page);
+    return page === undefined ? [] : pages.menu(input, page);
+  }
+  return connection.engine === 'redis' ? menuRedis.view(input, ref) : menuMongodb.view(input, ref);
+}
+
+/** Whether a node is of the engine's tree, which **Collapse all** collapses. */
+function isOfEngine(id: string): boolean {
+  return ['database:', 'redis-database:', 'namespace:', 'empty-databases'].some((start) => id.startsWith(start));
+}
+
+/** **Collapse all**: every node of the engine's tree collapsed; the parts and what was read stay. */
+export function collapsedAll(island: TreeIsland): TreeIsland {
+  return { ...island, expanded: island.expanded.filter((id) => !isOfEngine(id)) };
+}
+
+const parts: readonly PartName[] = ['pinned', 'databases', 'pages'];
+
+/** A node or a heading expanded or collapsed: a heading is a part of the island, kept per connection. */
+export function toggled(island: TreeIsland, item: string, to: 'expand' | 'collapse'): TreeIsland {
+  const part = parts.find((each) => nodeId({ kind: 'heading', part: each }) === item);
+  if (part !== undefined) {
+    const others = island.collapsedParts.filter((each) => each !== part);
+    return { ...island, collapsedParts: to === 'collapse' ? [...others, part] : others };
+  }
+  const others = island.expanded.filter((each) => each !== item);
+  return { ...island, expanded: to === 'expand' ? [...others, item] : others };
+}
+
+/**
+ * The island once the filter's text applies (300 ms after the last key). When it is emptied, the databases the filter
+ * showed expanded stay expanded (`tree.filter`).
+ */
+export function withFilterText(input: TreeInput, typed: string): TreeIsland {
+  const { island } = input;
+  const emptied = typed.trim() === '' && island.filter.text.trim() !== '';
+  const expanded = emptied ? expandedAfterClearing(island, mongodb.expandedByFilter(input)) : island.expanded;
+  return { ...island, expanded, filter: { ...island.filter, text: typed } };
+}
+
+/**
+ * The island of a connection that is no longer connected: what was read is forgotten (the key names seen included),
+ * and the nodes expanded, the selection, the parts and the filter stay.
+ */
+export function withoutReads(island: TreeIsland): TreeIsland {
+  return { ...island, mongodb: freshIsland.mongodb, redis: freshIsland.redis };
+}
+
+/** The databases the filter needs the collections of: every MongoDB database whose collections are not read yet. */
+export function databasesToList(island: TreeIsland): readonly string[] {
+  const loadable = island.mongodb.databases;
+  if (island.filter.text.trim() === '' || loadable.kind !== 'loaded') {
+    return [];
+  }
+  return loadable.value
+    .map((database) => database.name)
+    .filter((name) => (island.mongodb.contents[name]?.kind ?? 'idle') === 'idle');
 }

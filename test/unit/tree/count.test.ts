@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { countText, countedCollections, mostCounted, parse, request, sizeText } from '../../../src/features/tree/count';
+import {
+  countText,
+  countedCollections,
+  mostCounted,
+  parse,
+  request,
+  sizeText,
+  withCounts,
+} from '../../../src/features/tree/count';
 import type { CollectionEntry } from '../../../src/features/tree/types';
 import { contextOf, recorded } from './context';
 
@@ -71,5 +79,12 @@ describe('tree.count', () => {
 
   it('the key counts of Redis are written by the same rule', () => {
     expect(countText(1_204_000)).toBe('1.2M');
+  });
+
+  it('asks the runner for every count, even after one fails, and keeps the counts of the other databases', () => {
+    const read = request(contextOf('tree.count'), { connection: 'c-local', database: 'shop', collections: ['orders'] });
+    expect(read).toMatchObject({ kind: 'engine', failedRequests: 'are-replies' });
+    const before = { 'shop.orders': 3, 'shop.gone': 1, 'media.fs.files': 2 };
+    expect(withCounts(before, 'shop', { orders: 4 })).toEqual({ 'media.fs.files': 2, 'shop.orders': 4 });
   });
 });

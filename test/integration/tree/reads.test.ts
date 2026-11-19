@@ -29,6 +29,12 @@ const redisDatabase = servers.redisDatabases.includes(15) ? 15 : (servers.redisD
 const signal = (): AbortSignal => AbortSignal.timeout(30_000);
 const database = 'tree_shop';
 const decoder = new TextDecoder();
+/**
+ * The keys of the database the large scan reads (QA7 asks for 5 million): 200,000 by default, so that the suite stays
+ * short and the shared server is not loaded for minutes; `DATARDO_TEST_TREE_KEYS=5000000` runs it at the size of the
+ * exit criterion. A run reads about 10,000 keys whatever the size, since each `SCAN` call costs its `COUNT`.
+ */
+const manyKeys = Number(process.env['DATARDO_TEST_TREE_KEYS'] ?? 200_000);
 
 const context: Context = {
   feature: featureId('tree.list-databases'),
@@ -135,17 +141,29 @@ describe.runIf(servers.redis !== undefined)('tree.redis-databases and tree.scan-
   const engines = createEngines();
   const id = connectionId('tree-redis');
 
-  async function fill(keys: number): Promise<void> {
+  async function flush(): Promise<void> {
     const client = createClient({ url: servers.redis ?? '', database: redisDatabase });
     await client.connect();
     try {
       await client.flushDb();
-      for (let start = 0; start < keys; start += 1000) {
-        const chunk = Array.from({ length: Math.min(1000, keys - start) }, (_, index) => [
+    } finally {
+      client.destroy();
+    }
+  }
+
+  /** Empties the database, then writes `keys` keys `bulk:<n>`, 1,000 per `MSET`. */
+  async function fill(keys: number): Promise<void> {
+    const chunk = 1000;
+    const client = createClient({ url: servers.redis ?? '', database: redisDatabase });
+    await client.connect();
+    try {
+      await client.flushDb();
+      for (let start = 0; start < keys; start += chunk) {
+        const names = Array.from({ length: Math.min(chunk, keys - start) }, (_, index) => [
           `bulk:${String(start + index)}`,
           'x',
         ]);
-        await client.mSet(chunk.flat());
+        await client.mSet(names.flat());
       }
     } finally {
       client.destroy();
@@ -224,6 +242,28 @@ describe.runIf(servers.redis !== undefined)('tree.redis-databases and tree.scan-
     expect(scan.ended).toBe('whole');
     expect(scan.keys).toHaveLength(12_000);
   });
+
+  it(`tree.scan-namespaces: a database of ${manyKeys.toLocaleString('en-US')} keys shows its namespaces in under 1 second, with SCAN only`, async () => {
+    await fill(manyKeys);
+    const started = performance.now();
+    let scan = scanNamespaces.freshScan;
+    const calls: string[] = [];
+    while (scan.ended === undefined) {
+      const args: Json = { connection: id, database: redisDatabase, cursor: scan.cursor };
+      const read = scanNamespaces.request(context, args);
+      if (read.kind === 'engine' && read.requests[0]?.request.engine === 'redis') {
+        calls.push(read.requests[0].request.command.map((word) => decoder.decode(word)).join(' '));
+      }
+      scan = scanNamespaces.afterPage(scan, scanNamespaces.parse(await send(engines, read)));
+    }
+    const shown = namespacesOf(scan.keys, ':', true);
+    const elapsed = performance.now() - started;
+    expect(scan.ended).toBe('paused');
+    expect(calls.every((call) => /^SCAN \d+ COUNT 1000$/u.test(call))).toBe(true);
+    expect(shown.namespaces.map((each) => each.name)).toEqual(['bulk']);
+    expect(elapsed).toBeLessThan(1000);
+    await flush();
+  }, 600_000);
 
   it('tree.scan-namespaces: names that are not UTF-8 are scanned as bytes', async () => {
     const client = createClient({ url: servers.redis ?? '', database: redisDatabase });

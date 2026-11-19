@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { menu, view } from '../../../src/features/tree/pinned';
+import { menu, moveControl, view } from '../../../src/features/tree/pinned';
 import type { Pin } from '../../../src/shared/state/nav';
 import { inputOf, mongoConnection, redisConnection, stateOf } from './context';
 
@@ -55,5 +55,27 @@ describe('tree.pinned', () => {
       ['Open', 'tree.pinned@tree-menu'],
       ['Unpin', 'nav.pin@tree-menu'],
     ]);
+  });
+});
+
+describe('nav.pin in the tree', () => {
+  const input = inputOf({ pins });
+  const ids = view(input).map((node) => node.id);
+
+  it('a pinned item dragged onto another takes its place', () => {
+    expect(moveControl(input, ids[4] ?? '', { item: ids[0] ?? '' })).toMatchObject({
+      element: 'nav.pin@tree',
+      feature: 'nav.pin',
+      args: { action: 'move', connection: 'c-local', pin: pins[4], to: 0 },
+    });
+  });
+
+  it('Alt+Up and Alt+Down move it by one place, and not past either end', () => {
+    expect(moveControl(input, ids[1] ?? '', 'up')).toMatchObject({ args: { to: 0 } });
+    expect(moveControl(input, ids[1] ?? '', 'down')).toMatchObject({ args: { to: 2 } });
+    expect(moveControl(input, ids[0] ?? '', 'up')).toBeUndefined();
+    expect(moveControl(input, ids[4] ?? '', 'down')).toBeUndefined();
+    expect(moveControl(input, ids[2] ?? '', { item: ids[2] ?? '' })).toBeUndefined();
+    expect(moveControl(input, 'database:shop', 'up')).toBeUndefined();
   });
 });

@@ -1,0 +1,38 @@
+/* A tree: one line for each item, indented by its level, with a visible outline on the line that has the focus. */
+.tree {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: calc(var(--line-height) * var(--font-size-body));
+  padding-block: var(--space-0);
+  padding-inline-end: var(--space-1);
+  border-radius: var(--radius-small);
+  cursor: default;
+  user-select: none;
+}
+
+.row:hover {
+  background: var(--color-hover);
+}
+
+.row[aria-selected='true'] {
+  background: var(--color-selected);
+}
+
+.row:focus-visible {
+  outline: var(--focus-width) solid var(--color-focus);
+  outline-offset: calc(var(--focus-width) * -1);
+}
+
+.row[data-dimmed='true'] {
+  color: var(--color-text-muted);
+}
+
+.row[data-tone='error'] {
+  color: var(--color-danger);
+}

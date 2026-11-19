@@ -155,9 +155,21 @@ export interface OperationFeature {
   readonly plan: (context: Context, answers: Answers) => Outcome;
 }
 
+/**
+ * What a request of a Read that fails does: end the whole read (the default), or be given to `parse` in its place as
+ * `{ kind: 'error', message }`, the server's message without secrets, while the other requests go on. A Read whose
+ * card says what a failure means (a fallback, a count left out, a line under a node) asks for the second.
+ */
+export type FailedRequests = 'end-the-read' | 'are-replies';
+
 /** What a Read sends: to an engine, or to Datardo's own data (an app read the main process answers). */
 export type ReadRequest =
-  | { readonly kind: 'engine'; readonly requests: readonly ConnectionRequest[] }
+  | {
+      readonly kind: 'engine';
+      readonly requests: readonly ConnectionRequest[];
+      /** What a request that fails does; `end-the-read` when absent. */
+      readonly failedRequests?: FailedRequests;
+    }
   | { readonly kind: 'app'; readonly action: string; readonly args: Json };
 
 /** A Read: asks something and returns it, changing nothing. */

@@ -465,6 +465,19 @@ TypeScript and the core in Rust (about a quarter of what was built rewritten, an
 written in Rust), and Tauri 2 with everything in Rust. The cost stays D1's: an installer of about 100 MB.
 *Decided by the author on 2026-11-19.*
 
+## D53 — The tree counts estimates, and a Redis database opens on its name and expands on its arrow
+
+The tree is built as its cards say (M8). Beside each collection is its estimated count
+(`estimatedDocumentCount()`, at most 5 seconds each, for the first 500 collections of a database; views, time
+series and system collections have none, and a count that fails shows nothing) (`tree.count`). Clicking the name of a
+Redis database, or `Enter` on it, opens its keys tab and scans nothing; only its arrow, `Right` or a double click
+expands it and starts the scan (`tree.redis`, `tree.keyboard`). The databases that hold no key, other than `db0` and
+the database the connection opens first, are folded under one last node **<n> empty databases** (`tree.redis`). A
+prefix with one key is not a namespace: that key is found in the keys tab of its database (`tree.namespaces`).
+Rejected: an exact `countDocuments` per collection (a scan of each collection when the tree opens), a scan when a
+database's name is clicked, every database listed whatever it holds, and a namespace for every prefix.
+*Built in M8 on 2026-11-19 as the cards say; answers Q23 unless the author decides otherwise.*
+
 ## Open questions
 
 - **Q1** — *Answered on 2026-11-18 by [D7](#d7--home-is-the-first-page)*: the last active tab when tabs are restored,
@@ -521,9 +534,11 @@ Raised while the catalog was written; each names the cards that hold the current
 - **Q22** — A file given to a second start is ignored: should a playground file open in a tab? On a Linux desktop
   without a tray a hidden window has no icon. The smallest window is 640 × 400. (`window.single-instance`,
   `window.tray`, `window.frame`).
-- **Q23** — The tree: an estimated count beside each collection; a click on a Redis database opens its keys tab and
-  only the arrow expands it; databases without keys are folded under one line; a prefix with one key is not a
-  namespace. (`tree.count`, `tree.redis`, `tree.namespaces`).
+- **Q23** — *Answered on 2026-11-19 by
+  [D53](#d53--the-tree-counts-estimates-and-a-redis-database-opens-on-its-name-and-expands-on-its-arrow)*: The tree: an
+  estimated count beside each collection; a click on a Redis database opens its keys tab and only the arrow expands
+  it; databases without keys are folded under one line; a prefix with one key is not a namespace. (`tree.count`,
+  `tree.redis`, `tree.namespaces`).
 - **Q24** — Skip and Limit are fields of the query bar and paging happens inside their result. An empty filter shows
   the estimated count, marked by a tooltip. The time limit of a query is a setting. Cells show mongosh text with its
   quotes, where the sketch shows plain text. (`query.bar`, `query.count`, `query.run`, `table.cell-text`).
