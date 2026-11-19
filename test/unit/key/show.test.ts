@@ -3,10 +3,10 @@ import { pattern } from '../../../src/features/key/pattern';
 import { request } from '../../../src/features/key/scan';
 import type { ScanState } from '../../../src/features/key/scan';
 import type { KeysPageState } from '../../../src/features/key/show';
-import { scanArgsOf, startingField, startingScan, view } from '../../../src/features/key/show';
+import { open, scanArgsOf, startingField, startingScan, view } from '../../../src/features/key/show';
 import { noSelection } from '../../../src/features/key/select';
 import type { ReadRequest } from '../../../src/shared/feature';
-import { cache, keyContext, name, onDatabase, requestWords } from './context';
+import { cache, connected, keyContext, name, onDatabase, planOf, requestWords } from './context';
 
 const now = 1_763_400_000_000;
 
@@ -167,5 +167,37 @@ describe('key.show', () => {
     expect(view(offline).table).toMatchObject({ kind: 'not-connected', connect: { feature: 'connection.connect' } });
     expect(view(page({ error: 'NOPERM' })).table).toMatchObject({ kind: 'error', text: 'NOPERM' });
     expect(view(page()).table).toEqual({ kind: 'loading' });
+  });
+
+  it('Search in the rail opens the keys tab of the database it names, and makes it active when it is open', () => {
+    const fromRail = keyContext('key.show', { kind: 'connection', connection: cache.id });
+    expect(
+      planOf(open.plan(fromRail, { args: { connection: cache.id, database: 3, focus: 'pattern' } })).steps,
+    ).toEqual([
+      {
+        kind: 'app',
+        action: 'tab.open',
+        args: { shows: { kind: 'keys', connection: cache.id, database: 3, separator: ':' }, background: false },
+        text: 'open the keys tab of db3 on Cache local',
+      },
+    ]);
+    const shown = { kind: 'keys', connection: cache.id, database: 3, separator: ':' } as const;
+    const withTab = keyContext('key.show', onDatabase(3), connected(cache, '7.4.1', [shown]));
+    expect(planOf(open.plan(withTab, {})).steps).toEqual([
+      expect.objectContaining({ kind: 'app', action: 'tab.activate', args: { tab: 't1' } }),
+    ]);
+  });
+
+  it('a level of the path opens the keys tab of that namespace', () => {
+    const outcome = open.plan(keyContext('key.show', onDatabase()), { args: { namespace: 'orders:' } });
+    expect(planOf(outcome).steps).toEqual([
+      expect.objectContaining({
+        action: 'tab.open',
+        args: {
+          shows: { kind: 'keys', connection: cache.id, database: 0, separator: ':', namespace: 'orders:' },
+          background: false,
+        },
+      }),
+    ]);
   });
 });

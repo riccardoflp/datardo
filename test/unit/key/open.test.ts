@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { plan, read } from '../../../src/features/key/open';
 import { hexOf } from '../../../src/features/key/types';
+import { view as pinned } from '../../../src/features/tree/pinned';
+import { inputOf } from '../tree/context';
 import type { ReadRequest } from '../../../src/shared/feature';
 import { stateWith } from '../connection/context';
 import {
@@ -93,5 +95,15 @@ describe('key.open', () => {
     const bytes = Uint8Array.of(0x75, 0x73, 0x65, 0x72, 0x3a, 0xff);
     const step = planOf(plan(keyContext('key.open', onKey(bytes)), { type: 'string' })).steps[0];
     expect(step).toMatchObject({ args: { shows: { key: '"user:\\xff"', keyHex: '757365723aff' } } });
+  });
+
+  it('a click on a pinned key of the tree opens its key tab', () => {
+    const pins = [{ kind: 'key' as const, database: 0, keyHex: hexOf(name('user:7')) }];
+    const [node] = pinned(inputOf({ connections: [cache], pins }));
+    expect(node?.click).toMatchObject({
+      element: 'key.open@tree',
+      feature: 'tab.open',
+      args: { shows: { kind: 'key', connection: cache.id, database: 0, key: 'user:7' } },
+    });
   });
 });

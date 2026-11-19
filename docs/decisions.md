@@ -503,6 +503,17 @@ documents, as Mongoster's promise says (events for writes of thousands of docume
 again one by one, and none known for `$out`, `$merge` or `runCommand`).
 *Built in M11 on 2026-11-19 as the cards say; answers Q4 unless the author decides otherwise.*
 
+## D58 — The undo of a key keeps its whole dump and gives back the time it had left
+
+A write to keys is recorded with the `DUMP`, `PTTL` and `TYPE` of each key it touches, read before its steps, whatever
+part of the key the write changes; the size of a key is not asked first with `MEMORY USAGE`. A write whose dumps turn
+out larger than the undo history keeps asks whether to go on without undo, as D35 says. Undoing gives back each key
+with `RESTORE … REPLACE` and the time it had left when it was read, not the moment it would have expired. The details
+of an operation show the type, the size and the expiry of each key, not its value. Rejected: asking the size of every
+key first (one more command a key, for a question the dumps already answer), and dumping only the field a write
+changes (a second format of undo for each type).
+*Built in M11 and M13 on 2026-11-19 as Q14 describes; answers Q14 unless the author decides otherwise.*
+
 ## Open questions
 
 - **Q1** — *Answered on 2026-11-18 by [D7](#d7--home-is-the-first-page)*: the last active tab when tabs are restored,
@@ -535,9 +546,9 @@ Raised while the catalog was written; each names the cards that hold the current
 - **Q13** — *Answered on 2026-11-18 by [D40](#d40--the-playground-asks-before-it-drops) and
   [D51](#d51--one-playground-at-a-time-and-console-replies-as-the-server-sends-them)*: the playground asks before it
   drops; one runs at a time, with no memory limit.
-- **Q14** — Undo of a key: the whole key is dumped even for a write to one field; a key over the limit asks to go on
-  without undo; undoing gives back the time the key had left, not its original moment of expiry; the details show
-  type, size and expiry, not the value. Should large keys be asked for their size first (`MEMORY USAGE`, RS13)?
+- **Q14** — *Answered on 2026-11-19 by
+  [D58](#d58--the-undo-of-a-key-keeps-its-whole-dump-and-gives-back-the-time-it-had-left)*, unless the author decides
+  otherwise: the whole key is dumped, its size is not asked first, and undoing gives back the time it had left.
   (`undo.record`, `undo.revert-plan`, `undo.details`, `value.edit-field`).
 - **Q15** — Writes to one element of a list compare and then write in two commands; should they be one script that
   does both at once? (`value.edit-element`, `value.remove-elements`, `value.add-field`, `key.new`).
@@ -776,3 +787,22 @@ Raised while the catalog was written; each names the cards that hold the current
   the matching `_id`s itself rather than taking those `undo.record` keeps; an operation file written for an operation
   that the index then cannot take (a newer index) stays until the index can be written again.
   (`undo.revert`, `undo.details`, `undo.show`, `oplog.publish`, `undo.record`).
+- **Q65** — The keys tab as built in M13: the tabs of one connection share its client, which sends `SELECT` when a
+  request names another database than the last, where `key.switch-database` says each tab has a client of its own
+  that sends `SELECT` once; the requests of one read (`key.details`, `key.inspect`) are sent one after the other, not
+  as one pipeline; the messages that depend on a reply (`RENAMENX` answering 0, an `UNLINK` or `PERSIST` that changed
+  nothing, *Deleted 35 of 37 keys*) wait for Q58, their pure `afterReply` being tested alone; the notification of an
+  export is sent by its writer, which knows how many keys it wrote and whether a stream had consumer groups, and has no
+  **Show in folder**, since no feature shows a file in the file manager (Q39); the progress of an export, and of the
+  scan to the end that `key.delete-by-pattern` and `key.export` start, is the work in progress and its **Cancel**, not
+  a text of the status line; the delete by pattern that is not recorded is an action of the main process, which scans
+  again and unlinks what each reply gives, since a plan cannot scan; after a rename the table scans again, so the row
+  does not keep its place; a click on a database of the tree carries `key.switch-database@tree` while the active tab shows the keys of
+  another database of the same connection, and `key.show@tree` otherwise; a click on a pinned key carries
+  `key.open@tree` where the other pinned items carry `tree.pinned@tree`; in the menu of the database of the path, the
+  present database starts `key.show@scope-bar` and the others `key.switch-database@scope-bar`, and **Switch
+  database…** in Go to lists the databases the tree read last, which the window adds to the command; the keys of the
+  table (`Enter`, `F2`, `Delete`, `Ctrl+C`, a click on a header) start their features from the grid, which carries
+  their identifiers in one attribute; an import reads files of at most 512 MB, a number of Datardo's own (Q11).
+  (`key.switch-database`, `key.details`, `key.rename`, `key.export`, `key.delete-by-pattern`, `key.show`, `key.open`,
+  `key.import`).

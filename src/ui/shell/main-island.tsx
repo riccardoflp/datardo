@@ -8,7 +8,8 @@ import { view as scopeBarView, type ScopeButton } from '../../features/nav/scope
 import { pageTitle, text } from '../../features/nav/text';
 import type { NavInput } from '../../features/nav/types';
 import { useLayoutEffect, useRef, useState } from 'react';
-import { pages } from '../pages';
+import { pages, tabPages } from '../pages';
+import { KeysPathSegment } from '../pages/keys/keys-path';
 import { startFeature } from './intent';
 import { TabStrip } from './tab-strip';
 import styles from './bars.module.css';
@@ -45,9 +46,11 @@ function BarButton({
 
 function Segment({
   segment,
+  segments,
   openSwitcher,
 }: {
   readonly segment: PathSegment;
+  readonly segments: readonly PathSegment[];
   readonly openSwitcher: () => void;
 }): React.JSX.Element {
   const icon = segment.view === true ? <span className="codicon codicon-eye" aria-hidden="true" /> : null;
@@ -62,6 +65,9 @@ function Segment({
         {segment.label}
       </button>
     );
+  }
+  if (segment.menu === 'redis-database' || segment.menu === 'namespace') {
+    return <KeysPathSegment segment={segment} segments={segments} className={styles['segment']} />;
   }
   return (
     <span className={styles['segment-text']}>
@@ -118,7 +124,7 @@ function ScopeBar({
                 <span aria-hidden="true">/</span>
               </>
             ) : null}
-            <Segment segment={segment} openSwitcher={openSwitcher} />
+            <Segment segment={segment} segments={bar.path.segments} openSwitcher={openSwitcher} />
           </span>
         ))}
       </nav>
@@ -141,7 +147,7 @@ export function MainIsland({
 }): React.JSX.Element {
   const shown = input.activeTab;
   const page = shown.kind === 'app' || shown.kind === 'page' ? shown.page : shown.kind;
-  const Page = shown.kind === 'app' || shown.kind === 'page' ? pages[shown.page] : undefined;
+  const Page = shown.kind === 'app' || shown.kind === 'page' ? pages[shown.page] : tabPages[shown.kind];
   return (
     <section className={styles['main-island']} aria-label={text.islands.mainIsland} data-island="main" tabIndex={-1}>
       <TabStrip />

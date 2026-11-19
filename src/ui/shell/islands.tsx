@@ -10,6 +10,7 @@ import { isInspectorWanted } from '../../features/nav/inspector';
 import { layout, railWidth, rightMargin, type Layout } from '../../features/nav/layout';
 import { dragged, widthLimits, type ResizedIsland } from '../../features/nav/resize';
 import { navInput, type NavInput } from '../../features/nav/types';
+import { tabExtras } from '../pages';
 import { useAppState } from '../state/store';
 import { ConnectionSwitcher } from './connection-switcher';
 import { Explorer } from './explorer';
@@ -72,10 +73,17 @@ function useFocusKeptWhenHidden(shown: boolean): void {
   }, [shown]);
 }
 
+/** The active tab with what its page adds: the count of the status line, what the inspector island shows. */
+function withPageExtras(input: NavInput, state: ReturnType<typeof useAppState>): NavInput {
+  const tab = input.activeTab;
+  const extras = tab.tab === undefined ? undefined : tabExtras[tab.kind]?.(state, tab.tab);
+  return extras === undefined ? input : { ...input, activeTab: { ...tab, ...extras } };
+}
+
 /** The islands. */
 export function Islands(): React.JSX.Element {
   const state = useAppState();
-  const input = navInput(state);
+  const input = withPageExtras(navInput(state), state);
   const windowWidth = useWindowWidth();
   const [drag, setDrag] = useState<Drag | undefined>(undefined);
   const [switcherOpen, setSwitcherOpen] = useState(false);

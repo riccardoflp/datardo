@@ -67,15 +67,18 @@ function whatQuestion(selected: number, pattern: string, type: string): Outcome 
   });
 }
 
-/** The file step: `write C:\exports\cache-local-db0.redis`, its writer reading the keys named, in this order. */
-export function exportStep(place: KeysPlace, path: string, names: readonly KeyName[]): FileStep {
+/**
+ * The file step: `write C:\exports\cache-local-db0.redis`, its writer reading the keys named, in this order, with the
+ * commands of the server's version (`PEXPIRETIME` from Redis 7.0).
+ */
+export function exportStep(place: KeysPlace, path: string, names: readonly KeyName[], redisVersion = '6.2'): FileStep {
   const step = {
     kind: 'file' as const,
     action: 'write' as const,
     path,
     content: {
       writer: 'key.export',
-      args: { connection: place.connection.id, database: place.database, keys: names.map(hexOf) },
+      args: { connection: place.connection.id, database: place.database, keys: names.map(hexOf), redisVersion },
     },
   };
   return { ...step, text: stepText(step) };
@@ -129,7 +132,9 @@ export function plan(context: Context, answers: Answers): Outcome {
   if (file === undefined) {
     return needRead('file', fileReadId, { mode: 'save', name: exportFileName(place) });
   }
-  const steps = typeof file === 'string' ? [exportStep(place, file, names as readonly KeyName[])] : [];
+  const server = context.state.connections.live[place.connection.id]?.server;
+  const version = server?.engine === 'redis' ? server.redisVersion : undefined;
+  const steps = typeof file === 'string' ? [exportStep(place, file, names as readonly KeyName[], version)] : [];
   return run({
     title: text.export.title,
     steps,

@@ -6,8 +6,18 @@ import * as Tooltip from '@radix-ui/react-tooltip';
 import { useRef, useState, type KeyboardEvent } from 'react';
 import { view, type RailEntry } from '../../features/nav/rail';
 import type { NavInput } from '../../features/nav/types';
+import { focusPatternNext } from '../pages/keys/keys-store';
 import { startFeature } from './intent';
 import styles from './rail.module.css';
+
+/** **Search** on a Redis connection: the keys tab it shows puts the focus in its pattern field (`key.show`). */
+function askFocus(entry: RailEntry): void {
+  const args = entry.args as
+    { readonly focus?: unknown; readonly connection?: unknown; readonly database?: unknown } | undefined;
+  if (args?.focus === 'pattern' && typeof args.connection === 'string' && typeof args.database === 'number') {
+    focusPatternNext(args.connection, args.database);
+  }
+}
 
 function RailButton(props: {
   readonly entry: RailEntry;
@@ -34,6 +44,7 @@ function RailButton(props: {
           onFocus={props.onFocus}
           onClick={() => {
             if (!entry.disabled) {
+              askFocus(entry);
               startFeature(entry.feature, { place: 'rail', ...(entry.args === undefined ? {} : { args: entry.args }) });
             }
           }}

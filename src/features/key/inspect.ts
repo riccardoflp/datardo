@@ -143,6 +143,8 @@ export function request(_context: Context, args: Json): ReadRequest {
   const call = (words: readonly (string | Uint8Array)[]) => scanCall(asked.connection, asked.database, words);
   return {
     kind: 'engine',
+    // A server that refuses MEMORY USAGE or OBJECT ENCODING still answers the other lines: `parse` says `—`.
+    failedRequests: 'are-replies',
     requests: [
       call(['TYPE', asked.key]),
       call(['PTTL', asked.key]),

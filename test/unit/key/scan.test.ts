@@ -70,6 +70,12 @@ describe('key.scan', () => {
     );
     const sending = sources.filter((file) => /['"]KEYS['"]/u.test(readFileSync(join(folder, file), 'utf8')));
     expect(sending).toEqual([]);
+    // The scans of the main process that go to the end of a database (`key.scan-all`, `key.unlink-scanned`) and the
+    // writer of an export send SCAN too.
+    const main = join(import.meta.dirname, '..', '..', '..', 'src', 'main');
+    for (const file of ['key-scans.ts', 'key-export.ts', join('actions', 'key.ts')]) {
+      expect(readFileSync(join(main, file), 'utf8')).not.toMatch(/['"]KEYS['"]/u);
+    }
   });
 
   it('stops a run at the first reply that brings the keys found to 500 or more, and Scan more goes on from its cursor', () => {

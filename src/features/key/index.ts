@@ -20,10 +20,12 @@ import * as refresh from './refresh';
 import * as rename from './rename';
 import * as scan from './scan';
 import * as setExpiry from './set-expiry';
+import * as show from './show';
 import * as switchDatabase from './switch-database';
 
 /** The features of this area the runner can start. */
 export const features: readonly RunnableFeature[] = [
+  show.open,
   { kind: 'operation', id: featureId('key.open'), plan: open.plan },
   { kind: 'operation', id: featureId('key.rename'), plan: rename.plan },
   { kind: 'operation', id: featureId('key.persist'), plan: persist.plan },

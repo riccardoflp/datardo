@@ -13,6 +13,7 @@ import {
   planOf,
   recordedReplies,
   requestWords,
+  undoNames,
 } from './context';
 import { exampleFile } from './example';
 
@@ -94,7 +95,7 @@ describe('key.import', () => {
   it('keeps the keys it imports for the undo, so the undo deletes those created and puts back those replaced', () => {
     const imported = planOf(plan(context, { file, existing: 'replace', exists: userExists }));
     expect(imported.undo).toEqual({
-      keeps: { engine: 'redis', database: 0, keys: exampleNames.map((each) => hexOf(name(each))) },
+      keeps: { kind: 'keys', database: 0, keys: undoNames(exampleNames.map((each) => hexOf(name(each)))) },
     });
   });
 

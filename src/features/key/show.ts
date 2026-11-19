@@ -5,7 +5,18 @@
  * scan at a time, with the pattern field, the type filter, **Scan more**, **Refresh**, **New key** and **More**.
  */
 import type { Json } from '../../shared/engine-request';
-import type { ConnectionId } from '../../shared/ids';
+import {
+  run,
+  type Answers,
+  type AppStep,
+  type Context,
+  type OperationFeature,
+  type Outcome,
+} from '../../shared/feature';
+import { featureId, type ConnectionId } from '../../shared/ids';
+import type { TabShows } from '../../shared/state/tabs';
+import { appPlan } from '../nav/types';
+import { sameTab } from '../tab/open';
 import { sizeText } from '../connection/overview';
 import { expiryCellText } from './format-expiry';
 import { pattern, type KeyPattern } from './pattern';
@@ -15,7 +26,7 @@ import { selectedInOrder, type KeySelection } from './select';
 import { headerSorts, sortedKeys, sortNotice, type KeySort, type SortColumn } from './sort';
 import { text } from './text';
 import type { KeyName, KeyType, TypeFilter } from './types';
-import { databaseName, hexOf, knownTypes, nameText, typeLabel } from './types';
+import { argsOf, databaseName, hexOf, knownTypes, nameText, placeOf, separatorOf, typeLabel } from './types';
 
 /** What `key.details` read of a key, kept for the tab until **Refresh**. */
 export interface ReadDetails {
@@ -344,3 +355,42 @@ export function selectedKeys(state: KeysPageState): readonly KeyName[] {
     sortedRows(state).map((row) => row.name),
   );
 }
+
+/** The step that opens the keys tab of a database or a namespace, or makes the one open active as it is. */
+function openStep(context: Context, shows: Extract<TabShows, { kind: 'keys' }>, connection: string): AppStep {
+  const open = sameTab(context.state, shows);
+  const words = [databaseName(shows.database), connection] as const;
+  return open === undefined
+    ? {
+        kind: 'app',
+        action: 'tab.open',
+        args: { shows: shows as Json, background: false },
+        text: text.show.step(...words),
+      }
+    : { kind: 'app', action: 'tab.activate', args: { tab: open.id }, text: text.show.activate(...words) };
+}
+
+/**
+ * Feature: key.show. Opening the keys tab of `args.database` (or of the database of the target, `db0` for a
+ * connection), of `args.namespace` when one is given; no step on the deployment. While the connection is not
+ * connected the page offers **Connect**.
+ */
+function plan(context: Context, answers: Answers): Outcome {
+  const place = placeOf(context, answers);
+  if (place === undefined) {
+    throw new Error('key.show needs a Redis connection.');
+  }
+  const args = argsOf(answers);
+  const database = typeof args['database'] === 'number' ? args['database'] : place.database;
+  const shows = {
+    kind: 'keys' as const,
+    connection: place.connection.id,
+    database,
+    separator: separatorOf(context),
+    ...(place.namespace === undefined ? {} : { namespace: place.namespace }),
+  };
+  return run(appPlan(text.show.title, [openStep(context, shows, place.connection.name)]));
+}
+
+/** `key.show`, as the runner starts it: from the rail, Go to, a database of the scope bar. */
+export const open: OperationFeature = { kind: 'operation', id: featureId('key.show'), plan };

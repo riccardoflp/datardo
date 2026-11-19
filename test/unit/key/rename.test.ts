@@ -11,6 +11,7 @@ import {
   onKey,
   planOf,
   recordedReplies,
+  undoNames,
 } from './context';
 
 const context = keyContext('key.rename', onKey('orders:42'));
@@ -72,7 +73,7 @@ describe('key.rename', () => {
     const renamed = planOf(plan(context, { name: 'orders:43', exists: true }));
     expect(renamed.title).toBe('Rename orders:42 to orders:43');
     expect(renamed.undo).toEqual({
-      keeps: { engine: 'redis', database: 0, keys: [hexOf(name('orders:42')), hexOf(name('orders:43'))] },
+      keeps: { kind: 'keys', database: 0, keys: undoNames([hexOf(name('orders:42')), hexOf(name('orders:43'))]) },
     });
   });
 

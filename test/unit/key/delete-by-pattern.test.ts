@@ -9,7 +9,7 @@ import {
 import { matches } from '../../../src/features/key/pattern';
 import { scanCommand } from '../../../src/features/key/scan';
 import { hexOf } from '../../../src/features/key/types';
-import { cache, cacheReadOnly, connected, keyContext, name, onDatabase, planOf, wordsOf } from './context';
+import { cache, cacheReadOnly, connected, keyContext, name, onDatabase, planOf, undoNames, wordsOf } from './context';
 
 const context = keyContext('key.delete-by-pattern', onDatabase());
 const sessions = (count: number): string[] =>
@@ -115,7 +115,7 @@ describe('key.delete-by-pattern', () => {
   it('keeps the 1,832 keys for the undo', () => {
     const count = { found: 1832, total: 1_204_331, names: sessions(1832) };
     expect(planOf(plan(context, { ...asked, count })).undo).toEqual({
-      keeps: { engine: 'redis', database: 0, keys: sessions(1832) },
+      keeps: { kind: 'keys', database: 0, keys: undoNames(sessions(1832)) },
     });
   });
 

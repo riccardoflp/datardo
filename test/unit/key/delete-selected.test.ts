@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { afterReplies, plan } from '../../../src/features/key/delete-selected';
 import { view } from '../../../src/features/key/select';
 import { hexOf } from '../../../src/features/key/types';
-import { cacheReadOnly, connected, keyContext, name, onDatabase, planOf, wordsOf } from './context';
+import { cacheReadOnly, connected, keyContext, name, onDatabase, planOf, undoNames, wordsOf } from './context';
 
 const context = keyContext('key.delete-selected', onDatabase());
 const names = (count: number): Uint8Array[] => Array.from({ length: count }, (_, index) => name(`k${String(index)}`));
@@ -49,7 +49,7 @@ describe('key.delete-selected', () => {
 
   it('keeps the 3 keys for the undo', () => {
     expect(planOf(plan(context, selected(3))).undo).toEqual({
-      keeps: { engine: 'redis', database: 0, keys: names(3).map(hexOf) },
+      keeps: { kind: 'keys', database: 0, keys: undoNames(names(3).map(hexOf)) },
     });
   });
 

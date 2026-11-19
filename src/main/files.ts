@@ -10,8 +10,11 @@ import { connectionsToText, type ExportFormat, type ExportSecrets } from '../fea
 import { fileOfConnection, isFileProblem, jsonFields } from '../features/connection/types';
 import { transferText } from '../features/connection/text';
 import { writeAtomically } from '../storage/store';
-import { fullConnectionString, savedConnections, savedOptionSecrets } from './connections';
+import { notify } from '../runner/notify';
+import { whenRunnerReady } from './bridge';
+import { connectionEngines, fullConnectionString, savedConnections, savedOptionSecrets } from './connections';
 import { nodeFileCrypto } from './file-crypto';
+import { keyExportOf, writeKeyExport } from './key-export';
 
 const formats: readonly ExportFormat[] = ['datardo', 'compass', 'list'];
 const modes: readonly ExportSecrets[] = ['remove', 'include', 'encrypt'];
@@ -39,8 +42,18 @@ const writers: Readonly<Record<string, (args: Json) => Promise<string>>> = {
   'connection.write-file': connectionsFile,
 };
 
+/**
+ * `key.export`: the keys read a page at a time and written beside the file as `.part`, renamed once complete; what it
+ * exported is said in a notification, with the line on consumer groups when a stream had some.
+ */
+async function writeKeys(step: FileStep, args: Json, signal: AbortSignal): Promise<void> {
+  const done = await writeKeyExport(connectionEngines(), keyExportOf(step.path, args), signal);
+  const ports = await whenRunnerReady();
+  notify(ports, { feature: 'key.export', level: 'success', text: done.message });
+}
+
 /** Carries out a file step: writes, deletes or creates the folder at its path. */
-export const fileWriter: FileWriter = async (step: FileStep) => {
+export const fileWriter: FileWriter = async (step: FileStep, signal: AbortSignal) => {
   switch (step.action) {
     case 'delete':
       await rm(step.path, { force: true });
@@ -66,6 +79,10 @@ export const fileWriter: FileWriter = async (step: FileStep) => {
     }
     case 'write': {
       const content = step.content;
+      if (content?.writer === 'key.export') {
+        await writeKeys(step, content.args, signal);
+        return;
+      }
       const writer = content === undefined ? undefined : writers[content.writer];
       if (content === undefined || writer === undefined) {
         throw new Error(`Datardo has no writer for ${step.path}.`);

@@ -2,7 +2,17 @@ import { describe, expect, it } from 'vitest';
 import { afterReply, plan } from '../../../src/features/key/persist';
 import { rowMenu } from '../../../src/features/key/show';
 import { hexOf } from '../../../src/features/key/types';
-import { cacheReadOnly, commandsOf, connected, keyContext, name, onKey, planOf, recordedReplies } from './context';
+import {
+  cacheReadOnly,
+  commandsOf,
+  connected,
+  keyContext,
+  name,
+  onKey,
+  planOf,
+  recordedReplies,
+  undoNames,
+} from './context';
 
 const context = keyContext('key.persist', onKey('orders:42'));
 
@@ -32,7 +42,9 @@ describe('key.persist', () => {
   it('keeps the key with its time left for the undo, recorded as Make orders:42 persistent', () => {
     const persisted = planOf(plan(context, {}));
     expect(persisted.title).toBe('Make orders:42 persistent');
-    expect(persisted.undo).toEqual({ keeps: { engine: 'redis', database: 0, keys: [hexOf(name('orders:42'))] } });
+    expect(persisted.undo).toEqual({
+      keeps: { kind: 'keys', database: 0, keys: undoNames([hexOf(name('orders:42'))]) },
+    });
   });
 
   it('has no Make persistent on a read-only connection', () => {
