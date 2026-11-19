@@ -467,9 +467,10 @@ Replaces the value of a string with what the editor holds, keeping the key's exp
 - **After**: *Saved orders:42.*, with **Undo**; the value, its length and the key's size are read again; the editor
   is no longer marked as changed.
 - **Refuses**: what cannot be read (*Not valid JSON: …*, the errors of hexadecimal), under the editor, with the text
-  kept (`/invalid`); a key that became another type: the text of `value.check` (`/type-changed`); a question that
-  is closed: *Not saved: the value changed in the database.* (`/changed`); a server that refuses `KEEPTTL`: *This
-  server does not support SET with KEEPTTL: saving would remove the expiry.* (`/unsupported`).
+  kept (`/invalid`); a key that became another type: the text of `value.check` (`/type-changed`); a question that is
+  closed: *Not saved: the value changed in the database.* (`/changed`); a server that refuses `KEEPTTL`: *This server
+  does not support SET with KEEPTTL: saving would remove the expiry.* (`/unsupported`); a read-only connection: *The
+  connection Cache local is read-only.* (`/read-only`).
 - **Commands**: `value.save-string`
 - **Settings**: `datardo.undo.*` (whether it is recorded).
 - **Uses**: `value.typed-bytes`, `value.quote`, `value.check`, `value.read-string`, `undo.record`,
@@ -542,9 +543,10 @@ Adds a field with its value to a hash, never over a field that is there.
 - **Undo**: Recorded in the undo history (`undo.record`) as `Add field nickname to user:7`, keeping the key.
 - **After**: *Added the field nickname to user:7.*, with **Undo**; the field is the first row, selected; the count
   is read again.
-- **Refuses**: a field that exists: *user:7 already has a field named nickname: edit its value instead.*
-  (`/exists`), under **Field**, with the form still open; what cannot be read (`/invalid`); the refusals of
-  `value.check`.
+- **Refuses**: a field that exists: *user:7 already has a field named nickname: edit its value instead.* (`/exists`),
+  under **Field**, with the form still open; what cannot be read (`/invalid`); the refusals of `value.check`: a key that
+  is gone (`/gone`) or of another type (`/type-changed`); a read-only connection: *The connection Cache local is
+  read-only.* (`/read-only`).
 - **Commands**: `value.add-field`
 - **Settings**: `datardo.undo.*` (whether it is recorded).
 - **Uses**: `value.typed-bytes`, `value.quote`, `value.check`, `undo.record`, `undo.notification`,
@@ -582,8 +584,9 @@ Changes the value of one field of a hash, from its cell.
 - **Undo**: Recorded in the undo history (`undo.record`) as `Edit field visits of user:7`, keeping the key.
 - **After**: the editor closes, the row shows the new value and stays selected; *Saved the field visits of user:7.*,
   with **Undo**.
-- **Refuses**: what cannot be read, in place of the editor's hint (`/invalid`); a question that is closed: *Not
-  saved: the value changed in the database.* (`/changed`); the refusals of `value.check`.
+- **Refuses**: what cannot be read, in place of the editor's hint (`/invalid`); a question that is closed: *Not saved:
+  the value changed in the database.* (`/changed`); the refusals of `value.check`: a key that is gone (`/gone`) or of
+  another type (`/type-changed`); a read-only connection: *The connection Cache local is read-only.* (`/read-only`).
 - **Commands**: `value.edit-field`
 - **Settings**: `datardo.undo.*` (whether it is recorded).
 - **Uses**: `value.item-editor`, `value.typed-bytes`, `value.quote`, `value.check`, `undo.record`,
@@ -623,8 +626,9 @@ removed under the old one, in one transaction.
   key.
 - **After**: the row shows the new name and stays selected; *Renamed the field nickname to nick.*, with **Undo**.
 - **Refuses**: the same name: nothing is written; a name that exists: *user:7 already has a field named nick.*
-  (`/exists`); a field that is gone: *The field nickname is no longer in user:7.* (`/gone-item`); the refusals of
-  `value.check`.
+  (`/exists`); a field that is gone: *The field nickname is no longer in user:7.* (`/gone-item`); what cannot be read
+  (`/invalid`); the refusals of `value.check`: a key that is gone (`/gone`) or of another type (`/type-changed`); a
+  read-only connection: *The connection Cache local is read-only.* (`/read-only`).
 - **Commands**: `value.rename-field`
 - **Settings**: `datardo.undo.*` (whether it is recorded).
 - **Uses**: `value.item-editor`, `value.typed-bytes`, `value.quote`, `value.check`, `undo.record`,
@@ -663,7 +667,8 @@ Removes one field of a hash, or the selected ones.
 - **After**: *Removed the field nickname from user:7.*, or *Removed 3 fields from user:7.*, or *Removed 2 of 3
   fields from user:7: the others were already gone.*, with **Undo**; the rows leave the table. When no field is
   left: *user:7 has no fields left: the key was deleted.*, and the view shows the key as gone.
-- **Refuses**: the refusals of `value.check`.
+- **Refuses**: the refusals of `value.check`: a key that is gone (`/gone`) or of another type (`/type-changed`); a
+  read-only connection: *The connection Cache local is read-only.* (`/read-only`).
 - **Commands**: `value.remove-fields`
 - **Settings**: `datardo.undo.*` (whether it is recorded).
 - **Uses**: `value.check`, `value.quote`, `runner.confirm`, `undo.record`, `undo.notification`,
@@ -732,7 +737,8 @@ Adds an element at the head or at the tail of a list.
 - **Undo**: Recorded in the undo history (`undo.record`) as `Push to queue:mail`, keeping the key.
 - **After**: *Pushed an element to the tail of queue:mail.*, with **Undo**; the view shows the end it was pushed
   to, with the new element selected; the count is read again.
-- **Refuses**: what cannot be read (`/invalid`); the refusals of `value.check`.
+- **Refuses**: what cannot be read (`/invalid`); the refusals of `value.check`: a key that is gone (`/gone`) or of
+  another type (`/type-changed`); a read-only connection: *The connection Cache local is read-only.* (`/read-only`).
 - **Commands**: `value.push-element`
 - **Settings**: `datardo.undo.*` (whether it is recorded).
 - **Uses**: `value.typed-bytes`, `value.quote`, `value.check`, `undo.record`, `undo.notification`,
@@ -764,10 +770,11 @@ Changes the element at one index of a list.
 - **Read-only**: Refused on a read-only connection (`/read-only`).
 - **Undo**: Recorded in the undo history (`undo.record`) as `Edit element 3 of queue:mail`, keeping the key.
 - **After**: the editor closes, the row shows the new element; *Saved the element 3 of queue:mail.*, with **Undo**.
-- **Refuses**: an element at the index that is no longer the one shown, or no element there: *The element at index
-  3 of queue:mail is no longer the one shown: the list changed. Refresh and retry.* (`/changed`), with nothing
-  written: an index names a place, not an element, and overwriting would change another one; what cannot be read
-  (`/invalid`); the refusals of `value.check`.
+- **Refuses**: an element at the index that is no longer the one shown, or no element there: *The element at index 3 of
+  queue:mail is no longer the one shown: the list changed. Refresh and retry.* (`/changed`), with nothing written: an
+  index names a place, not an element, and overwriting would change another one; what cannot be read (`/invalid`); the
+  refusals of `value.check`: a key that is gone (`/gone`) or of another type (`/type-changed`); a read-only connection:
+  *The connection Cache local is read-only.* (`/read-only`).
 - **Commands**: `value.edit-element`
 - **Settings**: `datardo.undo.*` (whether it is recorded).
 - **Uses**: `value.item-editor`, `value.typed-bytes`, `value.quote`, `value.check`, `undo.record`,
@@ -811,8 +818,9 @@ equal elements.
 - **After**: *Removed the element at index 3 from queue:mail.*, or *Removed 3 elements from queue:mail.*, with
   **Undo**; the page is read again, since the indexes after the removed ones moved. When no element is left:
   *queue:mail has no elements left: the key was deleted.*
-- **Refuses**: an element at an index that is no longer the one shown: the text of `value.edit-element`
-  (`/changed`), with nothing written; the refusals of `value.check`.
+- **Refuses**: an element at an index that is no longer the one shown: the text of `value.edit-element` (`/changed`),
+  with nothing written; the refusals of `value.check`: a key that is gone (`/gone`) or of another type
+  (`/type-changed`); a read-only connection: *The connection Cache local is read-only.* (`/read-only`).
 - **Commands**: `value.remove-elements`
 - **Settings**: `datardo.undo.*` (whether it is recorded).
 - **Uses**: `value.check`, `value.edit-element`, `value.quote`, `runner.confirm`, `undo.record`,
@@ -854,9 +862,11 @@ Keeps a range of a list and removes the rest.
 - **Read-only**: Refused on a read-only connection (`/read-only`).
 - **Undo**: Recorded in the undo history (`undo.record`) as `Trim queue:mail to 0…99`, keeping the key.
 - **After**: *Trimmed queue:mail to 100 elements.*, with **Undo**; the first page and the count are read again.
-- **Refuses**: indexes that are not whole numbers (`/invalid`); a range that keeps everything: *This range keeps
-  every element: there is nothing to trim.* (`/nothing`); a range that keeps nothing: *This range keeps no element:
-  the key would be deleted. Use Delete key instead.* (`/empty-range`); the refusals of `value.check`.
+- **Refuses**: indexes that are not whole numbers (`/invalid`); a range that keeps everything: *This range keeps every
+  element: there is nothing to trim.* (`/nothing`); a range that keeps nothing: *This range keeps no element: the key
+  would be deleted. Use Delete key instead.* (`/empty-range`); the refusals of `value.check`: a key that is gone
+  (`/gone`) or of another type (`/type-changed`); a read-only connection: *The connection Cache local is read-only.*
+  (`/read-only`).
 - **Commands**: `value.trim-list`
 - **Settings**: `datardo.undo.*` (whether it is recorded).
 - **Uses**: `value.check`, `runner.confirm`, `undo.record`, `undo.notification`, `connection.read-only`.
@@ -914,8 +924,9 @@ Adds a member to a set.
 - **Undo**: Recorded in the undo history (`undo.record`) as `Add member redis to tags`, keeping the key.
 - **After**: *Added the member redis to tags.*, with **Undo**; the member is the first row, selected; the count is
   read again.
-- **Refuses**: a member that is there: *redis is already a member of tags.* (`/exists`), under the field; what
-  cannot be read (`/invalid`); the refusals of `value.check`.
+- **Refuses**: a member that is there: *redis is already a member of tags.* (`/exists`), under the field; what cannot be
+  read (`/invalid`); the refusals of `value.check`: a key that is gone (`/gone`) or of another type (`/type-changed`); a
+  read-only connection: *The connection Cache local is read-only.* (`/read-only`).
 - **Commands**: `value.add-member`
 - **Settings**: `datardo.undo.*` (whether it is recorded).
 - **Uses**: `value.typed-bytes`, `value.quote`, `value.check`, `undo.record`, `undo.notification`,
@@ -951,7 +962,8 @@ Removes one member of a set, or the selected ones.
 - **After**: *Removed the member redis from tags.*, or *Removed 3 members from tags.*, or *Removed 2 of 3 members
   from tags: the others were already gone.*, with **Undo**; the rows leave the table. When no member is left: *tags
   has no members left: the key was deleted.*
-- **Refuses**: the refusals of `value.check`.
+- **Refuses**: the refusals of `value.check`: a key that is gone (`/gone`) or of another type (`/type-changed`); a
+  read-only connection: *The connection Cache local is read-only.* (`/read-only`).
 - **Commands**: `value.remove-members`
 - **Settings**: `datardo.undo.*` (whether it is recorded).
 - **Uses**: `value.check`, `value.quote`, `runner.confirm`, `undo.record`, `undo.notification`,
@@ -1024,9 +1036,10 @@ Adds a member with its score to a sorted set, never changing the score of a memb
 - **Undo**: Recorded in the undo history (`undo.record`) as `Add member ada to board`, keeping the key.
 - **After**: *Added the member ada to board.*, with **Undo**; the page that holds its rank is shown, with the
   member selected; the count is read again.
-- **Refuses**: a member that is there: *ada is already a member of board, with the score 3: change its score
-  instead.* (`/exists`); a score that is not one: *Enter a number, inf or -inf.* (`/invalid`); what cannot be read
-  (`/invalid`); the refusals of `value.check`.
+- **Refuses**: a member that is there: *ada is already a member of board, with the score 3: change its score instead.*
+  (`/exists`); a score that is not one: *Enter a number, inf or -inf.* (`/invalid`); what cannot be read (`/invalid`);
+  the refusals of `value.check`: a key that is gone (`/gone`) or of another type (`/type-changed`); a read-only
+  connection: *The connection Cache local is read-only.* (`/read-only`).
 - **Commands**: `value.add-scored-member`
 - **Settings**: `datardo.undo.*` (whether it is recorded).
 - **Uses**: `value.typed-bytes`, `value.quote`, `value.check`, `undo.record`, `undo.notification`,
@@ -1061,9 +1074,10 @@ Changes the score of one member of a sorted set, from its cell.
 - **Undo**: Recorded in the undo history (`undo.record`) as `Change score of ada in board`, keeping the key.
 - **After**: the editor closes; the page that holds the member's new rank is shown, with the member selected;
   *Saved the score of ada in board.*, with **Undo**.
-- **Refuses**: a score that is not one: *Enter a number, inf or -inf.*, in place of the hint (`/invalid`); a member
-  that is gone: *ada is no longer a member of board.* (`/gone-item`); a question that is closed: *Not saved: the
-  score changed in the database.* (`/changed`); the refusals of `value.check`.
+- **Refuses**: a score that is not one: *Enter a number, inf or -inf.*, in place of the hint (`/invalid`); a member that
+  is gone: *ada is no longer a member of board.* (`/gone-item`); a question that is closed: *Not saved: the score
+  changed in the database.* (`/changed`); the refusals of `value.check`: a key that is gone (`/gone`) or of another type
+  (`/type-changed`); a read-only connection: *The connection Cache local is read-only.* (`/read-only`).
 - **Commands**: `value.change-score`
 - **Settings**: `datardo.undo.*` (whether it is recorded).
 - **Uses**: `value.item-editor`, `value.check`, `value.quote`, `undo.record`, `undo.notification`,
@@ -1103,7 +1117,8 @@ Removes one member of a sorted set, or the selected ones.
 - **After**: *Removed the member ada from board.*, or *Removed 3 members from board.*, or *Removed 2 of 3 members
   from board: the others were already gone.*, with **Undo**; the page is read again, since the ranks moved. When no
   member is left: *board has no members left: the key was deleted.*
-- **Refuses**: the refusals of `value.check`.
+- **Refuses**: the refusals of `value.check`: a key that is gone (`/gone`) or of another type (`/type-changed`); a
+  read-only connection: *The connection Cache local is read-only.* (`/read-only`).
 - **Commands**: `value.remove-scored-members`
 - **Settings**: `datardo.undo.*` (whether it is recorded).
 - **Uses**: `value.check`, `value.quote`, `runner.confirm`, `undo.record`, `undo.notification`,
@@ -1179,12 +1194,13 @@ Appends an entry to a stream.
 - **Undo**: Recorded in the undo history (`undo.record`) as `Add entry to events`, keeping the key.
 - **After**: *Added the entry 1795003200000-0 to events.*, with **Undo**; with **Newest first** the entry is the
   first row, selected; the count is read again.
-- **Refuses**: no pair, or a pair without a name: *An entry needs at least one field with a name.* (`/invalid`); an
-  ID that is not `*`, `<milliseconds>` or `<milliseconds>-<sequence>`: *Enter \*, or an ID such as
-  1700000000000-0.* (`/invalid`); `<milliseconds>-*` on a server older than 7.0: *This server needs \* or a full
-  ID.* (`/unsupported`); an ID not greater than the stream's last: *The ID must be greater than the last one,
-  1795003100000-3.*, from the server's error; a nil reply: the text of a key that is gone (`/gone`); the refusals of
-  `value.check`.
+- **Refuses**: no pair, or a pair without a name: *An entry needs at least one field with a name.* (`/invalid`); an ID
+  that is not `*`, `<milliseconds>` or `<milliseconds>-<sequence>`: *Enter \*, or an ID such as 1700000000000-0.*
+  (`/invalid`); `<milliseconds>-*` on a server older than 7.0: *This server needs \* or a full ID.* (`/unsupported`); an
+  ID not greater than the stream's last: *The ID must be greater than the last one, 1795003100000-3.*, from the server's
+  error; a nil reply: the text of a key that is gone (`/gone`); the refusals of `value.check`: a key that is gone
+  (`/gone`) or of another type (`/type-changed`); a read-only connection: *The connection Cache local is read-only.*
+  (`/read-only`).
 - **Commands**: `value.add-entry`
 - **Settings**: `datardo.undo.*` (whether it is recorded).
 - **Uses**: `value.typed-bytes`, `value.quote`, `value.check`, `undo.record`, `undo.notification`,
@@ -1224,7 +1240,8 @@ Deletes one entry of a stream, or the selected ones.
 - **After**: *Deleted the entry 1700000000000-0 from events.*, or *Deleted 3 entries from events.*, or *Deleted 2
   of 3 entries from events: the others were already gone.*, with **Undo**; the rows leave the table. A stream that
   loses its last entry stays, empty.
-- **Refuses**: the refusals of `value.check`.
+- **Refuses**: the refusals of `value.check`: a key that is gone (`/gone`) or of another type (`/type-changed`); a
+  read-only connection: *The connection Cache local is read-only.* (`/read-only`).
 - **Commands**: `value.delete-entries`
 - **Settings**: `datardo.undo.*` (whether it is recorded).
 - **Uses**: `value.check`, `runner.confirm`, `undo.record`, `undo.notification`, `connection.read-only`.
@@ -1264,9 +1281,10 @@ Keeps the newest entries of a stream, by number or from an ID, and deletes the o
   1700000000000-0`, keeping the key.
 - **After**: *Deleted 4,200 entries from events.*, the number being the server's reply, with **Undo**; the first
   page and the count are read again.
-- **Refuses**: a number that is not a whole number of 0 or more (`/invalid`); a number not less than the entries
-  there are: *events has 5,200 entries: there is nothing to trim.* (`/nothing`); an ID that cannot be read
-  (`/invalid`); the refusals of `value.check`.
+- **Refuses**: a number that is not a whole number of 0 or more (`/invalid`); a number not less than the entries there
+  are: *events has 5,200 entries: there is nothing to trim.* (`/nothing`); an ID that cannot be read (`/invalid`); the
+  refusals of `value.check`: a key that is gone (`/gone`) or of another type (`/type-changed`); a read-only connection:
+  *The connection Cache local is read-only.* (`/read-only`).
 - **Commands**: `value.trim-stream`
 - **Settings**: `datardo.undo.*` (whether it is recorded).
 - **Uses**: `value.check`, `value.read-stream`, `runner.confirm`, `undo.record`, `undo.notification`,
