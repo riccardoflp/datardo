@@ -1,0 +1,504 @@
+{
+  "set": [
+    [
+      "set",
+      -3,
+      ["write", "denyoom"],
+      1,
+      1,
+      1,
+      ["@write", "@string", "@slow"],
+      [],
+      [
+        {
+          "$map": [
+            ["notes", "RW and ACCESS due to the optional `GET` argument"],
+            ["flags", ["RW", "access", "update", "variable_flags"]],
+            [
+              "begin_search",
+              {
+                "$map": [
+                  ["type", "index"],
+                  [
+                    "spec",
+                    {
+                      "$map": [["index", 1]]
+                    }
+                  ]
+                ]
+              }
+            ],
+            [
+              "find_keys",
+              {
+                "$map": [
+                  ["type", "range"],
+                  [
+                    "spec",
+                    {
+                      "$map": [
+                        ["lastkey", 0],
+                        ["keystep", 1],
+                        ["limit", 0]
+                      ]
+                    }
+                  ]
+                ]
+              }
+            ]
+          ]
+        }
+      ],
+      []
+    ]
+  ],
+  "get": [
+    [
+      "get",
+      2,
+      ["readonly", "fast"],
+      1,
+      1,
+      1,
+      ["@read", "@string", "@fast"],
+      [],
+      [
+        {
+          "$map": [
+            ["flags", ["RO", "access"]],
+            [
+              "begin_search",
+              {
+                "$map": [
+                  ["type", "index"],
+                  [
+                    "spec",
+                    {
+                      "$map": [["index", 1]]
+                    }
+                  ]
+                ]
+              }
+            ],
+            [
+              "find_keys",
+              {
+                "$map": [
+                  ["type", "range"],
+                  [
+                    "spec",
+                    {
+                      "$map": [
+                        ["lastkey", 0],
+                        ["keystep", 1],
+                        ["limit", 0]
+                      ]
+                    }
+                  ]
+                ]
+              }
+            ]
+          ]
+        }
+      ],
+      []
+    ]
+  ],
+  "function": [
+    [
+      "function",
+      -2,
+      [],
+      0,
+      0,
+      0,
+      ["@slow"],
+      [],
+      [],
+      [
+        [
+          "function|restore",
+          -3,
+          ["write", "denyoom", "noscript"],
+          0,
+          0,
+          0,
+          ["@write", "@slow", "@scripting"],
+          ["request_policy:all_shards", "response_policy:all_succeeded"],
+          [],
+          []
+        ],
+        [
+          "function|load",
+          -3,
+          ["write", "denyoom", "noscript"],
+          0,
+          0,
+          0,
+          ["@write", "@slow", "@scripting"],
+          ["request_policy:all_shards", "response_policy:all_succeeded"],
+          [],
+          []
+        ],
+        [
+          "function|flush",
+          -2,
+          ["write", "noscript"],
+          0,
+          0,
+          0,
+          ["@write", "@slow", "@scripting"],
+          ["request_policy:all_shards", "response_policy:all_succeeded"],
+          [],
+          []
+        ],
+        [
+          "function|list",
+          -2,
+          ["noscript"],
+          0,
+          0,
+          0,
+          ["@slow", "@scripting"],
+          ["nondeterministic_output_order"],
+          [],
+          []
+        ],
+        ["function|dump", 2, ["noscript"], 0, 0, 0, ["@slow", "@scripting"], [], [], []],
+        ["function|help", 2, ["loading", "stale"], 0, 0, 0, ["@slow", "@scripting"], [], [], []],
+        [
+          "function|kill",
+          2,
+          ["noscript", "allow_busy"],
+          0,
+          0,
+          0,
+          ["@slow", "@scripting"],
+          ["request_policy:all_shards", "response_policy:one_succeeded"],
+          [],
+          []
+        ],
+        [
+          "function|delete",
+          3,
+          ["write", "noscript"],
+          0,
+          0,
+          0,
+          ["@write", "@slow", "@scripting"],
+          ["request_policy:all_shards", "response_policy:all_succeeded"],
+          [],
+          []
+        ],
+        [
+          "function|stats",
+          2,
+          ["noscript", "allow_busy"],
+          0,
+          0,
+          0,
+          ["@slow", "@scripting"],
+          ["nondeterministic_output", "request_policy:all_shards", "response_policy:special"],
+          [],
+          []
+        ]
+      ]
+    ]
+  ],
+  "sort": [
+    [
+      "sort",
+      -2,
+      ["write", "denyoom", "movablekeys"],
+      1,
+      1,
+      1,
+      ["@write", "@set", "@sortedset", "@list", "@slow", "@dangerous"],
+      [],
+      [
+        {
+          "$map": [
+            ["flags", ["RO", "access"]],
+            [
+              "begin_search",
+              {
+                "$map": [
+                  ["type", "index"],
+                  [
+                    "spec",
+                    {
+                      "$map": [["index", 1]]
+                    }
+                  ]
+                ]
+              }
+            ],
+            [
+              "find_keys",
+              {
+                "$map": [
+                  ["type", "range"],
+                  [
+                    "spec",
+                    {
+                      "$map": [
+                        ["lastkey", 0],
+                        ["keystep", 1],
+                        ["limit", 0]
+                      ]
+                    }
+                  ]
+                ]
+              }
+            ]
+          ]
+        },
+        {
+          "$map": [
+            [
+              "notes",
+              "For the optional BY/GET keyword. It is marked 'unknown' because the key names derive from the content of the key we sort"
+            ],
+            ["flags", ["RO", "access"]],
+            [
+              "begin_search",
+              {
+                "$map": [
+                  ["type", "unknown"],
+                  [
+                    "spec",
+                    {
+                      "$map": []
+                    }
+                  ]
+                ]
+              }
+            ],
+            [
+              "find_keys",
+              {
+                "$map": [
+                  ["type", "unknown"],
+                  [
+                    "spec",
+                    {
+                      "$map": []
+                    }
+                  ]
+                ]
+              }
+            ]
+          ]
+        },
+        {
+          "$map": [
+            [
+              "notes",
+              "For the optional STORE keyword. It is marked 'unknown' because the keyword can appear anywhere in the argument array"
+            ],
+            ["flags", ["OW", "update"]],
+            [
+              "begin_search",
+              {
+                "$map": [
+                  ["type", "unknown"],
+                  [
+                    "spec",
+                    {
+                      "$map": []
+                    }
+                  ]
+                ]
+              }
+            ],
+            [
+              "find_keys",
+              {
+                "$map": [
+                  ["type", "unknown"],
+                  [
+                    "spec",
+                    {
+                      "$map": []
+                    }
+                  ]
+                ]
+              }
+            ]
+          ]
+        }
+      ],
+      []
+    ]
+  ],
+  "config": [
+    [
+      "config",
+      -2,
+      [],
+      0,
+      0,
+      0,
+      ["@slow"],
+      [],
+      [],
+      [
+        [
+          "config|resetstat",
+          2,
+          ["admin", "noscript", "loading", "stale"],
+          0,
+          0,
+          0,
+          ["@admin", "@slow", "@dangerous"],
+          ["request_policy:all_nodes", "response_policy:all_succeeded"],
+          [],
+          []
+        ],
+        ["config|help", 2, ["loading", "stale"], 0, 0, 0, ["@slow"], [], [], []],
+        [
+          "config|get",
+          -3,
+          ["admin", "noscript", "loading", "stale"],
+          0,
+          0,
+          0,
+          ["@admin", "@slow", "@dangerous"],
+          [],
+          [],
+          []
+        ],
+        [
+          "config|rewrite",
+          2,
+          ["admin", "noscript", "loading", "stale"],
+          0,
+          0,
+          0,
+          ["@admin", "@slow", "@dangerous"],
+          ["request_policy:all_nodes", "response_policy:all_succeeded"],
+          [],
+          []
+        ],
+        [
+          "config|set",
+          -4,
+          ["admin", "noscript", "loading", "stale"],
+          0,
+          0,
+          0,
+          ["@admin", "@slow", "@dangerous"],
+          ["request_policy:all_nodes", "response_policy:all_succeeded"],
+          [],
+          []
+        ]
+      ]
+    ]
+  ],
+  "eval": [
+    [
+      "eval",
+      -3,
+      ["noscript", "stale", "skip_monitor", "no_mandatory_keys", "movablekeys"],
+      0,
+      0,
+      0,
+      ["@slow", "@scripting"],
+      [],
+      [
+        {
+          "$map": [
+            ["notes", "We cannot tell how the keys will be used so we assume the worst, RW and UPDATE"],
+            ["flags", ["RW", "access", "update"]],
+            [
+              "begin_search",
+              {
+                "$map": [
+                  ["type", "index"],
+                  [
+                    "spec",
+                    {
+                      "$map": [["index", 2]]
+                    }
+                  ]
+                ]
+              }
+            ],
+            [
+              "find_keys",
+              {
+                "$map": [
+                  ["type", "keynum"],
+                  [
+                    "spec",
+                    {
+                      "$map": [
+                        ["keynumidx", 0],
+                        ["firstkey", 1],
+                        ["keystep", 1]
+                      ]
+                    }
+                  ]
+                ]
+              }
+            ]
+          ]
+        }
+      ],
+      []
+    ]
+  ],
+  "blpop": [
+    [
+      "blpop",
+      -3,
+      ["write", "blocking"],
+      1,
+      -2,
+      1,
+      ["@write", "@list", "@slow", "@blocking"],
+      [],
+      [
+        {
+          "$map": [
+            ["flags", ["RW", "access", "delete"]],
+            [
+              "begin_search",
+              {
+                "$map": [
+                  ["type", "index"],
+                  [
+                    "spec",
+                    {
+                      "$map": [["index", 1]]
+                    }
+                  ]
+                ]
+              }
+            ],
+            [
+              "find_keys",
+              {
+                "$map": [
+                  ["type", "range"],
+                  [
+                    "spec",
+                    {
+                      "$map": [
+                        ["lastkey", -2],
+                        ["keystep", 1],
+                        ["limit", 0]
+                      ]
+                    }
+                  ]
+                ]
+              }
+            ]
+          ]
+        }
+      ],
+      []
+    ]
+  ],
+  "mymodule.do": [null]
+}
