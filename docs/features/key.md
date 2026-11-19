@@ -582,6 +582,7 @@ empty, so the form asks for the first field, element, member or entry.
   a key named orders:42 was created meanwhile.* (`/exists`); a value that cannot be read (`value.typed-bytes`), a
   score that is not a number, `inf` or `-inf`, a duration that cannot be read, a date in the past (*The date is in
   the past: the key would be deleted at once.*), an ID the server refuses: each under its field (`/invalid`).
+  On a read-only connection: *The connection Cache local is read-only.* (`/read-only`).
 - **Commands**: `key.new`
 - **Settings**: `datardo.undo.*` (whether it is recorded).
 - **Uses**: `value.typed-bytes`, `value.quote`, `key.parse-duration`, `undo.record`, `undo.notification`,
@@ -633,6 +634,7 @@ so.
 - **Refuses**: an empty name, or the same name: *Enter a different name.* (`/invalid`); `RENAMENX` that answers 0:
   *Not renamed: a key named orders:43 was created meanwhile.* (`/exists`), and nothing has changed; `ERR no such
   key`: the text of a key that is gone (`/gone`).
+  On a read-only connection: *The connection Cache local is read-only.* (`/read-only`).
 - **Commands**: `key.rename`
 - **Settings**: `datardo.undo.*` (whether it is recorded).
 - **Uses**: `undo.record`, `undo.notification`, `nav.pin`, `tree.refresh`, `connection.read-only`.
@@ -682,6 +684,7 @@ Makes a copy of a key, with its value and its expiry, under another name or in a
   (`/invalid`); `COPY` that answers 0: *Not copied: orders:42 no longer exists, or a key named orders:42-old was
   created meanwhile.* (`/not-copied`); a server without `COPY`: *This server has no COPY command.* (`/unsupported`);
   a module's type that cannot be copied: the server's error.
+  On a read-only connection: *The connection Cache local is read-only.* (`/read-only`).
 - **Commands**: `key.copy`
 - **Settings**: `datardo.undo.*` (whether it is recorded).
 - **Uses**: `key.switch-database`, `undo.record`, `undo.notification`, `tree.refresh`, `connection.read-only`.
@@ -728,6 +731,7 @@ Makes a key expire after a time, or at a date.
 - **Refuses**: a duration that cannot be read: *Enter a duration, for example 90, 15m, 2h or 7d.* (`/invalid`); a
   date that is not after now: *The date is in the past: the key would be deleted at once. Use Delete key instead.*
   (`/invalid`); a command that answers 0: the text of a key that is gone (`/gone`).
+  On a read-only connection: *The connection Cache local is read-only.* (`/read-only`).
 - **Commands**: `key.set-expiry`
 - **Settings**: `datardo.undo.*` (whether it is recorded).
 - **Uses**: `key.parse-duration`, `key.format-expiry`, `key.inspect`, `undo.record`, `undo.notification`,
@@ -765,6 +769,8 @@ Removes the expiry of a key, so that the server no longer deletes it.
 - **After**: *orders:42 no longer expires.*, with **Undo**; the row and the inspector island show `—` and
   **Persistent**. When `PERSIST` answers 0, the key is read again: gone, the text of a key that is gone (`/gone`);
   already persistent, *orders:42 is already persistent.*
+- **Refuses**: a read-only connection: *The connection Cache local is read-only.* (`/read-only`); `PERSIST` that answers 0 on a key that is
+  gone: the text of a key that is gone (`/gone`).
 - **Commands**: `key.persist`
 - **Settings**: `datardo.undo.*` (whether it is recorded).
 - **Uses**: `undo.record`, `undo.notification`, `connection.read-only`.
@@ -802,6 +808,7 @@ Deletes one key, after a confirmation.
 - **After**: *Deleted key orders:42 from db0.*, with **Undo**; the row leaves the table; an open key tab of the key
   closes (`tab.close`); the tree is refreshed. When `UNLINK` answers 0: *Key not found: it may have been deleted
   already, or have expired.*, and the row leaves the table.
+- **Refuses**: a read-only connection: *The connection Cache local is read-only.* (`/read-only`).
 - **Commands**: `key.delete`
 - **Settings**: `datardo.undo.*` (whether it is recorded).
 - **Uses**: `runner.confirm`, `undo.record`, `undo.limits`, `undo.notification`, `tab.close`, `tree.refresh`,
@@ -850,6 +857,7 @@ Deletes the keys selected in the table, after one confirmation.
 - **After**: *Deleted 37 keys from db0.*, or *Deleted 35 of 37 keys from db0: the others were already gone.*, with
   **Undo** when recorded; the rows leave the table and the selection is cleared; open key tabs of those keys close;
   the tree is refreshed.
+- **Refuses**: a read-only connection: *The connection Cache local is read-only.* (`/read-only`).
 - **Commands**: `key.delete-selected`
 - **Settings**: `datardo.undo.*` (whether it is recorded).
 - **Uses**: `key.select`, `key.delete`, `runner.confirm`, `runner.progress`, `undo.record`, `undo.limits`,
@@ -906,6 +914,7 @@ Deletes every key of a database that matches a pattern, and a type if one is cho
   flight: *Stopped: 900 keys matching `session:*` were deleted from db0.*; when recorded, **Undo** puts those back.
 - **Refuses**: an empty pattern: *Enter a pattern, for example session:\*.* (`/invalid`); no key found: *No keys
   match `session:*`: nothing to delete.* (`/nothing`); a count that is cancelled deletes nothing.
+  On a read-only connection: *The connection Cache local is read-only.* (`/read-only`).
 - **Commands**: `key.delete-by-pattern`
 - **Settings**: `datardo.undo.*` (whether it is recorded).
 - **Uses**: `key.scan`, `key.pattern`, `runner.confirm`, `runner.progress`, `runner.cancel`, `undo.record`,
@@ -1106,6 +1115,7 @@ Creates the keys of a file that `key.export` wrote, in the database of the tab.
 - **Refuses**: a file `key.import-parse` cannot read: its error, with the line (`/invalid-file`); a file without
   keys: *The file has no keys.* (`/empty`); with **Stop**, a key that exists: *Nothing imported: the key user:7
   already exists in db0.* (`/exists`).
+  On a read-only connection: *The connection Cache local is read-only.* (`/read-only`).
 - **Commands**: `key.import`
 - **Settings**: `datardo.undo.*` (whether it is recorded).
 - **Uses**: `key.import-parse`, `key.export`, `runner.confirm`, `runner.progress`, `runner.cancel`, `undo.record`,
