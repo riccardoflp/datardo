@@ -52,10 +52,14 @@ export const pageSizes: readonly number[] = [10, 20, 50, 100, 200, 500];
 /** The page size unless changed. */
 export const defaultPageSize = 50;
 
-/** A page of the output, and how many documents the output has; `count` is absent when it is unknown. */
+/**
+ * A page of the output, and how many documents the output has; `count` is absent when it is unknown. `failure` is the
+ * server's message when the page failed: it is shown above the table, which keeps what it showed.
+ */
 export interface PipelineOutput {
   readonly documents: readonly Json[];
   readonly count?: number;
+  readonly failure?: string;
 }
 
 /** A whole number as canonical Extended JSON: an `Int32`, or an `Int64` beyond it. */
@@ -145,7 +149,21 @@ export function request(context: Context, args: Json): ReadRequest | Outcome {
   }
   const { page, size } = pageOf(startArgs(answers));
   const requests = runRequests(place, built.pipeline, page, size);
-  return { kind: 'engine', requests: requests.map((each) => ({ connection: place.connection, request: each })) };
+  return {
+    kind: 'engine',
+    requests: requests.map((each) => ({ connection: place.connection, request: each })),
+    // A page that fails is shown above the table in the server's words; a count that fails leaves the total unknown.
+    failedRequests: 'are-replies',
+  };
+}
+
+/** The message of a request that failed, as the runner gives it to a Read that takes failures as replies. */
+function failureOf(reply: unknown): string | undefined {
+  if (typeof reply !== 'object' || reply === null || Array.isArray(reply)) {
+    return undefined;
+  }
+  const fields = reply as Readonly<Record<string, unknown>>;
+  return fields['kind'] === 'error' && typeof fields['message'] === 'string' ? fields['message'] : undefined;
 }
 
 function countOf(reply: unknown): number | undefined {
@@ -162,9 +180,16 @@ function countOf(reply: unknown): number | undefined {
   return Number.isFinite(count) ? count : undefined;
 }
 
-/** Feature: aggregate.run — the documents of the page and the count; a count that did not answer is left unknown. */
+/**
+ * Feature: aggregate.run — the documents of the page and the count; a count that did not answer is left unknown, and a
+ * page that failed gives the server's message.
+ */
 export function parse(replies: readonly unknown[]): PipelineOutput {
   const [page, count] = replies;
+  const failure = failureOf(page);
+  if (failure !== undefined) {
+    return { documents: [], failure };
+  }
   const documents = Array.isArray(page) ? (page as readonly Json[]) : [];
   const total = countOf(count);
   return total === undefined ? { documents } : { documents, count: total };

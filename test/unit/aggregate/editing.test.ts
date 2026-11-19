@@ -203,7 +203,8 @@ describe('aggregate.clear', () => {
     const cleared = editorAfter(plan);
     expect(cleared.stages).toEqual([]);
     expect(plan.danger).toEqual({ kind: 'none' });
-    expect(plan.after).toEqual([expect.objectContaining({ kind: 'start', feature: 'aggregate.run' })]);
+    // The window that started it runs the empty pipeline (aggregate.run) once the plan is done.
+    expect(plan.after).toEqual([]);
   });
 
   it('empties the text to []', () => {
@@ -227,9 +228,10 @@ describe('aggregate.show-stage', () => {
     expect(after(showStage, editorOf(three), { stage: 2 }).shown).toBeUndefined();
   });
 
-  it('runs after showing', () => {
+  it('leaves the run to the window that started it', () => {
     const plan = planOf(showStage(contextOn('aggregate.show-stage'), withPipeline(editorOf(three), { stage: 0 })));
-    expect(plan.after[0]).toMatchObject({ kind: 'start', feature: 'aggregate.run' });
+    expect(plan.after).toEqual([]);
+    expect(plan.steps[0]?.text).toBe('show the output of stage 1 ($match) of the pipeline of orders');
   });
 
   it('names the number of the stage shown and the others', () => {

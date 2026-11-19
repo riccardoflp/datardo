@@ -14,6 +14,7 @@ import { commands as treeCommands } from './tree/commands';
 import { commands as undoCommands } from './undo/commands';
 import { commands as queryCommands } from './query/commands';
 import { commands as tableCommands } from './table/commands';
+import { areaCommands as aggregateCommands } from './aggregate/commands';
 
 import type { Command } from './command';
 
@@ -33,4 +34,5 @@ export const commands: readonly Command[] = [
   ...undoCommands,
   ...queryCommands,
   ...tableCommands,
+  ...aggregateCommands,
 ];

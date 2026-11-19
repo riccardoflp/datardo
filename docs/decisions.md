@@ -805,3 +805,20 @@ Raised while the catalog was written; each names the cards that hold the current
   the matching `_id`s itself rather than taking those `undo.record` keeps; an operation file written for an operation
   that the index then cannot take (a newer index) stays until the index can be written again.
   (`undo.revert`, `undo.details`, `undo.show`, `oplog.publish`, `undo.record`).
+- **Q65** — The pipeline editor as built in M19: the cards of the aggregate area quote the parser's messages as JSON5
+  words them (*JSON5: invalid end of input at 1:11*), where `query.parse` words them its own way, so the area keeps
+  its own reader of mongosh syntax (`src/features/aggregate/mongosh`), which other areas import too, while its
+  suggestions are those of `query.autocomplete`; a start in the **After** of a plan gives its result to no control,
+  so the Operations that change what the table shows (`aggregate.clear`, `aggregate.show-stage`,
+  `aggregate.drop-condition`, `aggregate.sort-column`) leave the run of the pipeline to the window that started them,
+  and the window starts `aggregate.write-output` itself for a pipeline that writes, to learn whether it was written,
+  cancelled or refused; the step of a pipeline is written `db.orders.aggregate([{ … }], …)`, as every step that sends
+  an array, where the cards write `[ { … } ]`; **Run** while a stage is shown shows the whole pipeline and runs it;
+  a command of the editor from Go to on a tab in Find switches it to Aggregate first, and **Move stage left** or
+  **right** acts on the stage whose body has the focus, or on none; after a pipeline that wrote, the status line
+  says it through its notification; in Aggregate the total comes with each page and a click on it counts nothing
+  more; the number of a stage is named by its tooltip, the number being seen, not said; the marks of a card are
+  written as words on it; the lines about **Recent** wait for `saved-query.recent` (M20), and **Explain**, **Code**
+  and the Chart section for their milestones. (`aggregate.show`, `aggregate.run`, `aggregate.write-output`,
+  `aggregate.clear`, `aggregate.show-stage`, `aggregate.drop-condition`, `aggregate.sort-column`,
+  `aggregate.stage-marks`, `aggregate.from-text`).

@@ -99,8 +99,17 @@ function isOfferedByItsCard(state: AppState, id: string): boolean {
       // The query bar is a collection tab's: with none active, there is no query.
       return active?.shows.kind === 'collection';
     case 'query.mode:aggregate':
-      // Aggregate is built in M19.
-      return false;
+    case 'aggregate.add-stage':
+    case 'aggregate.move-stage:left':
+    case 'aggregate.move-stage:right':
+    case 'aggregate.clear':
+    case 'aggregate.edit-as-text:text':
+    case 'aggregate.edit-as-text:stages':
+    case 'aggregate.copy':
+    case 'aggregate.run':
+    case 'aggregate.save-as-view':
+      // The pipeline editor is a collection tab's; a command of it shows the editor first when Find is shown.
+      return active?.shows.kind === 'collection';
     case 'tree.refresh':
     case 'tree.filter':
       // The tree island shows the current connection: with none, there is nothing to refresh or filter.

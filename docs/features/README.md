@@ -69,26 +69,26 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`aggregate.show`](aggregate.md#aggregateshow--the-pipeline-editor) | The pipeline editor | View | M19 | Specified |
-| [`aggregate.add-stage`](aggregate.md#aggregateadd-stage--add-a-stage) | Add a stage | Operation | M19 | Specified |
-| [`aggregate.stage-template`](aggregate.md#aggregatestage-template--templates-of-the-common-stages) | Templates of the common stages | Derivation | M19 | Specified |
-| [`aggregate.remove-stage`](aggregate.md#aggregateremove-stage--remove-a-stage) | Remove a stage | Operation | M19 | Specified |
-| [`aggregate.move-stage`](aggregate.md#aggregatemove-stage--move-a-stage) | Move a stage | Operation | M19 | Specified |
-| [`aggregate.toggle-stage`](aggregate.md#aggregatetoggle-stage--disable-or-enable-a-stage) | Disable or enable a stage | Operation | M19 | Specified |
-| [`aggregate.clear`](aggregate.md#aggregateclear--remove-all-stages) | Remove all stages | Operation | M19 | Specified |
-| [`aggregate.show-stage`](aggregate.md#aggregateshow-stage--show-the-output-after-a-stage) | Show the output after a stage | Operation | M19 | Specified |
-| [`aggregate.edit-as-text`](aggregate.md#aggregateedit-as-text--edit-the-pipeline-as-text) | Edit the pipeline as text | Operation | M19 | Specified |
-| [`aggregate.to-text`](aggregate.md#aggregateto-text--the-text-of-a-pipeline) | The text of a pipeline | Derivation | M19 | Specified |
-| [`aggregate.from-text`](aggregate.md#aggregatefrom-text--the-stages-of-a-text) | The stages of a text | Derivation | M19 | Specified |
-| [`aggregate.copy`](aggregate.md#aggregatecopy--copy-the-pipeline) | Copy the pipeline | Operation | M19 | Specified |
-| [`aggregate.build`](aggregate.md#aggregatebuild--the-pipeline-that-is-sent) | The pipeline that is sent | Derivation | M19 | Specified |
-| [`aggregate.run`](aggregate.md#aggregaterun--run-the-pipeline) | Run the pipeline | Read | M19 | Specified |
-| [`aggregate.write-output`](aggregate.md#aggregatewrite-output--run-a-pipeline-that-writes) | Run a pipeline that writes | Operation | M19 | Specified |
-| [`aggregate.stage-marks`](aggregate.md#aggregatestage-marks--what-a-stage-card-says-about-its-stage) | What a stage card says about its stage | View | M19 | Specified |
-| [`aggregate.autocomplete`](aggregate.md#aggregateautocomplete--suggestions-in-a-stage) | Suggestions in a stage | Derivation | M19 | Specified |
-| [`aggregate.drop-condition`](aggregate.md#aggregatedrop-condition--drop-a-condition-into-the-pipeline) | Drop a condition into the pipeline | Operation | M19 | Specified |
-| [`aggregate.sort-column`](aggregate.md#aggregatesort-column--sort-the-output-from-a-column-header) | Sort the output from a column header | Operation | M19 | Specified |
-| [`aggregate.save-as-view`](aggregate.md#aggregatesave-as-view--save-the-pipeline-as-a-view) | Save the pipeline as a view | Operation | M19 | Specified |
+| [`aggregate.show`](aggregate.md#aggregateshow--the-pipeline-editor) | The pipeline editor | View | M19 | Built |
+| [`aggregate.add-stage`](aggregate.md#aggregateadd-stage--add-a-stage) | Add a stage | Operation | M19 | Built |
+| [`aggregate.stage-template`](aggregate.md#aggregatestage-template--templates-of-the-common-stages) | Templates of the common stages | Derivation | M19 | Built |
+| [`aggregate.remove-stage`](aggregate.md#aggregateremove-stage--remove-a-stage) | Remove a stage | Operation | M19 | Built |
+| [`aggregate.move-stage`](aggregate.md#aggregatemove-stage--move-a-stage) | Move a stage | Operation | M19 | Built |
+| [`aggregate.toggle-stage`](aggregate.md#aggregatetoggle-stage--disable-or-enable-a-stage) | Disable or enable a stage | Operation | M19 | Built |
+| [`aggregate.clear`](aggregate.md#aggregateclear--remove-all-stages) | Remove all stages | Operation | M19 | Built |
+| [`aggregate.show-stage`](aggregate.md#aggregateshow-stage--show-the-output-after-a-stage) | Show the output after a stage | Operation | M19 | Built |
+| [`aggregate.edit-as-text`](aggregate.md#aggregateedit-as-text--edit-the-pipeline-as-text) | Edit the pipeline as text | Operation | M19 | Built |
+| [`aggregate.to-text`](aggregate.md#aggregateto-text--the-text-of-a-pipeline) | The text of a pipeline | Derivation | M19 | Built |
+| [`aggregate.from-text`](aggregate.md#aggregatefrom-text--the-stages-of-a-text) | The stages of a text | Derivation | M19 | Built |
+| [`aggregate.copy`](aggregate.md#aggregatecopy--copy-the-pipeline) | Copy the pipeline | Operation | M19 | Built |
+| [`aggregate.build`](aggregate.md#aggregatebuild--the-pipeline-that-is-sent) | The pipeline that is sent | Derivation | M19 | Built |
+| [`aggregate.run`](aggregate.md#aggregaterun--run-the-pipeline) | Run the pipeline | Read | M19 | Built |
+| [`aggregate.write-output`](aggregate.md#aggregatewrite-output--run-a-pipeline-that-writes) | Run a pipeline that writes | Operation | M19 | Built |
+| [`aggregate.stage-marks`](aggregate.md#aggregatestage-marks--what-a-stage-card-says-about-its-stage) | What a stage card says about its stage | View | M19 | Built |
+| [`aggregate.autocomplete`](aggregate.md#aggregateautocomplete--suggestions-in-a-stage) | Suggestions in a stage | Derivation | M19 | Built |
+| [`aggregate.drop-condition`](aggregate.md#aggregatedrop-condition--drop-a-condition-into-the-pipeline) | Drop a condition into the pipeline | Operation | M19 | Built |
+| [`aggregate.sort-column`](aggregate.md#aggregatesort-column--sort-the-output-from-a-column-header) | Sort the output from a column header | Operation | M19 | Built |
+| [`aggregate.save-as-view`](aggregate.md#aggregatesave-as-view--save-the-pipeline-as-a-view) | Save the pipeline as a view | Operation | M19 | Built |
 
 ## Backup
 

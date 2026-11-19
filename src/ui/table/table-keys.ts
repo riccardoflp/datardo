@@ -104,7 +104,7 @@ function otherKey(grid: GridView, event: React.KeyboardEvent, place: KeyPlace): 
     menuKey(grid, place);
     return true;
   }
-  if (event.key === 'Enter' && grid.cell.at === 'header' && grid.cell.column > 0 && grid.target.mode === 'find') {
+  if (event.key === 'Enter' && grid.cell.at === 'header' && grid.cell.column > 0) {
     const leaf = grid.drawn[grid.cell.column - 1];
     if (leaf !== undefined) {
       sortByHeader(grid.ref, leaf.node.key);

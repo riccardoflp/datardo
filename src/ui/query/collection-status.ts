@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import type { NavInput } from '../../features/nav/types';
 import { view as showView } from '../../features/table/show';
 import type { AppState } from '../../shared/state';
+import { forgetClosedPipelines } from '../pages/aggregate/pipeline-store';
 import { forgetClosed, useCollection } from './collection-store';
 import { showStateOf } from './collection-view';
 
@@ -17,6 +18,7 @@ export function useCollectionStatus(state: AppState, input: NavInput): NavInput 
   const open = state.tabs.tabs;
   useEffect(() => {
     forgetClosed(new Set(open.map((each) => each.id)));
+    forgetClosedPipelines(new Set(open.map((each) => each.id)));
   }, [open]);
   if (tab === undefined) {
     return input;

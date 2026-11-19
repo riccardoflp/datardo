@@ -25,8 +25,14 @@ export const text = {
     body: (number: number) => `Body of stage ${String(number)}`,
     textHint: '[ { $match: { field: "value" } }, { $group: { _id: "$field", n: { $sum: 1 } } } ]',
     textLabel: 'Pipeline as text',
+    region: 'Pipeline editor',
+    list: 'Stages',
+    card: (number: number, name: string) => `Stage ${String(number)} (${name})`,
+    menu: (number: number) => `Stage ${String(number)} menu`,
+    marks: 'Marks',
   },
   toolbar: {
+    name: 'Pipeline toolbar',
     run: 'Run',
     clear: 'Clear',
     explain: 'Explain',
@@ -55,6 +61,7 @@ export const text = {
     shown: 'the stage shown',
   },
   drop: {
+    zones: 'Conditions to drop on the pipeline',
     into: (number: number) => `Drop to add the condition into $match (stage ${String(number)})`,
     after: (number: number) => `Drop to add the condition as a new $match after stage ${String(number)}`,
     asNew: 'Drop to add the condition as a new $match stage',

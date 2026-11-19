@@ -81,9 +81,7 @@ function pressed(grid: GridView, cell: HeaderCell): void {
     }
     return;
   }
-  if (grid.target.mode === 'find') {
-    sortByHeader(grid.ref, cell.node.key);
-  }
+  sortByHeader(grid.ref, cell.node.key);
 }
 
 function Heading({

@@ -1,8 +1,8 @@
 /**
  * Which controls of a collection tab are drawn: a control is shown only when the feature it starts is built (roadmap,
- * M8), as in the tree. The features the runner starts are those of the registry; the query and table areas also have
- * controls the window carries out itself (the bar, the builder, the menus, the columns), and **Cancel** stops work of
- * the runner.
+ * M8), as in the tree. The features the runner starts are those of the registry; the query, table and aggregate areas
+ * also have controls the window carries out itself (the bar, the builder, the menus, the columns, the pipeline editor),
+ * and **Cancel** stops work of the runner.
  */
 import { runnableFeatures } from '../../features/registry';
 
@@ -18,6 +18,10 @@ export function featureOfElement(element: string): string {
 export function isBuilt(element: string): boolean {
   const feature = featureOfElement(element);
   return (
-    runnable.has(feature) || feature.startsWith('query.') || feature.startsWith('table.') || feature === 'runner.cancel'
+    runnable.has(feature) ||
+    feature.startsWith('query.') ||
+    feature.startsWith('table.') ||
+    feature.startsWith('aggregate.') ||
+    feature === 'runner.cancel'
   );
 }

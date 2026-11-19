@@ -32,7 +32,7 @@ function dropped(editor: PipelineEditor, field: string, condition: string, withi
 }
 
 describe('aggregate.drop-condition', () => {
-  it('creates stage 1 on an empty pipeline, and runs it', () => {
+  it('creates stage 1 on an empty pipeline, and leaves the run to the window', () => {
     const plan = planOf(
       dropCondition(
         contextOn('aggregate.drop-condition'),
@@ -40,7 +40,8 @@ describe('aggregate.drop-condition', () => {
       ),
     );
     expect(editorAfter(plan).stages).toEqual([stage('$match', '{ status: "paid" }')]);
-    expect(plan.after[0]).toMatchObject({ kind: 'start', feature: 'aggregate.run' });
+    expect(plan.steps[0]?.text).toBe('add the stage $match { status: "paid" } to the pipeline of orders');
+    expect(plan.after).toEqual([]);
   });
 
   it('joins operators on the same field into one range', () => {
@@ -288,7 +289,7 @@ describe('aggregate.autocomplete', () => {
       database: 'shop',
       collection: 'orders',
       method: 'aggregate',
-      arguments: [[{ $sample: { size: { $numberInt: '500' } } }], { maxTimeMS: { $numberInt: '20000' } }],
+      arguments: [[{ $sample: { size: 500 } }], { maxTimeMS: 20000 }],
       limit: 500,
       timeLimitMs: 20000,
     });

@@ -1418,7 +1418,7 @@ exports them, publishes one, and follows the redis-oplog events of a linked Mong
 **Goal**: The pipeline editor builds a pipeline stage by stage, shows the output after any stage, switches between
 stages and text, runs pipelines that write only after a confirmation, and saves one as a view.
 **Depends on**: M10.
-**Status**: planned
+**Status**: done
 
 ### Features
 
@@ -1467,13 +1467,13 @@ stages and text, runs pipelines that write only after a confirmation, and saves 
 
 ### Exit criteria
 
-- [ ] A pipeline ending in `$out` is refused on a read-only connection and confirmed elsewhere, with the collection it
+- [x] A pipeline ending in `$out` is refused on a read-only connection and confirmed elsewhere, with the collection it
       replaces named.
-- [ ] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
+- [x] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
       `npm run test:integration`, `npm run test:ui`; `catalog.py --tests` reports none missing for these cards.
-- [ ] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
+- [x] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
       the keyboard alone (QA15, QA16).
-- [ ] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
+- [x] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
       and this milestone's **Status** is *done*.
 
 ### Not in this milestone
