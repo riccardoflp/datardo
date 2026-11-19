@@ -14,7 +14,11 @@ import { useAppState } from '../state/store';
 import styles from './connection-menu.module.css';
 
 function start(entry: Extract<MenuEntry, { kind: 'item' }>, props: ConnectionMenuProps): void {
-  startFeature(entry.feature, { place: props.place, target: { kind: 'connection', connection: props.connection } });
+  startFeature(entry.feature, {
+    place: props.place,
+    target: { kind: 'connection', connection: props.connection },
+    ...(entry.args === undefined ? {} : { args: entry.args }),
+  });
   props.onChosen?.();
 }
 

@@ -13,6 +13,8 @@ import { features as tabFeatures } from './tab';
 import { features as paletteFeatures } from './palette';
 import { features as homeFeatures } from './home';
 import { features as treeFeatures } from './tree';
+import { features as undoFeatures } from './undo';
+import { features as oplogFeatures } from './oplog';
 
 /** The features of every area, as each area's index lists them. */
 const areas: readonly (readonly RunnableFeature[])[] = [
@@ -25,6 +27,8 @@ const areas: readonly (readonly RunnableFeature[])[] = [
   paletteFeatures,
   homeFeatures,
   treeFeatures,
+  undoFeatures,
+  oplogFeatures,
 ];
 
 /** The features the runner can start, by identifier. */

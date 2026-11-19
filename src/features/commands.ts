@@ -11,6 +11,7 @@ import { commands as tabCommands } from './tab/commands';
 import { areaCommands as paletteCommands } from './palette/commands';
 import { commands as homeCommands } from './home/commands';
 import { commands as treeCommands } from './tree/commands';
+import { commands as undoCommands } from './undo/commands';
 
 import type { Command } from './command';
 
@@ -27,4 +28,5 @@ export const commands: readonly Command[] = [
   ...paletteCommands,
   ...homeCommands,
   ...treeCommands,
+  ...undoCommands,
 ];

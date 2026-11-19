@@ -1,9 +1,28 @@
 import { describe, expect, it } from 'vitest';
 import { plan } from '../../../src/features/connection/remove';
 import { connectionId, tabId } from '../../../src/shared/ids';
+import type { UndoEntry } from '../../../src/shared/state/undo';
 import { contextOf, mongoConnection, on, redisConnection, stateWith } from './context';
 
 const local = mongoConnection();
+
+/** An operation of the undo history on Local. */
+function operationOn(id: string): UndoEntry {
+  return {
+    id: id as UndoEntry['id'],
+    time: 0,
+    connection: local.id,
+    connectionName: 'Local',
+    title: 'Update 1 document',
+    inserted: 0,
+    updated: 1,
+    deleted: 0,
+    size: 10,
+    engine: 'mongodb',
+    database: 'shop',
+    collection: 'orders',
+  };
+}
 
 describe('connection.remove', () => {
   it('confirms, then disconnects, deletes the secrets and removes the connection', () => {
@@ -37,8 +56,10 @@ describe('connection.remove', () => {
   });
 
   it('lists what the other areas keep of it, only when there is some', () => {
-    const outcome = plan(contextOf('connection.remove', stateWith([local]), on(local)), {
-      counts: { savedQueries: 12, pins: 0, undoOperations: 3, remembers: true },
+    const state = stateWith([local]);
+    const kept = { ...state, undo: { ...state.undo, entries: ['a', 'b', 'c'].map(operationOn) } };
+    const outcome = plan(contextOf('connection.remove', kept, on(local)), {
+      counts: { savedQueries: 12, pins: 0, remembers: true },
     });
     expect(outcome.kind === 'run' && outcome.plan.danger.kind === 'confirm' ? outcome.plan.danger.text : '').toBe(
       [

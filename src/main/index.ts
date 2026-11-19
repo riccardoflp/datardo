@@ -22,6 +22,7 @@ import { islandFields, islandsOf } from './nav';
 import { connectionEngines, connectionName, isConnected, isReadOnly } from './connections';
 import { WindowDialogs } from './dialogs';
 import { fileWriter } from './files';
+import { oplogClients } from './oplog';
 import type { MainServices } from './services';
 import { guardTheSession } from './window-guard';
 import { windowHost } from './window-host';
@@ -78,6 +79,7 @@ function runnerPorts(): RunnerPorts {
     isConnected,
     connectionName,
     now: () => Date.now(),
+    oplog: oplogClients,
   };
 }
 

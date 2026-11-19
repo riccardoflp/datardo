@@ -1,11 +1,14 @@
 /**
- * `runner.run`: runs a plan. Around its steps, in this order: the read-only guard, the confirmation, the steps one by
- * one with what each says happens when it fails, then what follows and the notification. Recording for the undo
- * history and publishing for redis-oplog are added by the milestone that brings them (M11).
+ * `runner.run`: runs a plan. Around its steps, in this order: the read-only guard, the confirmation, recording what
+ * the undo history keeps (`undo.record`), the steps one by one with what each says happens when it fails, saving the
+ * record, publishing for redis-oplog (`oplog.publish`), then the limits of the undo history, what follows and the
+ * notification, with **Undo** when the write was recorded (`undo.notification`).
  */
 import { errorMessage } from '../features/runner/error';
 import { stepText } from '../features/runner/step-text';
 import { runnerText } from '../features/runner/text';
+import { view as notificationView } from '../features/undo/notification';
+import type { UndoEntry } from '../features/undo/types';
 import type { IntentResult } from '../shared/bridge';
 import type { After, Context, NotificationAction, Plan, StartedBy } from '../shared/feature';
 import { featureId, type ConnectionId } from '../shared/ids';
@@ -14,8 +17,13 @@ import { carryOutAfter } from './after';
 import { writeLog } from './log';
 import { notify, reportRefusal } from './notify';
 import type { RunnerPorts } from './ports';
+import { Publishing } from './publish';
+import { isStillKept, recordAfter, recordBefore, undoLine, type Recorded } from './record';
+import { endUndoing, revertStopped, startUndoing } from './revert';
 import { runtimeOf } from './runtime';
 import { GuardRefusal, guardStep, runSteps, type StepsOutcome } from './steps';
+import { PlanWatch } from './watch';
+import type { OperationId } from '../shared/state/undo';
 
 /** How a plan is run: who started it, what else cancels it, and how a feature it starts after is started. */
 export interface RunOptions {
@@ -42,14 +50,37 @@ export async function runPlan(
     }
   }
   const connections = engineConnections(plan);
-  const result = await runtimeOf(ports).queue.run(connections.length === 0 ? ['app'] : connections, () =>
+  const ran = await runtimeOf(ports).queue.run(connections.length === 0 ? ['app'] : connections, () =>
     runConfirmed(ports, plan, context, options),
   );
   // What follows is carried out once the plan has left its queue: a feature it starts queues behind it otherwise.
-  if (result.kind === 'done') {
-    await carryOutAfter(ports, context, plan.after, options.startFeature);
+  // The limits of the undo history come first, so that an operation they drop at once offers no Undo.
+  await carryOutAfter(ports, context, ran.recorded.after, options.startFeature);
+  const entry = isStillKept(ports, ran.recorded.entry) ? ran.recorded.entry : undefined;
+  if (ran.result.kind === 'done') {
+    await carryOutAfter(ports, context, withUndo(plan.after, entry), options.startFeature);
   }
-  return result;
+  return ran.result;
+}
+
+/** What follows, with **Undo** first in the notification of a write that recorded an operation (`undo.notification`). */
+function withUndo(afters: readonly After[], entry: UndoEntry | undefined): readonly After[] {
+  if (entry === undefined) {
+    return afters;
+  }
+  let added = false;
+  return afters.map((after) => {
+    if (added || after.kind !== 'notify' || (after.level !== 'success' && after.level !== 'info')) {
+      return after;
+    }
+    added = true;
+    const shown = notificationView({ text: after.text, level: after.level, recorded: entry });
+    return {
+      ...after,
+      actions: [...shown.actions, ...(after.actions ?? [])].slice(0, 2),
+      ...(shown.element === undefined ? {} : { element: shown.element }),
+    };
+  });
 }
 
 /** What the confirmation shows of a plan (`runner.confirm`). */
@@ -72,17 +103,18 @@ export function confirmationOf(plan: Plan, context: Context): Confirmation {
     title: plan.title,
     danger: plan.danger,
     steps,
-    undoLine: 'cannot' in plan.undo ? plan.undo.cannot : runnerText.canBeUndone,
+    undoLine: undoLine(plan, context),
     ...(plan.touches === undefined ? {} : { touches: plan.touches }),
   };
 }
 
-async function runConfirmed(
-  ports: RunnerPorts,
-  plan: Plan,
-  context: Context,
-  options: RunOptions,
-): Promise<IntentResult> {
+/** How a plan ran: its result, and what its record in the undo history gave. */
+interface Ran {
+  readonly result: IntentResult;
+  readonly recorded: Recorded;
+}
+
+async function runConfirmed(ports: RunnerPorts, plan: Plan, context: Context, options: RunOptions): Promise<Ran> {
   const connections = engineConnections(plan);
   const [first] = connections;
   const work = runtimeOf(ports).work.begin({
@@ -91,23 +123,41 @@ async function runConfirmed(
     ...(first === undefined ? {} : { connection: first }),
     ...(options.signal === undefined ? {} : { signal: options.signal }),
   });
-  let outcome: StepsOutcome;
+  const operation = startUndoing(ports, plan);
   try {
-    outcome = await runSteps({ ports, context, work }, plan);
-  } finally {
-    for (const connection of connections) {
-      ports.state.dispatch({ slice: 'runner', type: 'refresh-asked', connection });
+    const recording = await recordBefore(ports, plan, context, work.signal);
+    if (recording.kind === 'cancelled') {
+      work.end();
+      return { result: { kind: 'cancelled' }, recorded: { after: [] } };
     }
+    const publishing = Publishing.of(ports, plan, context, work.signal);
+    const watch = new PlanWatch(publishing);
+    let outcome: StepsOutcome;
+    try {
+      outcome = await runSteps({ ports, context, work, observer: watch }, plan);
+    } finally {
+      for (const connection of connections) {
+        ports.state.dispatch({ slice: 'runner', type: 'refresh-asked', connection });
+      }
+    }
+    const recorded = await recordAfter(recording, watch.failedIds(plan));
+    await publishing?.publish();
+    const result = ended(ports, { plan, context, operation }, outcome);
+    work.end(result.kind === 'failed' ? result.message : undefined);
+    return { result, recorded };
+  } catch (error: unknown) {
+    work.end(error instanceof Error ? error.message : String(error));
+    throw error;
+  } finally {
+    endUndoing(ports, operation);
   }
-  const result = ended(ports, { plan, context }, outcome);
-  work.end(result.kind === 'failed' ? result.message : undefined);
-  return result;
 }
 
-/** A plan being run, and what it was started on. */
+/** A plan being run, what it was started on, and the operation it undoes, when it is an undo. */
 interface PlanRun {
   readonly plan: Plan;
   readonly context: Context;
+  readonly operation: OperationId | undefined;
 }
 
 function ended(ports: RunnerPorts, planRun: PlanRun, outcome: StepsOutcome): IntentResult {
@@ -122,7 +172,10 @@ function ended(ports: RunnerPorts, planRun: PlanRun, outcome: StepsOutcome): Int
     if (outcome.failed.error instanceof GuardRefusal) {
       return refusedBy(ports, context, outcome.failed.error);
     }
-    return stopped(ports, plan, context, outcome.failed);
+    return (
+      revertStopped(ports, context, { plan, operation: planRun.operation }, outcome.failed) ??
+      stopped(ports, plan, context, outcome.failed)
+    );
   }
   if (outcome.failedOnTheWay.length > 0) {
     notify(ports, {

@@ -122,6 +122,8 @@ export type After =
       readonly actions?: readonly NotificationAction[];
       /** What **Details** shows. */
       readonly details?: string;
+      /** The element the notification carries, when a feature draws it (`undo.notification@notification`). */
+      readonly element?: string;
     }
   | { readonly kind: 'refresh'; readonly connection?: ConnectionId }
   /** Starts another feature on a target, with the arguments it is started with (`Intent.args`). */

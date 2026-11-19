@@ -13,12 +13,13 @@ import { disconnectStep, hasClient } from './disconnect';
 import { deleteSecretsStep } from './secrets';
 import { planText } from './text';
 import { appStep, connectionsOf, nothingToDo, targetConnection } from './types';
+import { operationCount } from '../undo/forget-connection';
 
 /**
  * What belongs to the connection in the other areas. The pins are counted in the app's state (`nav.pin`). The queries
- * saved for me and the operations of the undo history are counted by the reads of their areas (`saved-query.save`,
- * `undo.forget-connection`, M20 and M11), which give `answers.counts`: until those areas exist nothing gives it, the
- * counts are 0, and their steps (`saved-query.forget-connection`, `undo.forget-connection`) are left out of the plan.
+ * saved for me are counted by the read of their area (`saved-query.save`, M20), which gives `answers.counts`: until
+ * that area exists nothing gives it, the count is 0, and its step (`saved-query.forget-connection`) is left out of the
+ * plan. The operations of the undo history are counted in the app's state (`undo.forget-connection`).
  */
 export interface RemovalCounts {
   readonly savedQueries: number;
@@ -31,16 +32,16 @@ export interface RemovalCounts {
 /** Nothing of the connection in the other areas. */
 export const nothingElse: RemovalCounts = { savedQueries: 0, pins: 0, undoOperations: 0, remembers: false };
 
-function countsOf(value: unknown, pins: number): RemovalCounts {
+function countsOf(value: unknown, pins: number, undoOperations: number): RemovalCounts {
   if (typeof value !== 'object' || value === null) {
-    return { ...nothingElse, pins };
+    return { ...nothingElse, pins, undoOperations };
   }
   const fields = value as Readonly<Record<string, unknown>>;
   const count = (name: string): number => (typeof fields[name] === 'number' ? fields[name] : 0);
   return {
     savedQueries: count('savedQueries'),
     pins,
-    undoOperations: count('undoOperations'),
+    undoOperations,
     remembers: fields['remembers'] === true,
   };
 }
@@ -132,7 +133,8 @@ export function plan(context: Context, answers: Answers): Outcome {
   }
   const { state } = context;
   const connections = connectionsOf(state);
-  const counts = countsOf(answers['counts'], (state.nav.pins[connection.id] ?? []).length);
+  const pins = (state.nav.pins[connection.id] ?? []).length;
+  const counts = countsOf(answers['counts'], pins, operationCount(state, connection.id));
   const publishers = connections.saved.filter(
     (each) => each.engine === 'mongodb' && each.publishesTo === connection.id,
   );

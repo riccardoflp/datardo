@@ -852,7 +852,7 @@ several formats, paging.
 **Goal**: A write to documents or keys is recorded before it runs, listed in the Undo history page, and undone later,
 within limits the user sets; a write to MongoDB documents is published to the linked Redis connection for redis-oplog.
 **Depends on**: M7, M10.
-**Status**: planned
+**Status**: done
 
 ### Features
 
@@ -913,17 +913,17 @@ within limits the user sets; a write to MongoDB documents is published to the li
 
 ### Exit criteria
 
-- [ ] A plan that updates three documents is recorded, undone from its notification and from the page, and the
+- [x] A plan that updates three documents is recorded, undone from its notification and from the page, and the
       documents are equal to what they were, type by type.
-- [ ] With `undo/index.json` damaged, Datardo starts, says so, keeps the file aside and deletes no operation file
+- [x] With `undo/index.json` damaged, Datardo starts, says so, keeps the file aside and deletes no operation file
       (QA17).
-- [ ] A write to documents through a connection linked to a Redis connection publishes the events Meteor's redis-oplog
+- [x] A write to documents through a connection linked to a Redis connection publishes the events Meteor's redis-oplog
       expects: an integration test that subscribes.
-- [ ] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
+- [x] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
       `npm run test:integration`, `npm run test:ui`; `catalog.py --tests` reports none missing for these cards.
-- [ ] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
+- [x] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
       the keyboard alone (QA15, QA16).
-- [ ] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
+- [x] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
       and this milestone's **Status** is *done*.
 
 ### Not in this milestone

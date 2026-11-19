@@ -489,6 +489,20 @@ Mongoster's format too, which Datardo would then have to keep writing, and impor
 of the MongoDB connection, which Datardo's link by id (D17) has no place for.
 *Built in M7 on 2026-11-19 as Q18 proposes; answers Q18 unless the author decides otherwise.*
 
+## D55 — The writes published for redis-oplog are those whose plan says so
+
+A write to documents is published for redis-oplog when its plan's `publishes` is true and its MongoDB connection is
+linked to a Redis connection, for the databases and collections of its scope (`oplog.publish`, `oplog.scope`): the
+edits, inserts and deletes of documents, the updates and deletes of many, the restore of a version, the column
+actions, the playground's writes, and the undo of documents (`undo.revert`, `undo.last`). The runner reads the `_id`s a
+write by filter matches before its step, and sends the events after the steps, in the background, in the order of the
+writes of each MongoDB connection. Not published, as Mongoster's README lists them: importing and generating
+documents, copying a collection, restoring a backup, the writes of the comparison of two collections, GridFS, `$out`
+and `$merge`, `runCommand`, and drops; their plans say `publishes: false`. Rejected: publishing every write to
+documents, as Mongoster's promise says (events for writes of thousands of documents that a Meteor app would read
+again one by one, and none known for `$out`, `$merge` or `runCommand`).
+*Built in M11 on 2026-11-19 as the cards say; answers Q4 unless the author decides otherwise.*
+
 ## Open questions
 
 - **Q1** — *Answered on 2026-11-18 by [D7](#d7--home-is-the-first-page)*: the last active tab when tabs are restored,
@@ -497,9 +511,8 @@ of the MongoDB connection, which Datardo's link by id (D17) has no place for.
   [D44](#d44--datardo-says-when-a-newer-version-exists-and-installs-nothing-by-itself)*: Datardo says that a newer
   version exists, and the user installs it.
 - **Q3** — *Answered on 2026-11-18 by [D45](#d45--the-installers-are-not-signed)*: not signed for now.
-- **Q4** — Which writes are not published for redis-oplog. Mongoster's README lists import, generated documents, copy,
-  restore, the comparison's writes, GridFS, `$out` and `$merge`, `runCommand` and drops as not published, while its
-  promise says every write to documents is. Datardo keeps the README's list until this is answered (`oplog.publish`).
+- **Q4** — *Answered on 2026-11-19 by [D55](#d55--the-writes-published-for-redis-oplog-are-those-whose-plan-says-so)*,
+  unless the author decides otherwise: the README's list is not published, every other plan that says so is.
 - **Q5** — *Answered on 2026-11-18 by [D46](#d46--a-public-repository-the-mit-license-reports-through-github)*:
   public, MIT, reports through GitHub's private vulnerability reporting.
 - **Q6** — Redis Cluster and Sentinel: in which order after the first release, and whether values of module types
@@ -755,3 +768,11 @@ Raised while the catalog was written; each names the cards that hold the current
   at most 100 for each client, all closed with it; errors carry their code, its name and its labels as plain values,
   so that a feature can tell code 40573 or `TransientTransactionError`. (`playground.sessions`, `watch.stream`,
   `playground.runtime`).
+- **Q64** — The undo history as built in M11: the confirmation of an undo is titled by its plan, **Undo: \<title\>**,
+  where the card of `undo.revert` writes **Undo "\<title\>" in \<connection\> › \<database\>.\<collection\>?**, since a
+  confirmation's title is its plan's; the read of an undo connects first a connection that is not connected, the
+  details of a row do not; the row of the Undo history page expands from a button on its operation (a click on the
+  row still does), since a table row cannot carry `aria-expanded`; before a write by filter, `oplog.publish` reads
+  the matching `_id`s itself rather than taking those `undo.record` keeps; an operation file written for an operation
+  that the index then cannot take (a newer index) stays until the index can be written again.
+  (`undo.revert`, `undo.details`, `undo.show`, `oplog.publish`, `undo.record`).

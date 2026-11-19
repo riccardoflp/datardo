@@ -7,6 +7,7 @@ import { OverviewPage } from './connection/overview-page';
 import { HomePage } from './home/home-page';
 import { LogPage } from './log/log-page';
 import { SettingsPage } from './settings/settings-page';
+import { UndoHistoryPage } from './undo/undo-page';
 
 /** A page as the main island draws it. */
 export type PageView = () => React.JSX.Element | null;
@@ -18,4 +19,5 @@ export const pages: Readonly<Record<string, PageView>> = {
   log: LogPage,
   'connection-form': ConnectionFormPage,
   overview: OverviewPage,
+  undo: UndoHistoryPage,
 };

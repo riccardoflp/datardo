@@ -34,6 +34,12 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
 - Connections are imported from a file or the clipboard (Datardo, Mongoster and Compass exports, lists of connection
   strings), with their encrypted passwords when the passphrase is given, and exported for Datardo, for Compass or as
   a list, without passwords, with them encrypted, or in clear text.
+- Writes to documents and keys are recorded before they run, in an undo history kept between starts: the Undo history
+  page lists them with what each changed, shows what undoing one would do, and undoes it, or the last one, also from
+  the notification of the write; the undo is recorded too, so it can be redone. The history keeps its limits of size,
+  age and number, can be cleared, and can be turned off for one connection.
+- Writes to documents through a MongoDB connection linked to a Redis connection are published for redis-oplog, in the
+  background, so that the Meteor apps using it see them; a failure to publish is a warning that leaves the write done.
 
 ### Security
 

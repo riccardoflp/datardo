@@ -20,6 +20,8 @@ export interface Notice {
   readonly details?: string;
   readonly actions?: readonly NotificationAction[];
   readonly connection?: string;
+  /** The element the notification carries, when a feature draws it. */
+  readonly element?: string;
 }
 
 /** What sending a notification needs: the state and the time. */
@@ -81,6 +83,7 @@ function showNotification(ports: NotifyPorts, notice: Notice): void {
       logLine: state.logged,
       ...(notice.details === undefined ? {} : { details: notice.details }),
       ...(notice.actions === undefined ? {} : { actions: notice.actions.slice(0, 2) }),
+      ...(notice.element === undefined ? {} : { element: notice.element }),
     },
   });
 }

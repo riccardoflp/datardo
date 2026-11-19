@@ -9,6 +9,7 @@ import { view as linkedRows, type LinkedRow } from './linked-connection';
 import { isSlow, latencyOf, latencyText } from './ping';
 import { dotOf, type Dot } from './switch-connection';
 import { text } from './text';
+import { connectionText as undoText } from '../undo/text';
 import type { NavInput, SavedConnection } from './types';
 
 /** A button of the island's second line, and the feature it starts on the current connection. */
@@ -22,6 +23,8 @@ export interface IslandButton {
 export interface CurrentConnectionView {
   readonly kind: 'current';
   readonly name: string;
+  /** The name, and *Changes aren't kept in the undo history* when the connection does not keep it. */
+  readonly nameTooltip: string;
   readonly dot: Dot;
   readonly readOnly?: string;
   readonly line: string;
@@ -60,7 +63,7 @@ function firstLine(reason: string): string {
 function stateLine(
   input: NavInput,
   connection: SavedConnection,
-): Omit<CurrentConnectionView, 'kind' | 'name' | 'dot' | 'menu' | 'linked'> {
+): Omit<CurrentConnectionView, 'kind' | 'name' | 'nameTooltip' | 'dot' | 'menu' | 'linked'> {
   const engine = text.engines[connection.engine];
   const status = connection.status;
   switch (status.kind) {
@@ -119,6 +122,11 @@ export function view(input: NavInput): ConnectionIslandView {
   return {
     kind: 'current',
     name: current.name,
+    nameTooltip:
+      current.keepsUndo === false
+        ? `${current.name}
+${undoText.notKept}`
+        : current.name,
     dot: dotOf(current.status),
     ...(current.readOnly ? { readOnly: text.connection.readOnly } : {}),
     ...stateLine(input, current),

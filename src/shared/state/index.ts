@@ -20,6 +20,8 @@ import { initialRunnerState, reduceRunner, type RunnerEvent, type RunnerState } 
 import { initialSettingsState, reduceSettings, type SettingsEvent, type SettingsState } from './settings';
 import { initialTabsState, reduceTabs, type TabsEvent, type TabsState } from './tabs';
 import { initialWindowState, reduceWindow, type WindowEvent, type WindowState } from './window';
+import { initialUndoState, reduceUndo, type UndoEvent, type UndoState } from './undo';
+import { initialOplogState, reduceOplog, type OplogState, type OplogStateEvent } from './oplog';
 
 /** Everything the window shows and the features decide from, apart from the results of reads. */
 export interface AppState {
@@ -31,11 +33,22 @@ export interface AppState {
   readonly connections: ConnectionsState;
   readonly tabs: TabsState;
   readonly palette: PaletteState;
+  readonly undo: UndoState;
+  readonly oplog: OplogState;
 }
 
 /** Every change to the app's state. */
 export type AppEvent =
-  AppInfoEvent | SettingsEvent | RunnerEvent | WindowEvent | NavEvent | ConnectionsEvent | TabsEvent | PaletteEvent;
+  | AppInfoEvent
+  | SettingsEvent
+  | RunnerEvent
+  | WindowEvent
+  | NavEvent
+  | ConnectionsEvent
+  | TabsEvent
+  | PaletteEvent
+  | UndoEvent
+  | OplogStateEvent;
 
 /** The state at start, before anything is loaded. */
 export const initialState: AppState = {
@@ -47,6 +60,8 @@ export const initialState: AppState = {
   connections: initialConnectionsState,
   tabs: initialTabsState,
   palette: initialPaletteState,
+  undo: initialUndoState,
+  oplog: initialOplogState,
 };
 
 /** The one function that changes the app's state. */
@@ -68,5 +83,9 @@ export function reduce(state: AppState, event: AppEvent): AppState {
       return { ...state, tabs: reduceTabs(state.tabs, event) };
     case 'palette':
       return { ...state, palette: reducePalette(state.palette, event) };
+    case 'undo':
+      return { ...state, undo: reduceUndo(state.undo, event) };
+    case 'oplog':
+      return { ...state, oplog: reduceOplog(state.oplog, event) };
   }
 }

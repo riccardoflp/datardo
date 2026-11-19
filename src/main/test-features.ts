@@ -7,6 +7,7 @@ import type { AppAction, RunnerPorts } from '../runner/ports';
 import { redisCommand, type Json } from '../shared/engine-request';
 import { ask, needRead, run, type OperationFeature, type ReadFeature, type RunnableFeature } from '../shared/feature';
 import { connectionId, featureId, type ConnectionId, type FeatureId } from '../shared/ids';
+import { testPlans } from './test-plans';
 
 /** The connections of the tests: one that writes, one read-only, one whose steps take long. */
 const testConnections: Readonly<Record<string, string>> = {
@@ -92,6 +93,7 @@ export function withTestFeatures(ports: RunnerPorts): RunnerPorts {
     [destroy.id, destroy],
     [count.id, count],
     [sentRead.id, sentRead],
+    ...testPlans.map((plan): [FeatureId, RunnableFeature] => [plan.id, plan]),
   ]);
   const actions = new Map<string, AppAction>([
     ...ports.appActions,

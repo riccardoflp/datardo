@@ -10,7 +10,7 @@ import { entryFileName } from './record';
 import { undoOf } from './state/history';
 import { removeText } from './text';
 import type { UndoEntry } from './types';
-import { appStep, fieldsOf, undoSettings } from './types';
+import { appStep, argumentsOf, fieldsOf, undoSettings } from './types';
 
 /** How `undo/index.json` was found at start, as the storage tells it. */
 export type IndexFound = 'missing' | 'current' | 'older' | 'newer' | 'damaged';
@@ -23,8 +23,9 @@ export interface FolderFile {
 }
 
 /**
- * What the main process looked up at start, given as `answers.start`: how the index was found, the files of the
- * folder, and whether an index set aside as damaged is still in the folder.
+ * What the main process looked up at start, given as `answers.start` or as `start` of the arguments it starts the
+ * feature with: how the index was found, the files of the folder, and whether an index set aside as damaged is still
+ * in the folder.
  */
 export interface StartFacts {
   readonly index: IndexFound;
@@ -86,7 +87,7 @@ export function orphanFiles(
  */
 export function plan(context: Context, answers: Answers): Outcome {
   const undo = undoOf(context.state);
-  const start = startFactsOf(answers['start']);
+  const start = startFactsOf(answers['start'] ?? argumentsOf(answers)['start']);
   const settings = undoSettings(context.state.settings);
   const steps: Step[] = [];
   if (!undo.writable || start?.index === 'damaged' || start?.index === 'newer') {
