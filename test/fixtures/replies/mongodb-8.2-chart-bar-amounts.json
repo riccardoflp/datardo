@@ -1,0 +1,41 @@
+[
+  {
+    "_id": "decimal",
+    "total": {
+      "$numberDecimal": "5"
+    },
+    "items": [
+      {
+        "v": {
+          "$numberDecimal": "5"
+        }
+      }
+    ]
+  },
+  {
+    "_id": "double",
+    "total": {
+      "$numberDouble": "5.0"
+    },
+    "items": [
+      {
+        "v": {
+          "$numberDouble": "5.0"
+        }
+      }
+    ]
+  },
+  {
+    "_id": "long",
+    "total": {
+      "$numberLong": "5"
+    },
+    "items": [
+      {
+        "v": {
+          "$numberLong": "5"
+        }
+      }
+    ]
+  }
+]

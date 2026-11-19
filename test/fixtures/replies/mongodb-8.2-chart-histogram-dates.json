@@ -1,0 +1,32 @@
+[
+  {
+    "_id": {
+      "$numberDouble": "0.0"
+    },
+    "count": {
+      "$numberInt": "1"
+    },
+    "min": {
+      "$numberDouble": "1704067200000.0"
+    },
+    "max": {
+      "$numberDouble": "1704758400000.0"
+    },
+    "dates": true
+  },
+  {
+    "_id": {
+      "$numberDouble": "1.0"
+    },
+    "count": {
+      "$numberInt": "2"
+    },
+    "min": {
+      "$numberDouble": "1704067200000.0"
+    },
+    "max": {
+      "$numberDouble": "1704758400000.0"
+    },
+    "dates": true
+  }
+]
