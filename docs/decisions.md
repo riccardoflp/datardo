@@ -589,3 +589,9 @@ Raised while the catalog was written; each names the cards that hold the current
   remembered reads, per connection and per opening, not in the console's own state. The count of keys shown in a
   confirmation (`DBSIZE`, or `INFO keyspace` for `FLUSHALL`) is a read with no card. (`console.run`,
   `console.connect`, `console.command-flags`, `console.classify`).
+- **Q42** — The pipeline editor: the names of collections that exist come from the read of Go to, not from
+  `manage.read-options`; a read that fails (the count of a run, the check of an output collection) fails the whole
+  read today, where the cards want the total left unknown or the collection taken as existing; the editor kept in a
+  tab is a stored shape of its own; running while one stage is shown starts the run again after setting the pipeline,
+  because a read cannot change the tab; the commands that move a stage need the stage that has the focus.
+  (`aggregate.run`, `aggregate.write-output`, `aggregate.save-as-view`, `aggregate.move-stage`).
