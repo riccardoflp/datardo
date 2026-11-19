@@ -601,3 +601,9 @@ Raised while the catalog was written; each names the cards that hold the current
   left to the server's error, with no code; **Copy as command** writes one line per key, without the batches of
   `key.export-text`; the shape that tells the undo history what a write keeps is to settle with M11. (`value.check`,
   `value.quote`, `value.add-entry`, `value.copy`).
+- **Q44** — Redis keys: an import that stops at a refused line and removes its key needs "instead, then stop",
+  which the failure rules of D31 do not have; `key.new` asks one fixed form, since a question cannot show fields by
+  type; `key.export` scans the pattern before the file dialog, so "nothing to export" comes first; the texts of a
+  pattern keep the backticks of the card; the **Pin** of the row menu and the **Connect** of the keys page carry no
+  element, since `nav.pin` and `connection.connect` do not list those places; `MULTI` and `EXEC` as separate steps
+  need the runner to keep one client for the tab. (`key.import`, `key.new`, `key.export`, `key.show`).

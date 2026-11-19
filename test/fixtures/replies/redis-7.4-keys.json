@@ -79,14 +79,7 @@
       "bytes": "bm9uZQ=="
     }
   ],
-  "details": [
-    -1,
-    88,
-    7499955,
-    64,
-    -2,
-    null
-  ],
+  "details": [-1, 88, 7499955, 64, -2, null],
   "inspect-hash": [
     {
       "bytes": "aGFzaA=="
@@ -105,12 +98,8 @@
     null,
     null
   ],
-  "exists-taken": [
-    1
-  ],
-  "exists-free": [
-    0
-  ],
+  "exists-taken": [1],
+  "exists-free": [0],
   "type-hash": [
     {
       "bytes": "aGFzaA=="
@@ -126,32 +115,18 @@
       "error": "ERR unknown command 'MEMORYX', with args beginning with: 'USAGE' 'user:7' "
     }
   ],
-  "renamenx-taken": [
-    0
-  ],
+  "renamenx-taken": [0],
   "rename-gone": [
     {
       "error": "ERR no such key"
     }
   ],
-  "persist-persistent": [
-    0
-  ],
-  "unlink-gone": [
-    0
-  ],
-  "copy-taken": [
-    0
-  ],
-  "set-nx-taken": [
-    null
-  ],
-  "expire-gone": [
-    0
-  ],
-  "pexpiretime": [
-    1798761600000
-  ],
+  "persist-persistent": [0],
+  "unlink-gone": [0],
+  "copy-taken": [0],
+  "set-nx-taken": [null],
+  "expire-gone": [0],
+  "pexpiretime": [1798761600000],
   "export-session:1": [
     10,
     {

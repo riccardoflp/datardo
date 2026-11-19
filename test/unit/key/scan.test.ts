@@ -1,5 +1,5 @@
 import { readdirSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, sep } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import type { ScanPage, ScanState } from '../../../src/features/key/scan';
 import {
@@ -64,7 +64,10 @@ describe('key.scan', () => {
 
   it('is never KEYS: no feature of Datardo sends it', () => {
     const folder = join(import.meta.dirname, '..', '..', '..', 'src', 'features');
-    const sources = readdirSync(folder, { recursive: true, encoding: 'utf8' }).filter((file) => file.endsWith('.ts'));
+    // The console sends what the user types, and names KEYS only to classify it (console.classify).
+    const sources = readdirSync(folder, { recursive: true, encoding: 'utf8' }).filter(
+      (file) => file.endsWith('.ts') && !file.startsWith(`console${sep}`),
+    );
     const sending = sources.filter((file) => /['"]KEYS['"]/u.test(readFileSync(join(folder, file), 'utf8')));
     expect(sending).toEqual([]);
   });
