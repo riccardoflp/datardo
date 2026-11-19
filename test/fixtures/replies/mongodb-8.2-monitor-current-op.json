@@ -1,0 +1,498 @@
+{
+  "inprog": [
+    {
+      "type": "op",
+      "host": "localhost:27017",
+      "desc": "conn4",
+      "connectionId": {
+        "$numberInt": "4"
+      },
+      "client": "localhost:27017",
+      "clientMetadata": {
+        "driver": {
+          "name": "nodejs",
+          "version": "7.9.0"
+        },
+        "platform": "Node.js v24.13.1, LE",
+        "os": {
+          "name": "win32",
+          "architecture": "x64",
+          "version": "10.0.26300",
+          "type": "Windows_NT"
+        }
+      },
+      "active": true,
+      "currentOpTime": "2026-11-19T03:08:06.640+01:00",
+      "isFromUserConnection": true,
+      "threaded": true,
+      "opid": {
+        "$numberInt": "15364"
+      },
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "dnCzchP6SjauFTWSEUco/g==",
+            "subType": "04"
+          }
+        },
+        "uid": {
+          "$binary": {
+            "base64": "47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=",
+            "subType": "00"
+          }
+        }
+      },
+      "secs_running": {
+        "$numberInt": "0"
+      },
+      "microsecs_running": {
+        "$numberInt": "507786"
+      },
+      "op": "query",
+      "ns": "shop.orders",
+      "redacted": false,
+      "command": {
+        "find": "orders",
+        "filter": {
+          "_id": {
+            "$numberInt": "0"
+          },
+          "$where": "sleep(1500) || true"
+        },
+        "lsid": {
+          "id": {
+            "$binary": {
+              "base64": "dnCzchP6SjauFTWSEUco/g==",
+              "subType": "04"
+            }
+          }
+        },
+        "$db": "shop"
+      },
+      "queryFramework": "classic",
+      "planSummary": "IXSCAN { _id: 1 }",
+      "numYields": {
+        "$numberInt": "0"
+      },
+      "numInterruptChecks": {
+        "$numberInt": "26"
+      },
+      "queues": {
+        "ingress": {
+          "admissions": {
+            "$numberInt": "4"
+          },
+          "totalTimeQueuedMicros": {
+            "$numberInt": "0"
+          },
+          "isHoldingTicket": true
+        },
+        "execution": {
+          "admissions": {
+            "$numberInt": "1"
+          },
+          "totalTimeQueuedMicros": {
+            "$numberInt": "0"
+          },
+          "isHoldingTicket": true
+        }
+      },
+      "currentQueue": null,
+      "queryShapeHash": "BCCCFADB2A16AE699460733674B39661739305E4A16037D0293347C001484B76",
+      "locks": {
+        "Global": "r"
+      },
+      "waitingForLock": false,
+      "lockStats": {
+        "Global": {
+          "acquireCount": {
+            "r": {
+              "$numberInt": "7"
+            }
+          }
+        }
+      },
+      "waitingForFlowControl": false,
+      "flowControlStats": {}
+    },
+    {
+      "type": "op",
+      "host": "localhost:27017",
+      "desc": "conn3",
+      "connectionId": {
+        "$numberInt": "3"
+      },
+      "client": "localhost:27017",
+      "clientMetadata": {
+        "driver": {
+          "name": "nodejs",
+          "version": "7.9.0"
+        },
+        "platform": "Node.js v24.13.1, LE",
+        "os": {
+          "name": "win32",
+          "architecture": "x64",
+          "version": "10.0.26300",
+          "type": "Windows_NT"
+        }
+      },
+      "active": true,
+      "currentOpTime": "2026-11-19T03:08:06.641+01:00",
+      "isFromUserConnection": true,
+      "threaded": true,
+      "opid": {
+        "$numberInt": "14337"
+      },
+      "secs_running": {
+        "$numberInt": "0"
+      },
+      "microsecs_running": {
+        "$numberInt": "96611"
+      },
+      "op": "command",
+      "ns": "admin.$cmd",
+      "redacted": false,
+      "command": {
+        "hello": {
+          "$numberInt": "1"
+        },
+        "maxAwaitTimeMS": {
+          "$numberInt": "10000"
+        },
+        "topologyVersion": {
+          "processId": {
+            "$oid": "6afe5a0187d8e9cb2826ed1e"
+          },
+          "counter": {
+            "$numberInt": "0"
+          }
+        },
+        "$db": "admin"
+      },
+      "numYields": {
+        "$numberInt": "0"
+      },
+      "numInterruptChecks": {
+        "$numberInt": "2"
+      },
+      "queues": {
+        "ingress": {
+          "admissions": {
+            "$numberInt": "1"
+          },
+          "totalTimeQueuedMicros": {
+            "$numberInt": "0"
+          },
+          "isHoldingTicket": false
+        },
+        "execution": {
+          "admissions": {
+            "$numberInt": "0"
+          },
+          "totalTimeQueuedMicros": {
+            "$numberInt": "0"
+          },
+          "isHoldingTicket": false
+        }
+      },
+      "currentQueue": null,
+      "locks": {},
+      "waitingForLock": false,
+      "lockStats": {},
+      "waitingForFlowControl": false,
+      "flowControlStats": {}
+    },
+    {
+      "type": "op",
+      "host": "localhost:27017",
+      "desc": "conn2",
+      "connectionId": {
+        "$numberInt": "2"
+      },
+      "client": "localhost:27017",
+      "appName": "datardo",
+      "clientMetadata": {
+        "application": {
+          "name": "datardo"
+        },
+        "driver": {
+          "name": "nodejs",
+          "version": "7.9.0"
+        },
+        "platform": "Node.js v24.13.1, LE",
+        "os": {
+          "name": "win32",
+          "architecture": "x64",
+          "version": "10.0.26300",
+          "type": "Windows_NT"
+        }
+      },
+      "active": true,
+      "currentOpTime": "2026-11-19T03:08:06.641+01:00",
+      "isFromUserConnection": true,
+      "threaded": true,
+      "opid": {
+        "$numberInt": "13313"
+      },
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "P8dWE2e4SR6M7T4B0sIPkg==",
+            "subType": "04"
+          }
+        },
+        "uid": {
+          "$binary": {
+            "base64": "47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=",
+            "subType": "00"
+          }
+        }
+      },
+      "secs_running": {
+        "$numberInt": "0"
+      },
+      "microsecs_running": {
+        "$numberInt": "2071"
+      },
+      "op": "command",
+      "ns": "admin.$cmd.aggregate",
+      "redacted": false,
+      "command": {
+        "currentOp": {
+          "$numberInt": "1"
+        },
+        "$all": false,
+        "lsid": {
+          "id": {
+            "$binary": {
+              "base64": "P8dWE2e4SR6M7T4B0sIPkg==",
+              "subType": "04"
+            }
+          }
+        },
+        "$db": "admin"
+      },
+      "queryFramework": "classic",
+      "numYields": {
+        "$numberInt": "0"
+      },
+      "numInterruptChecks": {
+        "$numberInt": "1"
+      },
+      "queues": {
+        "ingress": {
+          "admissions": {
+            "$numberInt": "1"
+          },
+          "totalTimeQueuedMicros": {
+            "$numberInt": "0"
+          },
+          "isHoldingTicket": false
+        },
+        "execution": {
+          "admissions": {
+            "$numberInt": "0"
+          },
+          "totalTimeQueuedMicros": {
+            "$numberInt": "0"
+          },
+          "isHoldingTicket": false
+        }
+      },
+      "currentQueue": null,
+      "locks": {},
+      "waitingForLock": false,
+      "lockStats": {},
+      "waitingForFlowControl": false,
+      "flowControlStats": {}
+    },
+    {
+      "type": "op",
+      "host": "localhost:27017",
+      "desc": "conn1",
+      "connectionId": {
+        "$numberInt": "1"
+      },
+      "client": "localhost:27017",
+      "appName": "datardo",
+      "clientMetadata": {
+        "application": {
+          "name": "datardo"
+        },
+        "driver": {
+          "name": "nodejs",
+          "version": "7.9.0"
+        },
+        "platform": "Node.js v24.13.1, LE",
+        "os": {
+          "name": "win32",
+          "architecture": "x64",
+          "version": "10.0.26300",
+          "type": "Windows_NT"
+        }
+      },
+      "active": true,
+      "currentOpTime": "2026-11-19T03:08:06.641+01:00",
+      "isFromUserConnection": true,
+      "threaded": true,
+      "opid": {
+        "$numberInt": "12289"
+      },
+      "secs_running": {
+        "$numberInt": "0"
+      },
+      "microsecs_running": {
+        "$numberInt": "96862"
+      },
+      "op": "command",
+      "ns": "admin.$cmd",
+      "redacted": false,
+      "command": {
+        "hello": {
+          "$numberInt": "1"
+        },
+        "maxAwaitTimeMS": {
+          "$numberInt": "10000"
+        },
+        "topologyVersion": {
+          "processId": {
+            "$oid": "6afe5a0187d8e9cb2826ed1e"
+          },
+          "counter": {
+            "$numberInt": "0"
+          }
+        },
+        "$db": "admin"
+      },
+      "numYields": {
+        "$numberInt": "0"
+      },
+      "numInterruptChecks": {
+        "$numberInt": "2"
+      },
+      "queues": {
+        "ingress": {
+          "admissions": {
+            "$numberInt": "1"
+          },
+          "totalTimeQueuedMicros": {
+            "$numberInt": "0"
+          },
+          "isHoldingTicket": false
+        },
+        "execution": {
+          "admissions": {
+            "$numberInt": "0"
+          },
+          "totalTimeQueuedMicros": {
+            "$numberInt": "0"
+          },
+          "isHoldingTicket": false
+        }
+      },
+      "currentQueue": null,
+      "locks": {},
+      "waitingForLock": false,
+      "lockStats": {},
+      "waitingForFlowControl": false,
+      "flowControlStats": {}
+    },
+    {
+      "type": "op",
+      "host": "localhost:27017",
+      "desc": "Checkpointer",
+      "active": true,
+      "currentOpTime": "2026-11-19T03:08:06.641+01:00",
+      "isFromUserConnection": false,
+      "opid": {
+        "$numberInt": "4096"
+      },
+      "op": "none",
+      "ns": "",
+      "redacted": false,
+      "command": {},
+      "numYields": {
+        "$numberInt": "0"
+      },
+      "numInterruptChecks": {
+        "$numberInt": "0"
+      },
+      "queues": {
+        "ingress": {
+          "admissions": {
+            "$numberInt": "0"
+          },
+          "totalTimeQueuedMicros": {
+            "$numberInt": "0"
+          },
+          "isHoldingTicket": false
+        },
+        "execution": {
+          "admissions": {
+            "$numberInt": "0"
+          },
+          "totalTimeQueuedMicros": {
+            "$numberInt": "0"
+          },
+          "isHoldingTicket": false
+        }
+      },
+      "currentQueue": null,
+      "locks": {},
+      "waitingForLock": false,
+      "lockStats": {},
+      "waitingForFlowControl": false,
+      "flowControlStats": {}
+    },
+    {
+      "type": "op",
+      "host": "localhost:27017",
+      "desc": "JournalFlusher",
+      "active": true,
+      "currentOpTime": "2026-11-19T03:08:06.641+01:00",
+      "isFromUserConnection": false,
+      "opid": {
+        "$numberInt": "3072"
+      },
+      "op": "none",
+      "ns": "",
+      "redacted": false,
+      "command": {},
+      "numYields": {
+        "$numberInt": "0"
+      },
+      "numInterruptChecks": {
+        "$numberInt": "0"
+      },
+      "queues": {
+        "ingress": {
+          "admissions": {
+            "$numberInt": "0"
+          },
+          "totalTimeQueuedMicros": {
+            "$numberInt": "0"
+          },
+          "isHoldingTicket": false
+        },
+        "execution": {
+          "admissions": {
+            "$numberInt": "0"
+          },
+          "totalTimeQueuedMicros": {
+            "$numberInt": "0"
+          },
+          "isHoldingTicket": false
+        }
+      },
+      "currentQueue": null,
+      "locks": {},
+      "waitingForLock": false,
+      "lockStats": {},
+      "waitingForFlowControl": false,
+      "flowControlStats": {}
+    }
+  ],
+  "ok": {
+    "$numberInt": "1"
+  }
+}

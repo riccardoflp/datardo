@@ -1,0 +1,42 @@
+{
+  "db": "shop",
+  "collections": {
+    "$numberInt": "3"
+  },
+  "views": {
+    "$numberInt": "1"
+  },
+  "objects": {
+    "$numberInt": "41"
+  },
+  "avgObjSize": {
+    "$numberDouble": "26.829268292682926"
+  },
+  "dataSize": {
+    "$numberInt": "1100"
+  },
+  "storageSize": {
+    "$numberInt": "12288"
+  },
+  "indexes": {
+    "$numberInt": "3"
+  },
+  "indexSize": {
+    "$numberInt": "12288"
+  },
+  "totalSize": {
+    "$numberInt": "24576"
+  },
+  "scaleFactor": {
+    "$numberInt": "1"
+  },
+  "fsUsedSize": {
+    "$numberLong": "936266018816"
+  },
+  "fsTotalSize": {
+    "$numberLong": "1023141736448"
+  },
+  "ok": {
+    "$numberInt": "1"
+  }
+}

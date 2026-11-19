@@ -1,0 +1,92 @@
+{
+  "topologyVersion": {
+    "processId": {
+      "$oid": "6afe54b20e1d1ef70e4a8ef5"
+    },
+    "counter": {
+      "$numberInt": "6"
+    }
+  },
+  "hosts": ["localhost:27017"],
+  "setName": "testset",
+  "setVersion": {
+    "$numberInt": "1"
+  },
+  "isWritablePrimary": true,
+  "secondary": false,
+  "primary": "localhost:27017",
+  "me": "localhost:27017",
+  "electionId": {
+    "$oid": "7fffffff0000000000000001"
+  },
+  "lastWrite": {
+    "opTime": {
+      "ts": {
+        "$timestamp": {
+          "t": 1795052725,
+          "i": 10
+        }
+      },
+      "t": {
+        "$numberInt": "1"
+      }
+    },
+    "lastWriteDate": {
+      "$date": {
+        "$numberLong": "1795052725000"
+      }
+    },
+    "majorityOpTime": {
+      "ts": {
+        "$timestamp": {
+          "t": 1795052725,
+          "i": 10
+        }
+      },
+      "t": {
+        "$numberInt": "1"
+      }
+    },
+    "majorityWriteDate": {
+      "$date": {
+        "$numberLong": "1795052725000"
+      }
+    }
+  },
+  "maxBsonObjectSize": {
+    "$numberInt": "16777216"
+  },
+  "maxMessageSizeBytes": {
+    "$numberInt": "48000000"
+  },
+  "maxWriteBatchSize": {
+    "$numberInt": "100000"
+  },
+  "localTime": {
+    "$date": {
+      "$numberLong": "1795052725209"
+    }
+  },
+  "logicalSessionTimeoutMinutes": {
+    "$numberInt": "30"
+  },
+  "connectionId": {
+    "$numberInt": "4"
+  },
+  "minWireVersion": {
+    "$numberInt": "0"
+  },
+  "maxWireVersion": {
+    "$numberInt": "27"
+  },
+  "readOnly": false,
+  "ok": {
+    "$numberInt": "1"
+  },
+  "operationTime": {
+    "$timestamp": {
+      "t": 1795052725,
+      "i": 10
+    }
+  }
+}

@@ -1,0 +1,52 @@
+[
+  {
+    "ns": "local.oplog.rs",
+    "host": "localhost:27017",
+    "localTime": {
+      "$date": {
+        "$numberLong": "1795052725212"
+      }
+    },
+    "storageStats": {
+      "size": {
+        "$numberInt": "10818"
+      },
+      "count": {
+        "$numberInt": "26"
+      },
+      "avgObjSize": {
+        "$numberInt": "416"
+      },
+      "numOrphanDocs": {
+        "$numberInt": "0"
+      },
+      "storageSize": {
+        "$numberInt": "20480"
+      },
+      "freeStorageSize": {
+        "$numberInt": "0"
+      },
+      "capped": true,
+      "max": {
+        "$numberInt": "0"
+      },
+      "maxSize": {
+        "$numberLong": "4341328640"
+      },
+      "nindexes": {
+        "$numberInt": "0"
+      },
+      "indexBuilds": [],
+      "totalIndexSize": {
+        "$numberInt": "0"
+      },
+      "indexSizes": {},
+      "totalSize": {
+        "$numberInt": "20480"
+      },
+      "scaleFactor": {
+        "$numberInt": "1"
+      }
+    }
+  }
+]

@@ -578,7 +578,7 @@ Empties `system.profile` of one database and leaves the profiler recording as be
 - **After**: the section says *Cleared the profiler of shop.* and reads the slow operations again. When step 2
   fails the profiler stays off: the error names the step, and the section then reads *Profiler off*.
 - **Refuses**: *The connection Production is read-only.* (`/read-only`); *A mongos keeps no profiler: connect to a
-  shard to use it.* (`/unsupported`).
+  shard to use it.* (`/unsupported`); *The profiler of shop could not be read: nothing was cleared.* (`/not-read`).
 - **Uses**: `runner.confirm`, `runner.run`, `runner.notify`, `monitor.read-slow-queries`.
 - **Ported from**: `src/monitor.ts › clearProfile`.
 
@@ -656,6 +656,8 @@ explains it as the server runs it now.
   opens as the filter that chose its documents.
 - **Undo**: Cannot be undone: nothing is written; closing the tab is enough.
 - **After**: the collection tab is active with the query run (`query.run`); for **Explain**, on the Explain section.
+- **Refuses**: *This operation cannot be opened in its collection.* (`/unsupported`), for an operation it is not
+  offered on.
 - **Uses**: `tab.open`, `query.bar`, `query.format`, `query.run`, `aggregate.show`, `explain.show`.
 - **Ported from**: `src/monitor.ts › openOperation`; `src/shared/profile.ts › canOpen`, `splitNs`.
 

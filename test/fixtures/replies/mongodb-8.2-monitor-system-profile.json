@@ -1,0 +1,1580 @@
+[
+  {
+    "op": "query",
+    "ns": "shop.orders",
+    "command": {
+      "find": "orders",
+      "filter": {
+        "_id": {
+          "$numberInt": "0"
+        },
+        "$where": "sleep(1500) || true"
+      },
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "dnCzchP6SjauFTWSEUco/g==",
+            "subType": "04"
+          }
+        }
+      },
+      "$db": "shop"
+    },
+    "keysExamined": {
+      "$numberInt": "1"
+    },
+    "docsExamined": {
+      "$numberInt": "1"
+    },
+    "nBatches": {
+      "$numberInt": "1"
+    },
+    "cursorExhausted": true,
+    "numYield": {
+      "$numberInt": "1"
+    },
+    "nreturned": {
+      "$numberInt": "1"
+    },
+    "planCacheShapeHash": "B8048816",
+    "queryHash": "B8048816",
+    "planCacheKey": "60BB31FC",
+    "queryShapeHash": "BCCCFADB2A16AE699460733674B39661739305E4A16037D0293347C001484B76",
+    "queryFramework": "classic",
+    "locks": {
+      "Global": {
+        "acquireCount": {
+          "r": {
+            "$numberLong": "9"
+          }
+        }
+      }
+    },
+    "flowControl": {},
+    "storage": {
+      "timeWaitingMicros": {
+        "storageExecutionMicros": {
+          "$numberLong": "66"
+        }
+      }
+    },
+    "responseLength": {
+      "$numberInt": "164"
+    },
+    "protocol": "op_msg",
+    "millis": {
+      "$numberInt": "1571"
+    },
+    "planSummary": "IXSCAN { _id: 1 }",
+    "planningTimeMicros": {
+      "$numberInt": "69587"
+    },
+    "execStats": {
+      "isCached": false,
+      "stage": "FETCH",
+      "filter": {
+        "$where": {
+          "$code": "sleep(1500) || true"
+        }
+      },
+      "nReturned": {
+        "$numberInt": "1"
+      },
+      "executionTimeMillisEstimate": {
+        "$numberInt": "1502"
+      },
+      "works": {
+        "$numberInt": "2"
+      },
+      "advanced": {
+        "$numberInt": "1"
+      },
+      "needTime": {
+        "$numberInt": "0"
+      },
+      "needYield": {
+        "$numberInt": "0"
+      },
+      "saveState": {
+        "$numberInt": "1"
+      },
+      "restoreState": {
+        "$numberInt": "1"
+      },
+      "isEOF": {
+        "$numberInt": "1"
+      },
+      "docsExamined": {
+        "$numberInt": "1"
+      },
+      "alreadyHasObj": {
+        "$numberInt": "0"
+      },
+      "inputStage": {
+        "stage": "IXSCAN",
+        "nReturned": {
+          "$numberInt": "1"
+        },
+        "executionTimeMillisEstimate": {
+          "$numberInt": "0"
+        },
+        "works": {
+          "$numberInt": "2"
+        },
+        "advanced": {
+          "$numberInt": "1"
+        },
+        "needTime": {
+          "$numberInt": "0"
+        },
+        "needYield": {
+          "$numberInt": "0"
+        },
+        "saveState": {
+          "$numberInt": "1"
+        },
+        "restoreState": {
+          "$numberInt": "1"
+        },
+        "isEOF": {
+          "$numberInt": "1"
+        },
+        "keyPattern": {
+          "_id": {
+            "$numberInt": "1"
+          }
+        },
+        "indexName": "_id_",
+        "isMultiKey": false,
+        "isUnique": true,
+        "isSparse": false,
+        "isPartial": false,
+        "indexVersion": {
+          "$numberInt": "2"
+        },
+        "direction": "forward",
+        "indexBounds": {
+          "_id": ["[0, 0]"]
+        },
+        "keysExamined": {
+          "$numberInt": "1"
+        },
+        "seeks": {
+          "$numberInt": "1"
+        },
+        "dupsTested": {
+          "$numberInt": "0"
+        },
+        "dupsDropped": {
+          "$numberInt": "0"
+        }
+      }
+    },
+    "ts": {
+      "$date": {
+        "$numberLong": "1795054087705"
+      }
+    },
+    "client": "127.0.0.1",
+    "allUsers": [],
+    "user": ""
+  },
+  {
+    "op": "insert",
+    "ns": "shop.orders",
+    "command": {
+      "insert": "orders",
+      "documents": [
+        {
+          "_id": {
+            "$numberInt": "5000"
+          },
+          "status": "new",
+          "total": {
+            "$numberInt": "1"
+          }
+        }
+      ],
+      "ordered": true,
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "/oW39+zqTQ+fyA72cnmZ0w==",
+            "subType": "04"
+          }
+        }
+      },
+      "$db": "shop"
+    },
+    "ninserted": {
+      "$numberInt": "1"
+    },
+    "keysInserted": {
+      "$numberInt": "1"
+    },
+    "numYield": {
+      "$numberInt": "0"
+    },
+    "locks": {
+      "ReplicationStateTransition": {
+        "acquireCount": {
+          "w": {
+            "$numberLong": "1"
+          }
+        }
+      },
+      "Global": {
+        "acquireCount": {
+          "r": {
+            "$numberLong": "1"
+          },
+          "w": {
+            "$numberLong": "1"
+          }
+        }
+      },
+      "Database": {
+        "acquireCount": {
+          "w": {
+            "$numberLong": "1"
+          }
+        }
+      },
+      "Collection": {
+        "acquireCount": {
+          "w": {
+            "$numberLong": "1"
+          }
+        }
+      }
+    },
+    "flowControl": {
+      "acquireCount": {
+        "$numberLong": "1"
+      }
+    },
+    "storage": {
+      "timeWaitingMicros": {
+        "storageExecutionMicros": {
+          "$numberLong": "11"
+        }
+      }
+    },
+    "responseLength": {
+      "$numberInt": "45"
+    },
+    "protocol": "op_msg",
+    "millis": {
+      "$numberInt": "0"
+    },
+    "ts": {
+      "$date": {
+        "$numberLong": "1795054086130"
+      }
+    },
+    "client": "127.0.0.1",
+    "appName": "checkout",
+    "allUsers": [],
+    "user": ""
+  },
+  {
+    "op": "remove",
+    "ns": "shop.orders",
+    "command": {
+      "q": {
+        "_id": {
+          "$numberInt": "1999"
+        }
+      },
+      "limit": {
+        "$numberInt": "1"
+      }
+    },
+    "keysExamined": {
+      "$numberInt": "1"
+    },
+    "docsExamined": {
+      "$numberInt": "1"
+    },
+    "ndeleted": {
+      "$numberInt": "1"
+    },
+    "keysDeleted": {
+      "$numberInt": "1"
+    },
+    "numYield": {
+      "$numberInt": "0"
+    },
+    "locks": {
+      "ReplicationStateTransition": {
+        "acquireCount": {
+          "w": {
+            "$numberLong": "1"
+          }
+        }
+      },
+      "Global": {
+        "acquireCount": {
+          "r": {
+            "$numberLong": "1"
+          },
+          "w": {
+            "$numberLong": "1"
+          }
+        }
+      },
+      "Database": {
+        "acquireCount": {
+          "w": {
+            "$numberLong": "1"
+          }
+        }
+      },
+      "Collection": {
+        "acquireCount": {
+          "w": {
+            "$numberLong": "1"
+          }
+        }
+      }
+    },
+    "flowControl": {
+      "acquireCount": {
+        "$numberLong": "1"
+      }
+    },
+    "storage": {
+      "timeWaitingMicros": {
+        "storageExecutionMicros": {
+          "$numberLong": "13"
+        }
+      }
+    },
+    "millis": {
+      "$numberInt": "1"
+    },
+    "planSummary": "EXPRESS_IXSCAN { _id: 1 },EXPRESS_DELETE",
+    "planningTimeMicros": {
+      "$numberInt": "465"
+    },
+    "execStats": {
+      "isCached": false,
+      "stage": "EXPRESS_DELETE",
+      "keyPattern": "{ _id: 1 }",
+      "indexName": "_id_",
+      "keysExamined": {
+        "$numberInt": "1"
+      },
+      "docsExamined": {
+        "$numberInt": "1"
+      },
+      "nReturned": {
+        "$numberInt": "0"
+      },
+      "nWouldModify": {
+        "$numberInt": "0"
+      },
+      "nWouldUpsert": {
+        "$numberInt": "0"
+      },
+      "nWouldDelete": {
+        "$numberInt": "1"
+      }
+    },
+    "ts": {
+      "$date": {
+        "$numberLong": "1795054086128"
+      }
+    },
+    "client": "127.0.0.1",
+    "appName": "checkout",
+    "allUsers": [],
+    "user": ""
+  },
+  {
+    "op": "update",
+    "ns": "shop.orders",
+    "command": {
+      "q": {
+        "status": "new"
+      },
+      "u": {
+        "$set": {
+          "seen": true
+        }
+      },
+      "multi": true,
+      "upsert": false
+    },
+    "keysExamined": {
+      "$numberInt": "0"
+    },
+    "docsExamined": {
+      "$numberInt": "2000"
+    },
+    "nMatched": {
+      "$numberInt": "500"
+    },
+    "nModified": {
+      "$numberInt": "500"
+    },
+    "nUpserted": {
+      "$numberInt": "0"
+    },
+    "keysInserted": {
+      "$numberInt": "0"
+    },
+    "keysDeleted": {
+      "$numberInt": "0"
+    },
+    "numYield": {
+      "$numberInt": "0"
+    },
+    "planCacheShapeHash": "F7CB0027",
+    "queryHash": "F7CB0027",
+    "planCacheKey": "05441C6E",
+    "locks": {
+      "ReplicationStateTransition": {
+        "acquireCount": {
+          "w": {
+            "$numberLong": "1"
+          }
+        }
+      },
+      "Global": {
+        "acquireCount": {
+          "r": {
+            "$numberLong": "1"
+          },
+          "w": {
+            "$numberLong": "1"
+          }
+        }
+      },
+      "Database": {
+        "acquireCount": {
+          "w": {
+            "$numberLong": "1"
+          }
+        }
+      },
+      "Collection": {
+        "acquireCount": {
+          "w": {
+            "$numberLong": "1"
+          }
+        }
+      }
+    },
+    "flowControl": {
+      "acquireCount": {
+        "$numberLong": "1"
+      }
+    },
+    "storage": {
+      "timeWaitingMicros": {
+        "storageExecutionMicros": {
+          "$numberLong": "62"
+        }
+      }
+    },
+    "millis": {
+      "$numberInt": "6"
+    },
+    "planSummary": "COLLSCAN",
+    "planningTimeMicros": {
+      "$numberInt": "552"
+    },
+    "execStats": {
+      "isCached": false,
+      "stage": "UPDATE",
+      "nReturned": {
+        "$numberInt": "0"
+      },
+      "executionTimeMillisEstimate": {
+        "$numberInt": "1"
+      },
+      "works": {
+        "$numberInt": "2001"
+      },
+      "advanced": {
+        "$numberInt": "0"
+      },
+      "needTime": {
+        "$numberInt": "2000"
+      },
+      "needYield": {
+        "$numberInt": "0"
+      },
+      "saveState": {
+        "$numberInt": "0"
+      },
+      "restoreState": {
+        "$numberInt": "0"
+      },
+      "isEOF": {
+        "$numberInt": "1"
+      },
+      "nMatched": {
+        "$numberInt": "500"
+      },
+      "nWouldModify": {
+        "$numberInt": "500"
+      },
+      "nWouldUpsert": {
+        "$numberInt": "0"
+      },
+      "inputStage": {
+        "stage": "COLLSCAN",
+        "filter": {
+          "status": {
+            "$eq": "new"
+          }
+        },
+        "nReturned": {
+          "$numberInt": "500"
+        },
+        "executionTimeMillisEstimate": {
+          "$numberInt": "0"
+        },
+        "works": {
+          "$numberInt": "2001"
+        },
+        "advanced": {
+          "$numberInt": "500"
+        },
+        "needTime": {
+          "$numberInt": "1500"
+        },
+        "needYield": {
+          "$numberInt": "0"
+        },
+        "saveState": {
+          "$numberInt": "500"
+        },
+        "restoreState": {
+          "$numberInt": "500"
+        },
+        "isEOF": {
+          "$numberInt": "1"
+        },
+        "direction": "forward",
+        "docsExamined": {
+          "$numberInt": "2000"
+        }
+      }
+    },
+    "ts": {
+      "$date": {
+        "$numberLong": "1795054086126"
+      }
+    },
+    "client": "127.0.0.1",
+    "appName": "checkout",
+    "allUsers": [],
+    "user": ""
+  },
+  {
+    "op": "command",
+    "ns": "shop.orders",
+    "command": {
+      "distinct": "orders",
+      "key": "status",
+      "query": {
+        "total": {
+          "$lt": {
+            "$numberInt": "100"
+          }
+        }
+      },
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "/oW39+zqTQ+fyA72cnmZ0w==",
+            "subType": "04"
+          }
+        }
+      },
+      "$db": "shop"
+    },
+    "keysExamined": {
+      "$numberInt": "0"
+    },
+    "docsExamined": {
+      "$numberInt": "2000"
+    },
+    "numYield": {
+      "$numberInt": "0"
+    },
+    "nreturned": {
+      "$numberInt": "4"
+    },
+    "planCacheShapeHash": "4C103E40",
+    "queryHash": "4C103E40",
+    "planCacheKey": "5F441F03",
+    "queryShapeHash": "BCA6B4B86EE894D1854A70C7DD1363A942C87825110B8EB295ABB6B1DCD62E1E",
+    "queryFramework": "classic",
+    "locks": {
+      "Global": {
+        "acquireCount": {
+          "r": {
+            "$numberLong": "2"
+          }
+        }
+      }
+    },
+    "flowControl": {},
+    "storage": {
+      "timeWaitingMicros": {
+        "storageExecutionMicros": {
+          "$numberLong": "16"
+        }
+      }
+    },
+    "responseLength": {
+      "$numberInt": "106"
+    },
+    "protocol": "op_msg",
+    "millis": {
+      "$numberInt": "2"
+    },
+    "planSummary": "COLLSCAN",
+    "planningTimeMicros": {
+      "$numberInt": "1034"
+    },
+    "execStats": {
+      "isCached": false,
+      "stage": "COLLSCAN",
+      "filter": {
+        "total": {
+          "$lt": {
+            "$numberInt": "100"
+          }
+        }
+      },
+      "nReturned": {
+        "$numberInt": "34"
+      },
+      "executionTimeMillisEstimate": {
+        "$numberInt": "0"
+      },
+      "works": {
+        "$numberInt": "2001"
+      },
+      "advanced": {
+        "$numberInt": "34"
+      },
+      "needTime": {
+        "$numberInt": "1966"
+      },
+      "needYield": {
+        "$numberInt": "0"
+      },
+      "saveState": {
+        "$numberInt": "0"
+      },
+      "restoreState": {
+        "$numberInt": "0"
+      },
+      "isEOF": {
+        "$numberInt": "1"
+      },
+      "direction": "forward",
+      "docsExamined": {
+        "$numberInt": "2000"
+      }
+    },
+    "ts": {
+      "$date": {
+        "$numberLong": "1795054086116"
+      }
+    },
+    "client": "127.0.0.1",
+    "appName": "checkout",
+    "allUsers": [],
+    "user": ""
+  },
+  {
+    "op": "command",
+    "ns": "shop.orders",
+    "command": {
+      "aggregate": "orders",
+      "pipeline": [
+        {
+          "$match": {
+            "status": "new"
+          }
+        },
+        {
+          "$group": {
+            "_id": {
+              "$numberInt": "1"
+            },
+            "n": {
+              "$sum": {
+                "$numberInt": "1"
+              }
+            }
+          }
+        }
+      ],
+      "cursor": {},
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "/oW39+zqTQ+fyA72cnmZ0w==",
+            "subType": "04"
+          }
+        }
+      },
+      "$db": "shop"
+    },
+    "keysExamined": {
+      "$numberInt": "0"
+    },
+    "docsExamined": {
+      "$numberInt": "2000"
+    },
+    "cursorExhausted": true,
+    "numYield": {
+      "$numberInt": "0"
+    },
+    "nreturned": {
+      "$numberInt": "1"
+    },
+    "planCacheShapeHash": "2BC16FB2",
+    "queryHash": "2BC16FB2",
+    "planCacheKey": "BB6F879F",
+    "queryShapeHash": "F1C65D2303CEC0FB834ED1C608E2E95BD51B7B51DD1A9A2F8EF4B4FF4A8703B3",
+    "queryFramework": "sbe",
+    "locks": {
+      "Global": {
+        "acquireCount": {
+          "r": {
+            "$numberLong": "2"
+          }
+        }
+      }
+    },
+    "flowControl": {},
+    "storage": {
+      "timeWaitingMicros": {
+        "storageExecutionMicros": {
+          "$numberLong": "12"
+        }
+      }
+    },
+    "responseLength": {
+      "$numberInt": "124"
+    },
+    "protocol": "op_msg",
+    "millis": {
+      "$numberInt": "1"
+    },
+    "planSummary": "COLLSCAN",
+    "planningTimeMicros": {
+      "$numberInt": "540"
+    },
+    "ts": {
+      "$date": {
+        "$numberLong": "1795054086112"
+      }
+    },
+    "client": "127.0.0.1",
+    "appName": "checkout",
+    "allUsers": [],
+    "user": ""
+  },
+  {
+    "op": "command",
+    "ns": "shop.orders",
+    "command": {
+      "aggregate": "orders",
+      "pipeline": [
+        {
+          "$match": {
+            "status": "shipped"
+          }
+        },
+        {
+          "$group": {
+            "_id": "$status",
+            "total": {
+              "$sum": "$total"
+            }
+          }
+        }
+      ],
+      "cursor": {},
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "/oW39+zqTQ+fyA72cnmZ0w==",
+            "subType": "04"
+          }
+        }
+      },
+      "$db": "shop"
+    },
+    "keysExamined": {
+      "$numberInt": "0"
+    },
+    "docsExamined": {
+      "$numberInt": "2000"
+    },
+    "cursorExhausted": true,
+    "numYield": {
+      "$numberInt": "0"
+    },
+    "nreturned": {
+      "$numberInt": "1"
+    },
+    "planCacheShapeHash": "9EFF7FAE",
+    "queryHash": "9EFF7FAE",
+    "planCacheKey": "11C8121C",
+    "queryShapeHash": "089BA4CCFFDF927018F3BE7A3A201BC26B709A85B38A211B191F3401900C24FC",
+    "queryFramework": "sbe",
+    "locks": {
+      "Global": {
+        "acquireCount": {
+          "r": {
+            "$numberLong": "2"
+          }
+        }
+      }
+    },
+    "flowControl": {},
+    "storage": {
+      "timeWaitingMicros": {
+        "storageExecutionMicros": {
+          "$numberLong": "15"
+        }
+      }
+    },
+    "responseLength": {
+      "$numberInt": "136"
+    },
+    "protocol": "op_msg",
+    "millis": {
+      "$numberInt": "5"
+    },
+    "planSummary": "COLLSCAN",
+    "planningTimeMicros": {
+      "$numberInt": "2278"
+    },
+    "ts": {
+      "$date": {
+        "$numberLong": "1795054086109"
+      }
+    },
+    "client": "127.0.0.1",
+    "appName": "checkout",
+    "allUsers": [],
+    "user": ""
+  },
+  {
+    "op": "getmore",
+    "ns": "shop.orders",
+    "command": {
+      "getMore": {
+        "$numberLong": "5236615635837811808"
+      },
+      "collection": "orders",
+      "batchSize": {
+        "$numberInt": "2"
+      },
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "/oW39+zqTQ+fyA72cnmZ0w==",
+            "subType": "04"
+          }
+        }
+      },
+      "$db": "shop"
+    },
+    "originatingCommand": {
+      "find": "orders",
+      "filter": {
+        "total": {
+          "$gt": {
+            "$numberInt": "5000"
+          }
+        }
+      },
+      "limit": {
+        "$numberInt": "6"
+      },
+      "batchSize": {
+        "$numberInt": "2"
+      },
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "/oW39+zqTQ+fyA72cnmZ0w==",
+            "subType": "04"
+          }
+        }
+      },
+      "$db": "shop"
+    },
+    "cursorid": {
+      "$numberLong": "5236615635837811808"
+    },
+    "keysExamined": {
+      "$numberInt": "0"
+    },
+    "docsExamined": {
+      "$numberInt": "2"
+    },
+    "nBatches": {
+      "$numberInt": "1"
+    },
+    "cursorExhausted": true,
+    "numYield": {
+      "$numberInt": "0"
+    },
+    "nreturned": {
+      "$numberInt": "2"
+    },
+    "planCacheShapeHash": "1B22C360",
+    "queryHash": "1B22C360",
+    "planCacheKey": "8CB54A80",
+    "queryFramework": "classic",
+    "locks": {
+      "Global": {
+        "acquireCount": {
+          "r": {
+            "$numberLong": "2"
+          }
+        }
+      }
+    },
+    "flowControl": {},
+    "storage": {
+      "timeWaitingMicros": {
+        "storageExecutionMicros": {
+          "$numberLong": "11"
+        }
+      }
+    },
+    "responseLength": {
+      "$numberInt": "226"
+    },
+    "protocol": "op_msg",
+    "millis": {
+      "$numberInt": "0"
+    },
+    "planSummary": "COLLSCAN",
+    "execStats": {
+      "isCached": false,
+      "stage": "LIMIT",
+      "nReturned": {
+        "$numberInt": "6"
+      },
+      "executionTimeMillisEstimate": {
+        "$numberInt": "0"
+      },
+      "works": {
+        "$numberInt": "1673"
+      },
+      "advanced": {
+        "$numberInt": "6"
+      },
+      "needTime": {
+        "$numberInt": "1667"
+      },
+      "needYield": {
+        "$numberInt": "0"
+      },
+      "saveState": {
+        "$numberInt": "2"
+      },
+      "restoreState": {
+        "$numberInt": "2"
+      },
+      "isEOF": {
+        "$numberInt": "1"
+      },
+      "limitAmount": {
+        "$numberInt": "6"
+      },
+      "inputStage": {
+        "stage": "COLLSCAN",
+        "filter": {
+          "total": {
+            "$gt": {
+              "$numberInt": "5000"
+            }
+          }
+        },
+        "nReturned": {
+          "$numberInt": "6"
+        },
+        "executionTimeMillisEstimate": {
+          "$numberInt": "0"
+        },
+        "works": {
+          "$numberInt": "1673"
+        },
+        "advanced": {
+          "$numberInt": "6"
+        },
+        "needTime": {
+          "$numberInt": "1667"
+        },
+        "needYield": {
+          "$numberInt": "0"
+        },
+        "saveState": {
+          "$numberInt": "2"
+        },
+        "restoreState": {
+          "$numberInt": "2"
+        },
+        "isEOF": {
+          "$numberInt": "0"
+        },
+        "direction": "forward",
+        "docsExamined": {
+          "$numberInt": "1673"
+        }
+      }
+    },
+    "ts": {
+      "$date": {
+        "$numberLong": "1795054086101"
+      }
+    },
+    "client": "127.0.0.1",
+    "appName": "checkout",
+    "allUsers": [],
+    "user": ""
+  },
+  {
+    "op": "getmore",
+    "ns": "shop.orders",
+    "command": {
+      "getMore": {
+        "$numberLong": "5236615635837811808"
+      },
+      "collection": "orders",
+      "batchSize": {
+        "$numberInt": "2"
+      },
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "/oW39+zqTQ+fyA72cnmZ0w==",
+            "subType": "04"
+          }
+        }
+      },
+      "$db": "shop"
+    },
+    "originatingCommand": {
+      "find": "orders",
+      "filter": {
+        "total": {
+          "$gt": {
+            "$numberInt": "5000"
+          }
+        }
+      },
+      "limit": {
+        "$numberInt": "6"
+      },
+      "batchSize": {
+        "$numberInt": "2"
+      },
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "/oW39+zqTQ+fyA72cnmZ0w==",
+            "subType": "04"
+          }
+        }
+      },
+      "$db": "shop"
+    },
+    "cursorid": {
+      "$numberLong": "5236615635837811808"
+    },
+    "keysExamined": {
+      "$numberInt": "0"
+    },
+    "docsExamined": {
+      "$numberInt": "2"
+    },
+    "nBatches": {
+      "$numberInt": "1"
+    },
+    "numYield": {
+      "$numberInt": "0"
+    },
+    "nreturned": {
+      "$numberInt": "2"
+    },
+    "planCacheShapeHash": "1B22C360",
+    "queryHash": "1B22C360",
+    "planCacheKey": "8CB54A80",
+    "queryFramework": "classic",
+    "locks": {
+      "Global": {
+        "acquireCount": {
+          "r": {
+            "$numberLong": "2"
+          }
+        }
+      }
+    },
+    "flowControl": {},
+    "storage": {
+      "timeWaitingMicros": {
+        "storageExecutionMicros": {
+          "$numberLong": "16"
+        }
+      }
+    },
+    "responseLength": {
+      "$numberInt": "235"
+    },
+    "protocol": "op_msg",
+    "millis": {
+      "$numberInt": "0"
+    },
+    "planSummary": "COLLSCAN",
+    "execStats": {
+      "isCached": false,
+      "stage": "LIMIT",
+      "nReturned": {
+        "$numberInt": "4"
+      },
+      "executionTimeMillisEstimate": {
+        "$numberInt": "0"
+      },
+      "works": {
+        "$numberInt": "1671"
+      },
+      "advanced": {
+        "$numberInt": "4"
+      },
+      "needTime": {
+        "$numberInt": "1667"
+      },
+      "needYield": {
+        "$numberInt": "0"
+      },
+      "saveState": {
+        "$numberInt": "1"
+      },
+      "restoreState": {
+        "$numberInt": "1"
+      },
+      "isEOF": {
+        "$numberInt": "0"
+      },
+      "limitAmount": {
+        "$numberInt": "6"
+      },
+      "inputStage": {
+        "stage": "COLLSCAN",
+        "filter": {
+          "total": {
+            "$gt": {
+              "$numberInt": "5000"
+            }
+          }
+        },
+        "nReturned": {
+          "$numberInt": "4"
+        },
+        "executionTimeMillisEstimate": {
+          "$numberInt": "0"
+        },
+        "works": {
+          "$numberInt": "1671"
+        },
+        "advanced": {
+          "$numberInt": "4"
+        },
+        "needTime": {
+          "$numberInt": "1667"
+        },
+        "needYield": {
+          "$numberInt": "0"
+        },
+        "saveState": {
+          "$numberInt": "1"
+        },
+        "restoreState": {
+          "$numberInt": "1"
+        },
+        "isEOF": {
+          "$numberInt": "0"
+        },
+        "direction": "forward",
+        "docsExamined": {
+          "$numberInt": "1671"
+        }
+      }
+    },
+    "ts": {
+      "$date": {
+        "$numberLong": "1795054086100"
+      }
+    },
+    "client": "127.0.0.1",
+    "appName": "checkout",
+    "allUsers": [],
+    "user": ""
+  },
+  {
+    "op": "query",
+    "ns": "shop.orders",
+    "command": {
+      "find": "orders",
+      "filter": {
+        "total": {
+          "$gt": {
+            "$numberInt": "5000"
+          }
+        }
+      },
+      "limit": {
+        "$numberInt": "6"
+      },
+      "batchSize": {
+        "$numberInt": "2"
+      },
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "/oW39+zqTQ+fyA72cnmZ0w==",
+            "subType": "04"
+          }
+        }
+      },
+      "$db": "shop"
+    },
+    "cursorid": {
+      "$numberLong": "5236615635837811808"
+    },
+    "keysExamined": {
+      "$numberInt": "0"
+    },
+    "docsExamined": {
+      "$numberInt": "1669"
+    },
+    "nBatches": {
+      "$numberInt": "1"
+    },
+    "numYield": {
+      "$numberInt": "0"
+    },
+    "nreturned": {
+      "$numberInt": "2"
+    },
+    "planCacheShapeHash": "1B22C360",
+    "queryHash": "1B22C360",
+    "planCacheKey": "8CB54A80",
+    "queryShapeHash": "78F639A7CF9B4BA1348544D1924C73C4AEC336C4DF6E5277AA8162E43554FC31",
+    "queryFramework": "classic",
+    "locks": {
+      "Global": {
+        "acquireCount": {
+          "r": {
+            "$numberLong": "2"
+          }
+        }
+      }
+    },
+    "flowControl": {},
+    "storage": {
+      "timeWaitingMicros": {
+        "storageExecutionMicros": {
+          "$numberLong": "22"
+        }
+      }
+    },
+    "responseLength": {
+      "$numberInt": "227"
+    },
+    "protocol": "op_msg",
+    "millis": {
+      "$numberInt": "1"
+    },
+    "planSummary": "COLLSCAN",
+    "planningTimeMicros": {
+      "$numberInt": "158"
+    },
+    "execStats": {
+      "isCached": false,
+      "stage": "LIMIT",
+      "nReturned": {
+        "$numberInt": "2"
+      },
+      "executionTimeMillisEstimate": {
+        "$numberInt": "0"
+      },
+      "works": {
+        "$numberInt": "1669"
+      },
+      "advanced": {
+        "$numberInt": "2"
+      },
+      "needTime": {
+        "$numberInt": "1667"
+      },
+      "needYield": {
+        "$numberInt": "0"
+      },
+      "saveState": {
+        "$numberInt": "1"
+      },
+      "restoreState": {
+        "$numberInt": "0"
+      },
+      "isEOF": {
+        "$numberInt": "0"
+      },
+      "limitAmount": {
+        "$numberInt": "6"
+      },
+      "inputStage": {
+        "stage": "COLLSCAN",
+        "filter": {
+          "total": {
+            "$gt": {
+              "$numberInt": "5000"
+            }
+          }
+        },
+        "nReturned": {
+          "$numberInt": "2"
+        },
+        "executionTimeMillisEstimate": {
+          "$numberInt": "0"
+        },
+        "works": {
+          "$numberInt": "1669"
+        },
+        "advanced": {
+          "$numberInt": "2"
+        },
+        "needTime": {
+          "$numberInt": "1667"
+        },
+        "needYield": {
+          "$numberInt": "0"
+        },
+        "saveState": {
+          "$numberInt": "1"
+        },
+        "restoreState": {
+          "$numberInt": "0"
+        },
+        "isEOF": {
+          "$numberInt": "0"
+        },
+        "direction": "forward",
+        "docsExamined": {
+          "$numberInt": "1669"
+        }
+      }
+    },
+    "ts": {
+      "$date": {
+        "$numberLong": "1795054086097"
+      }
+    },
+    "client": "127.0.0.1",
+    "appName": "checkout",
+    "allUsers": [],
+    "user": ""
+  },
+  {
+    "op": "query",
+    "ns": "shop.orders",
+    "command": {
+      "find": "orders",
+      "filter": {
+        "status": "paid"
+      },
+      "sort": {
+        "createdAt": {
+          "$numberInt": "-1"
+        }
+      },
+      "limit": {
+        "$numberInt": "20"
+      },
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "/oW39+zqTQ+fyA72cnmZ0w==",
+            "subType": "04"
+          }
+        }
+      },
+      "$db": "shop"
+    },
+    "keysExamined": {
+      "$numberInt": "0"
+    },
+    "docsExamined": {
+      "$numberInt": "2000"
+    },
+    "hasSortStage": true,
+    "nBatches": {
+      "$numberInt": "1"
+    },
+    "cursorExhausted": true,
+    "numYield": {
+      "$numberInt": "0"
+    },
+    "nreturned": {
+      "$numberInt": "20"
+    },
+    "planCacheShapeHash": "AE6117E6",
+    "queryHash": "AE6117E6",
+    "planCacheKey": "F984E935",
+    "queryShapeHash": "6D1E7A0CA0A4E9A2F9BBEA337BF9667FDD5AFA26676AE97DB9E0728F6C8C5608",
+    "queryFramework": "classic",
+    "locks": {
+      "Global": {
+        "acquireCount": {
+          "r": {
+            "$numberLong": "2"
+          }
+        }
+      }
+    },
+    "flowControl": {},
+    "storage": {
+      "timeWaitingMicros": {
+        "storageExecutionMicros": {
+          "$numberLong": "38"
+        }
+      }
+    },
+    "responseLength": {
+      "$numberInt": "1390"
+    },
+    "protocol": "op_msg",
+    "millis": {
+      "$numberInt": "2"
+    },
+    "planSummary": "COLLSCAN",
+    "planningTimeMicros": {
+      "$numberInt": "347"
+    },
+    "execStats": {
+      "isCached": false,
+      "stage": "SORT",
+      "nReturned": {
+        "$numberInt": "20"
+      },
+      "executionTimeMillisEstimate": {
+        "$numberInt": "0"
+      },
+      "works": {
+        "$numberInt": "2022"
+      },
+      "advanced": {
+        "$numberInt": "20"
+      },
+      "needTime": {
+        "$numberInt": "2001"
+      },
+      "needYield": {
+        "$numberInt": "0"
+      },
+      "saveState": {
+        "$numberInt": "0"
+      },
+      "restoreState": {
+        "$numberInt": "0"
+      },
+      "isEOF": {
+        "$numberInt": "1"
+      },
+      "sortPattern": {
+        "createdAt": {
+          "$numberInt": "-1"
+        }
+      },
+      "memLimit": {
+        "$numberInt": "104857600"
+      },
+      "limitAmount": {
+        "$numberInt": "20"
+      },
+      "type": "simple",
+      "totalDataSizeSorted": {
+        "$numberInt": "1860"
+      },
+      "usedDisk": false,
+      "spills": {
+        "$numberInt": "0"
+      },
+      "spilledRecords": {
+        "$numberInt": "0"
+      },
+      "spilledBytes": {
+        "$numberInt": "0"
+      },
+      "spilledDataStorageSize": {
+        "$numberInt": "0"
+      },
+      "inputStage": {
+        "stage": "COLLSCAN",
+        "filter": {
+          "status": {
+            "$eq": "paid"
+          }
+        },
+        "nReturned": {
+          "$numberInt": "500"
+        },
+        "executionTimeMillisEstimate": {
+          "$numberInt": "0"
+        },
+        "works": {
+          "$numberInt": "2001"
+        },
+        "advanced": {
+          "$numberInt": "500"
+        },
+        "needTime": {
+          "$numberInt": "1500"
+        },
+        "needYield": {
+          "$numberInt": "0"
+        },
+        "saveState": {
+          "$numberInt": "0"
+        },
+        "restoreState": {
+          "$numberInt": "0"
+        },
+        "isEOF": {
+          "$numberInt": "1"
+        },
+        "direction": "forward",
+        "docsExamined": {
+          "$numberInt": "2000"
+        }
+      }
+    },
+    "ts": {
+      "$date": {
+        "$numberLong": "1795054086092"
+      }
+    },
+    "client": "127.0.0.1",
+    "appName": "checkout",
+    "allUsers": [],
+    "user": ""
+  }
+]

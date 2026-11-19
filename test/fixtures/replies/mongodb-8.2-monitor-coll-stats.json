@@ -1,0 +1,105 @@
+[
+  [
+    {
+      "ns": "shop.events",
+      "host": "localhost:27017",
+      "localTime": {
+        "$date": {
+          "$numberLong": "1795052725077"
+        }
+      },
+      "storageStats": {
+        "size": {
+          "$numberInt": "0"
+        },
+        "count": {
+          "$numberInt": "0"
+        },
+        "numOrphanDocs": {
+          "$numberInt": "0"
+        },
+        "storageSize": {
+          "$numberInt": "4096"
+        },
+        "freeStorageSize": {
+          "$numberInt": "0"
+        },
+        "capped": true,
+        "max": {
+          "$numberInt": "0"
+        },
+        "maxSize": {
+          "$numberInt": "1048576"
+        },
+        "nindexes": {
+          "$numberInt": "1"
+        },
+        "indexBuilds": [],
+        "totalIndexSize": {
+          "$numberInt": "4096"
+        },
+        "indexSizes": {
+          "_id_": {
+            "$numberInt": "4096"
+          }
+        },
+        "totalSize": {
+          "$numberInt": "8192"
+        },
+        "scaleFactor": {
+          "$numberInt": "1"
+        }
+      }
+    }
+  ],
+  [
+    {
+      "ns": "shop.orders",
+      "host": "localhost:27017",
+      "localTime": {
+        "$date": {
+          "$numberLong": "1795052725081"
+        }
+      },
+      "storageStats": {
+        "size": {
+          "$numberInt": "1000"
+        },
+        "count": {
+          "$numberInt": "40"
+        },
+        "avgObjSize": {
+          "$numberInt": "25"
+        },
+        "numOrphanDocs": {
+          "$numberInt": "0"
+        },
+        "storageSize": {
+          "$numberInt": "4096"
+        },
+        "freeStorageSize": {
+          "$numberInt": "0"
+        },
+        "capped": false,
+        "nindexes": {
+          "$numberInt": "1"
+        },
+        "indexBuilds": [],
+        "totalIndexSize": {
+          "$numberInt": "4096"
+        },
+        "indexSizes": {
+          "_id_": {
+            "$numberInt": "4096"
+          }
+        },
+        "totalSize": {
+          "$numberInt": "8192"
+        },
+        "scaleFactor": {
+          "$numberInt": "1"
+        }
+      }
+    }
+  ]
+]
