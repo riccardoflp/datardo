@@ -7,7 +7,10 @@ import type { EngineRequest } from '../../shared/engine-request';
 import { EngineError, type ClientSettings, type ClientTls, type Engine, type EngineClient } from '../engine';
 import { maskedError, secretsOf } from '../transport/mask';
 import { openDirectOrThrough } from '../transport/tunnel';
-import { callMethod, toExtendedJson } from './methods';
+import { withMongoFacts } from './errors';
+import { createHandles } from './handles';
+import { toExtendedJson } from './methods';
+import { carryOut } from './requests';
 
 /** The name the server sees for Datardo's clients (connection.connect). */
 export const appName = 'datardo';
@@ -51,6 +54,7 @@ function hasNoServer(event: TopologyDescriptionChangedEvent): boolean {
 
 function clientOf(client: MongoClient, secrets: readonly string[]): EngineClient {
   const dropListeners: ((reason: string) => void)[] = [];
+  const kept = { client, handles: createHandles() };
   let dropped = false;
   client.on('topologyDescriptionChanged', (event) => {
     if (!dropped && hasNoServer(event)) {
@@ -66,13 +70,14 @@ function clientOf(client: MongoClient, secrets: readonly string[]): EngineClient
         throw new EngineError('A Redis command cannot be sent to MongoDB.');
       }
       try {
-        return toExtendedJson(await callMethod(client.db(request.database), request, signal));
+        return toExtendedJson(await carryOut(kept, request, signal));
       } catch (error: unknown) {
-        throw maskedError(error, secrets);
+        throw withMongoFacts(maskedError(error, secrets), error);
       }
     },
     close: async () => {
       dropped = true;
+      await kept.handles.closeAll();
       await client.close();
     },
     onDrop: (listener) => {

@@ -2,7 +2,7 @@
  * The methods of MongoDB a request can name, as mongosh names them, carried out through the driver. Arguments arrive
  * as canonical Extended JSON and replies leave as canonical Extended JSON, so that every BSON type survives (R5.5).
  */
-import { BSON, type AbstractCursor, type Collection, type Db, type Document } from 'mongodb';
+import { BSON, type AbstractCursor, type ClientSession, type Collection, type Db, type Document } from 'mongodb';
 import type { Json, MongoRequest } from '../../shared/engine-request';
 import { EngineError } from '../engine';
 
@@ -19,7 +19,8 @@ export function toExtendedJson(value: unknown): Json {
   return (BSON.EJSON.serialize({ value }, { relaxed: false }) as { value: Json }).value;
 }
 
-async function readCursor(cursor: AbstractCursor, limit: number): Promise<unknown[]> {
+/** The documents of a cursor, at most `limit` of them; the cursor is closed after. */
+export async function readCursor(cursor: AbstractCursor, limit: number): Promise<unknown[]> {
   const documents: unknown[] = [];
   try {
     while (documents.length < limit) {
@@ -35,13 +36,20 @@ async function readCursor(cursor: AbstractCursor, limit: number): Promise<unknow
   return documents;
 }
 
-type Options = Document & { readonly signal: AbortSignal; readonly timeoutMS?: number };
+/** What every call of the driver is given: the signal, the time limit, and the session it runs in, if any. */
+export type Options = Document & {
+  readonly signal: AbortSignal;
+  readonly timeoutMS?: number;
+  readonly session?: ClientSession;
+};
 
-function document(value: unknown): Document {
+/** A value as a document of the driver; anything else is an empty document. */
+export function document(value: unknown): Document {
   return typeof value === 'object' && value !== null && !Array.isArray(value) ? value : {};
 }
 
-function documents(value: unknown): Document[] {
+/** A value as documents of the driver; anything but an array is none. */
+export function documents(value: unknown): Document[] {
   return Array.isArray(value) ? value.map(document) : [];
 }
 
@@ -59,7 +67,7 @@ function optionValue(value: unknown): unknown {
 }
 
 /** The options a request gives a method, with the signal and the time limit. */
-function merged(given: unknown, options: Options): Options {
+export function merged(given: unknown, options: Options): Options {
   const entries = Object.entries(document(given)).map(([name, value]) => [name, optionValue(value)] as const);
   return { ...Object.fromEntries(entries), ...options };
 }
@@ -131,12 +139,21 @@ function cursorOf(
   }
 }
 
-/** Carries out a request on a database of the client and returns the driver's reply, not yet as Extended JSON. */
-export async function callMethod(db: Db, request: MongoRequest, signal: AbortSignal): Promise<unknown> {
+/**
+ * Carries out a request on a database of the client and returns the driver's reply, not yet as Extended JSON; with a
+ * session, the method runs in it.
+ */
+export async function callMethod(
+  db: Db,
+  request: MongoRequest,
+  signal: AbortSignal,
+  session?: ClientSession,
+): Promise<unknown> {
   const args = request.arguments.map(fromExtendedJson);
   const options: Options = {
     signal,
     ...(request.timeLimitMs === undefined ? {} : { timeoutMS: request.timeLimitMs }),
+    ...(session === undefined ? {} : { session }),
   };
   if (request.method === 'runCommand') {
     return db.command(document(args[0]), options);
