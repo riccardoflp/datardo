@@ -45,6 +45,29 @@ const works = new Map<TabId, WorkId>();
 /** The collection each open collection tab shows, for what starts a read without its page (the status line). */
 const refs = new Map<TabId, CollectionRef>();
 
+/**
+ * What a tab in Aggregate does in place of its query: it runs its pipeline (`aggregate.run`) for the run button, the
+ * paging and **Refresh**; a header click sorts the output (`aggregate.sort-column`); the headers show the directions of
+ * that sort. The aggregate area of the window registers them, so that the query and the table need not import it.
+ */
+export interface PipelineHooks {
+  readonly run: (ref: CollectionRef, how: RunHow) => Promise<void>;
+  readonly sort: (ref: CollectionRef, key: string) => void;
+  readonly directions: (tab: TabId) => ReadonlyMap<string, 1 | -1>;
+}
+
+let pipelineHooks: PipelineHooks | undefined;
+
+/** Registers what a tab in Aggregate does in place of its query. */
+export function setPipelineHooks(hooks: PipelineHooks): void {
+  pipelineHooks = hooks;
+}
+
+/** What a tab in Aggregate does in place of its query, once the aggregate area of the window is loaded. */
+export function pipelineHooksOf(): PipelineHooks | undefined {
+  return pipelineHooks;
+}
+
 /** Remembers the collection a tab shows. */
 export function registerCollection(ref: CollectionRef): void {
   refs.set(ref.tab, ref);
@@ -216,6 +239,10 @@ function beginning(before: CollectionTab, how: RunHow, texts: QueryTexts, now: n
 export async function runQuery(ref: CollectionRef, how: RunHow): Promise<void> {
   const now = Date.now();
   const before = collectionOf(ref.tab);
+  if (before.query.mode === 'aggregate' && pipelineHooks !== undefined) {
+    await pipelineHooks.run(ref, how);
+    return;
+  }
   const texts = how.texts === 'bar' ? before.query.texts : textsRan(before);
   if (refused(ref, texts, now)) {
     return;
@@ -315,7 +342,8 @@ export async function countQuery(
 /** A click on the total of a tab, on the status line or the paging row: counts it exactly. */
 export function countTab(tab: TabId, place: 'status-line' | 'paging'): void {
   const ref = refs.get(tab);
-  if (ref !== undefined) {
+  // In Aggregate, the count comes with each page of the pipeline's output (`aggregate.run`).
+  if (ref !== undefined && collectionOf(tab).query.mode !== 'aggregate') {
     void countQuery(ref, 'exact', place);
   }
 }

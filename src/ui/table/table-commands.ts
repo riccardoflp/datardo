@@ -4,22 +4,20 @@
  * selected cell (expand, collapse, arrange, sort, copy its value or its path), the pages, the selection, and the copies
  * of the selected documents, or of the document of the selected cell.
  */
-import { edited } from '../../features/query/bar';
 import type { LayoutChange } from '../../features/table/arrange-columns';
 import type { CopyFormat } from '../../features/table/copy-text';
 import { view as pagingView } from '../../features/table/paging';
 import { selectedDocuments, selectionAfter, type SelectionAction } from '../../features/table/selection';
-import { sortAfterClick } from '../../features/table/sort';
 import type { Document } from '../../features/table/types';
 import type { AppState } from '../../shared/state';
 import { rememberedColumns } from '../../shared/state/table';
 import { activeTabOf } from '../../shared/state/tabs';
-import { runFromBar } from '../query/bar-actions';
 import { collectionRefOf, runQuery, type CollectionRef } from '../query/collection-reads';
-import { changeCollection, changeQuery, collectionOf, type CollectionTab } from '../query/collection-store';
+import { changeQuery, collectionOf, type CollectionTab } from '../query/collection-store';
 import { pagingStateOf } from '../query/collection-view';
 import { openColumnsPanel } from './columns-panel-store';
 import { selectedCell } from './selected-cell';
+import { sortByHeader } from './table-actions';
 import { tableColumnsOf, type TableColumns } from './table-columns';
 import { arrange, collapseColumn, copyDocuments, expandColumn, refreshTab, startOnCollection } from './table-start';
 
@@ -61,14 +59,6 @@ function copiedDocuments(on: On): readonly Document[] {
 }
 
 /** The sort of the column alone, then the other direction, then none; and run, as a click on its header. */
-function sortBy(ref: CollectionRef, key: string): void {
-  changeCollection(ref.tab, (before) => ({
-    ...before,
-    query: edited(before.query, 'sort', sortAfterClick(before.query.texts.sort, key)),
-  }));
-  runFromBar(ref);
-}
-
 function onColumn(on: On, id: string): void {
   const column = cellOf(on)?.column;
   if (column === undefined) {
@@ -90,7 +80,7 @@ function onColumn(on: On, id: string): void {
       arrange(on.ref, on.columns, { kind: variant, key } as LayoutChange, feature);
       return;
     case 'table.sort':
-      sortBy(on.ref, key);
+      sortByHeader(on.ref, key);
       return;
     case 'table.copy-path':
       void startOnCollection(on.ref, feature, { key });

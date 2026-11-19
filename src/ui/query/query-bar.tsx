@@ -73,9 +73,12 @@ function useDragEnd(): void {
 export function QueryBar({
   collectionRef,
   collection,
+  pipeline,
 }: {
   readonly collectionRef: CollectionRef;
   readonly collection: CollectionTab;
+  /** The pipeline editor of the aggregate area, drawn under the row in Aggregate. */
+  readonly pipeline?: React.ReactNode;
 }): React.JSX.Element {
   const bar = view({ query: collection.query, running: collection.running });
   const what = useDragged();
@@ -106,6 +109,7 @@ export function QueryBar({
             ))}
         </div>
       </div>
+      {bar.pipeline ? pipeline : null}
       {bar.builderOpen ? <QueryBuilder collectionRef={collectionRef} collection={collection} /> : null}
       {bar.errorLine === undefined ? null : (
         <ErrorLine key={bar.errorLine.message} line={bar.errorLine} collectionRef={collectionRef} />

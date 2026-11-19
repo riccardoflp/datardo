@@ -5,7 +5,8 @@
  * the stage shown, or the last stage for the whole pipeline. That stage being an enabled `$match`, the condition is
  * merged into its body as into a filter (operators on the same field join into one range; a field of the elements of
  * an expanded array goes into the `$elemMatch` of that array); otherwise a new enabled `$match` with the condition is
- * inserted right after it, and becomes the stage shown when a stage was shown. The pipeline is then run.
+ * inserted right after it, and becomes the stage shown when a stage was shown. The window that started it then runs
+ * the pipeline up to that stage (`aggregate.run`), since the output of a read goes back to the control that started it.
  *
  * Started with `{ field, condition, within? }`: the dotted field, its condition as canonical Extended JSON (the value
  * for **equals**, `{ $lte: 50 }` for **to**…, as the drag and drop of the query bar makes it), and the expanded array
@@ -24,7 +25,6 @@ import {
   editorStep,
   makersOf,
   placeOf,
-  runAfter,
   stageName,
   startArgs,
   upToIndex,
@@ -127,7 +127,7 @@ function changeOf(editor: PipelineEditor, dropped: Dropped, context: Context, co
   return { editor: withStages(editor, stages, shown), step };
 }
 
-/** Adds the condition dropped to the pipeline, and runs it up to the stage that received it. */
+/** Adds the condition dropped to the pipeline; the window runs it up to the stage that received it. */
 export function plan(context: Context, answers: Answers): Outcome {
   const place = placeOf(context, answers);
   const dropped = droppedOf(answers);
@@ -146,7 +146,7 @@ export function plan(context: Context, answers: Answers): Outcome {
   }
   const after = withTextKept(editor, change.editor);
   const step = editorStep(change.step, place, after);
-  return run(editorPlan(text.plans.dropCondition, [step], [runAfter(place, after)]));
+  return run(editorPlan(text.plans.dropCondition, [step]));
 }
 
 /** The feature, as the runner starts it. */

@@ -31,7 +31,8 @@ export function plan(context: Context, answers: Answers): Outcome {
     action: copyAction,
     args: { text: copied },
   } as const;
-  return run(editorPlan(text.plans.copy, [step], [{ kind: 'notify', level: 'success', text: text.results.copied }]));
+  // The status line says *Copied to the clipboard* once the window learns that the copy is done.
+  return run(editorPlan(text.plans.copy, [step]));
 }
 
 /** The feature, as the runner starts it. */

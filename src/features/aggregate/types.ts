@@ -167,8 +167,16 @@ export function placeOf(context: Context, answers: Answers): PipelinePlace | und
   };
 }
 
-function memoryEditor(tab: Tab | undefined): PipelineEditor | undefined {
-  const kept = tab?.memory?.pipeline;
+/**
+ * The pipeline as a tab keeps it (`TabMemory.pipeline`): the JSON of the editor read back, so that the window and the
+ * main process write the same text for the same pipeline, as `tab.restore` saves it.
+ */
+export function keptPipeline(editor: PipelineEditor): string {
+  return JSON.stringify(editorJson(readEditor(editorJson(editor)) ?? editor));
+}
+
+/** The pipeline a tab kept, read back; `undefined` when nothing usable is kept. */
+export function restoredPipeline(kept: string | undefined): PipelineEditor | undefined {
   if (kept === undefined) {
     return undefined;
   }
@@ -178,6 +186,10 @@ function memoryEditor(tab: Tab | undefined): PipelineEditor | undefined {
     // A memory that is not the JSON of an editor (an older text) is read as no pipeline: the editor shows it empty.
     return undefined;
   }
+}
+
+function memoryEditor(tab: Tab | undefined): PipelineEditor | undefined {
+  return restoredPipeline(tab?.memory?.pipeline);
 }
 
 /** The pipeline a feature works on: `args.pipeline` as the window sent it, or the one kept in the tab's memory. */

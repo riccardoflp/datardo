@@ -5,7 +5,8 @@
  * shows (the stage shown, or the last stage): a stage that is not an enabled `$sort` gets a `$sort { <field>: 1 }`
  * right after it, which becomes the stage shown when a stage was shown; an enabled `$sort` without the field, or with
  * it ascending, becomes `{ <field>: 1 }` or `{ <field>: -1 }`, one field at a time as in Find; one with the field
- * descending is removed. The pipeline is then run. Started with `{ field }`; the field of the column of an expanded
+ * descending is removed. The window that started it then runs the pipeline (`aggregate.run`), since the output of a
+ * read goes back to the control that started it. Started with `{ field }`; the field of the column of an expanded
  * array is its dotted path (`items[].sku` sorts by `items.sku`).
  */
 import type { Json } from '../../shared/engine-request';
@@ -22,7 +23,6 @@ import {
   editorStep,
   makersOf,
   placeOf,
-  runAfter,
   stageName,
   startArgs,
   upToIndex,
@@ -49,6 +49,29 @@ function directionOf(body: string, field: string): number {
   const inner = typeof direction === 'object' && direction !== null ? Object.values(direction)[0] : direction;
   const number = Number(inner);
   return number === 1 || number === -1 ? number : 0;
+}
+
+/**
+ * The direction each field has in the sort at the point the table shows, for the `▲` and `▼` of the headers, as in
+ * Find: the fields of the enabled `$sort` that is the stage shown, or the last stage; none otherwise.
+ */
+export function sortDirections(editor: PipelineEditor): ReadonlyMap<string, 1 | -1> {
+  const stage = editor.stages[upToIndex(editor)];
+  const directions = new Map<string, 1 | -1>();
+  if (stage?.enabled !== true || stageName(stage) !== '$sort') {
+    return directions;
+  }
+  const parsed = valueOf(stage.body, {});
+  if (!parsed.ok || typeof parsed.value !== 'object' || parsed.value === null || Array.isArray(parsed.value)) {
+    return directions;
+  }
+  for (const field of Object.keys(parsed.value)) {
+    const direction = directionOf(stage.body, field);
+    if (direction === 1 || direction === -1) {
+      directions.set(field, direction);
+    }
+  }
+  return directions;
 }
 
 /** The editor after a click on the header of `field`, and the text of its step. */
@@ -85,7 +108,7 @@ export function sortedEditor(
   return { editor: withStages(editor, stages, editor.shown === undefined ? undefined : index + 1), step };
 }
 
-/** Sorts the output shown by the column clicked. */
+/** Sorts the output shown by the column clicked; the window runs the pipeline once it is done. */
 export function plan(context: Context, answers: Answers): Outcome {
   const place = placeOf(context, answers);
   const column = startArgs(answers)['field'];
@@ -101,7 +124,7 @@ export function plan(context: Context, answers: Answers): Outcome {
   const sorted = sortedEditor(applied, sortField(column), place.collection);
   const after = withTextKept(editor, sorted.editor);
   const step = editorStep(sorted.step, place, after);
-  return run(editorPlan(text.plans.sortColumn, [step], [runAfter(place, after)]));
+  return run(editorPlan(text.plans.sortColumn, [step]));
 }
 
 /** The feature, as the runner starts it. */

@@ -3,7 +3,9 @@
  *
  * Shows in the table what the pipeline returns up to one stage (`args.stage`, from 0), or the whole pipeline (no
  * stage: **show full pipeline**). The number of the stage already shown, and the number of the last stage, show the
- * whole pipeline. The pipeline is run up to the stage shown from its first page; the stages after it are not sent.
+ * whole pipeline. The window that started it then runs the pipeline up to the stage shown from its first page
+ * (`aggregate.run`), since the output of a read goes back to the control that started it; the stages after it are not
+ * sent.
  */
 import { run, type Answers, type Context, type OperationFeature, type Outcome } from '../../shared/feature';
 import { featureId } from '../../shared/ids';
@@ -13,7 +15,6 @@ import {
   editorPlan,
   editorStep,
   placeOf,
-  runAfter,
   stageArg,
   stageName,
   withStages,
@@ -33,7 +34,7 @@ export function numberLabel(editor: PipelineEditor, index: number): string {
   return editor.shown === index ? text.editor.previewing : text.editor.showUpTo;
 }
 
-/** Shows the output of a stage, or of the whole pipeline, and runs it. */
+/** Shows the output of a stage, or of the whole pipeline; the window runs it once it is done. */
 export function plan(context: Context, answers: Answers): Outcome {
   const place = placeOf(context, answers);
   if (place === undefined) {
@@ -47,7 +48,7 @@ export function plan(context: Context, answers: Answers): Outcome {
     shown === undefined || stage === undefined
       ? text.steps.showWhole(place.collection)
       : text.steps.show(shown + 1, stageName(stage), place.collection);
-  return run(editorPlan(text.plans.showStage, [editorStep(step, place, after)], [runAfter(place, after)]));
+  return run(editorPlan(text.plans.showStage, [editorStep(step, place, after)]));
 }
 
 /** The feature, as the runner starts it. */

@@ -13,6 +13,8 @@ export interface ShowContext {
   readonly readOnly: boolean;
   readonly columns?: readonly ColumnNode[];
   readonly layout?: ColumnLayout;
+  /** In Aggregate, what the table says in place of rows after a pipeline that wrote. */
+  readonly note?: string;
 }
 
 /** The paging row's state: the page and its size, **Skip** and **Limit** as last run, the documents received. */
@@ -41,5 +43,6 @@ export function showStateOf(collection: CollectionTab, context: ShowContext): Sh
     paging: pagingStateOf(collection),
     ...(collection.milliseconds === undefined ? {} : { milliseconds: collection.milliseconds }),
     selected: query.selection.keys.length,
+    ...(context.note === undefined || query.mode !== 'aggregate' ? {} : { note: context.note }),
   };
 }

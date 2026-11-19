@@ -47,7 +47,8 @@ export function switchMode(ref: CollectionRef, mode: QueryMode): void {
   const before = collectionOf(ref.tab).query;
   const next = readAfterSwitch(before, mode);
   changeQuery(ref.tab, (query) => switchedMode(query, mode));
-  if (next === 'query.run') {
+  // `aggregate.run` once the tab is in Aggregate: the run of the tab follows its mode.
+  if (next !== undefined) {
     runFromBar(ref);
   }
 }

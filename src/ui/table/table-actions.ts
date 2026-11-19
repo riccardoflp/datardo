@@ -14,12 +14,17 @@ import { sortAfterClick } from '../../features/table/sort';
 import type { ColumnLayout, ColumnNode, Document } from '../../features/table/types';
 import type { Json } from '../../shared/engine-request';
 import { runFromBar } from '../query/bar-actions';
-import type { CollectionRef } from '../query/collection-reads';
-import { changeCollection } from '../query/collection-store';
+import { pipelineHooksOf, type CollectionRef } from '../query/collection-reads';
+import { changeCollection, collectionOf } from '../query/collection-store';
 import { columnsInOrder, refreshTab, startOnCollection } from './table-start';
 
 /** A header clicked, or `Enter` on it: the sort of that field alone, then the other direction, then none; and run. */
 export function sortByHeader(ref: CollectionRef, key: string): void {
+  // In Aggregate, the click adds or changes a `$sort` stage of the pipeline (`aggregate.sort-column`).
+  if (collectionOf(ref.tab).query.mode === 'aggregate') {
+    pipelineHooksOf()?.sort(ref, key);
+    return;
+  }
   changeCollection(ref.tab, (before) => ({
     ...before,
     query: edited(before.query, 'sort', sortAfterClick(before.query.texts.sort, key)),

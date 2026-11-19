@@ -60,6 +60,13 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
   before it runs, refused on a read-only connection, and recorded in the undo history when it fits.
 - Keys are exported to a file of Redis commands, with their values, expiries and bytes kept, and imported from it,
   skipping, replacing or stopping at the keys that exist.
+- A collection tab in **Aggregate** has the pipeline editor: stages added, renamed from the templates of the common
+  stages, disabled, moved and removed, with suggestions in their bodies and marks that say what needs attention; the
+  output after any stage or of the whole pipeline is shown in the table, paged and counted; the pipeline is edited as
+  text, copied, and kept by the tab for the next start. A cell or a header dragged onto the editor adds a condition,
+  and a click on a header sorts the output.
+- A pipeline ending with `$out` or `$merge` runs only after a confirmation, which asks to type the name of a collection
+  that `$out` replaces, and never on a read-only connection; a pipeline is saved as a view.
 
 ### Fixed
 

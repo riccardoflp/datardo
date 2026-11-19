@@ -11,6 +11,8 @@ import { runQuery, type CollectionRef } from '../../query/collection-reads';
 import { changeQuery, type CollectionTab } from '../../query/collection-store';
 import { showStateOf } from '../../query/collection-view';
 import { QueryBar } from '../../query/query-bar';
+import { PipelinePane } from '../aggregate/pipeline-editor';
+import { usePipeline } from '../aggregate/pipeline-store';
 import { startFeature } from '../../shell/intent';
 import { DocumentTable } from '../../table/document-table';
 import { PagingRow } from '../../table/paging-row';
@@ -88,6 +90,7 @@ export function DocumentsSection({
   readonly page: CollectionPageState;
 }): React.JSX.Element {
   const columns = useTableColumns(collectionRef, collection);
+  const { note } = usePipeline(collectionRef.tab);
   const target = tableTargetOf(collection, page);
   const parts: TablePartProps = { collectionRef, collection, columns, target };
   const shown = showView(
@@ -96,6 +99,7 @@ export function DocumentsSection({
       readOnly: page.readOnly,
       columns: columns.columns,
       layout: columns.layout,
+      ...(note === undefined ? {} : { note }),
     }),
   );
   return (
@@ -110,7 +114,11 @@ export function DocumentsSection({
       }}
     >
       <TableToolbar {...parts} />
-      <QueryBar collectionRef={collectionRef} collection={collection} />
+      <QueryBar
+        collectionRef={collectionRef}
+        collection={collection}
+        pipeline={<PipelinePane collectionRef={collectionRef} collection={collection} readOnly={page.readOnly} />}
+      />
       <SelectionBar {...parts} />
       {shown.body.kind === 'message' ? (
         <Message body={shown.body} collectionRef={collectionRef} />

@@ -33,6 +33,8 @@ export interface ShowState {
   readonly milliseconds?: number;
   /** How many rows are selected. */
   readonly selected: number;
+  /** In Aggregate, what the table says in place of rows after a pipeline that wrote (`aggregate.write-output`). */
+  readonly note?: string;
 }
 
 /** A button of the toolbar. */
@@ -96,7 +98,7 @@ function marks(target: TableTarget): readonly ToolbarMark[] {
 
 function emptyBody(state: ShowState): ShowBody {
   if (state.target.mode === 'aggregate') {
-    return { kind: 'message', text: text.show.emptyOutput, buttons: [] };
+    return { kind: 'message', text: state.note ?? text.show.emptyOutput, buttons: [] };
   }
   if (state.emptyQuery) {
     const insert = canWrite(state.target)

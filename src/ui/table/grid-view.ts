@@ -10,7 +10,7 @@ import { firstCell, type Position } from '../../features/table/navigate';
 import { rowsOfDocuments, type Row } from '../../features/table/rows';
 import { sortDirections, type Direction } from '../../features/table/sort';
 import type { RowKey, TableTarget } from '../../features/table/types';
-import type { CollectionRef } from '../query/collection-reads';
+import { pipelineHooksOf, type CollectionRef } from '../query/collection-reads';
 import type { CollectionTab } from '../query/collection-store';
 import {
   columnPlaces,
@@ -93,7 +93,10 @@ export function useGridView(
   }, [columns, documents, query.page, query.pageSize]);
   const widths = widthsWith(layoutPart.widths, layoutPart.drawn, resizing);
   const sortText = query.ran?.sort ?? query.texts.sort;
-  const directions = useMemo(() => sortDirections(sortText), [sortText]);
+  const findDirections = useMemo(() => sortDirections(sortText), [sortText]);
+  // In Aggregate, the directions of the `$sort` at the point the table shows (`aggregate.sort-column`).
+  const directions =
+    query.mode === 'aggregate' ? (pipelineHooksOf()?.directions(ref.tab) ?? findDirections) : findDirections;
   const selected = useMemo(() => new Set(query.selection.keys), [query.selection.keys]);
   return {
     ref,

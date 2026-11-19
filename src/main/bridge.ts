@@ -20,6 +20,7 @@ import type { RunnerPorts } from '../runner/ports';
 import { writeAtomically } from '../storage/store';
 import type { AppStateHolder } from './app-state';
 import type { WindowDialogs } from './dialogs';
+import { keepTabPipeline } from './aggregate';
 import { keepTabQuery } from './query';
 import { withTestFeatures } from './test-features';
 
@@ -43,6 +44,7 @@ export function answerTheBridge(given: RunnerPorts, state: AppStateHolder, dialo
     const started = Date.now();
     const result = await start(ports, intent);
     keepTabQuery(state, intent, result);
+    keepTabPipeline(state, intent, result);
     tellTheSystem(state, Date.now() - started, result.kind === 'failed' ? result.message : undefined);
     return result;
   });

@@ -85,6 +85,19 @@ describe('aggregate.run', () => {
   it('parses an empty count as 0 and a failed count as unknown', () => {
     expect(parse([[], recorded('count-empty')])).toEqual({ documents: [], count: 0 });
     expect(parse([[], undefined])).toEqual({ documents: [] });
+    const page = parse([recorded('page'), { kind: 'error', message: 'operation exceeded time limit' }]);
+    expect(page.count).toBeUndefined();
+    expect(page.documents).toHaveLength(3);
+  });
+
+  it('gives the message of the server when the page fails, so that the table keeps what it showed', () => {
+    const failed = parse([{ kind: 'error', message: 'Unrecognized pipeline stage name: $bogus' }, undefined]);
+    expect(failed).toEqual({ documents: [], failure: 'Unrecognized pipeline stage name: $bogus' });
+  });
+
+  it('takes the failures of its requests as replies', () => {
+    const outcome = sent(editorOf(paidByCustomer));
+    expect(outcome).toMatchObject({ kind: 'engine', failedRequests: 'are-replies' });
   });
 
   it('keeps a NumberLong of the output a NumberLong', () => {

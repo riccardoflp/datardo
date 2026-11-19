@@ -15,6 +15,7 @@ export const queryCommandIds: ReadonlySet<string> = new Set([
   'query.run',
   'query.reset',
   'query.mode:find',
+  'query.mode:aggregate',
   'query.builder',
 ]);
 
@@ -37,6 +38,9 @@ export function runQueryCommand(id: string, state: AppState): void {
       return;
     case 'query.mode:find':
       switchMode(ref, 'find');
+      return;
+    case 'query.mode:aggregate':
+      switchMode(ref, 'aggregate');
       return;
     case 'query.builder':
       toggleBuilder(ref);
