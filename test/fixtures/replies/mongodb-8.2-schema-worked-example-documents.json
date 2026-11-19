@@ -1,0 +1,75 @@
+[
+  {
+    "_id": {
+      "$oid": "65f1c0de9a1b2c3d4e5f6a01"
+    },
+    "status": "paid",
+    "total": {
+      "$numberDouble": "42.5"
+    },
+    "qty": {
+      "$numberInt": "2"
+    },
+    "address": {
+      "city": "Milano",
+      "zip": "20100"
+    },
+    "items": [
+      {
+        "sku": "A1",
+        "qty": {
+          "$numberInt": "1"
+        }
+      },
+      {
+        "sku": "B2",
+        "qty": {
+          "$numberInt": "3"
+        }
+      }
+    ],
+    "tags": ["a", "b"]
+  },
+  {
+    "_id": {
+      "$oid": "65f1c0de9a1b2c3d4e5f6a02"
+    },
+    "status": "new",
+    "total": {
+      "$numberInt": "12"
+    },
+    "qty": {
+      "$numberLong": "5"
+    },
+    "address": {
+      "city": "Roma"
+    },
+    "items": [],
+    "tags": ["a"]
+  },
+  {
+    "_id": {
+      "$oid": "65f1c0de9a1b2c3d4e5f6a03"
+    },
+    "status": "paid",
+    "total": null,
+    "address": "unknown",
+    "items": [
+      {
+        "sku": "A1",
+        "qty": {
+          "$numberInt": "2"
+        }
+      }
+    ]
+  },
+  {
+    "_id": {
+      "$oid": "65f1c0de9a1b2c3d4e5f6a04"
+    },
+    "status": "paid",
+    "total": {
+      "$numberDouble": "7.0"
+    }
+  }
+]
