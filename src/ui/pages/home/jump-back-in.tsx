@@ -23,10 +23,14 @@ function Item(props: { readonly item: JumpItem; readonly part: JumpBackInView })
           <button
             type="button"
             className={styles['jump']}
-            data-feature="home.jump-back-in@home"
+            data-feature={item.file === undefined ? 'home.jump-back-in@home' : item.file.element}
             data-color={item.color}
             onClick={() => {
-              startFeature('palette.open-result', { place: 'home', args: openArgs(item.opens, 'foreground') });
+              if (item.file === undefined) {
+                startFeature('palette.open-result', { place: 'home', args: openArgs(item.opens, 'foreground') });
+              } else {
+                startFeature('playground.open-file', { place: 'home', args: { path: item.file.path } });
+              }
             }}
           >
             <span className={`codicon codicon-${item.icon}`} aria-hidden="true" />

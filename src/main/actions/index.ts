@@ -16,6 +16,7 @@ import { actions as paletteActions } from './palette';
 import { actions as homeActions } from './home';
 import { actions as undoActions } from './undo';
 import { actions as tableActions } from './table';
+import { actions as playgroundActions } from './playground';
 
 /** The actions of one area, by name. */
 export type AreaActions = (services: MainServices) => Readonly<Record<string, AppAction>>;
@@ -33,6 +34,7 @@ const areas: readonly AreaActions[] = [
   homeActions,
   undoActions,
   tableActions,
+  playgroundActions,
 ];
 
 /** Every action of every area, by name; two areas never name an action alike. */

@@ -65,7 +65,13 @@ export interface RunStart {
 export type ToRun =
   | ({ readonly kind: 'start' } & RunStart)
   | { readonly kind: 'reply'; readonly id: number; readonly value: Json }
-  | { readonly kind: 'throw'; readonly id: number; readonly error: RunError };
+  | {
+      readonly kind: 'throw';
+      readonly id: number;
+      readonly error: RunError;
+      /** The server's error labels (`TransientTransactionError`), which `withTransaction` reads. */
+      readonly labels?: readonly string[];
+    };
 
 /** What the process of a run sends to the main process. */
 export type FromRun =
@@ -104,7 +110,7 @@ function isPlainDocument(value: Json | undefined): value is { readonly [field: s
  * mongosh writes `find(filter, projection, options)`; the engine takes `[filter, options]`, with the projection among
  * the options.
  */
-function findArguments(args: readonly Json[]): readonly Json[] {
+export function findArguments(args: readonly Json[]): readonly Json[] {
   const [filter, projection, options] = args;
   if (projection === undefined) {
     return args;

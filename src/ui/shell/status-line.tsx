@@ -83,7 +83,7 @@ export function StatusLine(props: { readonly input: NavInput; readonly openSwitc
             <button
               type="button"
               className={styles['part']}
-              data-feature={line.work.element}
+              data-feature={line.work.cancelElement ?? line.work.element}
               onClick={() => {
                 if (line.work?.kind === 'one') {
                   void window.datardo.cancel(line.work.work);

@@ -8,8 +8,10 @@
  * `src/playground/context.ts` and `src/playground/playground.ts` (`Playgrounds.completions`).
  */
 import type { Json, MongoRequest } from '../../shared/engine-request';
+import type { Context, ReadFeature, ReadRequest } from '../../shared/feature';
+import { connectionId, featureId } from '../../shared/ids';
 import { databaseAt } from '../../shared/playground/statements';
-import type { FieldHint } from '../aggregate/complete/fields';
+import { fieldsOfDocuments, type FieldHint } from '../aggregate/complete/fields';
 import { matchScore, type Suggestion } from '../aggregate/complete/items';
 import { argumentKind, argumentSuggestions } from './complete/arguments';
 import { callAt, memberAt, type MemberAt } from './complete/receiver';
@@ -193,3 +195,68 @@ export function completions(text: string, offset: number, hints: CompletionHints
   }
   return inCall(text, offset, database, hints) ?? { from: offset, to: offset, items: [], needs: [] };
 }
+
+/** The read of the collections of a database, for the list after `db.`: `{ connection, database }`. */
+export const collectionsReadId = 'playground.autocomplete:collections';
+
+/** The read of a sample of a collection, for the fields inside a call: `{ connection, database, collection }`. */
+export const sampleReadId = 'playground.autocomplete:sample';
+
+function fieldOf(value: Json | undefined, name: string): Json | undefined {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+    ? (value as Readonly<Record<string, Json>>)[name]
+    : undefined;
+}
+
+function textArgument(args: Json, name: string): string {
+  const value = fieldOf(args, name);
+  return typeof value === 'string' ? value : '';
+}
+
+/** `playground.autocomplete:collections`: the names of the collections, sorted; none when they cannot be read. */
+export const collectionsRead: ReadFeature = {
+  kind: 'read',
+  id: featureId(collectionsReadId),
+  request: (_context: Context, args: Json): ReadRequest => ({
+    kind: 'engine',
+    requests: [
+      {
+        connection: connectionId(textArgument(args, 'connection')),
+        request: collectionsRequest(textArgument(args, 'database')),
+      },
+    ],
+    // A list that cannot be read leaves the suggestions without collections, and shows no error.
+    failedRequests: 'are-replies',
+  }),
+  parse: (replies): readonly string[] => {
+    const [reply] = replies;
+    const names = Array.isArray(reply)
+      ? (reply as readonly Json[]).flatMap((each) => {
+          const name = typeof each === 'string' ? each : fieldOf(each, 'name');
+          return typeof name === 'string' ? [name] : [];
+        })
+      : [];
+    return [...names].sort((first, second) => (first < second ? -1 : first > second ? 1 : 0));
+  },
+};
+
+/** `playground.autocomplete:sample`: the fields of a sample of the collection; none when it cannot be read. */
+export const sampleRead: ReadFeature = {
+  kind: 'read',
+  id: featureId(sampleReadId),
+  request: (_context: Context, args: Json): ReadRequest => ({
+    kind: 'engine',
+    requests: [
+      {
+        connection: connectionId(textArgument(args, 'connection')),
+        request: sampleRequest(textArgument(args, 'database'), textArgument(args, 'collection')),
+      },
+    ],
+    // A sample that cannot be read (no privilege) leaves the operators, as on a collection never sampled.
+    failedRequests: 'are-replies',
+  }),
+  parse: (replies): readonly FieldHint[] => {
+    const [reply] = replies;
+    return Array.isArray(reply) ? fieldsOfDocuments(reply as readonly Json[]) : [];
+  },
+};

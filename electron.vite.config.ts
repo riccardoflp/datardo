@@ -12,7 +12,8 @@ export default defineConfig({
       outDir: 'out/main',
       externalizeDeps: false,
       rolldownOptions: {
-        input: { index: resolve('src/main/index.ts') },
+        // The process of a playground's run (`playground.run`) is a bundle of its own.
+        input: { index: resolve('src/main/index.ts'), playground: resolve('src/main/playground/process-entry.ts') },
         external: ['electron'],
       },
     },

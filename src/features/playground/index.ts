@@ -5,7 +5,10 @@
  */
 import type { RunnableFeature } from '../../shared/feature';
 import { featureId } from '../../shared/ids';
+import * as autocomplete from './autocomplete';
 import * as open from './open';
+import * as results from './results';
+import * as show from './show';
 import * as openFile from './open-file';
 import * as runPlayground from './run';
 import * as save from './save';
@@ -24,6 +27,11 @@ export const features: readonly RunnableFeature[] = [
   openFile.textRead,
   openFile.rememberedRead,
   save.fileRead,
+  save.writableRead,
   target.databasesRead,
   runPlayground.connectRead,
+  show.editRead,
+  results.layoutRead,
+  autocomplete.collectionsRead,
+  autocomplete.sampleRead,
 ];

@@ -76,10 +76,11 @@ The things used last, to go on from where the work stopped.
   - A click, or `Enter` with the focus on it, opens it (`tab.open`) on the section it had, and connects its
     connection if needed. A click with the middle button or with `Ctrl` opens it in the background.
   - What is open in a tab already is listed like the rest; a click makes that tab active.
+  - A playground file that is not open is opened by `playground.open-file` with its path, with no dialog.
   - Its context menu has **Remove from Jump back in** (`home.forget-recent`).
   - The filter of the cards does not change this part.
   - `Left` and `Right` move between the items.
-- **Uses**: `palette.recent`, `tab.open`, `tab.title`, `home.forget-recent`.
+- **Uses**: `palette.recent`, `tab.open`, `tab.title`, `home.forget-recent`, `playground.open-file`.
 - **Ported from**: *New in Datardo*.
 
 Acceptance:

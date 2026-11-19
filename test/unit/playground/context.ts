@@ -58,7 +58,7 @@ export function stateOf(setup: Setup = {}): AppState {
     tabs: { ...base.tabs, tabs, active: setup.active ?? tabs[0]?.id, nextId: tabs.length + 1 },
     nav: { ...base.nav, current: setup.current?.id },
     playgrounds: setup.playgrounds ?? {},
-  } as AppState;
+  };
 }
 
 /** The state with **Playground 1** open and active on Local and `shop`, with this text. */

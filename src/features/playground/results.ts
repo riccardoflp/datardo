@@ -7,6 +7,8 @@
  * `src/playground/resultPanel.ts` and `src/playground/shell.ts` (`result`, `serialize`, `toPlaygroundError`).
  */
 import type { Json } from '../../shared/engine-request';
+import type { Context, ReadFeature, ReadRequest } from '../../shared/feature';
+import { featureId } from '../../shared/ids';
 import { formattedValue, prettyWidth } from '../aggregate/mongosh/format';
 import { relaxedText } from './results/relaxed';
 import { resultTable, type ResultTable } from './results/table';
@@ -209,3 +211,14 @@ export function view(input: ResultsInput): ResultsView {
   }
   return { state: 'done', ...shownResult(input.result, input.layout) };
 }
+
+/** The read **Table** and **JSON** send: `{ tab, layout }`, kept for the next runs of every playground. */
+export const layoutReadId = 'playground.results:layout';
+
+/** `playground.results:layout`: the layout chosen; it answers nothing. */
+export const layoutRead: ReadFeature = {
+  kind: 'read',
+  id: featureId(layoutReadId),
+  request: (_context: Context, args: Json): ReadRequest => ({ kind: 'app', action: 'playground.layout', args }),
+  parse: () => null,
+};

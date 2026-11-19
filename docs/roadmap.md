@@ -358,6 +358,7 @@ at the next start.
 - Named by cards above and built in M8: `tree.show`.
 - Named by cards above and built in M9: `query.run`.
 - Named by cards above and built in M20: `saved-query.recent`.
+- Named by cards above and built in M28: `playground.save`.
 
 ## M5 — Go to and Home
 
@@ -425,6 +426,7 @@ saved connections by folder and the places used last.
 - Named by cards above and built in M8: `tree.show`, `tree.refresh`.
 - Named by cards above and built in M13: `key.show`, `key.scan`, `key.open`.
 - Named by cards above and built in M14: `value.format`.
+- Named by cards above and built in M28: `playground.open-file`.
 - Named by cards above and built in M33: `gridfs.show`.
 
 ## M6 — Connect to MongoDB and to Redis
@@ -2005,7 +2007,7 @@ the list.
 **Goal**: A playground tab runs mongosh code against a connection, statement by statement or whole, in a process of
 its own that Stop ends, with sessions and transactions, and shows the results.
 **Depends on**: M11.
-**Status**: planned
+**Status**: done
 
 ### Features
 
@@ -2045,13 +2047,13 @@ its own that Stop ends, with sessions and transactions, and shows the results.
 
 ### Exit criteria
 
-- [ ] A script with `while (true) {}` is stopped within 1 second and Datardo stays usable.
-- [ ] A script that writes is refused on a read-only connection with nothing sent (QA1).
-- [ ] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
+- [x] A script with `while (true) {}` is stopped within 1 second and Datardo stays usable.
+- [x] A script that writes is refused on a read-only connection with nothing sent (QA1).
+- [x] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
       `npm run test:integration`, `npm run test:ui`; `catalog.py --tests` reports none missing for these cards.
-- [ ] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
+- [x] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
       the keyboard alone (QA15, QA16).
-- [ ] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
+- [x] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
       and this milestone's **Status** is *done*.
 
 ### Not in this milestone

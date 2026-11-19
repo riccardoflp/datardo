@@ -9,9 +9,9 @@
  * Mongoster's `src/playground/playground.ts` (`Playgrounds.run`) and `src/playground/shell.ts` (`runPlayground`).
  */
 import type { Json } from '../../shared/engine-request';
-import type { After, Answers, Context, Outcome, ReadFeature, ReadRequest, Step } from '../../shared/feature';
+import type { Answers, Context, Outcome, ReadFeature, ReadRequest, Step } from '../../shared/feature';
 import { needRead, refuse, run } from '../../shared/feature';
-import { featureId, type ConnectionId } from '../../shared/ids';
+import { featureId } from '../../shared/ids';
 import { lineOf, lineStarts } from '../../shared/playground/statements';
 import { connectionState } from '../../shared/state/connections';
 import { appStep, mongoConnection } from './plans/common';
@@ -116,10 +116,6 @@ function runArgs(tab: PlaygroundTab, connection: string, ran: RunText): JsonObje
   return { ...common, error: { message, line: ran.firstLine + result.line - 1 } };
 }
 
-function refreshes(args: JsonObject, connection: ConnectionId): readonly After[] {
-  return args['writes'] === true ? [{ kind: 'refresh', connection }] : [];
-}
-
 /**
  * Feature: playground.run — `run <title> on <connection> › <database>`, the run of the active playground (or of
  * `args.tab`): `args` is the variant of the command (`all`, `selection`, `statement`), or `{ part, tab, text,
@@ -176,7 +172,8 @@ export function plan(context: Context, answers: Answers): Outcome {
     undo: { cannot: text.run.cannotUndo },
     // The writes are published call by call, by `oplog.playground-writes`, not by the runner after the step.
     publishes: false,
-    after: refreshes(stepArgs, connection.id),
+    // The step returns once the run has started: the host reads the tree again when the run ends (`args.writes`).
+    after: [],
   });
 }
 

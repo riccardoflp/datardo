@@ -40,6 +40,11 @@ export interface PlaygroundWrite {
   readonly arguments: readonly Json[];
   /** The number of the run's session it was made in, when it was. */
   readonly session?: number;
+  /**
+   * What the main process learned running it, as `oplog.playground-writes` takes it (its `PlaygroundWrite`): kept
+   * with the write while its transaction waits for the commit.
+   */
+  readonly learned?: Json;
 }
 
 /** A drop the script reached, which waits for the user's answer. */

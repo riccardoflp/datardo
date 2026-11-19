@@ -5,6 +5,9 @@
  * Opening a playground, restoring it and making its tab active send nothing to the deployment. Ported from Mongoster's
  * `src/playground/playground.ts` (the lenses and the label of the connection) and `src/playground/resultPanel.ts`.
  */
+import type { Json } from '../../shared/engine-request';
+import type { Context, ReadFeature, ReadRequest } from '../../shared/feature';
+import { featureId } from '../../shared/ids';
 import { databaseAt, scriptStatements } from '../../shared/playground/statements';
 import { view as resultsView, type ResultsView } from './results';
 import { text } from './text';
@@ -118,3 +121,14 @@ export function view(input: ShowInput): ShowView {
     }),
   };
 }
+
+/** The read the editor sends its text through as it is typed: `{ tab, text, selection }`, kept by the main process. */
+export const editReadId = 'playground.show:edit';
+
+/** `playground.show:edit`: the playground's text and selection, as the editor has them; it answers nothing. */
+export const editRead: ReadFeature = {
+  kind: 'read',
+  id: featureId(editReadId),
+  request: (_context: Context, args: Json): ReadRequest => ({ kind: 'app', action: 'playground.edit', args }),
+  parse: () => null,
+};

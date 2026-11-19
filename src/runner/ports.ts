@@ -26,6 +26,8 @@ export type FileWriter = (step: FileStep, signal: AbortSignal) => Promise<void>;
 export interface Dialogs {
   readonly ask: (feature: FeatureId, question: Question) => Promise<Answers | undefined>;
   readonly confirm: (feature: FeatureId, confirmation: Confirmation) => Promise<boolean>;
+  /** Closes, as cancelled, the dialogs a feature has open: a playground's run stopped while a drop waits. */
+  readonly dismiss?: (feature: FeatureId) => void;
 }
 
 /** The app's state, read and changed only through events (R3.3). */

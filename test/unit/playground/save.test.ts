@@ -17,7 +17,9 @@ describe('playground.save', () => {
   });
 
   it('saves report as report.mongodb.js, then remembers its connection and database', () => {
-    const found = planOf(plan(contextOf('playground.save', withPlayground('a = 1')), { file: 'C:/work/report' }));
+    const found = planOf(
+      plan(contextOf('playground.save', withPlayground('a = 1')), { file: 'C:/work/report', writable: null }),
+    );
     expect(found.steps.map((each) => each.text)).toEqual([
       expect.stringContaining('C:/work/report.mongodb.js'),
       'remember the connection and the database of C:/work/report.mongodb.js',
@@ -39,7 +41,7 @@ describe('playground.save', () => {
   });
 
   it('writes a playground with a file without a question', () => {
-    const found = planOf(plan(contextOf('playground.save', onFile('a = 2', 'a = 1')), {}));
+    const found = planOf(plan(contextOf('playground.save', onFile('a = 2', 'a = 1')), { writable: null }));
     expect(found.steps[0]).toMatchObject({ kind: 'file', path: saved });
   });
 
@@ -53,7 +55,11 @@ describe('playground.save', () => {
       need: { key: 'file', read: 'playground.save:file', args: { name: 'report.mongodb.js' } },
     });
     const found = planOf(
-      plan(contextOf('playground.save', onFile('a = 1', 'a = 1')), { args: 'as', file: 'C:/w/copy.js' }),
+      plan(contextOf('playground.save', onFile('a = 1', 'a = 1')), {
+        args: 'as',
+        file: 'C:/w/copy.js',
+        writable: null,
+      }),
     );
     expect(found.title).toBe('Save playground as…');
     expect(found.steps[0]).toMatchObject({ path: 'C:/w/copy.js' });
@@ -61,6 +67,20 @@ describe('playground.save', () => {
 
   it('saves nothing when the dialog is closed', () => {
     expect(planOf(plan(contextOf('playground.save', withPlayground('a = 1')), { file: null })).steps).toEqual([]);
+  });
+
+  it('tries the file before it writes it, and refuses one that cannot be written with why, writing nothing', () => {
+    expect(plan(contextOf('playground.save', onFile('a = 2', 'a = 1')), {})).toEqual({
+      kind: 'read',
+      need: { key: 'writable', read: 'playground.save:writable', args: { path: saved } },
+    });
+    expect(
+      plan(contextOf('playground.save', onFile('a = 2', 'a = 1')), { writable: 'EACCES: permission denied' }),
+    ).toEqual({
+      kind: 'refuse',
+      code: 'playground.save/save-failed',
+      message: 'Could not save report.mongodb.js: EACCES: permission denied',
+    });
   });
 
   it('keeps an extension that was typed, and says why a save failed', () => {

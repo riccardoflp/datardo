@@ -14,6 +14,7 @@ import { start as startPalette } from './palette';
 import { start as startUndo } from './undo';
 import { start as startOplog } from './oplog';
 import { start as startTable } from './table';
+import { start as startPlaygrounds } from './playgrounds';
 
 /** What one area does at start. */
 export type AreaStart = (services: MainServices) => Promise<void>;
@@ -26,6 +27,8 @@ const starts: readonly AreaStart[] = [
   startOplog,
   startKnownHosts,
   startNav,
+  // Before the tabs are restored, so that the playground of each restored tab is loaded.
+  startPlaygrounds,
   startTabs,
   startPalette,
   startTable,
