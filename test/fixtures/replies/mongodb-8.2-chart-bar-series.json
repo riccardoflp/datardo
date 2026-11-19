@@ -1,0 +1,36 @@
+[
+  {
+    "_id": "paid",
+    "total": {
+      "$numberInt": "90"
+    },
+    "items": [
+      {
+        "s": "FR",
+        "v": {
+          "$numberInt": "30"
+        }
+      },
+      {
+        "s": "IT",
+        "v": {
+          "$numberInt": "60"
+        }
+      }
+    ]
+  },
+  {
+    "_id": "new",
+    "total": {
+      "$numberInt": "5"
+    },
+    "items": [
+      {
+        "s": "FR",
+        "v": {
+          "$numberInt": "5"
+        }
+      }
+    ]
+  }
+]

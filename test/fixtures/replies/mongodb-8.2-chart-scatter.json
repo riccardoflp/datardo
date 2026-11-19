@@ -1,0 +1,31 @@
+[
+  {
+    "x": {
+      "$numberInt": "3"
+    },
+    "y": {
+      "$numberInt": "30"
+    },
+    "s": "new"
+  },
+  {
+    "x": {
+      "$date": {
+        "$numberLong": "1704067200000"
+      }
+    },
+    "y": {
+      "$numberInt": "5"
+    },
+    "s": "paid"
+  },
+  {
+    "x": {
+      "$numberInt": "2"
+    },
+    "y": {
+      "$numberDouble": "42.5"
+    },
+    "s": "paid"
+  }
+]

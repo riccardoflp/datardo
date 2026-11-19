@@ -1,0 +1,62 @@
+[
+  {
+    "_id": {
+      "$numberInt": "1"
+    },
+    "total": {
+      "$numberInt": "14"
+    },
+    "items": [
+      {
+        "s": "FR",
+        "v": {
+          "$numberInt": "4"
+        }
+      },
+      {
+        "s": "IT",
+        "v": {
+          "$numberInt": "10"
+        }
+      }
+    ]
+  },
+  {
+    "_id": {
+      "$numberInt": "2"
+    },
+    "total": {
+      "$numberInt": "6"
+    },
+    "items": [
+      {
+        "s": "FR",
+        "v": {
+          "$numberInt": "6"
+        }
+      }
+    ]
+  },
+  {
+    "_id": {
+      "$numberInt": "3"
+    },
+    "total": {
+      "$numberInt": "14"
+    },
+    "items": [
+      {
+        "s": "IT",
+        "v": {
+          "$numberInt": "12"
+        }
+      },
+      {
+        "s": "FR",
+        "v": {
+          "$numberInt": "2"
+        }
+      }
+    ]
+  }
+]

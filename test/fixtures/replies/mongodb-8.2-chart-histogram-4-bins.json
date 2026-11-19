@@ -1,0 +1,47 @@
+[
+  {
+    "_id": {
+      "$numberDouble": "0.0"
+    },
+    "count": {
+      "$numberInt": "2"
+    },
+    "min": {
+      "$numberDouble": "0.0"
+    },
+    "max": {
+      "$numberDouble": "100.0"
+    },
+    "dates": false
+  },
+  {
+    "_id": {
+      "$numberDouble": "2.0"
+    },
+    "count": {
+      "$numberInt": "1"
+    },
+    "min": {
+      "$numberDouble": "0.0"
+    },
+    "max": {
+      "$numberDouble": "100.0"
+    },
+    "dates": false
+  },
+  {
+    "_id": {
+      "$numberInt": "3"
+    },
+    "count": {
+      "$numberInt": "1"
+    },
+    "min": {
+      "$numberDouble": "0.0"
+    },
+    "max": {
+      "$numberDouble": "100.0"
+    },
+    "dates": false
+  }
+]

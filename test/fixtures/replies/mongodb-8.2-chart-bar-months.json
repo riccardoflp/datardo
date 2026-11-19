@@ -1,0 +1,53 @@
+[
+  {
+    "_id": {
+      "$date": {
+        "$numberLong": "1704067200000"
+      }
+    },
+    "total": {
+      "$numberInt": "1"
+    },
+    "items": [
+      {
+        "v": {
+          "$numberInt": "1"
+        }
+      }
+    ]
+  },
+  {
+    "_id": {
+      "$date": {
+        "$numberLong": "1706745600000"
+      }
+    },
+    "total": {
+      "$numberInt": "3"
+    },
+    "items": [
+      {
+        "v": {
+          "$numberInt": "3"
+        }
+      }
+    ]
+  },
+  {
+    "_id": {
+      "$date": {
+        "$numberLong": "1709251200000"
+      }
+    },
+    "total": {
+      "$numberInt": "2"
+    },
+    "items": [
+      {
+        "v": {
+          "$numberInt": "2"
+        }
+      }
+    ]
+  }
+]

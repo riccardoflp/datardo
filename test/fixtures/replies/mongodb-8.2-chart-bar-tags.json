@@ -1,0 +1,41 @@
+[
+  {
+    "_id": "a",
+    "total": {
+      "$numberInt": "2"
+    },
+    "items": [
+      {
+        "v": {
+          "$numberInt": "2"
+        }
+      }
+    ]
+  },
+  {
+    "_id": null,
+    "total": {
+      "$numberInt": "1"
+    },
+    "items": [
+      {
+        "v": {
+          "$numberInt": "1"
+        }
+      }
+    ]
+  },
+  {
+    "_id": "b",
+    "total": {
+      "$numberInt": "1"
+    },
+    "items": [
+      {
+        "v": {
+          "$numberInt": "1"
+        }
+      }
+    ]
+  }
+]
