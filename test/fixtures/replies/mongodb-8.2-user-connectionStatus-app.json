@@ -1,0 +1,25 @@
+{
+  "authInfo": {
+    "authenticatedUsers": [
+      {
+        "user": "app",
+        "db": "admin"
+      }
+    ],
+    "authenticatedUserRoles": [
+      {
+        "role": "readWrite",
+        "db": "shop"
+      }
+    ]
+  },
+  "uuid": {
+    "$binary": {
+      "base64": "NZEc1r61SMWB0wsdRN8CiA==",
+      "subType": "04"
+    }
+  },
+  "ok": {
+    "$numberInt": "1"
+  }
+}

@@ -1,0 +1,11 @@
+[
+  {
+    "_id": null,
+    "n": {
+      "$numberInt": "4"
+    },
+    "bytes": {
+      "$numberLong": "28"
+    }
+  }
+]

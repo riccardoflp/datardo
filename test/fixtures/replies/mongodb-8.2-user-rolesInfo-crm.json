@@ -1,0 +1,66 @@
+{
+  "roles": [
+    {
+      "_id": "crm.viewer",
+      "role": "viewer",
+      "db": "crm",
+      "privileges": [],
+      "roles": [
+        {
+          "role": "read",
+          "db": "crm"
+        }
+      ],
+      "isBuiltin": false,
+      "inheritedRoles": [
+        {
+          "role": "read",
+          "db": "crm"
+        }
+      ],
+      "inheritedPrivileges": [
+        {
+          "resource": {
+            "db": "crm",
+            "collection": ""
+          },
+          "actions": [
+            "changeStream",
+            "collStats",
+            "dbHash",
+            "dbStats",
+            "find",
+            "killCursors",
+            "listCollections",
+            "listIndexes",
+            "listSearchIndexes",
+            "planCacheRead",
+            "performRawDataOperations"
+          ]
+        },
+        {
+          "resource": {
+            "db": "crm",
+            "collection": "system.js"
+          },
+          "actions": [
+            "changeStream",
+            "collStats",
+            "dbHash",
+            "dbStats",
+            "find",
+            "killCursors",
+            "listCollections",
+            "listIndexes",
+            "listSearchIndexes",
+            "planCacheRead",
+            "performRawDataOperations"
+          ]
+        }
+      ]
+    }
+  ],
+  "ok": {
+    "$numberInt": "1"
+  }
+}

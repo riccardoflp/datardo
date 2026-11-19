@@ -555,7 +555,8 @@ Replaces the privileges and the inherited roles of a custom role.
   copied before, has the privileges and the roles it had.
 - **After**: the lists are read again; *Updated the role reader@shop.* (`runner.notify`).
 - **Refuses**: as `user.create-role`, with the codes of this card (`/read-only`, `/privileges`, `/not-a-list`); a
-  built-in role (`/built-in`): *Built-in roles can't be changed.*
+  built-in role (`/built-in`): *Built-in roles can't be changed.*; a role that is no longer there when it is read
+  (`/gone`): *The role reader@shop no longer exists.*
 - **Commands**: `user.edit-role`
 - **Uses**: `user.list-roles`, `user.role-reference`, `query.parse`, `query.format`, `runner.ask`, `runner.run`,
   `runner.notify`.

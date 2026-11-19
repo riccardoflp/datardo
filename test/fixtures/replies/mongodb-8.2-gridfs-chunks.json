@@ -1,0 +1,36 @@
+[
+  {
+    "_id": {
+      "$oid": "6afe4ebf1219a33ea62e7e47"
+    },
+    "files_id": {
+      "$oid": "65f1c0ffee0000000000a2c1"
+    },
+    "n": {
+      "$numberInt": "0"
+    },
+    "data": {
+      "$binary": {
+        "base64": "SGVsbG8sIEc=",
+        "subType": "00"
+      }
+    }
+  },
+  {
+    "_id": {
+      "$oid": "6afe4ebf1219a33ea62e7e48"
+    },
+    "files_id": {
+      "$oid": "65f1c0ffee0000000000a2c1"
+    },
+    "n": {
+      "$numberInt": "1"
+    },
+    "data": {
+      "$binary": {
+        "base64": "cmlkRlMhCg==",
+        "subType": "00"
+      }
+    }
+  }
+]

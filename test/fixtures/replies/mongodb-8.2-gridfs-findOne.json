@@ -1,0 +1,21 @@
+{
+  "_id": {
+    "$oid": "65f1c0ffee0000000000a2c1"
+  },
+  "uploadDate": {
+    "$date": {
+      "$numberLong": "1795006931000"
+    }
+  },
+  "filename": "notes.txt",
+  "metadata": {
+    "contentType": "text/plain",
+    "owner": "ada"
+  },
+  "length": {
+    "$numberLong": "15"
+  },
+  "chunkSize": {
+    "$numberInt": "8"
+  }
+}
