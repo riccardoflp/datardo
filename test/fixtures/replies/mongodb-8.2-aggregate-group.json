@@ -1,0 +1,35 @@
+[
+  {
+    "_id": {
+      "$oid": "65f1c0de9a1b2c3d4e5f6b00"
+    },
+    "quantity": {
+      "$numberLong": "9"
+    },
+    "orders": {
+      "$numberInt": "2"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "65f1c0de9a1b2c3d4e5f6b01"
+    },
+    "quantity": {
+      "$numberLong": "5"
+    },
+    "orders": {
+      "$numberInt": "2"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "65f1c0de9a1b2c3d4e5f6b02"
+    },
+    "quantity": {
+      "$numberLong": "7"
+    },
+    "orders": {
+      "$numberInt": "2"
+    }
+  }
+]
