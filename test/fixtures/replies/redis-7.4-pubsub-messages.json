@@ -1,0 +1,29 @@
+[
+  {
+    "channel": "datardo-record:orders",
+    "pattern": "datardo-record:*",
+    "message": "{\"e\":\"u\",\"d\":{\"_id\":\"abc\"},\"f\":[\"qty\"]}"
+  },
+  {
+    "channel": "datardo-record:tenant1::orders",
+    "pattern": "datardo-record:*",
+    "message": "{\"e\":\"u\",\"d\":{\"_id\":\"abc\"},\"f\":[\"qty\"]}"
+  },
+  {
+    "channel": "datardo-record:orders::abc",
+    "pattern": "datardo-record:*",
+    "message": "{\"e\":\"u\",\"d\":{\"_id\":\"abc\"},\"f\":[\"qty\"]}"
+  },
+  {
+    "channel": "datardo-record:orders",
+    "pattern": "datardo-record:*",
+    "message": "{\"status\":\"paid\"}"
+  },
+  {
+    "channel": "datardo-record:orders",
+    "pattern": "datardo-record:*",
+    "message": {
+      "$hex": "00ff41"
+    }
+  }
+]

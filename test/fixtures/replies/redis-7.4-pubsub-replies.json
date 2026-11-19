@@ -1,0 +1,9 @@
+{
+  "channels": ["datardo-record:invoices", "datardo-record:orders"],
+  "numsub": ["datardo-record:orders", 2, "datardo-record:invoices", 1, "datardo-record:none", 0],
+  "numpat": 1,
+  "publish": 3,
+  "publishNobody": 0,
+  "datardo-record-no-pubsub": "NOPERM User datardo-record-no-pubsub has no permissions to run the 'pubsub|channels' command",
+  "datardo-record-no-channel": "NOPERM No permissions to access a channel"
+}
