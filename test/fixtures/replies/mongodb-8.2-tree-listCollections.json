@@ -1,0 +1,38 @@
+[
+  {
+    "name": "system.views",
+    "type": "collection"
+  },
+  {
+    "name": "weather",
+    "type": "timeseries"
+  },
+  {
+    "name": "system.buckets.weather",
+    "type": "collection"
+  },
+  {
+    "name": "fs.files",
+    "type": "collection"
+  },
+  {
+    "name": "Customers",
+    "type": "collection"
+  },
+  {
+    "name": "img.files",
+    "type": "collection"
+  },
+  {
+    "name": "orders",
+    "type": "collection"
+  },
+  {
+    "name": "fs.chunks",
+    "type": "collection"
+  },
+  {
+    "name": "active_orders",
+    "type": "view"
+  }
+]
