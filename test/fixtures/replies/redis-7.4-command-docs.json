@@ -1,0 +1,837 @@
+{
+  "$map": [
+    [
+      "get",
+      {
+        "$map": [
+          ["summary", "Returns the string value of a key."],
+          ["since", "1.0.0"],
+          ["group", "string"],
+          ["complexity", "O(1)"],
+          [
+            "arguments",
+            [
+              {
+                "$map": [
+                  ["name", "key"],
+                  ["type", "key"],
+                  ["display_text", "key"],
+                  ["key_spec_index", 0]
+                ]
+              }
+            ]
+          ]
+        ]
+      }
+    ],
+    [
+      "set",
+      {
+        "$map": [
+          ["summary", "Sets the string value of a key, ignoring its type. The key is created if it doesn't exist."],
+          ["since", "1.0.0"],
+          ["group", "string"],
+          ["complexity", "O(1)"],
+          [
+            "history",
+            [
+              ["2.6.12", "Added the `EX`, `PX`, `NX` and `XX` options."],
+              ["6.0.0", "Added the `KEEPTTL` option."],
+              ["6.2.0", "Added the `GET`, `EXAT` and `PXAT` option."],
+              ["7.0.0", "Allowed the `NX` and `GET` options to be used together."]
+            ]
+          ],
+          [
+            "arguments",
+            [
+              {
+                "$map": [
+                  ["name", "key"],
+                  ["type", "key"],
+                  ["display_text", "key"],
+                  ["key_spec_index", 0]
+                ]
+              },
+              {
+                "$map": [
+                  ["name", "value"],
+                  ["type", "string"],
+                  ["display_text", "value"]
+                ]
+              },
+              {
+                "$map": [
+                  ["name", "condition"],
+                  ["type", "oneof"],
+                  ["since", "2.6.12"],
+                  ["flags", ["optional"]],
+                  [
+                    "arguments",
+                    [
+                      {
+                        "$map": [
+                          ["name", "nx"],
+                          ["type", "pure-token"],
+                          ["display_text", "nx"],
+                          ["token", "NX"]
+                        ]
+                      },
+                      {
+                        "$map": [
+                          ["name", "xx"],
+                          ["type", "pure-token"],
+                          ["display_text", "xx"],
+                          ["token", "XX"]
+                        ]
+                      }
+                    ]
+                  ]
+                ]
+              },
+              {
+                "$map": [
+                  ["name", "get"],
+                  ["type", "pure-token"],
+                  ["display_text", "get"],
+                  ["token", "GET"],
+                  ["since", "6.2.0"],
+                  ["flags", ["optional"]]
+                ]
+              },
+              {
+                "$map": [
+                  ["name", "expiration"],
+                  ["type", "oneof"],
+                  ["flags", ["optional"]],
+                  [
+                    "arguments",
+                    [
+                      {
+                        "$map": [
+                          ["name", "seconds"],
+                          ["type", "integer"],
+                          ["display_text", "seconds"],
+                          ["token", "EX"],
+                          ["since", "2.6.12"]
+                        ]
+                      },
+                      {
+                        "$map": [
+                          ["name", "milliseconds"],
+                          ["type", "integer"],
+                          ["display_text", "milliseconds"],
+                          ["token", "PX"],
+                          ["since", "2.6.12"]
+                        ]
+                      },
+                      {
+                        "$map": [
+                          ["name", "unix-time-seconds"],
+                          ["type", "unix-time"],
+                          ["display_text", "unix-time-seconds"],
+                          ["token", "EXAT"],
+                          ["since", "6.2.0"]
+                        ]
+                      },
+                      {
+                        "$map": [
+                          ["name", "unix-time-milliseconds"],
+                          ["type", "unix-time"],
+                          ["display_text", "unix-time-milliseconds"],
+                          ["token", "PXAT"],
+                          ["since", "6.2.0"]
+                        ]
+                      },
+                      {
+                        "$map": [
+                          ["name", "keepttl"],
+                          ["type", "pure-token"],
+                          ["display_text", "keepttl"],
+                          ["token", "KEEPTTL"],
+                          ["since", "6.0.0"]
+                        ]
+                      }
+                    ]
+                  ]
+                ]
+              }
+            ]
+          ]
+        ]
+      }
+    ],
+    [
+      "hset",
+      {
+        "$map": [
+          ["summary", "Creates or modifies the value of a field in a hash."],
+          ["since", "2.0.0"],
+          ["group", "hash"],
+          [
+            "complexity",
+            "O(1) for each field/value pair added, so O(N) to add N field/value pairs when the command is called with multiple field/value pairs."
+          ],
+          ["history", [["4.0.0", "Accepts multiple `field` and `value` arguments."]]],
+          [
+            "arguments",
+            [
+              {
+                "$map": [
+                  ["name", "key"],
+                  ["type", "key"],
+                  ["display_text", "key"],
+                  ["key_spec_index", 0]
+                ]
+              },
+              {
+                "$map": [
+                  ["name", "data"],
+                  ["type", "block"],
+                  ["flags", ["multiple"]],
+                  [
+                    "arguments",
+                    [
+                      {
+                        "$map": [
+                          ["name", "field"],
+                          ["type", "string"],
+                          ["display_text", "field"]
+                        ]
+                      },
+                      {
+                        "$map": [
+                          ["name", "value"],
+                          ["type", "string"],
+                          ["display_text", "value"]
+                        ]
+                      }
+                    ]
+                  ]
+                ]
+              }
+            ]
+          ]
+        ]
+      }
+    ],
+    [
+      "del",
+      {
+        "$map": [
+          ["summary", "Deletes one or more keys."],
+          ["since", "1.0.0"],
+          ["group", "generic"],
+          [
+            "complexity",
+            "O(N) where N is the number of keys that will be removed. When a key to remove holds a value other than a string, the individual complexity for this key is O(M) where M is the number of elements in the list, set, sorted set or hash. Removing a single key that holds a string value is O(1)."
+          ],
+          [
+            "arguments",
+            [
+              {
+                "$map": [
+                  ["name", "key"],
+                  ["type", "key"],
+                  ["display_text", "key"],
+                  ["key_spec_index", 0],
+                  ["flags", ["multiple"]]
+                ]
+              }
+            ]
+          ]
+        ]
+      }
+    ],
+    [
+      "scan",
+      {
+        "$map": [
+          ["summary", "Iterates over the key names in the database."],
+          ["since", "2.8.0"],
+          ["group", "generic"],
+          [
+            "complexity",
+            "O(1) for every call. O(N) for a complete iteration, including enough command calls for the cursor to return back to 0. N is the number of elements inside the collection."
+          ],
+          ["history", [["6.0.0", "Added the `TYPE` subcommand."]]],
+          [
+            "arguments",
+            [
+              {
+                "$map": [
+                  ["name", "cursor"],
+                  ["type", "integer"],
+                  ["display_text", "cursor"]
+                ]
+              },
+              {
+                "$map": [
+                  ["name", "pattern"],
+                  ["type", "pattern"],
+                  ["display_text", "pattern"],
+                  ["token", "MATCH"],
+                  ["flags", ["optional"]]
+                ]
+              },
+              {
+                "$map": [
+                  ["name", "count"],
+                  ["type", "integer"],
+                  ["display_text", "count"],
+                  ["token", "COUNT"],
+                  ["flags", ["optional"]]
+                ]
+              },
+              {
+                "$map": [
+                  ["name", "type"],
+                  ["type", "string"],
+                  ["display_text", "type"],
+                  ["token", "TYPE"],
+                  ["since", "6.0.0"],
+                  ["flags", ["optional"]]
+                ]
+              }
+            ]
+          ]
+        ]
+      }
+    ],
+    [
+      "zadd",
+      {
+        "$map": [
+          [
+            "summary",
+            "Adds one or more members to a sorted set, or updates their scores. Creates the key if it doesn't exist."
+          ],
+          ["since", "1.2.0"],
+          ["group", "sorted-set"],
+          ["complexity", "O(log(N)) for each item added, where N is the number of elements in the sorted set."],
+          [
+            "history",
+            [
+              ["2.4.0", "Accepts multiple elements."],
+              ["3.0.2", "Added the `XX`, `NX`, `CH` and `INCR` options."],
+              ["6.2.0", "Added the `GT` and `LT` options."]
+            ]
+          ],
+          [
+            "arguments",
+            [
+              {
+                "$map": [
+                  ["name", "key"],
+                  ["type", "key"],
+                  ["display_text", "key"],
+                  ["key_spec_index", 0]
+                ]
+              },
+              {
+                "$map": [
+                  ["name", "condition"],
+                  ["type", "oneof"],
+                  ["since", "3.0.2"],
+                  ["flags", ["optional"]],
+                  [
+                    "arguments",
+                    [
+                      {
+                        "$map": [
+                          ["name", "nx"],
+                          ["type", "pure-token"],
+                          ["display_text", "nx"],
+                          ["token", "NX"]
+                        ]
+                      },
+                      {
+                        "$map": [
+                          ["name", "xx"],
+                          ["type", "pure-token"],
+                          ["display_text", "xx"],
+                          ["token", "XX"]
+                        ]
+                      }
+                    ]
+                  ]
+                ]
+              },
+              {
+                "$map": [
+                  ["name", "comparison"],
+                  ["type", "oneof"],
+                  ["since", "6.2.0"],
+                  ["flags", ["optional"]],
+                  [
+                    "arguments",
+                    [
+                      {
+                        "$map": [
+                          ["name", "gt"],
+                          ["type", "pure-token"],
+                          ["display_text", "gt"],
+                          ["token", "GT"]
+                        ]
+                      },
+                      {
+                        "$map": [
+                          ["name", "lt"],
+                          ["type", "pure-token"],
+                          ["display_text", "lt"],
+                          ["token", "LT"]
+                        ]
+                      }
+                    ]
+                  ]
+                ]
+              },
+              {
+                "$map": [
+                  ["name", "change"],
+                  ["type", "pure-token"],
+                  ["display_text", "change"],
+                  ["token", "CH"],
+                  ["since", "3.0.2"],
+                  ["flags", ["optional"]]
+                ]
+              },
+              {
+                "$map": [
+                  ["name", "increment"],
+                  ["type", "pure-token"],
+                  ["display_text", "increment"],
+                  ["token", "INCR"],
+                  ["since", "3.0.2"],
+                  ["flags", ["optional"]]
+                ]
+              },
+              {
+                "$map": [
+                  ["name", "data"],
+                  ["type", "block"],
+                  ["flags", ["multiple"]],
+                  [
+                    "arguments",
+                    [
+                      {
+                        "$map": [
+                          ["name", "score"],
+                          ["type", "double"],
+                          ["display_text", "score"]
+                        ]
+                      },
+                      {
+                        "$map": [
+                          ["name", "member"],
+                          ["type", "string"],
+                          ["display_text", "member"]
+                        ]
+                      }
+                    ]
+                  ]
+                ]
+              }
+            ]
+          ]
+        ]
+      }
+    ],
+    [
+      "config",
+      {
+        "$map": [
+          ["summary", "A container for server configuration commands."],
+          ["since", "2.0.0"],
+          ["group", "server"],
+          ["complexity", "Depends on subcommand."],
+          [
+            "subcommands",
+            {
+              "$map": [
+                [
+                  "config|resetstat",
+                  {
+                    "$map": [
+                      ["summary", "Resets the server's statistics."],
+                      ["since", "2.0.0"],
+                      ["group", "server"],
+                      ["complexity", "O(1)"]
+                    ]
+                  }
+                ],
+                [
+                  "config|help",
+                  {
+                    "$map": [
+                      ["summary", "Returns helpful text about the different subcommands."],
+                      ["since", "5.0.0"],
+                      ["group", "server"],
+                      ["complexity", "O(1)"]
+                    ]
+                  }
+                ],
+                [
+                  "config|get",
+                  {
+                    "$map": [
+                      ["summary", "Returns the effective values of configuration parameters."],
+                      ["since", "2.0.0"],
+                      ["group", "server"],
+                      ["complexity", "O(N) when N is the number of configuration parameters provided"],
+                      ["history", [["7.0.0", "Added the ability to pass multiple pattern parameters in one call"]]],
+                      [
+                        "arguments",
+                        [
+                          {
+                            "$map": [
+                              ["name", "parameter"],
+                              ["type", "string"],
+                              ["display_text", "parameter"],
+                              ["flags", ["multiple"]]
+                            ]
+                          }
+                        ]
+                      ]
+                    ]
+                  }
+                ],
+                [
+                  "config|rewrite",
+                  {
+                    "$map": [
+                      ["summary", "Persists the effective configuration to file."],
+                      ["since", "2.8.0"],
+                      ["group", "server"],
+                      ["complexity", "O(1)"]
+                    ]
+                  }
+                ],
+                [
+                  "config|set",
+                  {
+                    "$map": [
+                      ["summary", "Sets configuration parameters in-flight."],
+                      ["since", "2.0.0"],
+                      ["group", "server"],
+                      ["complexity", "O(N) when N is the number of configuration parameters provided"],
+                      ["history", [["7.0.0", "Added the ability to set multiple parameters in one call."]]],
+                      [
+                        "arguments",
+                        [
+                          {
+                            "$map": [
+                              ["name", "data"],
+                              ["type", "block"],
+                              ["flags", ["multiple"]],
+                              [
+                                "arguments",
+                                [
+                                  {
+                                    "$map": [
+                                      ["name", "parameter"],
+                                      ["type", "string"],
+                                      ["display_text", "parameter"]
+                                    ]
+                                  },
+                                  {
+                                    "$map": [
+                                      ["name", "value"],
+                                      ["type", "string"],
+                                      ["display_text", "value"]
+                                    ]
+                                  }
+                                ]
+                              ]
+                            ]
+                          }
+                        ]
+                      ]
+                    ]
+                  }
+                ]
+              ]
+            }
+          ]
+        ]
+      }
+    ],
+    [
+      "blpop",
+      {
+        "$map": [
+          [
+            "summary",
+            "Removes and returns the first element in a list. Blocks until an element is available otherwise. Deletes the list if the last element was popped."
+          ],
+          ["since", "2.0.0"],
+          ["group", "list"],
+          ["complexity", "O(N) where N is the number of provided keys."],
+          ["history", [["6.0.0", "`timeout` is interpreted as a double instead of an integer."]]],
+          [
+            "arguments",
+            [
+              {
+                "$map": [
+                  ["name", "key"],
+                  ["type", "key"],
+                  ["display_text", "key"],
+                  ["key_spec_index", 0],
+                  ["flags", ["multiple"]]
+                ]
+              },
+              {
+                "$map": [
+                  ["name", "timeout"],
+                  ["type", "double"],
+                  ["display_text", "timeout"]
+                ]
+              }
+            ]
+          ]
+        ]
+      }
+    ],
+    [
+      "expire",
+      {
+        "$map": [
+          ["summary", "Sets the expiration time of a key in seconds."],
+          ["since", "1.0.0"],
+          ["group", "generic"],
+          ["complexity", "O(1)"],
+          ["history", [["7.0.0", "Added options: `NX`, `XX`, `GT` and `LT`."]]],
+          [
+            "arguments",
+            [
+              {
+                "$map": [
+                  ["name", "key"],
+                  ["type", "key"],
+                  ["display_text", "key"],
+                  ["key_spec_index", 0]
+                ]
+              },
+              {
+                "$map": [
+                  ["name", "seconds"],
+                  ["type", "integer"],
+                  ["display_text", "seconds"]
+                ]
+              },
+              {
+                "$map": [
+                  ["name", "condition"],
+                  ["type", "oneof"],
+                  ["since", "7.0.0"],
+                  ["flags", ["optional"]],
+                  [
+                    "arguments",
+                    [
+                      {
+                        "$map": [
+                          ["name", "nx"],
+                          ["type", "pure-token"],
+                          ["display_text", "nx"],
+                          ["token", "NX"]
+                        ]
+                      },
+                      {
+                        "$map": [
+                          ["name", "xx"],
+                          ["type", "pure-token"],
+                          ["display_text", "xx"],
+                          ["token", "XX"]
+                        ]
+                      },
+                      {
+                        "$map": [
+                          ["name", "gt"],
+                          ["type", "pure-token"],
+                          ["display_text", "gt"],
+                          ["token", "GT"]
+                        ]
+                      },
+                      {
+                        "$map": [
+                          ["name", "lt"],
+                          ["type", "pure-token"],
+                          ["display_text", "lt"],
+                          ["token", "LT"]
+                        ]
+                      }
+                    ]
+                  ]
+                ]
+              }
+            ]
+          ]
+        ]
+      }
+    ],
+    [
+      "sort",
+      {
+        "$map": [
+          ["summary", "Sorts the elements in a list, a set, or a sorted set, optionally storing the result."],
+          ["since", "1.0.0"],
+          ["group", "generic"],
+          [
+            "complexity",
+            "O(N+M*log(M)) where N is the number of elements in the list or set to sort, and M the number of returned elements. When the elements are not sorted, complexity is O(N)."
+          ],
+          [
+            "arguments",
+            [
+              {
+                "$map": [
+                  ["name", "key"],
+                  ["type", "key"],
+                  ["display_text", "key"],
+                  ["key_spec_index", 0]
+                ]
+              },
+              {
+                "$map": [
+                  ["name", "by-pattern"],
+                  ["type", "pattern"],
+                  ["display_text", "pattern"],
+                  ["key_spec_index", 1],
+                  ["token", "BY"],
+                  ["flags", ["optional"]]
+                ]
+              },
+              {
+                "$map": [
+                  ["name", "limit"],
+                  ["type", "block"],
+                  ["token", "LIMIT"],
+                  ["flags", ["optional"]],
+                  [
+                    "arguments",
+                    [
+                      {
+                        "$map": [
+                          ["name", "offset"],
+                          ["type", "integer"],
+                          ["display_text", "offset"]
+                        ]
+                      },
+                      {
+                        "$map": [
+                          ["name", "count"],
+                          ["type", "integer"],
+                          ["display_text", "count"]
+                        ]
+                      }
+                    ]
+                  ]
+                ]
+              },
+              {
+                "$map": [
+                  ["name", "get-pattern"],
+                  ["type", "pattern"],
+                  ["display_text", "pattern"],
+                  ["key_spec_index", 1],
+                  ["token", "GET"],
+                  ["flags", ["optional", "multiple", "multiple_token"]]
+                ]
+              },
+              {
+                "$map": [
+                  ["name", "order"],
+                  ["type", "oneof"],
+                  ["flags", ["optional"]],
+                  [
+                    "arguments",
+                    [
+                      {
+                        "$map": [
+                          ["name", "asc"],
+                          ["type", "pure-token"],
+                          ["display_text", "asc"],
+                          ["token", "ASC"]
+                        ]
+                      },
+                      {
+                        "$map": [
+                          ["name", "desc"],
+                          ["type", "pure-token"],
+                          ["display_text", "desc"],
+                          ["token", "DESC"]
+                        ]
+                      }
+                    ]
+                  ]
+                ]
+              },
+              {
+                "$map": [
+                  ["name", "sorting"],
+                  ["type", "pure-token"],
+                  ["display_text", "sorting"],
+                  ["token", "ALPHA"],
+                  ["flags", ["optional"]]
+                ]
+              },
+              {
+                "$map": [
+                  ["name", "destination"],
+                  ["type", "key"],
+                  ["display_text", "destination"],
+                  ["key_spec_index", 2],
+                  ["token", "STORE"],
+                  ["flags", ["optional"]]
+                ]
+              }
+            ]
+          ]
+        ]
+      }
+    ],
+    [
+      "substr",
+      {
+        "$map": [
+          ["summary", "Returns a substring from a string value."],
+          ["since", "1.0.0"],
+          ["group", "string"],
+          [
+            "complexity",
+            "O(N) where N is the length of the returned string. The complexity is ultimately determined by the returned length, but because creating a substring from an existing string is very cheap, it can be considered O(1) for small strings."
+          ],
+          ["doc_flags", ["deprecated"]],
+          ["deprecated_since", "2.0.0"],
+          ["replaced_by", "`GETRANGE`"],
+          [
+            "arguments",
+            [
+              {
+                "$map": [
+                  ["name", "key"],
+                  ["type", "key"],
+                  ["display_text", "key"],
+                  ["key_spec_index", 0]
+                ]
+              },
+              {
+                "$map": [
+                  ["name", "start"],
+                  ["type", "integer"],
+                  ["display_text", "start"]
+                ]
+              },
+              {
+                "$map": [
+                  ["name", "end"],
+                  ["type", "integer"],
+                  ["display_text", "end"]
+                ]
+              }
+            ]
+          ]
+        ]
+      }
+    ]
+  ]
+}
