@@ -1,0 +1,41 @@
+{
+  "isWritablePrimary": true,
+  "topologyVersion": {
+    "processId": {
+      "$oid": "6afe54b2988e23e9b2d3fd9e"
+    },
+    "counter": {
+      "$numberInt": "0"
+    }
+  },
+  "maxBsonObjectSize": {
+    "$numberInt": "16777216"
+  },
+  "maxMessageSizeBytes": {
+    "$numberInt": "48000000"
+  },
+  "maxWriteBatchSize": {
+    "$numberInt": "100000"
+  },
+  "localTime": {
+    "$date": {
+      "$numberLong": "1795052725085"
+    }
+  },
+  "logicalSessionTimeoutMinutes": {
+    "$numberInt": "30"
+  },
+  "connectionId": {
+    "$numberInt": "2"
+  },
+  "minWireVersion": {
+    "$numberInt": "0"
+  },
+  "maxWireVersion": {
+    "$numberInt": "27"
+  },
+  "readOnly": false,
+  "ok": {
+    "$numberInt": "1"
+  }
+}

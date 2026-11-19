@@ -1,0 +1,19 @@
+{
+  "databases": [
+    {
+      "name": "admin"
+    },
+    {
+      "name": "config"
+    },
+    {
+      "name": "local"
+    },
+    {
+      "name": "shop"
+    }
+  ],
+  "ok": {
+    "$numberInt": "1"
+  }
+}

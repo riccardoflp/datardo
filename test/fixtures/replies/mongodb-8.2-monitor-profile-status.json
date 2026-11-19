@@ -1,0 +1,14 @@
+{
+  "was": {
+    "$numberInt": "1"
+  },
+  "slowms": {
+    "$numberInt": "0"
+  },
+  "sampleRate": {
+    "$numberInt": "1"
+  },
+  "ok": {
+    "$numberInt": "1"
+  }
+}

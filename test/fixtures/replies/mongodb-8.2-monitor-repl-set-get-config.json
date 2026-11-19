@@ -1,0 +1,75 @@
+{
+  "config": {
+    "_id": "testset",
+    "version": {
+      "$numberInt": "1"
+    },
+    "term": {
+      "$numberInt": "1"
+    },
+    "members": [
+      {
+        "_id": {
+          "$numberInt": "0"
+        },
+        "host": "localhost:27017",
+        "arbiterOnly": false,
+        "buildIndexes": true,
+        "hidden": false,
+        "priority": {
+          "$numberInt": "1"
+        },
+        "tags": {},
+        "secondaryDelaySecs": {
+          "$numberInt": "0"
+        },
+        "votes": {
+          "$numberInt": "1"
+        }
+      }
+    ],
+    "protocolVersion": {
+      "$numberInt": "1"
+    },
+    "writeConcernMajorityJournalDefault": true,
+    "settings": {
+      "chainingAllowed": true,
+      "heartbeatIntervalMillis": {
+        "$numberInt": "2000"
+      },
+      "heartbeatTimeoutSecs": {
+        "$numberInt": "10"
+      },
+      "electionTimeoutMillis": {
+        "$numberInt": "5000"
+      },
+      "catchUpTimeoutMillis": {
+        "$numberInt": "-1"
+      },
+      "catchUpTakeoverDelayMillis": {
+        "$numberInt": "30000"
+      },
+      "getLastErrorModes": {},
+      "getLastErrorDefaults": {
+        "w": {
+          "$numberInt": "1"
+        },
+        "wtimeout": {
+          "$numberInt": "0"
+        }
+      },
+      "replicaSetId": {
+        "$oid": "6afe54b30e1d1ef70e4a8efc"
+      }
+    }
+  },
+  "ok": {
+    "$numberInt": "1"
+  },
+  "operationTime": {
+    "$timestamp": {
+      "t": 1795052725,
+      "i": 10
+    }
+  }
+}

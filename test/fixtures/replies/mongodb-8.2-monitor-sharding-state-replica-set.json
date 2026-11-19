@@ -1,0 +1,12 @@
+{
+  "enabled": false,
+  "ok": {
+    "$numberInt": "1"
+  },
+  "operationTime": {
+    "$timestamp": {
+      "t": 1795052725,
+      "i": 10
+    }
+  }
+}

@@ -1,0 +1,1615 @@
+[
+  {
+    "lsid": {
+      "id": {
+        "$binary": {
+          "base64": "Ijk2NlDJTD2C+GqVT79BHQ==",
+          "subType": "04"
+        }
+      },
+      "uid": {
+        "$binary": {
+          "base64": "47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=",
+          "subType": "00"
+        }
+      }
+    },
+    "txnNumber": {
+      "$numberLong": "4"
+    },
+    "op": "c",
+    "ns": "admin.$cmd",
+    "o": {
+      "applyOps": [
+        {
+          "op": "i",
+          "ns": "shop.customers",
+          "ui": {
+            "$binary": {
+              "base64": "3DAOpjHlRiuRyEVLbYHYiQ==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "2"
+            },
+            "name": "Grace"
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "2"
+            }
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.customers",
+          "ui": {
+            "$binary": {
+              "base64": "3DAOpjHlRiuRyEVLbYHYiQ==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "3"
+            },
+            "name": "Linus"
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "3"
+            }
+          }
+        }
+      ]
+    },
+    "ts": {
+      "$timestamp": {
+        "t": 1795052725,
+        "i": 10
+      }
+    },
+    "t": {
+      "$numberLong": "1"
+    },
+    "v": {
+      "$numberLong": "2"
+    },
+    "wall": {
+      "$date": {
+        "$numberLong": "1795052725205"
+      }
+    },
+    "prevOpTime": {
+      "ts": {
+        "$timestamp": {
+          "t": 0,
+          "i": 0
+        }
+      },
+      "t": {
+        "$numberLong": "-1"
+      }
+    }
+  },
+  {
+    "lsid": {
+      "id": {
+        "$binary": {
+          "base64": "Ijk2NlDJTD2C+GqVT79BHQ==",
+          "subType": "04"
+        }
+      },
+      "uid": {
+        "$binary": {
+          "base64": "47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=",
+          "subType": "00"
+        }
+      }
+    },
+    "txnNumber": {
+      "$numberLong": "3"
+    },
+    "op": "d",
+    "ns": "shop.customers",
+    "ui": {
+      "$binary": {
+        "base64": "3DAOpjHlRiuRyEVLbYHYiQ==",
+        "subType": "04"
+      }
+    },
+    "o": {
+      "_id": {
+        "$numberInt": "1"
+      }
+    },
+    "stmtId": {
+      "$numberInt": "0"
+    },
+    "ts": {
+      "$timestamp": {
+        "t": 1795052725,
+        "i": 9
+      }
+    },
+    "t": {
+      "$numberLong": "1"
+    },
+    "v": {
+      "$numberLong": "2"
+    },
+    "wall": {
+      "$date": {
+        "$numberLong": "1795052725201"
+      }
+    },
+    "prevOpTime": {
+      "ts": {
+        "$timestamp": {
+          "t": 0,
+          "i": 0
+        }
+      },
+      "t": {
+        "$numberLong": "-1"
+      }
+    }
+  },
+  {
+    "lsid": {
+      "id": {
+        "$binary": {
+          "base64": "Ijk2NlDJTD2C+GqVT79BHQ==",
+          "subType": "04"
+        }
+      },
+      "uid": {
+        "$binary": {
+          "base64": "47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=",
+          "subType": "00"
+        }
+      }
+    },
+    "txnNumber": {
+      "$numberLong": "2"
+    },
+    "op": "u",
+    "ns": "shop.customers",
+    "ui": {
+      "$binary": {
+        "base64": "3DAOpjHlRiuRyEVLbYHYiQ==",
+        "subType": "04"
+      }
+    },
+    "o": {
+      "$v": {
+        "$numberInt": "2"
+      },
+      "diff": {
+        "d": {
+          "name": false
+        },
+        "u": {
+          "tier": "platinum"
+        }
+      }
+    },
+    "o2": {
+      "_id": {
+        "$numberInt": "1"
+      }
+    },
+    "stmtId": {
+      "$numberInt": "0"
+    },
+    "ts": {
+      "$timestamp": {
+        "t": 1795052725,
+        "i": 8
+      }
+    },
+    "t": {
+      "$numberLong": "1"
+    },
+    "v": {
+      "$numberLong": "2"
+    },
+    "wall": {
+      "$date": {
+        "$numberLong": "1795052725196"
+      }
+    },
+    "prevOpTime": {
+      "ts": {
+        "$timestamp": {
+          "t": 0,
+          "i": 0
+        }
+      },
+      "t": {
+        "$numberLong": "-1"
+      }
+    }
+  },
+  {
+    "lsid": {
+      "id": {
+        "$binary": {
+          "base64": "Ijk2NlDJTD2C+GqVT79BHQ==",
+          "subType": "04"
+        }
+      },
+      "uid": {
+        "$binary": {
+          "base64": "47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=",
+          "subType": "00"
+        }
+      }
+    },
+    "txnNumber": {
+      "$numberLong": "1"
+    },
+    "op": "i",
+    "ns": "shop.customers",
+    "ui": {
+      "$binary": {
+        "base64": "3DAOpjHlRiuRyEVLbYHYiQ==",
+        "subType": "04"
+      }
+    },
+    "o": {
+      "_id": {
+        "$numberInt": "1"
+      },
+      "name": "Ada",
+      "tier": "gold"
+    },
+    "o2": {
+      "_id": {
+        "$numberInt": "1"
+      }
+    },
+    "stmtId": {
+      "$numberInt": "0"
+    },
+    "ts": {
+      "$timestamp": {
+        "t": 1795052725,
+        "i": 7
+      }
+    },
+    "t": {
+      "$numberLong": "1"
+    },
+    "v": {
+      "$numberLong": "2"
+    },
+    "wall": {
+      "$date": {
+        "$numberLong": "1795052725193"
+      }
+    },
+    "prevOpTime": {
+      "ts": {
+        "$timestamp": {
+          "t": 0,
+          "i": 0
+        }
+      },
+      "t": {
+        "$numberLong": "-1"
+      }
+    }
+  },
+  {
+    "op": "c",
+    "ns": "shop.$cmd",
+    "ui": {
+      "$binary": {
+        "base64": "3DAOpjHlRiuRyEVLbYHYiQ==",
+        "subType": "04"
+      }
+    },
+    "o": {
+      "create": "customers",
+      "idIndex": {
+        "v": {
+          "$numberInt": "2"
+        },
+        "key": {
+          "_id": {
+            "$numberInt": "1"
+          }
+        },
+        "name": "_id_"
+      }
+    },
+    "ts": {
+      "$timestamp": {
+        "t": 1795052725,
+        "i": 6
+      }
+    },
+    "t": {
+      "$numberLong": "1"
+    },
+    "v": {
+      "$numberLong": "2"
+    },
+    "wall": {
+      "$date": {
+        "$numberLong": "1795052725190"
+      }
+    }
+  },
+  {
+    "op": "i",
+    "ns": "shop.system.views",
+    "ui": {
+      "$binary": {
+        "base64": "2aKbzwUsRoK6+wlZrSkyWg==",
+        "subType": "04"
+      }
+    },
+    "o": {
+      "_id": "shop.paid",
+      "viewOn": "orders",
+      "pipeline": [
+        {
+          "$match": {
+            "total": {
+              "$gt": {
+                "$numberInt": "100"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "o2": {
+      "_id": "shop.paid"
+    },
+    "ts": {
+      "$timestamp": {
+        "t": 1795052725,
+        "i": 5
+      }
+    },
+    "t": {
+      "$numberLong": "1"
+    },
+    "v": {
+      "$numberLong": "2"
+    },
+    "wall": {
+      "$date": {
+        "$numberLong": "1795052725178"
+      }
+    }
+  },
+  {
+    "op": "c",
+    "ns": "shop.$cmd",
+    "ui": {
+      "$binary": {
+        "base64": "2aKbzwUsRoK6+wlZrSkyWg==",
+        "subType": "04"
+      }
+    },
+    "o": {
+      "create": "system.views",
+      "idIndex": {
+        "v": {
+          "$numberInt": "2"
+        },
+        "key": {
+          "_id": {
+            "$numberInt": "1"
+          }
+        },
+        "name": "_id_"
+      }
+    },
+    "ts": {
+      "$timestamp": {
+        "t": 1795052725,
+        "i": 4
+      }
+    },
+    "t": {
+      "$numberLong": "1"
+    },
+    "v": {
+      "$numberLong": "2"
+    },
+    "wall": {
+      "$date": {
+        "$numberLong": "1795052725178"
+      }
+    }
+  },
+  {
+    "op": "c",
+    "ns": "shop.$cmd",
+    "ui": {
+      "$binary": {
+        "base64": "AsrpFNiHQiWQfDbK111pMg==",
+        "subType": "04"
+      }
+    },
+    "o": {
+      "create": "events",
+      "capped": true,
+      "size": {
+        "$numberInt": "1048576"
+      },
+      "idIndex": {
+        "v": {
+          "$numberInt": "2"
+        },
+        "key": {
+          "_id": {
+            "$numberInt": "1"
+          }
+        },
+        "name": "_id_"
+      }
+    },
+    "ts": {
+      "$timestamp": {
+        "t": 1795052725,
+        "i": 3
+      }
+    },
+    "t": {
+      "$numberLong": "1"
+    },
+    "v": {
+      "$numberLong": "2"
+    },
+    "wall": {
+      "$date": {
+        "$numberLong": "1795052725168"
+      }
+    }
+  },
+  {
+    "lsid": {
+      "id": {
+        "$binary": {
+          "base64": "rIPh0BnZRJe88We+uQzSWA==",
+          "subType": "04"
+        }
+      },
+      "uid": {
+        "$binary": {
+          "base64": "47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=",
+          "subType": "00"
+        }
+      }
+    },
+    "txnNumber": {
+      "$numberLong": "1"
+    },
+    "op": "c",
+    "ns": "admin.$cmd",
+    "o": {
+      "applyOps": [
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "0"
+            },
+            "total": {
+              "$numberInt": "0"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "0"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "0"
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "1"
+            },
+            "total": {
+              "$numberInt": "10"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "1"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "1"
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "2"
+            },
+            "total": {
+              "$numberInt": "20"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "2"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "2"
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "3"
+            },
+            "total": {
+              "$numberInt": "30"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "3"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "3"
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "4"
+            },
+            "total": {
+              "$numberInt": "40"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "4"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "4"
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "5"
+            },
+            "total": {
+              "$numberInt": "50"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "5"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "5"
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "6"
+            },
+            "total": {
+              "$numberInt": "60"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "6"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "6"
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "7"
+            },
+            "total": {
+              "$numberInt": "70"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "7"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "7"
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "8"
+            },
+            "total": {
+              "$numberInt": "80"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "8"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "8"
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "9"
+            },
+            "total": {
+              "$numberInt": "90"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "9"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "9"
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "10"
+            },
+            "total": {
+              "$numberInt": "100"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "10"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "10"
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "11"
+            },
+            "total": {
+              "$numberInt": "110"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "11"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "11"
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "12"
+            },
+            "total": {
+              "$numberInt": "120"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "12"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "12"
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "13"
+            },
+            "total": {
+              "$numberInt": "130"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "13"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "13"
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "14"
+            },
+            "total": {
+              "$numberInt": "140"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "14"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "14"
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "15"
+            },
+            "total": {
+              "$numberInt": "150"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "15"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "15"
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "16"
+            },
+            "total": {
+              "$numberInt": "160"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "16"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "16"
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "17"
+            },
+            "total": {
+              "$numberInt": "170"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "17"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "17"
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "18"
+            },
+            "total": {
+              "$numberInt": "180"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "18"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "18"
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "19"
+            },
+            "total": {
+              "$numberInt": "190"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "19"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "19"
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "20"
+            },
+            "total": {
+              "$numberInt": "200"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "20"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "20"
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "21"
+            },
+            "total": {
+              "$numberInt": "210"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "21"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "21"
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "22"
+            },
+            "total": {
+              "$numberInt": "220"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "22"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "22"
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "23"
+            },
+            "total": {
+              "$numberInt": "230"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "23"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "23"
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "24"
+            },
+            "total": {
+              "$numberInt": "240"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "24"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "24"
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "25"
+            },
+            "total": {
+              "$numberInt": "250"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "25"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "25"
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "26"
+            },
+            "total": {
+              "$numberInt": "260"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "26"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "26"
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "27"
+            },
+            "total": {
+              "$numberInt": "270"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "27"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "27"
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "28"
+            },
+            "total": {
+              "$numberInt": "280"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "28"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "28"
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "29"
+            },
+            "total": {
+              "$numberInt": "290"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "29"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "29"
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "30"
+            },
+            "total": {
+              "$numberInt": "300"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "30"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "30"
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "31"
+            },
+            "total": {
+              "$numberInt": "310"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "31"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "31"
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "32"
+            },
+            "total": {
+              "$numberInt": "320"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "32"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "32"
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "33"
+            },
+            "total": {
+              "$numberInt": "330"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "33"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "33"
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "34"
+            },
+            "total": {
+              "$numberInt": "340"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "34"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "34"
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "35"
+            },
+            "total": {
+              "$numberInt": "350"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "35"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "35"
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "36"
+            },
+            "total": {
+              "$numberInt": "360"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "36"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "36"
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "37"
+            },
+            "total": {
+              "$numberInt": "370"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "37"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "37"
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "38"
+            },
+            "total": {
+              "$numberInt": "380"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "38"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "38"
+          }
+        },
+        {
+          "op": "i",
+          "ns": "shop.orders",
+          "ui": {
+            "$binary": {
+              "base64": "Mf98eC4eRwmgINScEn7V5w==",
+              "subType": "04"
+            }
+          },
+          "o": {
+            "_id": {
+              "$numberInt": "39"
+            },
+            "total": {
+              "$numberInt": "390"
+            }
+          },
+          "o2": {
+            "_id": {
+              "$numberInt": "39"
+            }
+          },
+          "stmtId": {
+            "$numberInt": "39"
+          }
+        }
+      ]
+    },
+    "ts": {
+      "$timestamp": {
+        "t": 1795052725,
+        "i": 2
+      }
+    },
+    "t": {
+      "$numberLong": "1"
+    },
+    "v": {
+      "$numberLong": "2"
+    },
+    "wall": {
+      "$date": {
+        "$numberLong": "1795052725161"
+      }
+    },
+    "prevOpTime": {
+      "ts": {
+        "$timestamp": {
+          "t": 0,
+          "i": 0
+        }
+      },
+      "t": {
+        "$numberLong": "-1"
+      }
+    },
+    "multiOpType": {
+      "$numberInt": "1"
+    }
+  },
+  {
+    "op": "c",
+    "ns": "shop.$cmd",
+    "ui": {
+      "$binary": {
+        "base64": "Mf98eC4eRwmgINScEn7V5w==",
+        "subType": "04"
+      }
+    },
+    "o": {
+      "create": "orders",
+      "idIndex": {
+        "v": {
+          "$numberInt": "2"
+        },
+        "key": {
+          "_id": {
+            "$numberInt": "1"
+          }
+        },
+        "name": "_id_"
+      }
+    },
+    "ts": {
+      "$timestamp": {
+        "t": 1795052725,
+        "i": 1
+      }
+    },
+    "t": {
+      "$numberLong": "1"
+    },
+    "v": {
+      "$numberLong": "2"
+    },
+    "wall": {
+      "$date": {
+        "$numberLong": "1795052725161"
+      }
+    }
+  }
+]

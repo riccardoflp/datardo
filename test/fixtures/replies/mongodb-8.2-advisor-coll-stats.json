@@ -1,0 +1,74 @@
+[
+  {
+    "ns": "shop.orders",
+    "host": "localhost:27017",
+    "localTime": {
+      "$date": {
+        "$numberLong": "1795052369507"
+      }
+    },
+    "storageStats": {
+      "size": {
+        "$numberInt": "10314"
+      },
+      "count": {
+        "$numberInt": "60"
+      },
+      "avgObjSize": {
+        "$numberInt": "171"
+      },
+      "numOrphanDocs": {
+        "$numberInt": "0"
+      },
+      "storageSize": {
+        "$numberInt": "4096"
+      },
+      "freeStorageSize": {
+        "$numberInt": "0"
+      },
+      "capped": false,
+      "nindexes": {
+        "$numberInt": "9"
+      },
+      "indexBuilds": [],
+      "totalIndexSize": {
+        "$numberInt": "167936"
+      },
+      "indexSizes": {
+        "_id_": {
+          "$numberInt": "4096"
+        },
+        "email_1": {
+          "$numberInt": "20480"
+        },
+        "expiresAt_1": {
+          "$numberInt": "20480"
+        },
+        "customerId_1": {
+          "$numberInt": "20480"
+        },
+        "note_1": {
+          "$numberInt": "20480"
+        },
+        "total_1": {
+          "$numberInt": "20480"
+        },
+        "name_1": {
+          "$numberInt": "20480"
+        },
+        "status_1": {
+          "$numberInt": "20480"
+        },
+        "status_1_createdAt_-1": {
+          "$numberInt": "20480"
+        }
+      },
+      "totalSize": {
+        "$numberInt": "172032"
+      },
+      "scaleFactor": {
+        "$numberInt": "1"
+      }
+    }
+  }
+]

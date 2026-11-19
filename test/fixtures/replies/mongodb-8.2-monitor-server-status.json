@@ -1,0 +1,92 @@
+{
+  "host": "localhost:27017",
+  "version": "8.2.5",
+  "uptime": {
+    "$numberInt": "3"
+  },
+  "localTime": {
+    "$date": {
+      "$numberLong": "1795052725060"
+    }
+  },
+  "connections": {
+    "current": {
+      "$numberInt": "2"
+    },
+    "available": {
+      "$numberInt": "412021"
+    },
+    "totalCreated": {
+      "$numberInt": "2"
+    },
+    "rejected": {
+      "$numberInt": "0"
+    },
+    "active": {
+      "$numberInt": "1"
+    },
+    "queuedForEstablishment": {
+      "$numberInt": "0"
+    },
+    "establishmentRateLimit": {
+      "rejected": {
+        "$numberInt": "0"
+      },
+      "exempted": {
+        "$numberInt": "0"
+      },
+      "interruptedDueToClientDisconnect": {
+        "$numberInt": "0"
+      }
+    },
+    "threaded": {
+      "$numberInt": "2"
+    },
+    "exhaustIsMaster": {
+      "$numberInt": "0"
+    },
+    "exhaustHello": {
+      "$numberInt": "0"
+    },
+    "awaitingTopologyChanges": {
+      "$numberInt": "0"
+    },
+    "loadBalanced": {
+      "$numberInt": "0"
+    }
+  },
+  "opcounters": {
+    "insert": {
+      "$numberInt": "40"
+    },
+    "query": {
+      "$numberInt": "0"
+    },
+    "update": {
+      "$numberInt": "0"
+    },
+    "delete": {
+      "$numberInt": "0"
+    },
+    "getmore": {
+      "$numberInt": "0"
+    },
+    "command": {
+      "$numberInt": "9"
+    }
+  },
+  "network": {
+    "bytesIn": {
+      "$numberInt": "2312"
+    },
+    "bytesOut": {
+      "$numberInt": "817"
+    },
+    "numRequests": {
+      "$numberInt": "7"
+    }
+  },
+  "ok": {
+    "$numberInt": "1"
+  }
+}

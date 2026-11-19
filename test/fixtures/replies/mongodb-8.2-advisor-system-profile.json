@@ -1,0 +1,2448 @@
+[
+  {
+    "op": "command",
+    "ns": "shop.orders",
+    "command": {
+      "count": "orders",
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "at6YzZT0SoKQwmcAolcHDA==",
+            "subType": "04"
+          }
+        }
+      },
+      "$db": "shop"
+    },
+    "keysExamined": {
+      "$numberInt": "0"
+    },
+    "docsExamined": {
+      "$numberInt": "0"
+    },
+    "numYield": {
+      "$numberInt": "0"
+    },
+    "nreturned": {
+      "$numberInt": "1"
+    },
+    "planCacheShapeHash": "4E45B701",
+    "queryHash": "4E45B701",
+    "planCacheKey": "4C95D723",
+    "locks": {
+      "Global": {
+        "acquireCount": {
+          "r": {
+            "$numberLong": "2"
+          }
+        }
+      }
+    },
+    "flowControl": {},
+    "storage": {
+      "timeWaitingMicros": {
+        "storageExecutionMicros": {
+          "$numberLong": "16"
+        }
+      }
+    },
+    "responseLength": {
+      "$numberInt": "45"
+    },
+    "protocol": "op_msg",
+    "millis": {
+      "$numberInt": "0"
+    },
+    "planSummary": "RECORD_STORE_FAST_COUNT",
+    "planningTimeMicros": {
+      "$numberInt": "46"
+    },
+    "execStats": {
+      "isCached": false,
+      "stage": "RECORD_STORE_FAST_COUNT",
+      "nReturned": {
+        "$numberInt": "0"
+      },
+      "executionTimeMillisEstimate": {
+        "$numberInt": "0"
+      },
+      "works": {
+        "$numberInt": "1"
+      },
+      "advanced": {
+        "$numberInt": "0"
+      },
+      "needTime": {
+        "$numberInt": "0"
+      },
+      "needYield": {
+        "$numberInt": "0"
+      },
+      "saveState": {
+        "$numberInt": "0"
+      },
+      "restoreState": {
+        "$numberInt": "0"
+      },
+      "isEOF": {
+        "$numberInt": "1"
+      },
+      "nCounted": {
+        "$numberInt": "60"
+      },
+      "nSkipped": {
+        "$numberInt": "0"
+      }
+    },
+    "ts": {
+      "$date": {
+        "$numberLong": "1795052369527"
+      }
+    },
+    "client": "127.0.0.1",
+    "appName": "datardo",
+    "allUsers": [],
+    "user": ""
+  },
+  {
+    "op": "command",
+    "ns": "shop.orders",
+    "command": {
+      "aggregate": "orders",
+      "pipeline": [
+        {
+          "$collStats": {
+            "storageStats": {}
+          }
+        }
+      ],
+      "cursor": {},
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "at6YzZT0SoKQwmcAolcHDA==",
+            "subType": "04"
+          }
+        }
+      },
+      "$db": "shop"
+    },
+    "keysExamined": {
+      "$numberInt": "0"
+    },
+    "docsExamined": {
+      "$numberInt": "0"
+    },
+    "cursorExhausted": true,
+    "numYield": {
+      "$numberInt": "0"
+    },
+    "nreturned": {
+      "$numberInt": "1"
+    },
+    "queryShapeHash": "7CC2D0F9DE43A3D7CC91D3342E658134E167F094BA6C2E6BC997B183151181E9",
+    "queryFramework": "classic",
+    "locks": {
+      "Global": {
+        "acquireCount": {
+          "r": {
+            "$numberLong": "3"
+          }
+        }
+      }
+    },
+    "flowControl": {},
+    "storage": {
+      "data": {
+        "bytesRead": {
+          "$numberLong": "2085"
+        }
+      },
+      "timeWaitingMicros": {
+        "storageExecutionMicros": {
+          "$numberLong": "2818"
+        }
+      }
+    },
+    "responseLength": {
+      "$numberInt": "176281"
+    },
+    "protocol": "op_msg",
+    "millis": {
+      "$numberInt": "9"
+    },
+    "ts": {
+      "$date": {
+        "$numberLong": "1795052369516"
+      }
+    },
+    "client": "127.0.0.1",
+    "appName": "datardo",
+    "allUsers": [],
+    "user": ""
+  },
+  {
+    "op": "command",
+    "ns": "shop.orders",
+    "command": {
+      "aggregate": "orders",
+      "pipeline": [
+        {
+          "$indexStats": {}
+        }
+      ],
+      "cursor": {},
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "at6YzZT0SoKQwmcAolcHDA==",
+            "subType": "04"
+          }
+        }
+      },
+      "$db": "shop"
+    },
+    "keysExamined": {
+      "$numberInt": "0"
+    },
+    "docsExamined": {
+      "$numberInt": "0"
+    },
+    "cursorExhausted": true,
+    "numYield": {
+      "$numberInt": "0"
+    },
+    "nreturned": {
+      "$numberInt": "9"
+    },
+    "queryShapeHash": "C4FFEFEA7F63AA87BA0049FB5206D8C617539B6888134231D8A8A0AAA985930D",
+    "queryFramework": "classic",
+    "locks": {
+      "Global": {
+        "acquireCount": {
+          "r": {
+            "$numberLong": "3"
+          }
+        }
+      }
+    },
+    "flowControl": {},
+    "storage": {
+      "timeWaitingMicros": {
+        "storageExecutionMicros": {
+          "$numberLong": "11"
+        }
+      }
+    },
+    "responseLength": {
+      "$numberInt": "2030"
+    },
+    "protocol": "op_msg",
+    "millis": {
+      "$numberInt": "0"
+    },
+    "ts": {
+      "$date": {
+        "$numberLong": "1795052369505"
+      }
+    },
+    "client": "127.0.0.1",
+    "appName": "datardo",
+    "allUsers": [],
+    "user": ""
+  },
+  {
+    "op": "command",
+    "ns": "shop.orders",
+    "command": {
+      "listIndexes": "orders",
+      "cursor": {},
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "at6YzZT0SoKQwmcAolcHDA==",
+            "subType": "04"
+          }
+        }
+      },
+      "$db": "shop"
+    },
+    "numYield": {
+      "$numberInt": "0"
+    },
+    "locks": {
+      "Global": {
+        "acquireCount": {
+          "r": {
+            "$numberLong": "2"
+          }
+        }
+      }
+    },
+    "flowControl": {},
+    "storage": {
+      "timeWaitingMicros": {
+        "storageExecutionMicros": {
+          "$numberLong": "14"
+        }
+      }
+    },
+    "responseLength": {
+      "$numberInt": "909"
+    },
+    "protocol": "op_msg",
+    "millis": {
+      "$numberInt": "0"
+    },
+    "ts": {
+      "$date": {
+        "$numberLong": "1795052369503"
+      }
+    },
+    "client": "127.0.0.1",
+    "appName": "datardo",
+    "allUsers": [],
+    "user": ""
+  },
+  {
+    "op": "command",
+    "ns": "shop.orders",
+    "command": {
+      "aggregate": "orders",
+      "pipeline": [
+        {
+          "$match": {
+            "customerId": {
+              "$numberInt": "2"
+            }
+          }
+        },
+        {
+          "$sort": {
+            "total": {
+              "$numberInt": "-1"
+            }
+          }
+        }
+      ],
+      "cursor": {},
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "at6YzZT0SoKQwmcAolcHDA==",
+            "subType": "04"
+          }
+        }
+      },
+      "$db": "shop"
+    },
+    "keysExamined": {
+      "$numberInt": "0"
+    },
+    "docsExamined": {
+      "$numberInt": "60"
+    },
+    "hasSortStage": true,
+    "cursorExhausted": true,
+    "numYield": {
+      "$numberInt": "0"
+    },
+    "nreturned": {
+      "$numberInt": "10"
+    },
+    "planCacheShapeHash": "5FD02D63",
+    "queryHash": "5FD02D63",
+    "planCacheKey": "FFE68A60",
+    "queryShapeHash": "EC4D3E13C89F056B2A1E5F6D1A823AEDAFA18A7E7828D1B88FEEA5FA9D4F9F6C",
+    "queryFramework": "classic",
+    "locks": {
+      "Global": {
+        "acquireCount": {
+          "r": {
+            "$numberLong": "2"
+          }
+        }
+      }
+    },
+    "flowControl": {},
+    "storage": {
+      "timeWaitingMicros": {
+        "storageExecutionMicros": {
+          "$numberLong": "14"
+        }
+      }
+    },
+    "responseLength": {
+      "$numberInt": "1852"
+    },
+    "protocol": "op_msg",
+    "millis": {
+      "$numberInt": "0"
+    },
+    "planSummary": "COLLSCAN",
+    "planningTimeMicros": {
+      "$numberInt": "152"
+    },
+    "ts": {
+      "$date": {
+        "$numberLong": "1795052369498"
+      }
+    },
+    "client": "127.0.0.1",
+    "appName": "datardo",
+    "allUsers": [],
+    "user": ""
+  },
+  {
+    "op": "query",
+    "ns": "shop.orders",
+    "command": {
+      "find": "orders",
+      "filter": {
+        "email": "customer7@example.com"
+      },
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "at6YzZT0SoKQwmcAolcHDA==",
+            "subType": "04"
+          }
+        }
+      },
+      "$db": "shop"
+    },
+    "keysExamined": {
+      "$numberInt": "1"
+    },
+    "docsExamined": {
+      "$numberInt": "1"
+    },
+    "nBatches": {
+      "$numberInt": "1"
+    },
+    "cursorExhausted": true,
+    "numYield": {
+      "$numberInt": "0"
+    },
+    "nreturned": {
+      "$numberInt": "1"
+    },
+    "queryShapeHash": "D98C4D418E8E9A30646D707DB9F6F7116FC34B9CA2D9AFCBA9C915B5657DE519",
+    "queryFramework": "classic",
+    "locks": {
+      "Global": {
+        "acquireCount": {
+          "r": {
+            "$numberLong": "2"
+          }
+        }
+      }
+    },
+    "flowControl": {},
+    "storage": {
+      "data": {
+        "bytesRead": {
+          "$numberLong": "2528"
+        }
+      },
+      "timeWaitingMicros": {
+        "storageExecutionMicros": {
+          "$numberLong": "11"
+        }
+      }
+    },
+    "responseLength": {
+      "$numberInt": "270"
+    },
+    "protocol": "op_msg",
+    "millis": {
+      "$numberInt": "0"
+    },
+    "planSummary": "EXPRESS_IXSCAN { email: 1 }",
+    "planningTimeMicros": {
+      "$numberInt": "119"
+    },
+    "execStats": {
+      "isCached": false,
+      "stage": "EXPRESS_IXSCAN",
+      "keyPattern": "{ email: 1 }",
+      "indexName": "email_1",
+      "keysExamined": {
+        "$numberInt": "1"
+      },
+      "docsExamined": {
+        "$numberInt": "1"
+      },
+      "nReturned": {
+        "$numberInt": "1"
+      }
+    },
+    "ts": {
+      "$date": {
+        "$numberLong": "1795052369495"
+      }
+    },
+    "client": "127.0.0.1",
+    "appName": "datardo",
+    "allUsers": [],
+    "user": ""
+  },
+  {
+    "op": "getmore",
+    "ns": "shop.orders",
+    "command": {
+      "getMore": {
+        "$numberLong": "4905601191882685871"
+      },
+      "collection": "orders",
+      "batchSize": {
+        "$numberInt": "5"
+      },
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "at6YzZT0SoKQwmcAolcHDA==",
+            "subType": "04"
+          }
+        }
+      },
+      "$db": "shop"
+    },
+    "originatingCommand": {
+      "find": "orders",
+      "filter": {
+        "total": {
+          "$gt": {
+            "$numberInt": "100"
+          }
+        }
+      },
+      "batchSize": {
+        "$numberInt": "5"
+      },
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "at6YzZT0SoKQwmcAolcHDA==",
+            "subType": "04"
+          }
+        }
+      },
+      "$db": "shop"
+    },
+    "cursorid": {
+      "$numberLong": "4905601191882685871"
+    },
+    "keysExamined": {
+      "$numberInt": "0"
+    },
+    "docsExamined": {
+      "$numberInt": "4"
+    },
+    "nBatches": {
+      "$numberInt": "1"
+    },
+    "cursorExhausted": true,
+    "numYield": {
+      "$numberInt": "0"
+    },
+    "nreturned": {
+      "$numberInt": "4"
+    },
+    "planCacheShapeHash": "1B22C360",
+    "queryHash": "1B22C360",
+    "planCacheKey": "3738698E",
+    "queryFramework": "classic",
+    "locks": {
+      "Global": {
+        "acquireCount": {
+          "r": {
+            "$numberLong": "2"
+          }
+        }
+      }
+    },
+    "flowControl": {},
+    "storage": {
+      "timeWaitingMicros": {
+        "storageExecutionMicros": {
+          "$numberLong": "7"
+        }
+      }
+    },
+    "responseLength": {
+      "$numberInt": "786"
+    },
+    "protocol": "op_msg",
+    "millis": {
+      "$numberInt": "0"
+    },
+    "planSummary": "COLLSCAN",
+    "execStats": {
+      "isCached": false,
+      "stage": "COLLSCAN",
+      "filter": {
+        "total": {
+          "$gt": {
+            "$numberInt": "100"
+          }
+        }
+      },
+      "nReturned": {
+        "$numberInt": "49"
+      },
+      "executionTimeMillisEstimate": {
+        "$numberInt": "0"
+      },
+      "works": {
+        "$numberInt": "61"
+      },
+      "advanced": {
+        "$numberInt": "49"
+      },
+      "needTime": {
+        "$numberInt": "11"
+      },
+      "needYield": {
+        "$numberInt": "0"
+      },
+      "saveState": {
+        "$numberInt": "9"
+      },
+      "restoreState": {
+        "$numberInt": "9"
+      },
+      "isEOF": {
+        "$numberInt": "1"
+      },
+      "direction": "forward",
+      "docsExamined": {
+        "$numberInt": "60"
+      }
+    },
+    "ts": {
+      "$date": {
+        "$numberLong": "1795052369493"
+      }
+    },
+    "client": "127.0.0.1",
+    "appName": "datardo",
+    "allUsers": [],
+    "user": ""
+  },
+  {
+    "op": "getmore",
+    "ns": "shop.orders",
+    "command": {
+      "getMore": {
+        "$numberLong": "4905601191882685871"
+      },
+      "collection": "orders",
+      "batchSize": {
+        "$numberInt": "5"
+      },
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "at6YzZT0SoKQwmcAolcHDA==",
+            "subType": "04"
+          }
+        }
+      },
+      "$db": "shop"
+    },
+    "originatingCommand": {
+      "find": "orders",
+      "filter": {
+        "total": {
+          "$gt": {
+            "$numberInt": "100"
+          }
+        }
+      },
+      "batchSize": {
+        "$numberInt": "5"
+      },
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "at6YzZT0SoKQwmcAolcHDA==",
+            "subType": "04"
+          }
+        }
+      },
+      "$db": "shop"
+    },
+    "cursorid": {
+      "$numberLong": "4905601191882685871"
+    },
+    "keysExamined": {
+      "$numberInt": "0"
+    },
+    "docsExamined": {
+      "$numberInt": "5"
+    },
+    "nBatches": {
+      "$numberInt": "1"
+    },
+    "numYield": {
+      "$numberInt": "0"
+    },
+    "nreturned": {
+      "$numberInt": "5"
+    },
+    "planCacheShapeHash": "1B22C360",
+    "queryHash": "1B22C360",
+    "planCacheKey": "3738698E",
+    "queryFramework": "classic",
+    "locks": {
+      "Global": {
+        "acquireCount": {
+          "r": {
+            "$numberLong": "2"
+          }
+        }
+      }
+    },
+    "flowControl": {},
+    "storage": {
+      "timeWaitingMicros": {
+        "storageExecutionMicros": {
+          "$numberLong": "9"
+        }
+      }
+    },
+    "responseLength": {
+      "$numberInt": "976"
+    },
+    "protocol": "op_msg",
+    "millis": {
+      "$numberInt": "0"
+    },
+    "planSummary": "COLLSCAN",
+    "execStats": {
+      "isCached": false,
+      "stage": "COLLSCAN",
+      "filter": {
+        "total": {
+          "$gt": {
+            "$numberInt": "100"
+          }
+        }
+      },
+      "nReturned": {
+        "$numberInt": "40"
+      },
+      "executionTimeMillisEstimate": {
+        "$numberInt": "0"
+      },
+      "works": {
+        "$numberInt": "51"
+      },
+      "advanced": {
+        "$numberInt": "40"
+      },
+      "needTime": {
+        "$numberInt": "11"
+      },
+      "needYield": {
+        "$numberInt": "0"
+      },
+      "saveState": {
+        "$numberInt": "7"
+      },
+      "restoreState": {
+        "$numberInt": "7"
+      },
+      "isEOF": {
+        "$numberInt": "0"
+      },
+      "direction": "forward",
+      "docsExamined": {
+        "$numberInt": "51"
+      }
+    },
+    "ts": {
+      "$date": {
+        "$numberLong": "1795052369492"
+      }
+    },
+    "client": "127.0.0.1",
+    "appName": "datardo",
+    "allUsers": [],
+    "user": ""
+  },
+  {
+    "op": "getmore",
+    "ns": "shop.orders",
+    "command": {
+      "getMore": {
+        "$numberLong": "4905601191882685871"
+      },
+      "collection": "orders",
+      "batchSize": {
+        "$numberInt": "5"
+      },
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "at6YzZT0SoKQwmcAolcHDA==",
+            "subType": "04"
+          }
+        }
+      },
+      "$db": "shop"
+    },
+    "originatingCommand": {
+      "find": "orders",
+      "filter": {
+        "total": {
+          "$gt": {
+            "$numberInt": "100"
+          }
+        }
+      },
+      "batchSize": {
+        "$numberInt": "5"
+      },
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "at6YzZT0SoKQwmcAolcHDA==",
+            "subType": "04"
+          }
+        }
+      },
+      "$db": "shop"
+    },
+    "cursorid": {
+      "$numberLong": "4905601191882685871"
+    },
+    "keysExamined": {
+      "$numberInt": "0"
+    },
+    "docsExamined": {
+      "$numberInt": "5"
+    },
+    "nBatches": {
+      "$numberInt": "1"
+    },
+    "numYield": {
+      "$numberInt": "0"
+    },
+    "nreturned": {
+      "$numberInt": "5"
+    },
+    "planCacheShapeHash": "1B22C360",
+    "queryHash": "1B22C360",
+    "planCacheKey": "3738698E",
+    "queryFramework": "classic",
+    "locks": {
+      "Global": {
+        "acquireCount": {
+          "r": {
+            "$numberLong": "2"
+          }
+        }
+      }
+    },
+    "flowControl": {},
+    "storage": {
+      "timeWaitingMicros": {
+        "storageExecutionMicros": {
+          "$numberLong": "9"
+        }
+      }
+    },
+    "responseLength": {
+      "$numberInt": "975"
+    },
+    "protocol": "op_msg",
+    "millis": {
+      "$numberInt": "0"
+    },
+    "planSummary": "COLLSCAN",
+    "execStats": {
+      "isCached": false,
+      "stage": "COLLSCAN",
+      "filter": {
+        "total": {
+          "$gt": {
+            "$numberInt": "100"
+          }
+        }
+      },
+      "nReturned": {
+        "$numberInt": "45"
+      },
+      "executionTimeMillisEstimate": {
+        "$numberInt": "0"
+      },
+      "works": {
+        "$numberInt": "56"
+      },
+      "advanced": {
+        "$numberInt": "45"
+      },
+      "needTime": {
+        "$numberInt": "11"
+      },
+      "needYield": {
+        "$numberInt": "0"
+      },
+      "saveState": {
+        "$numberInt": "8"
+      },
+      "restoreState": {
+        "$numberInt": "8"
+      },
+      "isEOF": {
+        "$numberInt": "0"
+      },
+      "direction": "forward",
+      "docsExamined": {
+        "$numberInt": "56"
+      }
+    },
+    "ts": {
+      "$date": {
+        "$numberLong": "1795052369492"
+      }
+    },
+    "client": "127.0.0.1",
+    "appName": "datardo",
+    "allUsers": [],
+    "user": ""
+  },
+  {
+    "op": "getmore",
+    "ns": "shop.orders",
+    "command": {
+      "getMore": {
+        "$numberLong": "4905601191882685871"
+      },
+      "collection": "orders",
+      "batchSize": {
+        "$numberInt": "5"
+      },
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "at6YzZT0SoKQwmcAolcHDA==",
+            "subType": "04"
+          }
+        }
+      },
+      "$db": "shop"
+    },
+    "originatingCommand": {
+      "find": "orders",
+      "filter": {
+        "total": {
+          "$gt": {
+            "$numberInt": "100"
+          }
+        }
+      },
+      "batchSize": {
+        "$numberInt": "5"
+      },
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "at6YzZT0SoKQwmcAolcHDA==",
+            "subType": "04"
+          }
+        }
+      },
+      "$db": "shop"
+    },
+    "cursorid": {
+      "$numberLong": "4905601191882685871"
+    },
+    "keysExamined": {
+      "$numberInt": "0"
+    },
+    "docsExamined": {
+      "$numberInt": "5"
+    },
+    "nBatches": {
+      "$numberInt": "1"
+    },
+    "numYield": {
+      "$numberInt": "0"
+    },
+    "nreturned": {
+      "$numberInt": "5"
+    },
+    "planCacheShapeHash": "1B22C360",
+    "queryHash": "1B22C360",
+    "planCacheKey": "3738698E",
+    "queryFramework": "classic",
+    "locks": {
+      "Global": {
+        "acquireCount": {
+          "r": {
+            "$numberLong": "2"
+          }
+        }
+      }
+    },
+    "flowControl": {},
+    "storage": {
+      "timeWaitingMicros": {
+        "storageExecutionMicros": {
+          "$numberLong": "10"
+        }
+      }
+    },
+    "responseLength": {
+      "$numberInt": "975"
+    },
+    "protocol": "op_msg",
+    "millis": {
+      "$numberInt": "0"
+    },
+    "planSummary": "COLLSCAN",
+    "execStats": {
+      "isCached": false,
+      "stage": "COLLSCAN",
+      "filter": {
+        "total": {
+          "$gt": {
+            "$numberInt": "100"
+          }
+        }
+      },
+      "nReturned": {
+        "$numberInt": "35"
+      },
+      "executionTimeMillisEstimate": {
+        "$numberInt": "0"
+      },
+      "works": {
+        "$numberInt": "46"
+      },
+      "advanced": {
+        "$numberInt": "35"
+      },
+      "needTime": {
+        "$numberInt": "11"
+      },
+      "needYield": {
+        "$numberInt": "0"
+      },
+      "saveState": {
+        "$numberInt": "6"
+      },
+      "restoreState": {
+        "$numberInt": "6"
+      },
+      "isEOF": {
+        "$numberInt": "0"
+      },
+      "direction": "forward",
+      "docsExamined": {
+        "$numberInt": "46"
+      }
+    },
+    "ts": {
+      "$date": {
+        "$numberLong": "1795052369491"
+      }
+    },
+    "client": "127.0.0.1",
+    "appName": "datardo",
+    "allUsers": [],
+    "user": ""
+  },
+  {
+    "op": "getmore",
+    "ns": "shop.orders",
+    "command": {
+      "getMore": {
+        "$numberLong": "4905601191882685871"
+      },
+      "collection": "orders",
+      "batchSize": {
+        "$numberInt": "5"
+      },
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "at6YzZT0SoKQwmcAolcHDA==",
+            "subType": "04"
+          }
+        }
+      },
+      "$db": "shop"
+    },
+    "originatingCommand": {
+      "find": "orders",
+      "filter": {
+        "total": {
+          "$gt": {
+            "$numberInt": "100"
+          }
+        }
+      },
+      "batchSize": {
+        "$numberInt": "5"
+      },
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "at6YzZT0SoKQwmcAolcHDA==",
+            "subType": "04"
+          }
+        }
+      },
+      "$db": "shop"
+    },
+    "cursorid": {
+      "$numberLong": "4905601191882685871"
+    },
+    "keysExamined": {
+      "$numberInt": "0"
+    },
+    "docsExamined": {
+      "$numberInt": "5"
+    },
+    "nBatches": {
+      "$numberInt": "1"
+    },
+    "numYield": {
+      "$numberInt": "0"
+    },
+    "nreturned": {
+      "$numberInt": "5"
+    },
+    "planCacheShapeHash": "1B22C360",
+    "queryHash": "1B22C360",
+    "planCacheKey": "3738698E",
+    "queryFramework": "classic",
+    "locks": {
+      "Global": {
+        "acquireCount": {
+          "r": {
+            "$numberLong": "2"
+          }
+        }
+      }
+    },
+    "flowControl": {},
+    "storage": {
+      "timeWaitingMicros": {
+        "storageExecutionMicros": {
+          "$numberLong": "11"
+        }
+      }
+    },
+    "responseLength": {
+      "$numberInt": "975"
+    },
+    "protocol": "op_msg",
+    "millis": {
+      "$numberInt": "0"
+    },
+    "planSummary": "COLLSCAN",
+    "execStats": {
+      "isCached": false,
+      "stage": "COLLSCAN",
+      "filter": {
+        "total": {
+          "$gt": {
+            "$numberInt": "100"
+          }
+        }
+      },
+      "nReturned": {
+        "$numberInt": "30"
+      },
+      "executionTimeMillisEstimate": {
+        "$numberInt": "0"
+      },
+      "works": {
+        "$numberInt": "41"
+      },
+      "advanced": {
+        "$numberInt": "30"
+      },
+      "needTime": {
+        "$numberInt": "11"
+      },
+      "needYield": {
+        "$numberInt": "0"
+      },
+      "saveState": {
+        "$numberInt": "5"
+      },
+      "restoreState": {
+        "$numberInt": "5"
+      },
+      "isEOF": {
+        "$numberInt": "0"
+      },
+      "direction": "forward",
+      "docsExamined": {
+        "$numberInt": "41"
+      }
+    },
+    "ts": {
+      "$date": {
+        "$numberLong": "1795052369490"
+      }
+    },
+    "client": "127.0.0.1",
+    "appName": "datardo",
+    "allUsers": [],
+    "user": ""
+  },
+  {
+    "op": "getmore",
+    "ns": "shop.orders",
+    "command": {
+      "getMore": {
+        "$numberLong": "4905601191882685871"
+      },
+      "collection": "orders",
+      "batchSize": {
+        "$numberInt": "5"
+      },
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "at6YzZT0SoKQwmcAolcHDA==",
+            "subType": "04"
+          }
+        }
+      },
+      "$db": "shop"
+    },
+    "originatingCommand": {
+      "find": "orders",
+      "filter": {
+        "total": {
+          "$gt": {
+            "$numberInt": "100"
+          }
+        }
+      },
+      "batchSize": {
+        "$numberInt": "5"
+      },
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "at6YzZT0SoKQwmcAolcHDA==",
+            "subType": "04"
+          }
+        }
+      },
+      "$db": "shop"
+    },
+    "cursorid": {
+      "$numberLong": "4905601191882685871"
+    },
+    "keysExamined": {
+      "$numberInt": "0"
+    },
+    "docsExamined": {
+      "$numberInt": "5"
+    },
+    "nBatches": {
+      "$numberInt": "1"
+    },
+    "numYield": {
+      "$numberInt": "0"
+    },
+    "nreturned": {
+      "$numberInt": "5"
+    },
+    "planCacheShapeHash": "1B22C360",
+    "queryHash": "1B22C360",
+    "planCacheKey": "3738698E",
+    "queryFramework": "classic",
+    "locks": {
+      "Global": {
+        "acquireCount": {
+          "r": {
+            "$numberLong": "2"
+          }
+        }
+      }
+    },
+    "flowControl": {},
+    "storage": {
+      "timeWaitingMicros": {
+        "storageExecutionMicros": {
+          "$numberLong": "8"
+        }
+      }
+    },
+    "responseLength": {
+      "$numberInt": "976"
+    },
+    "protocol": "op_msg",
+    "millis": {
+      "$numberInt": "0"
+    },
+    "planSummary": "COLLSCAN",
+    "execStats": {
+      "isCached": false,
+      "stage": "COLLSCAN",
+      "filter": {
+        "total": {
+          "$gt": {
+            "$numberInt": "100"
+          }
+        }
+      },
+      "nReturned": {
+        "$numberInt": "25"
+      },
+      "executionTimeMillisEstimate": {
+        "$numberInt": "0"
+      },
+      "works": {
+        "$numberInt": "36"
+      },
+      "advanced": {
+        "$numberInt": "25"
+      },
+      "needTime": {
+        "$numberInt": "11"
+      },
+      "needYield": {
+        "$numberInt": "0"
+      },
+      "saveState": {
+        "$numberInt": "4"
+      },
+      "restoreState": {
+        "$numberInt": "4"
+      },
+      "isEOF": {
+        "$numberInt": "0"
+      },
+      "direction": "forward",
+      "docsExamined": {
+        "$numberInt": "36"
+      }
+    },
+    "ts": {
+      "$date": {
+        "$numberLong": "1795052369489"
+      }
+    },
+    "client": "127.0.0.1",
+    "appName": "datardo",
+    "allUsers": [],
+    "user": ""
+  },
+  {
+    "op": "getmore",
+    "ns": "shop.orders",
+    "command": {
+      "getMore": {
+        "$numberLong": "4905601191882685871"
+      },
+      "collection": "orders",
+      "batchSize": {
+        "$numberInt": "5"
+      },
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "at6YzZT0SoKQwmcAolcHDA==",
+            "subType": "04"
+          }
+        }
+      },
+      "$db": "shop"
+    },
+    "originatingCommand": {
+      "find": "orders",
+      "filter": {
+        "total": {
+          "$gt": {
+            "$numberInt": "100"
+          }
+        }
+      },
+      "batchSize": {
+        "$numberInt": "5"
+      },
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "at6YzZT0SoKQwmcAolcHDA==",
+            "subType": "04"
+          }
+        }
+      },
+      "$db": "shop"
+    },
+    "cursorid": {
+      "$numberLong": "4905601191882685871"
+    },
+    "keysExamined": {
+      "$numberInt": "0"
+    },
+    "docsExamined": {
+      "$numberInt": "5"
+    },
+    "nBatches": {
+      "$numberInt": "1"
+    },
+    "numYield": {
+      "$numberInt": "0"
+    },
+    "nreturned": {
+      "$numberInt": "5"
+    },
+    "planCacheShapeHash": "1B22C360",
+    "queryHash": "1B22C360",
+    "planCacheKey": "3738698E",
+    "queryFramework": "classic",
+    "locks": {
+      "Global": {
+        "acquireCount": {
+          "r": {
+            "$numberLong": "2"
+          }
+        }
+      }
+    },
+    "flowControl": {},
+    "storage": {
+      "timeWaitingMicros": {
+        "storageExecutionMicros": {
+          "$numberLong": "10"
+        }
+      }
+    },
+    "responseLength": {
+      "$numberInt": "975"
+    },
+    "protocol": "op_msg",
+    "millis": {
+      "$numberInt": "0"
+    },
+    "planSummary": "COLLSCAN",
+    "execStats": {
+      "isCached": false,
+      "stage": "COLLSCAN",
+      "filter": {
+        "total": {
+          "$gt": {
+            "$numberInt": "100"
+          }
+        }
+      },
+      "nReturned": {
+        "$numberInt": "15"
+      },
+      "executionTimeMillisEstimate": {
+        "$numberInt": "0"
+      },
+      "works": {
+        "$numberInt": "26"
+      },
+      "advanced": {
+        "$numberInt": "15"
+      },
+      "needTime": {
+        "$numberInt": "11"
+      },
+      "needYield": {
+        "$numberInt": "0"
+      },
+      "saveState": {
+        "$numberInt": "2"
+      },
+      "restoreState": {
+        "$numberInt": "2"
+      },
+      "isEOF": {
+        "$numberInt": "0"
+      },
+      "direction": "forward",
+      "docsExamined": {
+        "$numberInt": "26"
+      }
+    },
+    "ts": {
+      "$date": {
+        "$numberLong": "1795052369488"
+      }
+    },
+    "client": "127.0.0.1",
+    "appName": "datardo",
+    "allUsers": [],
+    "user": ""
+  },
+  {
+    "op": "getmore",
+    "ns": "shop.orders",
+    "command": {
+      "getMore": {
+        "$numberLong": "4905601191882685871"
+      },
+      "collection": "orders",
+      "batchSize": {
+        "$numberInt": "5"
+      },
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "at6YzZT0SoKQwmcAolcHDA==",
+            "subType": "04"
+          }
+        }
+      },
+      "$db": "shop"
+    },
+    "originatingCommand": {
+      "find": "orders",
+      "filter": {
+        "total": {
+          "$gt": {
+            "$numberInt": "100"
+          }
+        }
+      },
+      "batchSize": {
+        "$numberInt": "5"
+      },
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "at6YzZT0SoKQwmcAolcHDA==",
+            "subType": "04"
+          }
+        }
+      },
+      "$db": "shop"
+    },
+    "cursorid": {
+      "$numberLong": "4905601191882685871"
+    },
+    "keysExamined": {
+      "$numberInt": "0"
+    },
+    "docsExamined": {
+      "$numberInt": "5"
+    },
+    "nBatches": {
+      "$numberInt": "1"
+    },
+    "numYield": {
+      "$numberInt": "0"
+    },
+    "nreturned": {
+      "$numberInt": "5"
+    },
+    "planCacheShapeHash": "1B22C360",
+    "queryHash": "1B22C360",
+    "planCacheKey": "3738698E",
+    "queryFramework": "classic",
+    "locks": {
+      "Global": {
+        "acquireCount": {
+          "r": {
+            "$numberLong": "2"
+          }
+        }
+      }
+    },
+    "flowControl": {},
+    "storage": {
+      "timeWaitingMicros": {
+        "storageExecutionMicros": {
+          "$numberLong": "9"
+        }
+      }
+    },
+    "responseLength": {
+      "$numberInt": "975"
+    },
+    "protocol": "op_msg",
+    "millis": {
+      "$numberInt": "0"
+    },
+    "planSummary": "COLLSCAN",
+    "execStats": {
+      "isCached": false,
+      "stage": "COLLSCAN",
+      "filter": {
+        "total": {
+          "$gt": {
+            "$numberInt": "100"
+          }
+        }
+      },
+      "nReturned": {
+        "$numberInt": "20"
+      },
+      "executionTimeMillisEstimate": {
+        "$numberInt": "0"
+      },
+      "works": {
+        "$numberInt": "31"
+      },
+      "advanced": {
+        "$numberInt": "20"
+      },
+      "needTime": {
+        "$numberInt": "11"
+      },
+      "needYield": {
+        "$numberInt": "0"
+      },
+      "saveState": {
+        "$numberInt": "3"
+      },
+      "restoreState": {
+        "$numberInt": "3"
+      },
+      "isEOF": {
+        "$numberInt": "0"
+      },
+      "direction": "forward",
+      "docsExamined": {
+        "$numberInt": "31"
+      }
+    },
+    "ts": {
+      "$date": {
+        "$numberLong": "1795052369488"
+      }
+    },
+    "client": "127.0.0.1",
+    "appName": "datardo",
+    "allUsers": [],
+    "user": ""
+  },
+  {
+    "op": "getmore",
+    "ns": "shop.orders",
+    "command": {
+      "getMore": {
+        "$numberLong": "4905601191882685871"
+      },
+      "collection": "orders",
+      "batchSize": {
+        "$numberInt": "5"
+      },
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "at6YzZT0SoKQwmcAolcHDA==",
+            "subType": "04"
+          }
+        }
+      },
+      "$db": "shop"
+    },
+    "originatingCommand": {
+      "find": "orders",
+      "filter": {
+        "total": {
+          "$gt": {
+            "$numberInt": "100"
+          }
+        }
+      },
+      "batchSize": {
+        "$numberInt": "5"
+      },
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "at6YzZT0SoKQwmcAolcHDA==",
+            "subType": "04"
+          }
+        }
+      },
+      "$db": "shop"
+    },
+    "cursorid": {
+      "$numberLong": "4905601191882685871"
+    },
+    "keysExamined": {
+      "$numberInt": "0"
+    },
+    "docsExamined": {
+      "$numberInt": "5"
+    },
+    "nBatches": {
+      "$numberInt": "1"
+    },
+    "numYield": {
+      "$numberInt": "0"
+    },
+    "nreturned": {
+      "$numberInt": "5"
+    },
+    "planCacheShapeHash": "1B22C360",
+    "queryHash": "1B22C360",
+    "planCacheKey": "3738698E",
+    "queryFramework": "classic",
+    "locks": {
+      "Global": {
+        "acquireCount": {
+          "r": {
+            "$numberLong": "2"
+          }
+        }
+      }
+    },
+    "flowControl": {},
+    "storage": {
+      "timeWaitingMicros": {
+        "storageExecutionMicros": {
+          "$numberLong": "13"
+        }
+      }
+    },
+    "responseLength": {
+      "$numberInt": "976"
+    },
+    "protocol": "op_msg",
+    "millis": {
+      "$numberInt": "0"
+    },
+    "planSummary": "COLLSCAN",
+    "execStats": {
+      "isCached": false,
+      "stage": "COLLSCAN",
+      "filter": {
+        "total": {
+          "$gt": {
+            "$numberInt": "100"
+          }
+        }
+      },
+      "nReturned": {
+        "$numberInt": "10"
+      },
+      "executionTimeMillisEstimate": {
+        "$numberInt": "0"
+      },
+      "works": {
+        "$numberInt": "21"
+      },
+      "advanced": {
+        "$numberInt": "10"
+      },
+      "needTime": {
+        "$numberInt": "11"
+      },
+      "needYield": {
+        "$numberInt": "0"
+      },
+      "saveState": {
+        "$numberInt": "1"
+      },
+      "restoreState": {
+        "$numberInt": "1"
+      },
+      "isEOF": {
+        "$numberInt": "0"
+      },
+      "direction": "forward",
+      "docsExamined": {
+        "$numberInt": "21"
+      }
+    },
+    "ts": {
+      "$date": {
+        "$numberLong": "1795052369486"
+      }
+    },
+    "client": "127.0.0.1",
+    "appName": "datardo",
+    "allUsers": [],
+    "user": ""
+  },
+  {
+    "op": "query",
+    "ns": "shop.orders",
+    "command": {
+      "find": "orders",
+      "filter": {
+        "total": {
+          "$gt": {
+            "$numberInt": "100"
+          }
+        }
+      },
+      "batchSize": {
+        "$numberInt": "5"
+      },
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "at6YzZT0SoKQwmcAolcHDA==",
+            "subType": "04"
+          }
+        }
+      },
+      "$db": "shop"
+    },
+    "cursorid": {
+      "$numberLong": "4905601191882685871"
+    },
+    "keysExamined": {
+      "$numberInt": "0"
+    },
+    "docsExamined": {
+      "$numberInt": "16"
+    },
+    "nBatches": {
+      "$numberInt": "1"
+    },
+    "numYield": {
+      "$numberInt": "0"
+    },
+    "nreturned": {
+      "$numberInt": "5"
+    },
+    "planCacheShapeHash": "1B22C360",
+    "queryHash": "1B22C360",
+    "planCacheKey": "3738698E",
+    "queryShapeHash": "F2BE639D730E5DC9EC2D5E5AEC7376CC03A9BB9DAF14FC228D16C6428683C665",
+    "queryFramework": "classic",
+    "locks": {
+      "Global": {
+        "acquireCount": {
+          "r": {
+            "$numberLong": "2"
+          }
+        }
+      }
+    },
+    "flowControl": {},
+    "storage": {
+      "timeWaitingMicros": {
+        "storageExecutionMicros": {
+          "$numberLong": "19"
+        }
+      }
+    },
+    "responseLength": {
+      "$numberInt": "976"
+    },
+    "protocol": "op_msg",
+    "millis": {
+      "$numberInt": "0"
+    },
+    "planSummary": "COLLSCAN",
+    "planningTimeMicros": {
+      "$numberInt": "202"
+    },
+    "execStats": {
+      "isCached": false,
+      "stage": "COLLSCAN",
+      "filter": {
+        "total": {
+          "$gt": {
+            "$numberInt": "100"
+          }
+        }
+      },
+      "nReturned": {
+        "$numberInt": "5"
+      },
+      "executionTimeMillisEstimate": {
+        "$numberInt": "0"
+      },
+      "works": {
+        "$numberInt": "16"
+      },
+      "advanced": {
+        "$numberInt": "5"
+      },
+      "needTime": {
+        "$numberInt": "11"
+      },
+      "needYield": {
+        "$numberInt": "0"
+      },
+      "saveState": {
+        "$numberInt": "1"
+      },
+      "restoreState": {
+        "$numberInt": "0"
+      },
+      "isEOF": {
+        "$numberInt": "0"
+      },
+      "direction": "forward",
+      "docsExamined": {
+        "$numberInt": "16"
+      }
+    },
+    "ts": {
+      "$date": {
+        "$numberLong": "1795052369485"
+      }
+    },
+    "client": "127.0.0.1",
+    "appName": "datardo",
+    "allUsers": [],
+    "user": ""
+  },
+  {
+    "op": "query",
+    "ns": "shop.orders",
+    "command": {
+      "find": "orders",
+      "filter": {
+        "customerId": {
+          "$numberInt": "3"
+        }
+      },
+      "sort": {
+        "createdAt": {
+          "$numberInt": "-1"
+        }
+      },
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "at6YzZT0SoKQwmcAolcHDA==",
+            "subType": "04"
+          }
+        }
+      },
+      "$db": "shop"
+    },
+    "keysExamined": {
+      "$numberInt": "0"
+    },
+    "docsExamined": {
+      "$numberInt": "60"
+    },
+    "hasSortStage": true,
+    "nBatches": {
+      "$numberInt": "1"
+    },
+    "cursorExhausted": true,
+    "numYield": {
+      "$numberInt": "0"
+    },
+    "nreturned": {
+      "$numberInt": "10"
+    },
+    "planCacheShapeHash": "564BE11C",
+    "queryHash": "564BE11C",
+    "planCacheKey": "907F5A53",
+    "queryShapeHash": "ED553B360608D9FF51B17E7A4A7774DB23E52199A96D053DD9826CE579AF4C0A",
+    "queryFramework": "classic",
+    "locks": {
+      "Global": {
+        "acquireCount": {
+          "r": {
+            "$numberLong": "2"
+          }
+        }
+      }
+    },
+    "flowControl": {},
+    "storage": {
+      "timeWaitingMicros": {
+        "storageExecutionMicros": {
+          "$numberLong": "18"
+        }
+      }
+    },
+    "responseLength": {
+      "$numberInt": "1842"
+    },
+    "protocol": "op_msg",
+    "millis": {
+      "$numberInt": "0"
+    },
+    "planSummary": "COLLSCAN",
+    "planningTimeMicros": {
+      "$numberInt": "243"
+    },
+    "execStats": {
+      "isCached": false,
+      "stage": "SORT",
+      "nReturned": {
+        "$numberInt": "10"
+      },
+      "executionTimeMillisEstimate": {
+        "$numberInt": "0"
+      },
+      "works": {
+        "$numberInt": "72"
+      },
+      "advanced": {
+        "$numberInt": "10"
+      },
+      "needTime": {
+        "$numberInt": "61"
+      },
+      "needYield": {
+        "$numberInt": "0"
+      },
+      "saveState": {
+        "$numberInt": "0"
+      },
+      "restoreState": {
+        "$numberInt": "0"
+      },
+      "isEOF": {
+        "$numberInt": "1"
+      },
+      "sortPattern": {
+        "createdAt": {
+          "$numberInt": "-1"
+        }
+      },
+      "memLimit": {
+        "$numberInt": "104857600"
+      },
+      "type": "simple",
+      "totalDataSizeSorted": {
+        "$numberInt": "2032"
+      },
+      "usedDisk": false,
+      "spills": {
+        "$numberInt": "0"
+      },
+      "spilledRecords": {
+        "$numberInt": "0"
+      },
+      "spilledBytes": {
+        "$numberInt": "0"
+      },
+      "spilledDataStorageSize": {
+        "$numberInt": "0"
+      },
+      "inputStage": {
+        "stage": "COLLSCAN",
+        "filter": {
+          "customerId": {
+            "$eq": {
+              "$numberInt": "3"
+            }
+          }
+        },
+        "nReturned": {
+          "$numberInt": "10"
+        },
+        "executionTimeMillisEstimate": {
+          "$numberInt": "0"
+        },
+        "works": {
+          "$numberInt": "61"
+        },
+        "advanced": {
+          "$numberInt": "10"
+        },
+        "needTime": {
+          "$numberInt": "50"
+        },
+        "needYield": {
+          "$numberInt": "0"
+        },
+        "saveState": {
+          "$numberInt": "0"
+        },
+        "restoreState": {
+          "$numberInt": "0"
+        },
+        "isEOF": {
+          "$numberInt": "1"
+        },
+        "direction": "forward",
+        "docsExamined": {
+          "$numberInt": "60"
+        }
+      }
+    },
+    "ts": {
+      "$date": {
+        "$numberLong": "1795052369482"
+      }
+    },
+    "client": "127.0.0.1",
+    "appName": "datardo",
+    "allUsers": [],
+    "user": ""
+  },
+  {
+    "op": "query",
+    "ns": "shop.orders",
+    "command": {
+      "find": "orders",
+      "filter": {
+        "status": "new"
+      },
+      "sort": {
+        "createdAt": {
+          "$numberInt": "-1"
+        }
+      },
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "at6YzZT0SoKQwmcAolcHDA==",
+            "subType": "04"
+          }
+        }
+      },
+      "$db": "shop"
+    },
+    "keysExamined": {
+      "$numberInt": "20"
+    },
+    "docsExamined": {
+      "$numberInt": "20"
+    },
+    "fromMultiPlanner": true,
+    "nBatches": {
+      "$numberInt": "1"
+    },
+    "cursorExhausted": true,
+    "numYield": {
+      "$numberInt": "0"
+    },
+    "nreturned": {
+      "$numberInt": "20"
+    },
+    "planCacheShapeHash": "AE6117E6",
+    "queryHash": "AE6117E6",
+    "planCacheKey": "477A5F33",
+    "queryShapeHash": "69C3EAC7D7C23AB310B9E90A787F9EC8458798E49CD7EDF292EAD4EE33CE1A75",
+    "queryFramework": "classic",
+    "locks": {
+      "Global": {
+        "acquireCount": {
+          "r": {
+            "$numberLong": "2"
+          }
+        }
+      }
+    },
+    "flowControl": {},
+    "storage": {
+      "timeWaitingMicros": {
+        "storageExecutionMicros": {
+          "$numberLong": "16"
+        }
+      }
+    },
+    "responseLength": {
+      "$numberInt": "3593"
+    },
+    "protocol": "op_msg",
+    "millis": {
+      "$numberInt": "0"
+    },
+    "planSummary": "IXSCAN { status: 1, createdAt: -1 }",
+    "planningTimeMicros": {
+      "$numberInt": "625"
+    },
+    "execStats": {
+      "isCached": false,
+      "stage": "FETCH",
+      "nReturned": {
+        "$numberInt": "20"
+      },
+      "executionTimeMillisEstimate": {
+        "$numberInt": "0"
+      },
+      "works": {
+        "$numberInt": "22"
+      },
+      "advanced": {
+        "$numberInt": "20"
+      },
+      "needTime": {
+        "$numberInt": "0"
+      },
+      "needYield": {
+        "$numberInt": "0"
+      },
+      "saveState": {
+        "$numberInt": "0"
+      },
+      "restoreState": {
+        "$numberInt": "0"
+      },
+      "isEOF": {
+        "$numberInt": "1"
+      },
+      "docsExamined": {
+        "$numberInt": "20"
+      },
+      "alreadyHasObj": {
+        "$numberInt": "0"
+      },
+      "inputStage": {
+        "stage": "IXSCAN",
+        "nReturned": {
+          "$numberInt": "20"
+        },
+        "executionTimeMillisEstimate": {
+          "$numberInt": "0"
+        },
+        "works": {
+          "$numberInt": "21"
+        },
+        "advanced": {
+          "$numberInt": "20"
+        },
+        "needTime": {
+          "$numberInt": "0"
+        },
+        "needYield": {
+          "$numberInt": "0"
+        },
+        "saveState": {
+          "$numberInt": "0"
+        },
+        "restoreState": {
+          "$numberInt": "0"
+        },
+        "isEOF": {
+          "$numberInt": "1"
+        },
+        "keyPattern": {
+          "status": {
+            "$numberInt": "1"
+          },
+          "createdAt": {
+            "$numberInt": "-1"
+          }
+        },
+        "indexName": "status_1_createdAt_-1",
+        "isMultiKey": false,
+        "multiKeyPaths": {
+          "status": [],
+          "createdAt": []
+        },
+        "isUnique": false,
+        "isSparse": false,
+        "isPartial": false,
+        "indexVersion": {
+          "$numberInt": "2"
+        },
+        "direction": "forward",
+        "indexBounds": {
+          "status": ["[\"new\", \"new\"]"],
+          "createdAt": ["[MaxKey, MinKey]"]
+        },
+        "keysExamined": {
+          "$numberInt": "20"
+        },
+        "seeks": {
+          "$numberInt": "1"
+        },
+        "dupsTested": {
+          "$numberInt": "0"
+        },
+        "dupsDropped": {
+          "$numberInt": "0"
+        }
+      }
+    },
+    "ts": {
+      "$date": {
+        "$numberLong": "1795052369479"
+      }
+    },
+    "client": "127.0.0.1",
+    "appName": "datardo",
+    "allUsers": [],
+    "user": ""
+  },
+  {
+    "op": "query",
+    "ns": "shop.orders",
+    "command": {
+      "find": "orders",
+      "filter": {
+        "status": "paid"
+      },
+      "lsid": {
+        "id": {
+          "$binary": {
+            "base64": "at6YzZT0SoKQwmcAolcHDA==",
+            "subType": "04"
+          }
+        }
+      },
+      "$db": "shop"
+    },
+    "keysExamined": {
+      "$numberInt": "40"
+    },
+    "docsExamined": {
+      "$numberInt": "40"
+    },
+    "fromMultiPlanner": true,
+    "nBatches": {
+      "$numberInt": "1"
+    },
+    "cursorExhausted": true,
+    "numYield": {
+      "$numberInt": "0"
+    },
+    "nreturned": {
+      "$numberInt": "40"
+    },
+    "planCacheShapeHash": "F7CB0027",
+    "queryHash": "F7CB0027",
+    "planCacheKey": "E73D279A",
+    "queryShapeHash": "A4868DC6DDF6DD2B27232D970900EF6C968EB1104B001251B63CBF3EF4F4067D",
+    "queryFramework": "classic",
+    "locks": {
+      "Global": {
+        "acquireCount": {
+          "r": {
+            "$numberLong": "2"
+          }
+        }
+      }
+    },
+    "flowControl": {},
+    "storage": {
+      "data": {
+        "bytesRead": {
+          "$numberLong": "1918"
+        }
+      },
+      "timeWaitingMicros": {
+        "storageExecutionMicros": {
+          "$numberLong": "16"
+        }
+      }
+    },
+    "responseLength": {
+      "$numberInt": "7141"
+    },
+    "protocol": "op_msg",
+    "millis": {
+      "$numberInt": "2"
+    },
+    "planSummary": "IXSCAN { status: 1 }",
+    "planningTimeMicros": {
+      "$numberInt": "2118"
+    },
+    "execStats": {
+      "isCached": false,
+      "stage": "FETCH",
+      "nReturned": {
+        "$numberInt": "40"
+      },
+      "executionTimeMillisEstimate": {
+        "$numberInt": "0"
+      },
+      "works": {
+        "$numberInt": "42"
+      },
+      "advanced": {
+        "$numberInt": "40"
+      },
+      "needTime": {
+        "$numberInt": "0"
+      },
+      "needYield": {
+        "$numberInt": "0"
+      },
+      "saveState": {
+        "$numberInt": "0"
+      },
+      "restoreState": {
+        "$numberInt": "0"
+      },
+      "isEOF": {
+        "$numberInt": "1"
+      },
+      "docsExamined": {
+        "$numberInt": "40"
+      },
+      "alreadyHasObj": {
+        "$numberInt": "0"
+      },
+      "inputStage": {
+        "stage": "IXSCAN",
+        "nReturned": {
+          "$numberInt": "40"
+        },
+        "executionTimeMillisEstimate": {
+          "$numberInt": "0"
+        },
+        "works": {
+          "$numberInt": "41"
+        },
+        "advanced": {
+          "$numberInt": "40"
+        },
+        "needTime": {
+          "$numberInt": "0"
+        },
+        "needYield": {
+          "$numberInt": "0"
+        },
+        "saveState": {
+          "$numberInt": "0"
+        },
+        "restoreState": {
+          "$numberInt": "0"
+        },
+        "isEOF": {
+          "$numberInt": "1"
+        },
+        "keyPattern": {
+          "status": {
+            "$numberInt": "1"
+          }
+        },
+        "indexName": "status_1",
+        "isMultiKey": false,
+        "multiKeyPaths": {
+          "status": []
+        },
+        "isUnique": false,
+        "isSparse": false,
+        "isPartial": false,
+        "indexVersion": {
+          "$numberInt": "2"
+        },
+        "direction": "forward",
+        "indexBounds": {
+          "status": ["[\"paid\", \"paid\"]"]
+        },
+        "keysExamined": {
+          "$numberInt": "40"
+        },
+        "seeks": {
+          "$numberInt": "1"
+        },
+        "dupsTested": {
+          "$numberInt": "0"
+        },
+        "dupsDropped": {
+          "$numberInt": "0"
+        }
+      }
+    },
+    "ts": {
+      "$date": {
+        "$numberLong": "1795052369474"
+      }
+    },
+    "client": "127.0.0.1",
+    "appName": "datardo",
+    "allUsers": [],
+    "user": ""
+  }
+]
