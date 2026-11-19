@@ -695,3 +695,21 @@ Raised while the catalog was written; each names the cards that hold the current
   state **Stopped**, a fifth state; most writes show as retryable, since drivers retry by default; **Open document**
   in the history's toolbar has no place on `document.open`. (`watch.pause`, `watch.stream`, `watch.show`,
   `history.show`).
+- **Q55** — Connections organized: a name already taken on import is one pick-one list (**Skip**, **Replace**,
+  **Keep both**) with the button **Import**, since a question has one button; the copy notice closes after the
+  runner's 6 seconds, not 4; the host key is confirmed inside the connect action, and a reconnection, a scheduled
+  task or an MCP tool never asks; the reads of import and export can be started by the window, so it can read the
+  clipboard through `connection.import:source`, which the bridge cannot yet tell apart from a read of its own;
+  renaming a folder does not keep it collapsed on Home; copying a connection whose string is missing is an error, not
+  nothing. (`connection.import`, `connection.copy-string`, `connection.trust-host-key`, `connection.rename-folder`).
+- **Q56** — The tree: places no card lists (**Create database…**, **Open GridFS bucket**, **Open console**, the
+  hover buttons, **Collapse all**) use the tree's own; tree.md names `manage.edit-view` and `manage.edit-validation`
+  where the cards are `manage.definition` and `manage.validation`; the limits are Datardo's (10 seconds for the lists,
+  10,000 collections, 5 seconds a count and a `SCAN`, 200 namespaces then "<n> more namespaces"); the rows are not
+  virtualized; **Move up** and **Move down** of a pin are a drag and `Alt+Up`/`Alt+Down`, since the pinned item's menu
+  has only **Open** and **Unpin**. (`tree.mongodb`, `tree.redis`, `tree.namespaces`, `tree.pinned`, `nav.pin`).
+- **Q57** — Collections, fields and indexes: the options of a collection are kept as canonical Extended JSON, so
+  that their types survive; the 63-byte limit of a database name is checked when the form is answered; Go to on the
+  wrong kind of tab asks to pick instead of refusing; the references found for a database are not forgotten until
+  relations exist; notices after a field change count what was planned, not what was modified. (`manage.read-options`,
+  `manage.create-database`, `manage.definition`, `manage.drop-database`, `field.rename`).
