@@ -1,0 +1,13 @@
+{
+  "name": "Paid this month",
+  "description": "Orders paid since the first of the month",
+  "database": "shop",
+  "collection": "orders",
+  "filter": [
+    "{",
+    "  status: \"paid\",",
+    "  createdAt: { $gte: ISODate(\"2024-03-01\") }",
+    "}"
+  ],
+  "sort": "{ createdAt: -1 }"
+}

@@ -50,6 +50,8 @@ function fileVerb(action: FileStep['action']): string {
       return 'delete';
     case 'create-folder':
       return 'create folder';
+    case 'rename':
+      return 'rename';
   }
 }
 

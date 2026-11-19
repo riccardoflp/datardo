@@ -83,7 +83,8 @@ export interface EngineStep extends StepBase, ConnectionRequest {
 /** A change to a file the user chose. */
 export interface FileStep extends StepBase {
   readonly kind: 'file';
-  readonly action: 'write' | 'delete' | 'create-folder';
+  /** A `rename` renames the file at `path`; the arguments of its `content` say the new name. */
+  readonly action: 'write' | 'delete' | 'create-folder' | 'rename';
   readonly path: string;
   /** What to write, built by the main process from the plan: the name of a writer and its arguments. */
   readonly content?: { readonly writer: string; readonly args: Json };
