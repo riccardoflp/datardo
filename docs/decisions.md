@@ -631,3 +631,16 @@ Raised while the catalog was written; each names the cards that hold the current
   place; moving to my queries replaces one of the same name without asking; choosing the folder needs a question
   that opens the system's folder dialog. (`saved-query.file-path`, `saved-query.parse-file`, `saved-query.save`,
   `saved-query.move`, `saved-query.choose-folder`).
+- **Q49** — The undo history: the fingerprints and BSON sizes of what a write keeps are computed by the main
+  process, since features cannot hash or serialize BSON; the record is made in two calls, before the steps and after
+  them; a read-only connection counts as one whose history is off; **Undo all** or **unchanged only** is one choice
+  with the button **Undo**; operations whose file is missing are dropped at start; the writes that are not published
+  to redis-oplog are those of Mongoster's list, and each plan's `publishes` decides (Q4); a document whose fields were
+  only reordered shows no changed field. (`undo.record`, `undo.note`, `undo.revert`, `undo.limits`, `oplog.publish`,
+  `undo.details`).
+- **Q50** — Pub/Sub: subscribing while not connected only adds the names, which reconnecting subscribes to; the
+  channels are three reads, so that a refusal of one leaves the others; the filter searches messages as they are
+  shown; **Export** writes only the messages listed, not those held by a pause, and a gap as a record of its own;
+  **Copy as PUBLISH command** is never cut; several texts are new (the subscribe form, **Subscribe again**, **Show
+  every message**, **Filter channels**); the notice of a publish needs the reply of its step. (`pubsub.subscribe`,
+  `pubsub.channels`, `pubsub.filter`, `pubsub.export`, `pubsub.copy`, `pubsub.publish`).
