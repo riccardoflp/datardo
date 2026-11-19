@@ -1,0 +1,151 @@
+/*
+ * A mongosh editor: a field framed like the other inputs, with a visible outline while it has the focus, the colors
+ * of query.highlight from the theme's syntax tokens, and its list of suggestions.
+ */
+.editor {
+  position: relative;
+  min-width: 0;
+  min-height: var(--editor-line-min-height);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-small);
+  background: var(--color-canvas);
+  color: var(--color-text);
+  font-size: var(--font-size-body);
+}
+
+.editor:focus-within {
+  outline: var(--focus-width) solid var(--color-focus);
+  outline-offset: calc(var(--focus-width) * -1);
+}
+
+.editor[data-invalid='true'] {
+  border-color: var(--color-danger);
+}
+
+.host {
+  min-width: 0;
+}
+
+.placeholder {
+  color: var(--color-text-muted);
+}
+
+/* The flash of `flash`: one short highlight behind the text, which lets the clicks through. */
+.flash {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-small);
+  background: var(--color-selected);
+  opacity: 0;
+  pointer-events: none;
+  animation: flash var(--duration-flash) ease-out;
+}
+
+@keyframes flash {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flash {
+    animation-duration: var(--duration-short);
+  }
+}
+
+/* The colors of query.highlight, one token of the theme for each role. */
+.editor [data-syntax='key'] {
+  color: var(--color-syntax-key);
+}
+
+.editor [data-syntax='op'] {
+  color: var(--color-syntax-op);
+}
+
+.editor [data-syntax='string'] {
+  color: var(--color-syntax-string);
+}
+
+.editor [data-syntax='ref'] {
+  color: var(--color-syntax-ref);
+}
+
+.editor [data-syntax='number'] {
+  color: var(--color-syntax-number);
+}
+
+.editor [data-syntax='bool'] {
+  color: var(--color-syntax-bool);
+}
+
+.editor [data-syntax='oid'] {
+  color: var(--color-syntax-oid);
+}
+
+.editor [data-syntax='date'] {
+  color: var(--color-syntax-date);
+}
+
+.editor [data-syntax='regex'] {
+  color: var(--color-syntax-regex);
+}
+
+.editor [data-syntax='comment'] {
+  color: var(--color-syntax-comment);
+  font-style: italic;
+}
+
+/* The list of suggestions, in a layer over the window; its place is set when it is drawn. */
+.list {
+  position: fixed;
+  z-index: var(--z-suggestions);
+  overflow-y: auto;
+  min-width: var(--suggestion-list-min-width);
+  max-width: var(--suggestion-list-max-width);
+  max-height: var(--suggestion-list-height);
+  padding: var(--space-1);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-medium);
+  background: var(--color-raised);
+  color: var(--color-text);
+  font-family: var(--font-family-code);
+  font-size: var(--font-size-body);
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-0) var(--space-2);
+  border-radius: var(--radius-small);
+  white-space: nowrap;
+  cursor: default;
+}
+
+.option:hover {
+  background: var(--color-hover);
+}
+
+.option[aria-selected='true'] {
+  background: var(--color-selected);
+}
+
+.label {
+  overflow: hidden;
+  flex: 1;
+  text-overflow: ellipsis;
+}
+
+.typed {
+  font-weight: var(--font-weight-strong);
+}
+
+.detail {
+  color: var(--color-text-muted);
+  font-family: var(--font-family-ui);
+  font-size: var(--font-size-small);
+}

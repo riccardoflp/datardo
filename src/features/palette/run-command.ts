@@ -91,12 +91,23 @@ function isOfferedByItsCard(state: AppState, id: string): boolean {
       return isKeepUndoOffered(state, 'stop');
     case 'undo.per-connection:keep':
       return isKeepUndoOffered(state, 'keep');
+    case 'query.bar':
+    case 'query.run':
+    case 'query.reset':
+    case 'query.mode:find':
+    case 'query.builder':
+      // The query bar is a collection tab's: with none active, there is no query.
+      return active?.shows.kind === 'collection';
+    case 'query.mode:aggregate':
+      // Aggregate is built in M19.
+      return false;
     case 'tree.refresh':
     case 'tree.filter':
       // The tree island shows the current connection: with none, there is nothing to refresh or filter.
       return state.nav.current !== undefined;
     default:
-      return isWindowCommandOffered(state, id);
+      // The commands of the table act on the active collection tab: with none, there is no table.
+      return id.startsWith('table.') ? active?.shows.kind === 'collection' : isWindowCommandOffered(state, id);
   }
 }
 

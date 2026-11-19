@@ -13,6 +13,7 @@ import { start as startPing } from './ping';
 import { start as startPalette } from './palette';
 import { start as startUndo } from './undo';
 import { start as startOplog } from './oplog';
+import { start as startTable } from './table';
 
 /** What one area does at start. */
 export type AreaStart = (services: MainServices) => Promise<void>;
@@ -27,6 +28,7 @@ const starts: readonly AreaStart[] = [
   startNav,
   startTabs,
   startPalette,
+  startTable,
   startPing,
   startCheckUpdate,
 ];

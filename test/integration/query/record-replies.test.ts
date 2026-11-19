@@ -15,6 +15,7 @@ import type { Json, MongoRequest } from '../../../src/shared/engine-request';
 import { connectionId } from '../../../src/shared/ids';
 import { everyType } from '../../unit/query/values';
 import { testServers } from '../servers';
+import { documentBytes, insertBytes } from './insert-bytes';
 
 const recording = process.env['DATARDO_RECORD_REPLIES'] === '1';
 const folder = join(import.meta.dirname, '..', '..', 'fixtures', 'replies');
@@ -36,7 +37,9 @@ describe('the recorded replies of query.run, query.count and query.field-hints',
     try {
       await mkdir(folder, { recursive: true });
       await send(on('types', 'deleteMany', [{}]));
-      await send(on('types', 'insertOne', [{ _id: { $numberInt: '1' }, ...everyType }]));
+      // The driver cannot write a BSON undefined nor a date beyond JavaScript: the document goes as bytes of its own.
+      const typed = documentBytes({ _id: { $numberInt: '1' }, ...everyType });
+      await insertBytes(testServers().mongoStandalone, 'datardo_record', 'types', typed);
       await send(on('orders', 'deleteMany', [{}]));
       const statuses = ['paid', 'paid', 'paid', 'new', 'shipped'];
       const orders = statuses.map((status, index) => ({

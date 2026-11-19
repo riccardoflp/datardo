@@ -39,7 +39,17 @@
   --app-icon-size: 18px;
   --about-icon-size: 48px;
   --dialog-width: 480px;
+  --z-sticky-number: 1;
+  --z-sticky-heading: 2;
+  --z-sticky-pinned-heading: 3;
+  --z-sticky-corner: 4;
   --z-dialog: 100;
+  --z-suggestions: 200;
+  --duration-flash: 600ms;
+  --suggestion-list-height: 240px;
+  --suggestion-list-min-width: 240px;
+  --suggestion-list-max-width: 480px;
+  --editor-line-min-height: 26px;
   --color-canvas: #101216;
   --color-island: #181b21;
   --color-raised: #20242c;
@@ -61,6 +71,19 @@
   --color-connection-green: #5fcf8a;
   --color-connection-blue: #6ea8fe;
   --color-connection-purple: #c39bff;
+
+  /* The syntax colors of mongosh text (query.highlight), one for each role, the same in the editors and the cells: at
+   * least 4.5:1 against the canvas, the island, the raised surfaces, a hovered and a selected line. */
+  --color-syntax-key: #9cdcfe;
+  --color-syntax-op: #d7a0ff;
+  --color-syntax-string: #e6a07c;
+  --color-syntax-ref: #4ec9b0;
+  --color-syntax-number: #b5cea8;
+  --color-syntax-bool: #79b8ff;
+  --color-syntax-oid: #dcdcaa;
+  --color-syntax-date: #e2c08d;
+  --color-syntax-regex: #ff9492;
+  --color-syntax-comment: #a7aebb;
 }
 
 @media (prefers-color-scheme: light) {
@@ -88,5 +111,15 @@
     --color-connection-green: #1b7b44;
     --color-connection-blue: #2f6fde;
     --color-connection-purple: #7a3fd1;
+    --color-syntax-key: #0451a5;
+    --color-syntax-op: #9a1fb8;
+    --color-syntax-string: #a31515;
+    --color-syntax-ref: #11667a;
+    --color-syntax-number: #0a6b47;
+    --color-syntax-bool: #1f4fd1;
+    --color-syntax-oid: #6b5220;
+    --color-syntax-date: #7a4f00;
+    --color-syntax-regex: #a3264f;
+    --color-syntax-comment: #4f6b3d;
   }
 }

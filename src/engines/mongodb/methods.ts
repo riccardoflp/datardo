@@ -5,6 +5,7 @@
 import { BSON, type AbstractCursor, type ClientSession, type Collection, type Db, type Document } from 'mongodb';
 import type { Json, MongoRequest } from '../../shared/engine-request';
 import { EngineError } from '../engine';
+import { documentOfBytes } from './document-bytes';
 
 /** How many documents a method that returns many gives at most when the request names no limit (R9.2). */
 export const mostDocuments = 1000;
@@ -17,6 +18,26 @@ export function fromExtendedJson(value: Json): unknown {
 /** A value of the driver as canonical Extended JSON. */
 export function toExtendedJson(value: unknown): Json {
   return (BSON.EJSON.serialize({ value }, { relaxed: false }) as { value: Json }).value;
+}
+
+/**
+ * A reply of the driver as canonical Extended JSON. A document asked for as BSON bytes (`raw: true`) is read from its
+ * bytes, so that a BSON undefined and a date beyond JavaScript survive; with values not promoted, the driver gives
+ * bytes for nothing else.
+ */
+export function replyOf(value: unknown): Json {
+  if (value instanceof Uint8Array) {
+    return documentOfBytes(value);
+  }
+  if (Array.isArray(value) && value.some((item) => item instanceof Uint8Array)) {
+    return value.map(replyOf);
+  }
+  return toExtendedJson(value);
+}
+
+/** The options of a method that returns documents, which the driver then gives as BSON bytes (see `replyOf`). */
+function asBytes(options: Options): Options {
+  return { ...options, raw: true };
 }
 
 /** The documents of a cursor, at most `limit` of them; the cursor is closed after. */
@@ -81,7 +102,7 @@ function collectionMethod(
   const [first, second, third] = args;
   switch (method) {
     case 'findOne':
-      return collection.findOne(document(first), merged(second, options));
+      return collection.findOne(document(first), asBytes(merged(second, options)));
     case 'countDocuments':
       return collection.countDocuments(document(first), merged(second, options));
     case 'estimatedDocumentCount':
@@ -125,11 +146,11 @@ function cursorOf(
   const collection = request.collection === undefined ? undefined : db.collection(request.collection);
   switch (request.method) {
     case 'find':
-      return collection?.find(document(first), merged(second, options));
+      return collection?.find(document(first), asBytes(merged(second, options)));
     case 'aggregate':
       return collection === undefined
-        ? db.aggregate(documents(first), merged(second, options))
-        : collection.aggregate(documents(first), merged(second, options));
+        ? db.aggregate(documents(first), asBytes(merged(second, options)))
+        : collection.aggregate(documents(first), asBytes(merged(second, options)));
     case 'listCollections':
       return db.listCollections(document(first), merged(second, options));
     case 'listIndexes':

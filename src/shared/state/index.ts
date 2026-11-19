@@ -18,6 +18,7 @@ import { initialNavState, reduceNav, type NavEvent, type NavState } from './nav'
 import { initialPaletteState, reducePalette, type PaletteEvent, type PaletteState } from './palette';
 import { initialRunnerState, reduceRunner, type RunnerEvent, type RunnerState } from './runner';
 import { initialSettingsState, reduceSettings, type SettingsEvent, type SettingsState } from './settings';
+import { initialTableState, reduceTable, type TableEvent, type TableState } from './table';
 import { initialTabsState, reduceTabs, type TabsEvent, type TabsState } from './tabs';
 import { initialWindowState, reduceWindow, type WindowEvent, type WindowState } from './window';
 import { initialUndoState, reduceUndo, type UndoEvent, type UndoState } from './undo';
@@ -35,6 +36,7 @@ export interface AppState {
   readonly palette: PaletteState;
   readonly undo: UndoState;
   readonly oplog: OplogState;
+  readonly table: TableState;
 }
 
 /** Every change to the app's state. */
@@ -48,7 +50,8 @@ export type AppEvent =
   | TabsEvent
   | PaletteEvent
   | UndoEvent
-  | OplogStateEvent;
+  | OplogStateEvent
+  | TableEvent;
 
 /** The state at start, before anything is loaded. */
 export const initialState: AppState = {
@@ -62,6 +65,7 @@ export const initialState: AppState = {
   palette: initialPaletteState,
   undo: initialUndoState,
   oplog: initialOplogState,
+  table: initialTableState,
 };
 
 /** The one function that changes the app's state. */
@@ -87,5 +91,7 @@ export function reduce(state: AppState, event: AppEvent): AppState {
       return { ...state, undo: reduceUndo(state.undo, event) };
     case 'oplog':
       return { ...state, oplog: reduceOplog(state.oplog, event) };
+    case 'table':
+      return { ...state, table: reduceTable(state.table, event) };
   }
 }

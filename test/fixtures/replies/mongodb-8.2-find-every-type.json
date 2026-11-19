@@ -75,7 +75,7 @@
     },
     "dateBeyondJavaScript": {
       "$date": {
-        "$numberLong": "0"
+        "$numberLong": "9000000000000000000"
       }
     },
     "regex": {
@@ -126,7 +126,9 @@
     "maxKey": {
       "$maxKey": 1
     },
-    "undefined": null,
+    "undefined": {
+      "$undefined": true
+    },
     "symbol": {
       "$symbol": "x"
     },

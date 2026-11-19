@@ -96,6 +96,7 @@ export const text = {
     descending: 'sorted descending',
   },
   paging: {
+    label: 'Paging',
     range: (first: string, last: string, total: string) => `${first}–${last} of ${total}`,
     previous: 'Previous page',
     next: 'Next page',
@@ -200,5 +201,18 @@ export const text = {
     copyValue: 'Copy value',
     copyPath: 'Copy field path',
     refresh: 'Refresh documents',
+  },
+  /** The names a screen reader says for the menus, the panel and the bars around the table. */
+  names: {
+    rowMenu: (row: number) => `Menu of document ${String(row)}`,
+    cellMenu: (key: string, row: number) => `Menu of ${key} in document ${String(row)}`,
+    columnMenu: (key: string) => `Menu of the column ${key}`,
+    columnsPanel: 'Columns',
+    columnsList: 'Columns of the table',
+    pinned: (name: string) => `Pin ${name}`,
+    toolbar: 'Documents toolbar',
+    selectionBar: 'Selection',
+    copyAsMenu: 'Copy as',
+    sections: 'Sections',
   },
 } as const;

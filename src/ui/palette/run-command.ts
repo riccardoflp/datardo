@@ -7,6 +7,8 @@ import { intentOf } from '../../features/palette/run-command';
 import type { AppState } from '../../shared/state';
 import { focusNextIsland } from '../shell/focus';
 import { startIntent } from '../shell/top-bar/start';
+import { queryCommandIds, runQueryCommand } from '../query/query-commands';
+import { isTableCommand, runTableCommand } from '../table/table-commands';
 import { runTreeCommand } from '../tree/tree-commands';
 import { openAbout } from '../window/about';
 import { openGoTo } from './go-to-store';
@@ -45,6 +47,14 @@ const windowOnly: Readonly<Record<string, () => void>> = {
 export function runCommand(id: string, state: AppState): void {
   if (id === 'tree.refresh' || id === 'tree.filter') {
     runTreeCommand(id, state);
+    return;
+  }
+  if (queryCommandIds.has(id)) {
+    runQueryCommand(id, state);
+    return;
+  }
+  if (isTableCommand(id)) {
+    runTableCommand(id, state);
     return;
   }
   const local = windowOnly[id];

@@ -9,7 +9,7 @@ import { maskedError, secretsOf } from '../transport/mask';
 import { openDirectOrThrough } from '../transport/tunnel';
 import { withMongoFacts } from './errors';
 import { createHandles } from './handles';
-import { toExtendedJson } from './methods';
+import { replyOf } from './methods';
 import { carryOut } from './requests';
 
 /** The name the server sees for Datardo's clients (connection.connect). */
@@ -70,7 +70,7 @@ function clientOf(client: MongoClient, secrets: readonly string[]): EngineClient
         throw new EngineError('A Redis command cannot be sent to MongoDB.');
       }
       try {
-        return toExtendedJson(await carryOut(kept, request, signal));
+        return replyOf(await carryOut(kept, request, signal));
       } catch (error: unknown) {
         throw withMongoFacts(maskedError(error, secrets), error);
       }

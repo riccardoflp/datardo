@@ -690,7 +690,7 @@ from the keyboard.
 **Goal**: A collection tab has its query bar: a filter, a sort, a projection, skip and limit in mongosh syntax, with
 colors, autocomplete, the query builder, a count, a time limit and Cancel.
 **Depends on**: M8.
-**Status**: planned
+**Status**: done
 
 ### Features
 
@@ -744,14 +744,14 @@ colors, autocomplete, the query builder, a count, a time limit and Cancel.
 
 ### Exit criteria
 
-- [ ] Every value `query.format` writes is read back by `query.parse` with the same BSON type: the round-trip test
+- [x] Every value `query.format` writes is read back by `query.parse` with the same BSON type: the round-trip test
       over every type (QA2, its first part).
-- [ ] A query on a server made slow stops after the time limit and says so (QA8).
-- [ ] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
+- [x] A query on a server made slow stops after the time limit and says so (QA8).
+- [x] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
       `npm run test:integration`, `npm run test:ui`; `catalog.py --tests` reports none missing for these cards.
-- [ ] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
+- [x] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
       the keyboard alone (QA15, QA16).
-- [ ] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
+- [x] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
       and this milestone's **Status** is *done*.
 
 ### Not in this milestone
@@ -770,7 +770,7 @@ colors, autocomplete, the query builder, a count, a time limit and Cancel.
 cell, nested fields and arrays expanded into columns and sub-rows, the columns' layout, the selection, copying in
 several formats, paging.
 **Depends on**: M9.
-**Status**: planned
+**Status**: done
 
 ### Features
 
@@ -823,15 +823,15 @@ several formats, paging.
 
 ### Exit criteria
 
-- [ ] A collection of 10 million documents opens with one `find` and one estimated count, its first rows in under 1
+- [x] A collection of 10 million documents opens with one `find` and one estimated count, its first rows in under 1
       second (QA6).
-- [ ] A document with a value of every BSON type, copied as mongosh text, is text that `query.parse` reads back with
+- [x] A document with a value of every BSON type, copied as mongosh text, is text that `query.parse` reads back with
       every type.
-- [ ] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
+- [x] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
       `npm run test:integration`, `npm run test:ui`; `catalog.py --tests` reports none missing for these cards.
-- [ ] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
+- [x] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
       the keyboard alone (QA15, QA16).
-- [ ] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
+- [x] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
       and this milestone's **Status** is *done*.
 
 ### Not in this milestone

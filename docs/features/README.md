@@ -539,25 +539,25 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`query.bar`](query.md#querybar--the-query-bar) | The query bar | View | M9 | Specified |
-| [`query.mode`](query.md#querymode--switch-between-find-and-aggregate) | Switch between Find and Aggregate | Derivation | M9 | Specified |
-| [`query.run`](query.md#queryrun--run-the-query) | Run the query | Read | M9 | Specified |
-| [`query.count`](query.md#querycount--count-the-matching-documents) | Count the matching documents | Read | M9 | Specified |
-| [`query.reset`](query.md#queryreset--reset-the-query) | Reset the query | Derivation | M9 | Specified |
-| [`query.restore`](query.md#queryrestore--the-query-a-tab-remembers) | The query a tab remembers | Derivation | M9 | Specified |
-| [`query.parse`](query.md#queryparse--read-mongosh-syntax-into-values) | Read mongosh syntax into values | Derivation | M9 | Specified |
-| [`query.format`](query.md#queryformat--write-values-as-mongosh-syntax) | Write values as mongosh syntax | Derivation | M9 | Specified |
-| [`query.highlight`](query.md#queryhighlight--the-syntax-colors-of-mongosh-text) | The syntax colors of mongosh text | Derivation | M9 | Specified |
-| [`query.builder`](query.md#querybuilder--the-query-builder) | The query builder | View | M9 | Specified |
-| [`query.builder-filter`](query.md#querybuilder-filter--the-filter-of-the-builders-rows) | The filter of the builder's rows | Derivation | M9 | Specified |
-| [`query.builder-rows`](query.md#querybuilder-rows--the-builders-rows-of-a-filter) | The builder's rows of a filter | Derivation | M9 | Specified |
-| [`query.autocomplete`](query.md#queryautocomplete--suggestions-while-typing) | Suggestions while typing | View | M9 | Specified |
-| [`query.suggestions`](query.md#querysuggestions--what-is-suggested-where-the-cursor-is) | What is suggested where the cursor is | Derivation | M9 | Specified |
-| [`query.field-hints`](query.md#queryfield-hints--the-fields-and-frequent-values-of-a-collection) | The fields and frequent values of a collection | Read | M9 | Specified |
-| [`query.drag`](query.md#querydrag--drag-a-field-or-a-value-into-the-bar) | Drag a field or a value into the bar | View | M9 | Specified |
-| [`query.add-condition`](query.md#queryadd-condition--add-a-condition-to-the-filter) | Add a condition to the filter | Derivation | M9 | Specified |
-| [`query.add-sort`](query.md#queryadd-sort--add-a-field-to-the-sort) | Add a field to the sort | Derivation | M9 | Specified |
-| [`query.add-projection`](query.md#queryadd-projection--add-a-field-to-the-projection) | Add a field to the projection | Derivation | M9 | Specified |
+| [`query.bar`](query.md#querybar--the-query-bar) | The query bar | View | M9 | Built |
+| [`query.mode`](query.md#querymode--switch-between-find-and-aggregate) | Switch between Find and Aggregate | Derivation | M9 | Built |
+| [`query.run`](query.md#queryrun--run-the-query) | Run the query | Read | M9 | Built |
+| [`query.count`](query.md#querycount--count-the-matching-documents) | Count the matching documents | Read | M9 | Built |
+| [`query.reset`](query.md#queryreset--reset-the-query) | Reset the query | Derivation | M9 | Built |
+| [`query.restore`](query.md#queryrestore--the-query-a-tab-remembers) | The query a tab remembers | Derivation | M9 | Built |
+| [`query.parse`](query.md#queryparse--read-mongosh-syntax-into-values) | Read mongosh syntax into values | Derivation | M9 | Built |
+| [`query.format`](query.md#queryformat--write-values-as-mongosh-syntax) | Write values as mongosh syntax | Derivation | M9 | Built |
+| [`query.highlight`](query.md#queryhighlight--the-syntax-colors-of-mongosh-text) | The syntax colors of mongosh text | Derivation | M9 | Built |
+| [`query.builder`](query.md#querybuilder--the-query-builder) | The query builder | View | M9 | Built |
+| [`query.builder-filter`](query.md#querybuilder-filter--the-filter-of-the-builders-rows) | The filter of the builder's rows | Derivation | M9 | Built |
+| [`query.builder-rows`](query.md#querybuilder-rows--the-builders-rows-of-a-filter) | The builder's rows of a filter | Derivation | M9 | Built |
+| [`query.autocomplete`](query.md#queryautocomplete--suggestions-while-typing) | Suggestions while typing | View | M9 | Built |
+| [`query.suggestions`](query.md#querysuggestions--what-is-suggested-where-the-cursor-is) | What is suggested where the cursor is | Derivation | M9 | Built |
+| [`query.field-hints`](query.md#queryfield-hints--the-fields-and-frequent-values-of-a-collection) | The fields and frequent values of a collection | Read | M9 | Built |
+| [`query.drag`](query.md#querydrag--drag-a-field-or-a-value-into-the-bar) | Drag a field or a value into the bar | View | M9 | Built |
+| [`query.add-condition`](query.md#queryadd-condition--add-a-condition-to-the-filter) | Add a condition to the filter | Derivation | M9 | Built |
+| [`query.add-sort`](query.md#queryadd-sort--add-a-field-to-the-sort) | Add a field to the sort | Derivation | M9 | Built |
+| [`query.add-projection`](query.md#queryadd-projection--add-a-field-to-the-projection) | Add a field to the projection | Derivation | M9 | Built |
 
 ## References
 
@@ -706,29 +706,29 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`table.show`](table.md#tableshow--the-documents-section) | The Documents section | View | M10 | Specified |
-| [`table.detect-columns`](table.md#tabledetect-columns--the-columns-of-a-page-of-documents) | The columns of a page of documents | Derivation | M10 | Specified |
-| [`table.cell-text`](table.md#tablecell-text--how-a-value-is-written-in-a-cell) | How a value is written in a cell | Derivation | M10 | Specified |
-| [`table.rows`](table.md#tablerows--the-rows-of-the-table) | The rows of the table | Derivation | M10 | Specified |
-| [`table.expand`](table.md#tableexpand--expand-a-field-into-columns-or-sub-rows) | Expand a field into columns or sub-rows | Operation | M10 | Specified |
-| [`table.collapse`](table.md#tablecollapse--collapse-an-expanded-field) | Collapse an expanded field | Operation | M10 | Specified |
-| [`table.columns`](table.md#tablecolumns--the-columns-layout) | The columns' layout | View | M10 | Specified |
-| [`table.arrange-columns`](table.md#tablearrange-columns--hide-show-move-pin-and-resize-columns) | Hide, show, move, pin and resize columns | Operation | M10 | Specified |
-| [`table.layout`](table.md#tablelayout--the-columns-in-the-order-of-their-layout) | The columns in the order of their layout | Derivation | M10 | Specified |
-| [`table.sort`](table.md#tablesort--sort-from-a-column-header) | Sort from a column header | Derivation | M10 | Specified |
-| [`table.paging`](table.md#tablepaging--the-paging-row) | The paging row | View | M10 | Specified |
-| [`table.page-window`](table.md#tablepage-window--which-documents-a-page-asks-for) | Which documents a page asks for | Derivation | M10 | Specified |
-| [`table.navigate`](table.md#tablenavigate--move-between-cells-with-the-keyboard) | Move between cells with the keyboard | Derivation | M10 | Specified |
-| [`table.selection`](table.md#tableselection--select-rows) | Select rows | Derivation | M10 | Specified |
-| [`table.selection-bar`](table.md#tableselection-bar--the-selection-bar-of-the-table) | The selection bar of the table | View | M10 | Specified |
-| [`table.copy-as`](table.md#tablecopy-as--copy-documents-as-text) | Copy documents as text | Operation | M10 | Specified |
-| [`table.copy-text`](table.md#tablecopy-text--the-text-of-each-copy-format) | The text of each copy format | Derivation | M10 | Specified |
-| [`table.copy-value`](table.md#tablecopy-value--copy-the-value-of-a-cell) | Copy the value of a cell | Operation | M10 | Specified |
-| [`table.copy-path`](table.md#tablecopy-path--copy-a-field-path) | Copy a field path | Operation | M10 | Specified |
-| [`table.row-menu`](table.md#tablerow-menu--the-context-menu-of-a-row) | The context menu of a row | View | M10 | Specified |
-| [`table.cell-menu`](table.md#tablecell-menu--the-context-menu-of-a-cell) | The context menu of a cell | View | M10 | Specified |
-| [`table.column-menu`](table.md#tablecolumn-menu--the-context-menu-of-a-column-header) | The context menu of a column header | View | M10 | Specified |
-| [`table.refresh`](table.md#tablerefresh--refresh-the-documents) | Refresh the documents | Read | M10 | Specified |
+| [`table.show`](table.md#tableshow--the-documents-section) | The Documents section | View | M10 | Built |
+| [`table.detect-columns`](table.md#tabledetect-columns--the-columns-of-a-page-of-documents) | The columns of a page of documents | Derivation | M10 | Built |
+| [`table.cell-text`](table.md#tablecell-text--how-a-value-is-written-in-a-cell) | How a value is written in a cell | Derivation | M10 | Built |
+| [`table.rows`](table.md#tablerows--the-rows-of-the-table) | The rows of the table | Derivation | M10 | Built |
+| [`table.expand`](table.md#tableexpand--expand-a-field-into-columns-or-sub-rows) | Expand a field into columns or sub-rows | Operation | M10 | Built |
+| [`table.collapse`](table.md#tablecollapse--collapse-an-expanded-field) | Collapse an expanded field | Operation | M10 | Built |
+| [`table.columns`](table.md#tablecolumns--the-columns-layout) | The columns' layout | View | M10 | Built |
+| [`table.arrange-columns`](table.md#tablearrange-columns--hide-show-move-pin-and-resize-columns) | Hide, show, move, pin and resize columns | Operation | M10 | Built |
+| [`table.layout`](table.md#tablelayout--the-columns-in-the-order-of-their-layout) | The columns in the order of their layout | Derivation | M10 | Built |
+| [`table.sort`](table.md#tablesort--sort-from-a-column-header) | Sort from a column header | Derivation | M10 | Built |
+| [`table.paging`](table.md#tablepaging--the-paging-row) | The paging row | View | M10 | Built |
+| [`table.page-window`](table.md#tablepage-window--which-documents-a-page-asks-for) | Which documents a page asks for | Derivation | M10 | Built |
+| [`table.navigate`](table.md#tablenavigate--move-between-cells-with-the-keyboard) | Move between cells with the keyboard | Derivation | M10 | Built |
+| [`table.selection`](table.md#tableselection--select-rows) | Select rows | Derivation | M10 | Built |
+| [`table.selection-bar`](table.md#tableselection-bar--the-selection-bar-of-the-table) | The selection bar of the table | View | M10 | Built |
+| [`table.copy-as`](table.md#tablecopy-as--copy-documents-as-text) | Copy documents as text | Operation | M10 | Built |
+| [`table.copy-text`](table.md#tablecopy-text--the-text-of-each-copy-format) | The text of each copy format | Derivation | M10 | Built |
+| [`table.copy-value`](table.md#tablecopy-value--copy-the-value-of-a-cell) | Copy the value of a cell | Operation | M10 | Built |
+| [`table.copy-path`](table.md#tablecopy-path--copy-a-field-path) | Copy a field path | Operation | M10 | Built |
+| [`table.row-menu`](table.md#tablerow-menu--the-context-menu-of-a-row) | The context menu of a row | View | M10 | Built |
+| [`table.cell-menu`](table.md#tablecell-menu--the-context-menu-of-a-cell) | The context menu of a cell | View | M10 | Built |
+| [`table.column-menu`](table.md#tablecolumn-menu--the-context-menu-of-a-column-header) | The context menu of a column header | View | M10 | Built |
+| [`table.refresh`](table.md#tablerefresh--refresh-the-documents) | Refresh the documents | Read | M10 | Built |
 
 ## Scheduled tasks
 

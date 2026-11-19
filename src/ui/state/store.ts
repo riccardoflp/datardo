@@ -36,6 +36,11 @@ function subscribe(listener: () => void): () => void {
   return () => listeners.delete(listener);
 }
 
+/** The app's state as the window mirrors it now, for what reads it outside a component. */
+export function currentAppState(): AppState {
+  return state;
+}
+
 /** The app's state, drawn again whenever it changes. */
 export function useAppState(): AppState {
   return useSyncExternalStore(subscribe, () => state);
