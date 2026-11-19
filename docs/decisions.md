@@ -650,3 +650,21 @@ Raised while the catalog was written; each names the cards that hold the current
   saving a saved file with no change does nothing; the engine needs sessions, transactions, cursors kept by id and
   more methods of a collection for the playground process. (`playground.run`, `playground.open-file`,
   `playground.save`, `playground.runtime`).
+- **Q52** — Schema and Explain: MongoDB 8.2 runs `$group` inside the query engine, so `$match`, `$group`, `$sort`
+  lists only `$sort` after the query, where `explain.show` expects `$group` and `$sort`; the time limit of an explain
+  is the command's own `maxTimeMS`, since 8.2 ignores one inside the explained command; a Long in the statistics of
+  an explain is left out; `NumberLong(1200)` and `Long("1200")` are both written today and must agree; **Create…**,
+  **Validation rules…**, **Expand all** and **Collapse all** have no place on their cards. (`explain.show`,
+  `explain.run`, `explain.raw`, `schema.show`).
+- **Q53** — Export, import and backup: generated and imported ObjectIds come from the time and a salt, so that plans
+  stay pure; the seed of generated data is the one typed, else one drawn by the runner; a restore is undone collection
+  by collection; dropping the destination or existing collections cannot be undone; the last folder used is not
+  remembered; [data.md](data.md) is left as it is, since archives and exported files are the formats of mongodump and
+  mongoexport, not files of Datardo. (`transfer.generate`, `transfer.import`, `backup.restore`,
+  `transfer.copy-collection`).
+- **Q54** — The document history and Watch changes: **Pause**, **Stop** and **Clear** are steps of the application,
+  since the page's state changes only through a step, where the cards say "no step"; the whole deployment is watched
+  as `admin` with no collection; Go to **Watch changes** on a view's tab watches its database; an error shows the
+  state **Stopped**, a fifth state; most writes show as retryable, since drivers retry by default; **Open document**
+  in the history's toolbar has no place on `document.open`. (`watch.pause`, `watch.stream`, `watch.show`,
+  `history.show`).
