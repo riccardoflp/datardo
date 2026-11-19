@@ -572,3 +572,9 @@ Raised while the catalog was written; each names the cards that hold the current
   a task that keeps a number of outputs is saved? (`task.retention`).
 - **Q38** — The texts that are new in Datardo (where Mongoster had none, or where its words named VS Code) need a
   reading by the author: each card marks them in **Ported from**.
+- **Q39** — Scheduled tasks need facts of the disk (the folder exists, which names are taken, what is at each
+  output path) that no Read card gives; the main process passes them as answers. Should a Read card of the task area
+  exist? Neither **Reveal** in a notification nor the output link on the page has a feature to show a file in the
+  file manager. The place of **Keep running in the tray** on the Settings page is on no card. The field names of
+  `tasks/tasks.json` and `tasks/<id>.json` are not yet in [data.md](data.md). (`task.run`, `task.retention`,
+  `task.notify`, `task.tray`).
