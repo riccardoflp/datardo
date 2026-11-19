@@ -14,6 +14,11 @@ export interface Makers {
   readonly now?: number;
   /** A new id of 24 hexadecimal digits. */
   readonly newId?: () => string;
+  /**
+   * Told of each number written as digits alone (`5`, `6.5`, `5000000000`), not with a helper or as Extended JSON, with
+   * the value read and the digits: `document.keep-numeric-types` tells such a number from one written with its type.
+   */
+  readonly onPlainNumber?: (value: Json, digits: string) => void;
 }
 
 /** No time and no maker of ids: `ISODate()` and `ObjectId()` are not read. */

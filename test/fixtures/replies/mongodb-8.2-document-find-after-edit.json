@@ -1,0 +1,51 @@
+[
+  {
+    "_id": {
+      "$numberInt": "7"
+    },
+    "name": "Ada",
+    "qty": {
+      "$numberInt": "5"
+    },
+    "price": {
+      "$numberDouble": "6.0"
+    },
+    "big": {
+      "$numberLong": "7"
+    },
+    "amount": {
+      "$numberDecimal": "1.10"
+    },
+    "pattern": {
+      "$regularExpression": {
+        "pattern": "^a",
+        "options": "i"
+      }
+    },
+    "createdAt": {
+      "$date": {
+        "$numberLong": "1710496800000"
+      }
+    },
+    "items": [
+      {
+        "qty": {
+          "$numberInt": "1"
+        }
+      },
+      {
+        "qty": {
+          "$numberInt": "2"
+        }
+      },
+      {
+        "qty": {
+          "$numberInt": "30"
+        }
+      }
+    ],
+    "address": {
+      "city": "Rome"
+    }
+  }
+]

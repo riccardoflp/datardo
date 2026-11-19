@@ -1,0 +1,14 @@
+{
+  "acknowledged": true,
+  "insertedCount": {
+    "$numberInt": "2"
+  },
+  "insertedIds": {
+    "0": {
+      "$oid": "6afe48bc6ece4e0d19cc4294"
+    },
+    "1": {
+      "$oid": "6afe48bc6ece4e0d19cc4295"
+    }
+  }
+}

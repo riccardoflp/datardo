@@ -275,10 +275,11 @@ class Reader {
     }
     this.position += digits.length;
     const unsigned = digits.replace(/^[-+]/u, '');
-    if (/^(0[xX][0-9a-fA-F]+|\d+)$/u.test(unsigned)) {
-      return wholeNumber(digits);
-    }
-    return { $numberDouble: doubleText(Number(digits.replace(/^\+/u, ''))) };
+    const value = /^(0[xX][0-9a-fA-F]+|\d+)$/u.test(unsigned)
+      ? wholeNumber(digits)
+      : { $numberDouble: doubleText(Number(digits.replace(/^\+/u, ''))) };
+    this.makers.onPlainNumber?.(value, digits);
+    return value;
   }
 
   private regex(): Json {
@@ -289,7 +290,9 @@ class Reader {
     }
     this.position += match[0].length;
     const options = [...new Set((match[2] ?? '').replace(/[^imsxu]/gu, ''))].sort().join('');
-    return { $regularExpression: { pattern: match[1] ?? '', options } };
+    // `\/` is a slash of the pattern, which `query.format` writes so; every other escape stays as it is written.
+    const pattern = (match[1] ?? '').replace(/\\[\s\S]/gu, (escape) => (escape === '\\/' ? '/' : escape));
+    return { $regularExpression: { pattern, options } };
   }
 
   private word(): Json {
