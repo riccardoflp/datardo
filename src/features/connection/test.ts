@@ -51,11 +51,18 @@ function successText(info: ServerInfo, host: string, through: string | undefined
     : testText.redisConnected(host, via, `${info.product} ${info.version}`);
 }
 
+/** The codes of connection.test for what connection.connect refuses once the server has answered. */
+const testCodes: Readonly<Record<string, string>> = {
+  'connection.connect/redis-cluster': 'connection.test/redis-cluster',
+  'connection.connect/redis-sentinel': 'connection.test/redis-sentinel',
+  'connection.connect/unsupported': 'connection.test/unsupported',
+};
+
 function answered(reply: Extract<TryReply, { kind: 'answered' }>): TestResult {
   const info = parseServerInfo(reply.replies, { hosts: reply.host });
   const refusal = serverRefusal(info);
   if (refusal !== undefined) {
-    return { ok: false, text: refusal.message, code: refusal.code };
+    return { ok: false, text: refusal.message, code: testCodes[refusal.code] ?? refusal.code };
   }
   const text = successText(info, reply.host, reply.through);
   if (reply.linked === undefined) {

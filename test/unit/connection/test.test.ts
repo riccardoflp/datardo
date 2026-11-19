@@ -59,11 +59,16 @@ describe('connection.test', () => {
     const cluster = parse([
       { kind: 'answered', engine: 'redis', host: 'c:6379', replies: [redisReply('redis-7.4-cluster-info-server')] },
     ]);
-    expect(cluster).toMatchObject({ ok: false, text: 'Redis Cluster is not supported yet.' });
+    expect(cluster).toMatchObject({
+      ok: false,
+      text: 'Redis Cluster is not supported yet.',
+      code: 'connection.test/redis-cluster',
+    });
     const old = parse([
       { kind: 'answered', engine: 'redis', host: 'c:6379', replies: ['# Server\r\nredis_version:5.0.14\r\n'] },
     ]);
     expect(old.text).toBe('Redis 5.0.14 is too old: Datardo needs Redis 6.2 or later.');
+    expect(old.code).toBe('connection.test/unsupported');
   });
 
   it('a refusal of the main process marks its field', () => {

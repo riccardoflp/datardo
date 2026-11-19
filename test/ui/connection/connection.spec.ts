@@ -16,7 +16,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createServer as createTlsServer, type Server } from 'node:tls';
 import { createClient } from 'redis';
-import { expectAccessible } from '../app';
+import { expectAccessible, firstWindow } from '../app';
 
 const tlsFolder = join(import.meta.dirname, '..', '..', 'fixtures', 'tls');
 const caFile = join(tlsFolder, 'ca.pem');
@@ -114,7 +114,7 @@ async function launch(): Promise<{ readonly app: ElectronApplication; readonly w
     },
   });
   running.push(app);
-  const window = await app.firstWindow();
+  const window = await firstWindow(app);
   await window.setViewportSize({ width: 1440, height: 900 });
   await expect(window.getByRole('navigation', { name: 'Rail' })).toBeVisible();
   await window.evaluate(() => {
@@ -222,15 +222,21 @@ async function filesOf(root: string): Promise<readonly { readonly path: string; 
   return Promise.all(files.map(async (path) => ({ path, bytes: await readFile(path) })));
 }
 
-/** R14.1: neither password is in a file of the data folder, an event sent to the window, the state or the Log. */
-async function expectNoPassword(window: Page): Promise<void> {
+/** R14.1: neither password is in an event sent to the window, in the state or in the Log. */
+async function expectNoPasswordSent(window: Page): Promise<void> {
   const seen = await window.evaluate(async () => {
     const global = globalThis as unknown as { events: string[]; datardo: { state: () => Promise<unknown> } };
     return [...global.events, JSON.stringify(await global.datardo.state())].join('\n');
   });
   for (const password of [mongoPassword, redisPassword]) {
     expect(seen.includes(password)).toBe(false);
-    for (const file of await filesOf(folder)) {
+  }
+}
+
+/** R14.1: neither password is in a file of the data folder, read once Datardo has quit and left them. */
+async function expectNoPasswordInFiles(): Promise<void> {
+  for (const file of await filesOf(folder)) {
+    for (const password of [mongoPassword, redisPassword]) {
       expect(file.bytes.includes(password), file.path).toBe(false);
     }
   }
@@ -251,8 +257,9 @@ test('adds, tests, saves and connects a MongoDB replica set and a Redis server w
   await expect(overview.getByRole('heading', { name: /Cache/u })).toBeVisible();
   await expect(overview).toContainText('Eviction policy');
   await expect(overview).toContainText('Read-only: Datardo refuses writes through this connection');
-  await expectNoPassword(first.window);
+  await expectNoPasswordSent(first.window);
   await quit(first.app);
+  await expectNoPasswordInFiles();
 
   const second = await launch();
   for (const name of ['Replica', 'Cache']) {
@@ -260,7 +267,9 @@ test('adds, tests, saves and connects a MongoDB replica set and a Redis server w
     await expectConnected(second.window, name);
   }
   await expect(second.window.getByRole('dialog')).toHaveCount(0);
-  await expectNoPassword(second.window);
+  await expectNoPasswordSent(second.window);
+  await quit(second.app);
+  await expectNoPasswordInFiles();
 });
 
 test('a read-only connection refuses a write', async () => {
@@ -318,7 +327,9 @@ test('the connection form: Redis fields and string, a refusal marked, Escape, an
 test('the menu of the current connection, from the … button of the connection island', async () => {
   const { window } = await launch();
   await addRedis(window);
-  await window.getByRole('button', { name: 'Menu of Cache' }).click();
+  // The Overview in front, so that the check is of the menu and of the pages of this area.
+  await start(window, 'connection.overview', await idOf(window, 'Cache'));
+  await window.locator('[data-feature="connection.menu@connection-island"]').click();
   const menu = window.getByRole('menu', { name: 'Menu of Cache' });
   await expect(menu.getByRole('menuitem')).toHaveText([
     'Disconnect',

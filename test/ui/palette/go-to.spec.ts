@@ -36,7 +36,7 @@ test.describe('palette.open', () => {
     await window.keyboard.press('Control+k');
     await expect(field(window)).toBeFocused();
     await window.keyboard.type('>show log');
-    await expect(window.getByRole('option').first()).toHaveAttribute('aria-label', /^Show log, command/u);
+    await expect(window.getByRole('option').first()).toContainText('Show log');
     await window.keyboard.press('Enter');
     await expect(page(window)).toHaveAttribute('data-page', 'log');
     await expect(field(window)).toHaveCount(0);

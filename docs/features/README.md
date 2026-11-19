@@ -144,36 +144,36 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`connection.add`](connection.md#connectionadd--add-a-connection) | Add a connection | Operation | M6 | Specified |
-| [`connection.edit`](connection.md#connectionedit--edit-a-connection) | Edit a connection | Operation | M6 | Specified |
-| [`connection.form`](connection.md#connectionform--the-connection-form) | The connection form | View | M6 | Specified |
-| [`connection.read-form`](connection.md#connectionread-form--what-the-form-says-checked) | What the form says, checked | Derivation | M6 | Specified |
-| [`connection.redis-string`](connection.md#connectionredis-string--a-redis-connection-string-read-and-written) | A Redis connection string, read and written | Derivation | M6 | Specified |
-| [`connection.string-secrets`](connection.md#connectionstring-secrets--the-secrets-in-and-out-of-a-connection-string) | The secrets in and out of a connection string | Derivation | M6 | Specified |
-| [`connection.test`](connection.md#connectiontest--test-the-connection) | Test the connection | Read | M6 | Specified |
-| [`connection.save`](connection.md#connectionsave--save-the-connection-form) | Save the connection form | Operation | M6 | Specified |
+| [`connection.add`](connection.md#connectionadd--add-a-connection) | Add a connection | Operation | M6 | Built |
+| [`connection.edit`](connection.md#connectionedit--edit-a-connection) | Edit a connection | Operation | M6 | Built |
+| [`connection.form`](connection.md#connectionform--the-connection-form) | The connection form | View | M6 | Built |
+| [`connection.read-form`](connection.md#connectionread-form--what-the-form-says-checked) | What the form says, checked | Derivation | M6 | Built |
+| [`connection.redis-string`](connection.md#connectionredis-string--a-redis-connection-string-read-and-written) | A Redis connection string, read and written | Derivation | M6 | Built |
+| [`connection.string-secrets`](connection.md#connectionstring-secrets--the-secrets-in-and-out-of-a-connection-string) | The secrets in and out of a connection string | Derivation | M6 | Built |
+| [`connection.test`](connection.md#connectiontest--test-the-connection) | Test the connection | Read | M6 | Built |
+| [`connection.save`](connection.md#connectionsave--save-the-connection-form) | Save the connection form | Operation | M6 | Built |
 | [`connection.copy-string`](connection.md#connectioncopy-string--copy-the-connection-string) | Copy the connection string | Read | M7 | Specified |
 | [`connection.duplicate`](connection.md#connectionduplicate--duplicate-a-connection) | Duplicate a connection | Operation | M7 | Specified |
-| [`connection.connect`](connection.md#connectionconnect--connect-a-connection) | Connect a connection | Operation | M6 | Specified |
-| [`connection.server-info`](connection.md#connectionserver-info--what-the-server-is) | What the server is | Read | M6 | Specified |
-| [`connection.disconnect`](connection.md#connectiondisconnect--disconnect) | Disconnect | Operation | M6 | Specified |
-| [`connection.state`](connection.md#connectionstate--the-state-and-latency-of-a-connection) | The state and latency of a connection | Read | M6 | Specified |
-| [`connection.reconnect`](connection.md#connectionreconnect--reconnect-after-a-drop) | Reconnect after a drop | Operation | M6 | Specified |
+| [`connection.connect`](connection.md#connectionconnect--connect-a-connection) | Connect a connection | Operation | M6 | Built |
+| [`connection.server-info`](connection.md#connectionserver-info--what-the-server-is) | What the server is | Read | M6 | Built |
+| [`connection.disconnect`](connection.md#connectiondisconnect--disconnect) | Disconnect | Operation | M6 | Built |
+| [`connection.state`](connection.md#connectionstate--the-state-and-latency-of-a-connection) | The state and latency of a connection | Read | M6 | Built |
+| [`connection.reconnect`](connection.md#connectionreconnect--reconnect-after-a-drop) | Reconnect after a drop | Operation | M6 | Built |
 | [`connection.ssh-tunnel-target`](connection.md#connectionssh-tunnel-target--where-the-ssh-tunnel-leads) | Where the SSH tunnel leads | Derivation | M7 | Specified |
 | [`connection.trust-host-key`](connection.md#connectiontrust-host-key--confirm-the-host-key-of-an-ssh-server) | Confirm the host key of an SSH server | Operation | M7 | Specified |
-| [`connection.overview`](connection.md#connectionoverview--the-overview-page-of-a-connection) | The Overview page of a connection | View | M6 | Specified |
-| [`connection.menu`](connection.md#connectionmenu--the-menu-of-a-connection) | The menu of a connection | View | M6 | Specified |
+| [`connection.overview`](connection.md#connectionoverview--the-overview-page-of-a-connection) | The Overview page of a connection | View | M6 | Built |
+| [`connection.menu`](connection.md#connectionmenu--the-menu-of-a-connection) | The menu of a connection | View | M6 | Built |
 | [`connection.folder-menu`](connection.md#connectionfolder-menu--the-menu-of-a-folder) | The menu of a folder | View | M7 | Specified |
 | [`connection.set-color`](connection.md#connectionset-color--set-the-color-of-a-connection) | Set the color of a connection | Operation | M7 | Specified |
 | [`connection.move-to-folder`](connection.md#connectionmove-to-folder--move-a-connection-to-a-folder) | Move a connection to a folder | Operation | M7 | Specified |
 | [`connection.rename-folder`](connection.md#connectionrename-folder--rename-a-folder) | Rename a folder | Operation | M7 | Specified |
 | [`connection.remove-folder`](connection.md#connectionremove-folder--remove-a-folder-keeping-its-connections) | Remove a folder, keeping its connections | Operation | M7 | Specified |
-| [`connection.remove`](connection.md#connectionremove--remove-a-connection) | Remove a connection | Operation | M6 | Specified |
-| [`connection.read-only`](connection.md#connectionread-only--make-a-connection-read-only) | Make a connection read-only | Operation | M6 | Specified |
-| [`connection.allow-changes`](connection.md#connectionallow-changes--allow-changes-through-a-read-only-connection) | Allow changes through a read-only connection | Operation | M6 | Specified |
+| [`connection.remove`](connection.md#connectionremove--remove-a-connection) | Remove a connection | Operation | M6 | Built |
+| [`connection.read-only`](connection.md#connectionread-only--make-a-connection-read-only) | Make a connection read-only | Operation | M6 | Built |
+| [`connection.allow-changes`](connection.md#connectionallow-changes--allow-changes-through-a-read-only-connection) | Allow changes through a read-only connection | Operation | M6 | Built |
 | [`connection.link-redis`](connection.md#connectionlink-redis--link-a-redis-connection-to-a-mongodb-connection) | Link a Redis connection to a MongoDB connection | Operation | M7 | Specified |
 | [`connection.unlink-redis`](connection.md#connectionunlink-redis--remove-the-link-to-a-redis-connection) | Remove the link to a Redis connection | Operation | M7 | Specified |
-| [`connection.secrets`](connection.md#connectionsecrets--keep-the-secrets-of-a-connection) | Keep the secrets of a connection | Operation | M6 | Specified |
+| [`connection.secrets`](connection.md#connectionsecrets--keep-the-secrets-of-a-connection) | Keep the secrets of a connection | Operation | M6 | Built |
 | [`connection.import`](connection.md#connectionimport--import-connections) | Import connections | Operation | M7 | Specified |
 | [`connection.export`](connection.md#connectionexport--export-connections) | Export connections | Operation | M7 | Specified |
 | [`connection.read-file`](connection.md#connectionread-file--read-a-connections-file) | Read a connections file | Derivation | M7 | Specified |
@@ -181,7 +181,7 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [`connection.read-compass`](connection.md#connectionread-compass--read-a-mongodb-compass-export) | Read a MongoDB Compass export | Derivation | M7 | Specified |
 | [`connection.write-file`](connection.md#connectionwrite-file--write-a-connections-file) | Write a connections file | Derivation | M7 | Specified |
 | [`connection.encryption`](connection.md#connectionencryption--encrypt-the-passwords-of-a-file-as-compass-does) | Encrypt the passwords of a file as Compass does | Derivation | M7 | Specified |
-| [`connection.tls-in-uri`](connection.md#connectiontls-in-uri--tls-settings-in-and-out-of-a-mongodb-connection-string) | TLS settings in and out of a MongoDB connection string | Derivation | M6 | Specified |
+| [`connection.tls-in-uri`](connection.md#connectiontls-in-uri--tls-settings-in-and-out-of-a-mongodb-connection-string) | TLS settings in and out of a MongoDB connection string | Derivation | M6 | Built |
 | [`connection.color-from-compass`](connection.md#connectioncolor-from-compass--the-closest-color-of-a-compass-connection) | The closest color of a Compass connection | Derivation | M7 | Specified |
 
 ## Console
@@ -299,14 +299,14 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`home.show`](home.md#homeshow--the-home-page) | The Home page | View | M5 | Specified |
-| [`home.jump-back-in`](home.md#homejump-back-in--jump-back-in) | Jump back in | View | M5 | Specified |
-| [`home.forget-recent`](home.md#homeforget-recent--remove-a-recent-place) | Remove a recent place | Operation | M5 | Specified |
-| [`home.connections`](home.md#homeconnections--the-connection-cards-by-folder) | The connection cards, by folder | View | M5 | Specified |
-| [`home.card`](home.md#homecard--a-connection-card) | A connection card | View | M5 | Specified |
-| [`home.address`](home.md#homeaddress--the-address-of-a-connection-without-credentials) | The address of a connection, without credentials | Derivation | M5 | Specified |
-| [`home.filter`](home.md#homefilter--filter-the-cards-by-text-and-by-engine) | Filter the cards by text and by engine | Derivation | M5 | Specified |
-| [`home.card-menu`](home.md#homecard-menu--the-menu-of-a-connection) | The menu of a connection | View | M5 | Specified |
+| [`home.show`](home.md#homeshow--the-home-page) | The Home page | View | M5 | Built |
+| [`home.jump-back-in`](home.md#homejump-back-in--jump-back-in) | Jump back in | View | M5 | Built |
+| [`home.forget-recent`](home.md#homeforget-recent--remove-a-recent-place) | Remove a recent place | Operation | M5 | Built |
+| [`home.connections`](home.md#homeconnections--the-connection-cards-by-folder) | The connection cards, by folder | View | M5 | Built |
+| [`home.card`](home.md#homecard--a-connection-card) | A connection card | View | M5 | Built |
+| [`home.address`](home.md#homeaddress--the-address-of-a-connection-without-credentials) | The address of a connection, without credentials | Derivation | M5 | Built |
+| [`home.filter`](home.md#homefilter--filter-the-cards-by-text-and-by-engine) | Filter the cards by text and by engine | Derivation | M5 | Built |
+| [`home.card-menu`](home.md#homecard-menu--the-menu-of-a-connection) | The menu of a connection | View | M5 | Built |
 
 ## Indexes
 
@@ -482,16 +482,16 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`palette.open`](palette.md#paletteopen--open-go-to) | Open Go to | View | M5 | Specified |
-| [`palette.recent`](palette.md#paletterecent--recent-places) | Recent places | Read | M5 | Specified |
-| [`palette.sources`](palette.md#palettesources--where-go-to-looks) | Where Go to looks | Derivation | M5 | Specified |
-| [`palette.find-collections`](palette.md#palettefind-collections--the-names-of-collections-for-go-to) | The names of collections for Go to | Read | M5 | Specified |
-| [`palette.find-keys`](palette.md#palettefind-keys--the-keys-of-the-current-redis-connection-for-go-to) | The keys of the current Redis connection for Go to | Read | M5 | Specified |
-| [`palette.rank`](palette.md#paletterank--how-go-to-ranks-what-it-finds) | How Go to ranks what it finds | Derivation | M5 | Specified |
-| [`palette.open-result`](palette.md#paletteopen-result--open-a-result) | Open a result | Operation | M5 | Specified |
-| [`palette.commands`](palette.md#palettecommands--every-command-with-its-title-and-its-key) | Every command, with its title and its key | Derivation | M5 | Specified |
-| [`palette.run-command`](palette.md#paletterun-command--run-a-command) | Run a command | Operation | M5 | Specified |
-| [`palette.key-press`](palette.md#palettekey-press--which-command-a-key-starts) | Which command a key starts | Derivation | M5 | Specified |
+| [`palette.open`](palette.md#paletteopen--open-go-to) | Open Go to | View | M5 | Built |
+| [`palette.recent`](palette.md#paletterecent--recent-places) | Recent places | Read | M5 | Built |
+| [`palette.sources`](palette.md#palettesources--where-go-to-looks) | Where Go to looks | Derivation | M5 | Built |
+| [`palette.find-collections`](palette.md#palettefind-collections--the-names-of-collections-for-go-to) | The names of collections for Go to | Read | M5 | Built |
+| [`palette.find-keys`](palette.md#palettefind-keys--the-keys-of-the-current-redis-connection-for-go-to) | The keys of the current Redis connection for Go to | Read | M5 | Built |
+| [`palette.rank`](palette.md#paletterank--how-go-to-ranks-what-it-finds) | How Go to ranks what it finds | Derivation | M5 | Built |
+| [`palette.open-result`](palette.md#paletteopen-result--open-a-result) | Open a result | Operation | M5 | Built |
+| [`palette.commands`](palette.md#palettecommands--every-command-with-its-title-and-its-key) | Every command, with its title and its key | Derivation | M5 | Built |
+| [`palette.run-command`](palette.md#paletterun-command--run-a-command) | Run a command | Operation | M5 | Built |
+| [`palette.key-press`](palette.md#palettekey-press--which-command-a-key-starts) | Which command a key starts | Derivation | M5 | Built |
 
 ## Playgrounds
 

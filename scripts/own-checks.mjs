@@ -63,10 +63,15 @@ export function checkFeatureModules(root) {
   const modules = new Set();
   for (const file of files(featureFolder, ['.ts', '.tsx'])) {
     const path = relative(featureFolder, file).split(sep);
-    if (path.length !== 2 || sharedModules.has(path[1]) || path[1].endsWith('.d.ts')) {
+    if (path.length !== 2 || path[1].endsWith('.d.ts')) {
       continue;
     }
     const identifier = `${path[0]}.${path[1].replace(/\.tsx?$/, '')}`;
+    // A shared module of an area (its commands, text, types, index) is also a card's module when a card has its name,
+    // as palette.commands does.
+    if (sharedModules.has(path[1]) && !statuses.has(identifier)) {
+      continue;
+    }
     modules.add(identifier);
     if (!statuses.has(identifier)) {
       problems.push(`R2.1: ${relative(root, file)} is the module of no card.`);

@@ -5,6 +5,7 @@
  */
 import * as ContextMenu from '@radix-ui/react-context-menu';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+import { useRef } from 'react';
 import { view, type MenuEntry, type MenuPlace } from '../../features/connection/menu';
 import type { ConnectionId } from '../../shared/ids';
 import { savedConnection, type ConnectionsState } from '../../shared/state/connections';
@@ -39,6 +40,14 @@ export function ConnectionMenuButton(
   props: ConnectionMenuProps & { readonly className?: string | undefined },
 ): React.JSX.Element | null {
   const menu = menuOf(useAppState().connections, props.connection, props.place);
+  // An entry chosen leaves the focus where its feature puts it (a form, a dialog), not on the trigger.
+  const chosen = useRef(false);
+  const keepFocus = (event: Event): void => {
+    if (chosen.current) {
+      event.preventDefault();
+      chosen.current = false;
+    }
+  };
   if (menu === undefined) {
     return null;
   }
@@ -50,7 +59,12 @@ export function ConnectionMenuButton(
         </button>
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal>
-        <DropdownMenu.Content className={styles['menu']} aria-label={menu.label} align="end">
+        <DropdownMenu.Content
+          className={styles['menu']}
+          aria-label={menu.label}
+          align="end"
+          onCloseAutoFocus={keepFocus}
+        >
           {menu.entries.map((entry, index) =>
             entry.kind === 'separator' ? (
               <DropdownMenu.Separator key={`separator ${String(index)}`} className={styles['separator']} />
@@ -60,6 +74,7 @@ export function ConnectionMenuButton(
                 className={styles['item']}
                 data-feature={entry.element}
                 onSelect={() => {
+                  chosen.current = true;
                   start(entry, props);
                 }}
               >
@@ -78,6 +93,14 @@ export function ConnectionContextMenu(
   props: ConnectionMenuProps & { readonly children: React.JSX.Element },
 ): React.JSX.Element {
   const menu = menuOf(useAppState().connections, props.connection, props.place);
+  // An entry chosen leaves the focus where its feature puts it (a form, a dialog), not on the trigger.
+  const chosen = useRef(false);
+  const keepFocus = (event: Event): void => {
+    if (chosen.current) {
+      event.preventDefault();
+      chosen.current = false;
+    }
+  };
   if (menu === undefined) {
     return props.children;
   }
@@ -85,7 +108,12 @@ export function ConnectionContextMenu(
     <ContextMenu.Root modal={false}>
       <ContextMenu.Trigger asChild>{props.children}</ContextMenu.Trigger>
       <ContextMenu.Portal>
-        <ContextMenu.Content className={styles['menu']} aria-label={menu.label} data-feature={menu.element}>
+        <ContextMenu.Content
+          className={styles['menu']}
+          aria-label={menu.label}
+          data-feature={menu.element}
+          onCloseAutoFocus={keepFocus}
+        >
           {menu.entries.map((entry, index) =>
             entry.kind === 'separator' ? (
               <ContextMenu.Separator key={`separator ${String(index)}`} className={styles['separator']} />
@@ -95,6 +123,7 @@ export function ConnectionContextMenu(
                 className={styles['item']}
                 data-feature={entry.element}
                 onSelect={() => {
+                  chosen.current = true;
                   start(entry, props);
                 }}
               >

@@ -25,7 +25,6 @@ function Item(props: { readonly item: JumpItem; readonly part: JumpBackInView })
             className={styles['jump']}
             data-feature="home.jump-back-in@home"
             data-color={item.color}
-            aria-label={item.spoken}
             onClick={() => {
               startFeature('palette.open-result', { place: 'home', args: openArgs(item.opens, 'foreground') });
             }}

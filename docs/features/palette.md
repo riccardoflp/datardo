@@ -467,7 +467,7 @@ Starts the feature of a command on what the user is looking at.
 - **Engine**: Any
 - **Function**: `src/features/palette/run-command.ts › plan(context, answers)`
 - **Entry points**: a command chosen in Go to (`palette.open-result`); its key (`palette.key-press`); its entry of
-  the system's menu bar on macOS (`@app-menu`).
+  the system's menu bar on macOS (`window.app-menu`).
 - **Offered when**: Go to lists a command when its feature is for every engine, or for the engine of the current
   connection; with no connection current, only the commands for every engine. A command its own card says is not
   offered now (**Zoom in** at 200%, **Back** with no place before) is not listed either, and its key does nothing.

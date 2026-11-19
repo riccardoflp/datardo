@@ -42,9 +42,14 @@ export async function runPlan(
     }
   }
   const connections = engineConnections(plan);
-  return runtimeOf(ports).queue.run(connections.length === 0 ? ['app'] : connections, () =>
+  const result = await runtimeOf(ports).queue.run(connections.length === 0 ? ['app'] : connections, () =>
     runConfirmed(ports, plan, context, options),
   );
+  // What follows is carried out once the plan has left its queue: a feature it starts queues behind it otherwise.
+  if (result.kind === 'done') {
+    await carryOutAfter(ports, context, plan.after, options.startFeature);
+  }
+  return result;
 }
 
 /** What the confirmation shows of a plan (`runner.confirm`). */
@@ -94,20 +99,19 @@ async function runConfirmed(
       ports.state.dispatch({ slice: 'runner', type: 'refresh-asked', connection });
     }
   }
-  const result = await ended(ports, { plan, context, options }, outcome);
+  const result = ended(ports, { plan, context }, outcome);
   work.end(result.kind === 'failed' ? result.message : undefined);
   return result;
 }
 
-/** A plan being run, with what it was started with. */
+/** A plan being run, and what it was started on. */
 interface PlanRun {
   readonly plan: Plan;
   readonly context: Context;
-  readonly options: RunOptions;
 }
 
-async function ended(ports: RunnerPorts, planRun: PlanRun, outcome: StepsOutcome): Promise<IntentResult> {
-  const { plan, context, options } = planRun;
+function ended(ports: RunnerPorts, planRun: PlanRun, outcome: StepsOutcome): IntentResult {
+  const { plan, context } = planRun;
   if (outcome.cancelledAfter !== undefined) {
     const howFar = runnerText.stoppedAfter(outcome.cancelledAfter, plan.steps.length);
     writeLog(ports, [{ feature: context.feature, kind: 'info', text: `cancelled: ${howFar}` }]);
@@ -127,7 +131,6 @@ async function ended(ports: RunnerPorts, planRun: PlanRun, outcome: StepsOutcome
       text: runnerText.stepsFailed(plan.title, outcome.failedOnTheWay),
     });
   }
-  await carryOutAfter(ports, context, plan.after, options.startFeature);
   return { kind: 'done' };
 }
 

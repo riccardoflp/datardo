@@ -35,6 +35,11 @@ def readers_of_settings(docs: Path) -> dict[str, set[str]]:
     return readers
 
 
+# A refusal of a built card that only a later card can raise, left out until that card is built: the host key of an
+# SSH server is checked by connection.trust-host-key (M7).
+LATER_REASONS = {"connection.connect/host-key": "connection.trust-host-key"}
+
+
 def names_to_leave_out(docs: Path) -> list[str]:
     """What the cards that are not built would require of the sources."""
     features = docs / "features"
@@ -57,6 +62,7 @@ def names_to_leave_out(docs: Path) -> list[str]:
             names |= {f"{card['id']}@{place}" for place in card["places"]
                       if place.split("-", 1)[0] not in built_areas
                       and place.split("-", 1)[0] in {other["id"].split(".", 1)[0] for other in cards}}
+    names |= {reason for reason, card in LATER_REASONS.items() if card not in built}
     for setting, readers in readers_of_settings(docs).items():
         if not readers & built:
             names.add(setting)

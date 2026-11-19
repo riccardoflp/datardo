@@ -364,7 +364,7 @@ at the next start.
 **Goal**: `Ctrl+K` finds connections, pages, open tabs and commands and runs them from the keyboard; Home lists the
 saved connections by folder and the places used last.
 **Depends on**: M4.
-**Status**: planned
+**Status**: done
 
 ### Features
 
@@ -407,13 +407,13 @@ saved connections by folder and the places used last.
 
 ### Exit criteria
 
-- [ ] With the pointer unplugged, a command is found by its title in Go to and run, and Home is reached and left: the
+- [x] With the pointer unplugged, a command is found by its title in Go to and run, and Home is reached and left: the
       keyboard-only UI test of this milestone.
-- [ ] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
+- [x] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
       `npm run test:integration`, `npm run test:ui`; `catalog.py --tests` reports none missing for these cards.
-- [ ] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
+- [x] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
       the keyboard alone (QA15, QA16).
-- [ ] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
+- [x] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
       and this milestone's **Status** is *done*.
 
 ### Not in this milestone
@@ -432,7 +432,7 @@ saved connections by folder and the places used last.
 **Goal**: The user adds a connection of either engine in the connection form, tests it, saves it with its secrets in
 the secret storage, connects and disconnects, makes it read-only, and sees its Overview.
 **Depends on**: M5.
-**Status**: planned
+**Status**: done
 
 ### Features
 
@@ -488,16 +488,16 @@ the secret storage, connects and disconnects, makes it read-only, and sees its O
 
 ### Exit criteria
 
-- [ ] A MongoDB replica set and a Redis server, each with a password and TLS, are added, tested, saved, connected and
+- [x] A MongoDB replica set and a Redis server, each with a password and TLS, are added, tested, saved, connected and
       shown in the Overview; after a restart they connect again without the password being asked.
-- [ ] The password of a saved connection is in no file of the data folder in clear text, in no message of the bridge
+- [x] The password of a saved connection is in no file of the data folder in clear text, in no message of the bridge
       and in no line of the Log: the test of R14.1.
-- [ ] A connection made read-only refuses the test write of M3 with `/read-only`.
-- [ ] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
+- [x] A connection made read-only refuses the test write of M3 with `/read-only`.
+- [x] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
       `npm run test:integration`, `npm run test:ui`; `catalog.py --tests` reports none missing for these cards.
-- [ ] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
+- [x] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
       the keyboard alone (QA15, QA16).
-- [ ] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
+- [x] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
       and this milestone's **Status** is *done*.
 
 ### Not in this milestone

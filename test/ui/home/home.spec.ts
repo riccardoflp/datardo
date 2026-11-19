@@ -8,7 +8,7 @@ import { _electron as electron, expect, test, type ElectronApplication, type Pag
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { expectAccessible } from '../app';
+import { expectAccessible, firstWindow } from '../app';
 
 let folder: string;
 const running: ElectronApplication[] = [];
@@ -63,7 +63,7 @@ async function writeData(saved: readonly Saved[], more: Readonly<Record<string, 
 async function launch(): Promise<Page> {
   const app = await electron.launch({ args: ['.'], env: { ...process.env, DATARDO_DATA: folder, DATARDO_TEST: '1' } });
   running.push(app);
-  const window = await app.firstWindow();
+  const window = await firstWindow(app);
   await window.setViewportSize({ width: 1440, height: 900 });
   await expect(window.getByRole('navigation', { name: 'Rail' })).toBeVisible();
   return window;

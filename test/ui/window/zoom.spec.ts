@@ -20,7 +20,8 @@ async function zoomFactor(): Promise<number | undefined> {
 
 test('window.zoom: the keys zoom in, out and back to 100%', async () => {
   const modifier = process.platform === 'darwin' ? 'Meta' : 'Control';
-  await started.window.locator('header').click({ position: { x: 600, y: 20 } });
+  // An empty part of the bar: the Go to field in its middle would open Go to, which takes the keys.
+  await started.window.locator('header').click({ position: { x: 200, y: 20 } });
   await started.window.keyboard.press(`${modifier}+Equal`);
   await expect.poll(zoomFactor).toBeCloseTo(1.1);
   await started.window.keyboard.press(`${modifier}+Minus`);

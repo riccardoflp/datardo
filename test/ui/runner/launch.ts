@@ -4,7 +4,7 @@
  * The check for a newer version asks a local address where nothing listens unless a test says otherwise.
  */
 import { _electron as electron, type ElectronApplication, type Locator, type Page } from '@playwright/test';
-import { expectAccessible } from '../app';
+import { expectAccessible, firstWindow } from '../app';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -33,7 +33,7 @@ export async function launch(
       DATARDO_TEST: '1',
     },
   });
-  const window = await app.firstWindow();
+  const window = await firstWindow(app);
   await window.setViewportSize({ width: 1440, height: 900 });
   await window.locator('header').first().waitFor();
   return {

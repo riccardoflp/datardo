@@ -16,6 +16,17 @@ export interface StartedApp {
   readonly close: () => Promise<void>;
 }
 
+/**
+ * The first window of a started Datardo. It behaves as the window in front even when another program is (Chromium's
+ * focus emulation), so that the tests of the focus do not depend on what else happens on the desktop.
+ */
+export async function firstWindow(app: ElectronApplication): Promise<Page> {
+  const window = await app.firstWindow();
+  const session = await window.context().newCDPSession(window);
+  await session.send('Emulation.setFocusEmulationEnabled', { enabled: true });
+  return window;
+}
+
 /** Starts Datardo from `out/`, as `npm run build` wrote it. */
 export async function startApp(environment: Readonly<Record<string, string>> = {}): Promise<StartedApp> {
   const dataFolder = await mkdtemp(join(tmpdir(), 'datardo-ui-'));
@@ -30,7 +41,7 @@ export async function startApp(environment: Readonly<Record<string, string>> = {
       DATARDO_TEST: '1',
     },
   });
-  const window = await app.firstWindow();
+  const window = await firstWindow(app);
   await window.setViewportSize({ width: 1440, height: 900 });
   return {
     app,

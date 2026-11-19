@@ -9,6 +9,7 @@ import type { ChildProcess } from 'node:child_process';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { firstWindow } from '../app';
 
 /** How long a Datardo is given to quit before it is ended. */
 const quitWaitMs = 10_000;
@@ -48,7 +49,7 @@ const children = new Set<ChildProcess>();
 export async function launch(dataFolder: string): Promise<Launched> {
   const app = await electron.launch({ args: ['.'], env: testEnvironment(dataFolder) });
   running.add(app);
-  const window = await app.firstWindow();
+  const window = await firstWindow(app);
   await window.locator('header').first().waitFor();
   return { app, window };
 }

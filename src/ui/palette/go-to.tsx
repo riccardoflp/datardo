@@ -8,6 +8,7 @@ import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { listWidth, rowsInSight, view, type GoToRow, type GoToView } from '../../features/palette/open';
 import { openArgs, staysOpen, type Opening } from '../../features/palette/open-result';
 import { readText } from '../../features/palette/sources';
+import { text } from '../../features/palette/text';
 import type { OpenTarget } from '../../features/palette/types';
 import type { AppState } from '../../shared/state';
 import { focusIsland } from '../shell/focus';
@@ -62,7 +63,6 @@ function Row(props: {
       id={`go-to-${row.id}`}
       role="option"
       aria-selected={props.selected}
-      aria-label={row.spoken}
       className={styles['row']}
       onPointerMove={props.onSelect}
       onMouseDown={(event) => {
@@ -85,6 +85,7 @@ function Row(props: {
       </span>
       <span className={styles['context']}>{row.context}</span>
       <span className={styles['right']}>{row.right}</span>
+      {row.kind === 'command' ? <span className={styles['spoken']}>{text.kinds.command}</span> : null}
     </li>
   );
 }
