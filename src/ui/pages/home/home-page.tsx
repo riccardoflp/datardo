@@ -11,6 +11,7 @@ import { runnableFeatures } from '../../../features/registry';
 import { featureId } from '../../../shared/ids';
 import type { AppState } from '../../../shared/state';
 import menuStyles from '../../connection/connection-menu.module.css';
+import { FolderMenuButton } from '../../connection/folder-menu';
 import { startFeature } from '../../shell/intent';
 import { AppIcon } from '../../shell/top-bar/app-icon';
 import { useAppState } from '../../state/store';
@@ -188,21 +189,24 @@ function Connections(props: { readonly shown: WithConnections; readonly state: A
       {connections.groups.map((group) => (
         <div key={group.folder ?? ''} className={styles['folder']}>
           {group.folder === undefined ? null : (
-            <button
-              type="button"
-              className={styles['folderName']}
-              aria-expanded={!group.collapsed}
-              data-feature="home.connections@home"
-              onClick={() => {
-                startFeature('home.show', {
-                  place: 'home',
-                  args: { folder: group.folder ?? '', collapsed: !group.collapsed },
-                });
-              }}
-            >
-              <span className={`codicon codicon-chevron-${group.collapsed ? 'right' : 'down'}`} aria-hidden="true" />
-              {group.heading}
-            </button>
+            <div className={styles['folderHeading']}>
+              <button
+                type="button"
+                className={styles['folderName']}
+                aria-expanded={!group.collapsed}
+                data-feature="home.connections@home"
+                onClick={() => {
+                  startFeature('home.show', {
+                    place: 'home',
+                    args: { folder: group.folder ?? '', collapsed: !group.collapsed },
+                  });
+                }}
+              >
+                <span className={`codicon codicon-chevron-${group.collapsed ? 'right' : 'down'}`} aria-hidden="true" />
+                {group.heading}
+              </button>
+              <FolderMenuButton folder={group.folder} place="home" className={styles['iconButton']} />
+            </div>
           )}
           {group.cards.length === 0 ? null : (
             <div className={styles['cards']}>

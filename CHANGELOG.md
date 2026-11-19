@@ -22,3 +22,11 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
   connections by folder and the places used last.
 - MongoDB and Redis connections are added in the connection form, tested, saved with their passwords in the secret
   storage, connected and disconnected, made read-only, and shown in their Overview.
+- Connections reach their servers through an SSH tunnel, with a password, a private key or the SSH agent; the host
+  key of an SSH server is confirmed the first time, and a key that changed is a warning.
+- Connections are duplicated, their connection string is copied, they are moved between folders and given a color,
+  and folders are renamed and removed from their own menu; a MongoDB connection is linked to a Redis connection for
+  redis-oplog, and unlinked.
+- Connections are imported from a file or the clipboard (Datardo, Mongoster and Compass exports, lists of connection
+  strings), with their encrypted passwords when the passphrase is given, and exported for Datardo, for Compass or as
+  a list, without passwords, with them encrypted, or in clear text.

@@ -22,6 +22,10 @@ import { Store, type Found } from '../storage/store';
 import { secretKeys } from '../features/connection/secrets';
 import { withSecrets, withoutSecrets, type StringSecrets } from '../features/connection/string-secrets';
 import { setOptions } from '../features/connection/tls-in-uri';
+import { isTunnelProblem, throughTunnel, tunnelTarget } from '../features/connection/ssh-tunnel-target';
+import type { OptionSecrets as FileOptionSecrets } from '../features/connection/types';
+import type { StartedBy } from '../shared/feature';
+import { hostKeyCheck } from './known-hosts';
 import { nextAttempt } from '../features/connection/reconnect';
 import { connectionsOf } from '../features/connection/types';
 import { redisConnectMs } from '../features/connection/connect';
@@ -221,15 +225,32 @@ export function deleteSecrets(id: ConnectionId): void {
 
 type Reach = Pick<SavedConnection, 'engine' | 'tls' | 'ssh'>;
 
-function settingsOf(
-  reach: Reach,
-  connectionString: string,
-  secrets: OptionSecrets,
-  connectTimeoutMs: number,
-): ClientSettings {
+/** Where the tunnel of a connection leads, and the connection string through it (connection.ssh-tunnel-target). */
+function throughOf(reach: Reach, connectionString: string, startedBy: StartedBy): Partial<ClientSettings> {
+  if (reach.ssh === undefined) {
+    return {};
+  }
+  const target = tunnelTarget(reach.engine, connectionString);
+  return {
+    through: isTunnelProblem(target)
+      ? { target: { host: '', port: 0 }, connectionString: () => connectionString, problem: target.problem }
+      : { target, connectionString: (localPort) => throughTunnel(reach.engine, connectionString, localPort) },
+    hostKey: hostKeyCheck(startedBy),
+  };
+}
+
+/** How a client is opened: the time to find the server, and who started it, which says whether a host key is asked. */
+interface Opening {
+  readonly connectTimeoutMs: number;
+  readonly startedBy: StartedBy;
+}
+
+function settingsOf(reach: Reach, connectionString: string, secrets: OptionSecrets, opening: Opening): ClientSettings {
   const { keyPassword, sshPassword, passphrase } = secrets;
+  const { connectTimeoutMs } = opening;
   const connection = reach;
   return {
+    ...throughOf(reach, connectionString, opening.startedBy),
     engine: connection.engine,
     connectionString,
     connectTimeoutMs,
@@ -250,12 +271,37 @@ function settingsOf(
   };
 }
 
-/** What a client of the connection is opened with, secrets included; `undefined` when its connection string is lost. */
-export function clientSettings(connection: SavedConnection, connectTimeoutMs: number): ClientSettings | undefined {
+/**
+ * What a client of the connection is opened with, secrets included; `undefined` when its connection string is lost.
+ * A host key that is not known is asked only when a person started it.
+ */
+export function clientSettings(
+  connection: SavedConnection,
+  connectTimeoutMs: number,
+  startedBy: StartedBy = 'user',
+): ClientSettings | undefined {
   const connectionString = fullConnectionString(connection.id);
   return connectionString === undefined
     ? undefined
-    : settingsOf(connection, connectionString, optionSecrets(connection.id), connectTimeoutMs);
+    : settingsOf(connection, connectionString, optionSecrets(connection.id), { connectTimeoutMs, startedBy });
+}
+
+/** The secrets of a connection that are not in its connection string. */
+export function savedOptionSecrets(id: ConnectionId): FileOptionSecrets {
+  return optionSecrets(id);
+}
+
+/** Keeps a connection string and the other secrets of a connection as they are given (import, duplicate). */
+export function writeGivenSecrets(id: ConnectionId, connectionString: string, options: FileOptionSecrets): void {
+  const { secrets } = need();
+  const keys = secretKeys(id);
+  const kept = Object.fromEntries(Object.entries(options).filter((entry) => entry[1] !== undefined && entry[1] !== ''));
+  const written =
+    secrets.set(keys.string, connectionString) &&
+    (Object.keys(kept).length === 0 ? secrets.delete(keys.options) : secrets.set(keys.options, JSON.stringify(kept)));
+  if (!written) {
+    throw new Error(newerFileText.replace('the connections', 'the passwords'));
+  }
 }
 
 /** What a client is opened with to try a form: the draft, with the saved secrets where the form keeps them. */
@@ -264,7 +310,10 @@ export function draftSettings(
   draft: ConnectionDraft,
   connectTimeoutMs: number,
 ): ClientSettings {
-  return settingsOf(draft, stringWithSecrets(id, draft), optionsOfDraft(id, draft), connectTimeoutMs);
+  return settingsOf(draft, stringWithSecrets(id, draft), optionsOfDraft(id, draft), {
+    connectTimeoutMs,
+    startedBy: 'user',
+  });
 }
 
 function reasonOf(error: unknown): string {
@@ -319,7 +368,8 @@ async function reconnect(id: ConnectionId, droppedAt: number, firstReason: strin
     if (connection === undefined || stateNow(id) !== 'reconnecting') {
       return;
     }
-    const settings = clientSettings(connection, redisConnectMs);
+    // A reconnection asks nothing: a host key that changed meanwhile ends the attempts.
+    const settings = clientSettings(connection, redisConnectMs, 'task');
     if (settings === undefined) {
       gaveUp(id, reason);
       return;

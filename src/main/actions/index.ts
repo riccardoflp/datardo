@@ -10,6 +10,7 @@ import { actions as navActions } from './nav';
 import { actions as runnerActions } from './runner';
 import { actions as settingsActions } from './settings';
 import { actions as connectionActions } from './connection';
+import { actions as connectionOrganizeActions } from './connection-organize';
 import { actions as tabActions } from './tab';
 import { actions as paletteActions } from './palette';
 import { actions as homeActions } from './home';
@@ -24,6 +25,7 @@ const areas: readonly AreaActions[] = [
   runnerActions,
   settingsActions,
   connectionActions,
+  connectionOrganizeActions,
   tabActions,
   paletteActions,
   homeActions,

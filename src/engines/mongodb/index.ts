@@ -6,7 +6,7 @@ import { MongoClient, type MongoClientOptions, type TopologyDescriptionChangedEv
 import type { EngineRequest } from '../../shared/engine-request';
 import { EngineError, type ClientSettings, type ClientTls, type Engine, type EngineClient } from '../engine';
 import { maskedError, secretsOf } from '../transport/mask';
-import { tunnelNotYet } from '../transport/tunnel';
+import { openDirectOrThrough } from '../transport/tunnel';
 import { callMethod, toExtendedJson } from './methods';
 
 /** The name the server sees for Datardo's clients (connection.connect). */
@@ -100,13 +100,13 @@ export const mongoEngine: Engine = {
   name: 'mongodb',
   open: async (settings: ClientSettings, signal: AbortSignal) => {
     const secrets = secretsOf(settings);
-    if (settings.ssh !== undefined) {
-      throw tunnelNotYet();
-    }
     try {
-      const client = new MongoClient(settings.connectionString, clientOptions(settings));
-      await connectAbortably(client, signal);
-      return clientOf(client, secrets);
+      return await openDirectOrThrough(settings, signal, async (direct, servername) => {
+        const options = { ...clientOptions(direct), ...(servername === undefined ? {} : { servername }) };
+        const client = new MongoClient(direct.connectionString, options);
+        await connectAbortably(client, signal);
+        return clientOf(client, secrets);
+      });
     } catch (error: unknown) {
       throw maskedError(error, secrets);
     }

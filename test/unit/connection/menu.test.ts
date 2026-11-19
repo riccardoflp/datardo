@@ -25,8 +25,13 @@ describe('connection.menu', () => {
       'Open overview',
       '—',
       'Edit connection…',
+      'Duplicate',
+      'Copy connection string',
       '—',
+      'Move to folder…',
+      'Set color…',
       'Make read-only',
+      'Link a Redis connection…',
       '—',
       'Remove connection',
     ]);

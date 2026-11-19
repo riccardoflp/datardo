@@ -16,7 +16,7 @@ import type { EngineRequest } from '../../shared/engine-request';
 import { EngineError, type ClientSettings, type Engine, type EngineClient } from '../engine';
 import { maskedError, secretsOf } from '../transport/mask';
 import { socketTlsOptions } from '../transport/tls';
-import { tunnelNotYet } from '../transport/tunnel';
+import { openDirectOrThrough } from '../transport/tunnel';
 import { bytesMapping, toRedisReply } from './replies';
 import { selectedAtStart, sendInDatabase } from './select';
 
@@ -65,7 +65,15 @@ export function redisAddress(connectionString: string): RedisAddress {
 type Client = RedisClientType<RedisModules, RedisFunctions, RedisScripts, RespVersions>;
 type Options = RedisClientOptions<RedisModules, RedisFunctions, RedisScripts, RespVersions>;
 
-async function optionsOf(settings: ClientSettings, address: RedisAddress, resp: RespVersions): Promise<Options> {
+/** How a client is opened: its settings, its address, and the host its certificate is checked against. */
+interface Opening {
+  readonly settings: ClientSettings;
+  readonly address: RedisAddress;
+  readonly servername: string;
+}
+
+async function optionsOf(opening: Opening, resp: RespVersions): Promise<Options> {
+  const { settings, address } = opening;
   const common = { connectTimeout: settings.connectTimeoutMs, reconnectStrategy: false as const };
   const tls = address.tls || settings.tls !== undefined;
   return {
@@ -80,7 +88,7 @@ async function optionsOf(settings: ClientSettings, address: RedisAddress, resp: 
           host: address.host,
           port: address.port,
           tls: true,
-          ...(await socketTlsOptions(settings.tls ?? {}, address.host)),
+          ...(await socketTlsOptions(settings.tls ?? {}, opening.servername)),
         }
       : { ...common, host: address.host, port: address.port },
   };
@@ -126,13 +134,9 @@ async function readyInTime(
   }
 }
 
-async function connectWith(
-  settings: ClientSettings,
-  address: RedisAddress,
-  resp: RespVersions,
-  signal: AbortSignal,
-): Promise<Client> {
-  const client: Client = createClient(await optionsOf(settings, address, resp));
+async function connectWith(opening: Opening, resp: RespVersions, signal: AbortSignal): Promise<Client> {
+  const { settings, address } = opening;
+  const client: Client = createClient(await optionsOf(opening, resp));
   client.on('error', () => {
     // Errors of the socket reach the commands and the 'end' of the client, which say them where they matter.
   });
@@ -212,18 +216,18 @@ export const redisEngine: Engine = {
   open: async (settings: ClientSettings, signal: AbortSignal) => {
     const secrets = secretsOf(settings);
     try {
-      if (settings.ssh !== undefined) {
-        throw tunnelNotYet();
-      }
       signal.throwIfAborted();
-      const address = redisAddress(settings.connectionString);
-      const client = await connectWith(settings, address, 3, signal).catch((error: unknown) => {
-        if (isHelloUnknown(error)) {
-          return connectWith(settings, address, 2, signal);
-        }
-        throw error;
+      return await openDirectOrThrough(settings, signal, async (direct, servername) => {
+        const address = redisAddress(direct.connectionString);
+        const opening: Opening = { settings: direct, address, servername: servername ?? address.host };
+        const client = await connectWith(opening, 3, signal).catch((error: unknown) => {
+          if (isHelloUnknown(error)) {
+            return connectWith(opening, 2, signal);
+          }
+          throw error;
+        });
+        return clientOf(client, secrets);
       });
-      return clientOf(client, secrets);
     } catch (error: unknown) {
       throw maskedError(error, secrets);
     }

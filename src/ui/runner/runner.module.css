@@ -7,6 +7,7 @@
 
 .text {
   margin: 0;
+  white-space: pre-line;
 }
 
 .muted {
@@ -123,4 +124,12 @@
 .undo {
   margin: 0;
   color: var(--color-text-muted);
+}
+
+.swatch {
+  flex: none;
+  width: var(--space-3);
+  height: var(--space-3);
+  border-radius: var(--radius-round);
+  background: var(--connection-color, var(--color-border));
 }

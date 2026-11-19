@@ -3,13 +3,11 @@
  * its card of the Home page (`@home`), on its line of the connection switcher (`@connection-switcher`) and on the
  * connection island (`@connection-island`).
  *
- * The entries of cards not built yet join the menu with them, in the place the card gives: **Duplicate** and **Copy
- * connection string** after **Edit connection…**, **Move to folder…**, **Set color…**, the redis-oplog link (M7) and the
- * undo history (M11) in the third group.
+ * The entries of the undo history (M11) join the third group with their cards.
  */
 import type { ConnectionStateName, ConnectionView } from '../../shared/connection';
 import type { ConnectionId } from '../../shared/ids';
-import { connectionState, type ConnectionsState } from '../../shared/state/connections';
+import { connectionState, savedConnection, type ConnectionsState } from '../../shared/state/connections';
 import { menuText } from './text';
 
 /** The places the menu is drawn in. */
@@ -84,6 +82,36 @@ const elements = {
     'connection-switcher': 'connection.remove@connection-switcher',
     'connection-island': 'connection.remove@connection-island',
   },
+  duplicate: {
+    home: 'connection.duplicate@home',
+    'connection-switcher': 'connection.duplicate@connection-switcher',
+    'connection-island': 'connection.duplicate@connection-island',
+  },
+  copyString: {
+    home: 'connection.copy-string@home',
+    'connection-switcher': 'connection.copy-string@connection-switcher',
+    'connection-island': 'connection.copy-string@connection-island',
+  },
+  moveToFolder: {
+    home: 'connection.move-to-folder@home',
+    'connection-switcher': 'connection.move-to-folder@connection-switcher',
+    'connection-island': 'connection.move-to-folder@connection-island',
+  },
+  setColor: {
+    home: 'connection.set-color@home',
+    'connection-switcher': 'connection.set-color@connection-switcher',
+    'connection-island': 'connection.set-color@connection-island',
+  },
+  linkRedis: {
+    home: 'connection.link-redis@home',
+    'connection-switcher': 'connection.link-redis@connection-switcher',
+    'connection-island': 'connection.link-redis@connection-island',
+  },
+  unlinkRedis: {
+    home: 'connection.unlink-redis@home',
+    'connection-switcher': 'connection.unlink-redis@connection-switcher',
+    'connection-island': 'connection.unlink-redis@connection-island',
+  },
 } as const satisfies Readonly<Record<string, Elements>>;
 
 const separator: MenuEntry = { kind: 'separator' };
@@ -105,6 +133,35 @@ function stateEntries(state: ConnectionStateName, place: MenuPlace): readonly Me
   ];
 }
 
+/** The third group: folder, color, read-only, and for MongoDB the redis-oplog link. */
+function organizeEntries(
+  connections: ConnectionsState,
+  connection: ConnectionView,
+  place: MenuPlace,
+): readonly MenuEntry[] {
+  const linked =
+    connection.publishesTo === undefined ? undefined : savedConnection(connections, connection.publishesTo);
+  return [
+    item(menuText.moveToFolder, 'connection.move-to-folder', elements.moveToFolder[place]),
+    item(menuText.setColor, 'connection.set-color', elements.setColor[place]),
+    connection.readOnly
+      ? item(menuText.allowChanges, 'connection.allow-changes', elements.allowChanges[place])
+      : item(menuText.readOnly, 'connection.read-only', elements.readOnly[place]),
+    ...(connection.engine === 'mongodb'
+      ? [item(menuText.linkRedis, 'connection.link-redis', elements.linkRedis[place])]
+      : []),
+    ...(connection.engine === 'mongodb' && connection.publishesTo !== undefined
+      ? [
+          item(
+            menuText.unlink(linked?.name ?? connection.publishesTo),
+            'connection.unlink-redis',
+            elements.unlinkRedis[place],
+          ),
+        ]
+      : []),
+  ];
+}
+
 /**
  * Feature: connection.menu — the entries of the menu of a connection in a place, in the order of the card, with a
  * line between the groups.
@@ -123,10 +180,10 @@ export function view(state: {
       ...stateEntries(connectionState(state.connections, connection.id), place),
       separator,
       item(menuText.edit, 'connection.edit', elements.edit[place]),
+      item(menuText.duplicate, 'connection.duplicate', elements.duplicate[place]),
+      item(menuText.copyString, 'connection.copy-string', elements.copyString[place]),
       separator,
-      connection.readOnly
-        ? item(menuText.allowChanges, 'connection.allow-changes', elements.allowChanges[place])
-        : item(menuText.readOnly, 'connection.read-only', elements.readOnly[place]),
+      ...organizeEntries(state.connections, connection, place),
       separator,
       item(menuText.remove, 'connection.remove', elements.remove[place]),
     ],

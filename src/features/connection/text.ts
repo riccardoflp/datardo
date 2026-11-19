@@ -254,4 +254,173 @@ export const menuText = {
   readOnly: 'Make read-only',
   allowChanges: 'Allow changes',
   remove: 'Remove connection',
+  duplicate: 'Duplicate',
+  copyString: 'Copy connection string',
+  moveToFolder: 'Move to folder…',
+  setColor: 'Set color…',
+  linkRedis: 'Link a Redis connection…',
+  unlink: (name: string): string => `Unlink ${name}`,
+} as const;
+
+/** The entries of the menu of a folder (connection.folder-menu). */
+export const folderMenuText = {
+  label: (folder: string): string => `Menu of the folder ${folder}`,
+  add: 'Add connection',
+  rename: 'Rename folder…',
+  remove: 'Remove folder (keep connections)',
+  importConnections: 'Import connections…',
+  exportConnections: 'Export connections…',
+} as const;
+
+const wasWere = (count: number, one: string, many: string): string =>
+  `${String(count)} ${count === 1 ? `${one} was` : `${many} were`}`;
+
+/** The refusals and the notes of the files of connections (connection.read-file and the cards it uses). */
+export const fileText = {
+  neither: 'This JSON file is neither a Compass export ("Compass Connections") nor a Datardo or Mongoster export',
+  notJson: (reason: string): string => `Not a valid JSON file: ${reason}`,
+  version: (version: string): string => `Unsupported version of the file: ${version} (expected 1)`,
+  noList: 'The file has no list of connections',
+  tooLarge: 'The file is too large: a file of connections has at most 10 MB',
+  tooDeep: 'The file is nested too deeply to be a file of connections',
+  noPassword: 'no password',
+  noSshPassword: 'no SSH password',
+  encrypted: 'passwords not imported (encrypted)',
+  linkNotInFile: 'redis-oplog link not imported: its Redis connection is not in the file',
+  srvTunnel: "SSH tunnel not imported: a mongodb+srv:// connection string can't go through one",
+  firstHostOnly: 'the SSH tunnel goes to the first host only',
+  inUseEncryption: 'In-Use Encryption settings not imported',
+  applicationProxy: 'application proxy setting not imported',
+  tooShort: 'The encrypted data is too short',
+  unknownVersion: (version: number): string => `Unknown encrypted data version: 0x${version.toString(16)}`,
+  wrongPassphrase: 'Wrong passphrase, or the file is damaged',
+  unreadableSecrets: (reason: string): string => `The encrypted passwords can't be read: ${reason}`,
+  needPassphrase: 'A passphrase is needed to encrypt the passwords',
+  listCannotEncrypt: "A list of connection strings can't be encrypted",
+  listHeader: '# Connections exported from Datardo: name = connection string',
+  withoutPasswords: ' (without passwords)',
+  compassLeftOut: "folders, read-only and redis-oplog were left out (Compass doesn't have them)",
+  redisLeftOut: (count: number): string =>
+    `${wasWere(count, 'Redis connection', 'Redis connections')} left out (Compass doesn't have them)`,
+  agent: "Compass can't use the SSH agent: those tunnels have no password or key",
+  sshLeftOut: (count: number): string =>
+    `${wasWere(count, 'SSH tunnel', 'SSH tunnels')} left out (a connection string can't hold one)`,
+  listLeftOut: 'folders, colors, read-only and redis-oplog were left out',
+  redisFilesLeftOut: (count: number): string =>
+    `the TLS certificate files of ${String(count)} Redis ${count === 1 ? 'connection' : 'connections'} were left out (a redis:// connection string can't hold them)`,
+  linkedAdded: (count: number): string =>
+    `${wasWere(count, 'linked Redis connection', 'linked Redis connections')} added`,
+} as const;
+
+/** The questions, steps and notifications of organizing connections (folders, colors, copies, redis-oplog). */
+export const organizeText = {
+  copied: 'Connection string copied (it may contain the password)',
+  copiedLog: (name: string): string => `copied the connection string of ${name}`,
+  duplicateTitle: (name: string): string => `Duplicate ${name}`,
+  added: (name: string): string => `Connection ${name} added`,
+  edit: 'Edit connection…',
+  cannotUndoDuplicate: 'Remove connection removes the copy.',
+  colorTitle: (name: string): string => `Color of ${name}`,
+  colorPlaceholder: 'Shown on its island, its group of tabs and its card, e.g. red for production',
+  current: 'current',
+  pick: 'Choose',
+  setColor: (name: string, color: string): string => `set the color of ${name} to ${color}`,
+  removeColor: (name: string): string => `remove the color of ${name}`,
+  cannotUndoColor: 'Choose the previous color again.',
+  moveTitle: (name: string): string => `Move ${name} to folder`,
+  move: 'Move',
+  newFolder: 'New folder…',
+  newFolderTitle: 'New folder',
+  folderName: 'Folder name',
+  enterAName: 'Enter a name',
+  noFolder: 'No folder',
+  moveTo: (name: string, folder: string): string => `move ${name} to the folder ${folder}`,
+  moveOut: (name: string): string => `move ${name} out of its folder`,
+  cannotUndoMove: 'Move it back.',
+  renameTitle: (folder: string): string => `Rename folder ${folder}`,
+  rename: 'Rename',
+  folderExists: 'This folder already exists',
+  renameFolder: (folder: string, name: string): string => `rename the folder ${folder} to ${name}`,
+  cannotUndoRename: 'Rename it back.',
+  removeFolderTitle: (folder: string): string => `Remove folder ${folder}`,
+  removeFolder: (folder: string): string => `remove the folder ${folder}`,
+  cannotUndoRemoveFolder: 'Move the connections back with Move to folder….',
+  linkTitle: (name: string): string => `Publish the writes of ${name} through`,
+  linkButton: 'Link',
+  link: (name: string, to: string): string => `link ${name} to ${to}`,
+  cannotUndoLink: 'Unlink removes the link.',
+  unlinkTitle: (name: string): string => `Unlink ${name}`,
+  unlinked: (name: string): string => `Writes through ${name} are no longer published for redis-oplog.`,
+  cannotUndoUnlink: 'Link a Redis connection… links it again.',
+} as const;
+
+const plural = (count: number, one: string, many: string): string => `${String(count)} ${count === 1 ? one : many}`;
+
+/** The questions and the notifications of importing and exporting connections (connection.import, connection.export). */
+export const transferText = {
+  importTitle: 'Import connections',
+  where: 'Where are the connections?',
+  fromFile: 'From a file…',
+  fromClipboard: 'From the clipboard',
+  importButton: 'Import',
+  theClipboard: 'the clipboard',
+  passphraseTitle: 'Import connections: Passphrase',
+  passphrase:
+    'The passwords in this file are encrypted: enter the passphrase used to export it. Leave it empty to import without the passwords.',
+  wrongPassphrase: 'Wrong passphrase: try again, or leave it empty to import without the passwords.',
+  chooseTitle: (source: string): string => `Import connections from ${source}`,
+  formats: { compass: 'Compass export', datardo: 'Datardo export', mongoster: 'Mongoster export', list: 'list' },
+  notConnections: (count: number, list: boolean): string =>
+    ` (${list ? plural(count, 'line was', 'lines were') : plural(count, 'entry was', 'entries were')} not a connection)`,
+  found: (format: string, count: number, skipped: string): string =>
+    `${format}: ${plural(count, 'connection', 'connections')}${skipped}. Choose those to import`,
+  exists: '✓ already exists',
+  same: '✓ already exists (same connection string)',
+  oneTaken: (name: string): string => `A connection named ${name} already exists.`,
+  manyTaken: (count: number): string => `${String(count)} connections with the same name already exist.`,
+  takenDetail:
+    'Skip: leave them out. Replace: the existing connections take the connection string and the settings of the imported ones. Keep both: the imported ones are added with a number after the name. Replace cannot be undone.',
+  skip: 'Skip',
+  replace: 'Replace',
+  keepBoth: 'Keep both',
+  folderTitle: 'Import connections: Folder',
+  folderPlaceholder: 'Where to put the imported connections',
+  foldersFromFile: 'Folders from the file',
+  replaceStep: (name: string): string => `replace the connection ${name}`,
+  imported: (added: number, replaced: number, skipped: number): string =>
+    `${plural(added, 'connection', 'connections')} imported, ${plural(replaced, 'connection', 'connections')} replaced, ${String(skipped)} skipped.`,
+  nothingImported: 'Nothing imported.',
+  withoutPassword: (names: string): string => ` Without a password: ${names}; set it with Edit connection….`,
+  nothingFound: (source: string, skipped: string): string => `No connections found in ${source}${skipped}.`,
+  couldNotImport: (reason: string): string => `Could not import the connections: ${reason}`,
+  cannotUndoImport: 'Replace overwrites the connection string, the secrets and the settings.',
+  exportTitle: 'Export connections',
+  chooseExport: 'Choose the connections to export',
+  formatTitle: 'Export connections: Format',
+  formatNames: { datardo: 'Datardo (JSON)', compass: 'MongoDB Compass (JSON)', list: 'Connection strings (text)' },
+  passwordsTitle: 'Export connections: Passwords',
+  includePasswords: 'Include the passwords?',
+  modes: {
+    remove: 'Without passwords',
+    encrypt: 'With passwords, encrypted with a passphrase',
+    include: 'With passwords in clear text',
+  },
+  passphrase1: 'Export connections: Passphrase (1/2)',
+  passphrase2: 'Export connections: Passphrase (2/2)',
+  atLeast8: 'At least 8 characters',
+  sameAgain: 'The same passphrase again',
+  noMatch: "The passphrases don't match",
+  exportButton: 'Export',
+  next: 'Next',
+  clearTitle: 'Export the passwords in clear text?',
+  clearDetail:
+    'The file will contain the passwords of the connection strings and SSH as they are: whoever reads it can connect. Keep it safe, or export with a passphrase instead.',
+  clearButton: 'Export with passwords',
+  write: (path: string): string => `write ${path}`,
+  exported: (count: number, file: string): string =>
+    `${plural(count, 'connection', 'connections')} exported to ${file}.`,
+  note: (notes: string): string => ` Note: ${notes}.`,
+  noConnections: 'There are no connections to export.',
+  couldNotExport: (reason: string): string => `Could not export the connections: ${reason}`,
+  cannotUndoExport: 'Nothing to undo in Datardo; the file is written where you chose.',
 } as const;

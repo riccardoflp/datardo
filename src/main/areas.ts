@@ -7,6 +7,7 @@ import { start as startNav } from './nav';
 import { start as startSettings } from './settings';
 import { start as startCheckUpdate } from './check-update';
 import { start as startConnections } from './connections';
+import { start as startKnownHosts } from './known-hosts';
 import { start as startTabs } from './tabs';
 import { start as startPing } from './ping';
 import { start as startPalette } from './palette';
@@ -18,6 +19,7 @@ export type AreaStart = (services: MainServices) => Promise<void>;
 const starts: readonly AreaStart[] = [
   startSettings,
   startConnections,
+  startKnownHosts,
   startNav,
   startTabs,
   startPalette,

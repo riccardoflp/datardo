@@ -169,13 +169,6 @@ describe('connection.connect', () => {
       proxy.close();
     }
   });
-
-  it('MongoDB: an SSH tunnel is refused until tunnels exist (M7)', async () => {
-    const ssh = { host: 'bastion', port: 22, username: 'ada', authentication: 'agent' as const };
-    await expect(createEngines().open(settings('mongodb', servers.mongoStandalone, { ssh }), signal())).rejects.toThrow(
-      /SSH tunnels are not supported yet/,
-    );
-  });
 });
 
 describe.runIf(redisUrl !== undefined)('connection.connect on Redis', () => {

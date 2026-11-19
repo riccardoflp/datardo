@@ -9,8 +9,28 @@ import type { EngineName, EngineRequest } from '../shared/engine-request';
 /** The TLS settings with the key password: what the client is opened with. */
 export type ClientTls = TlsSettings & { readonly certificateKeyFilePassword?: string };
 
-/** The SSH tunnel with its password and passphrase: what the tunnel is opened with (M7). */
+/** The SSH tunnel with its password and passphrase: what the tunnel is opened with. */
 export type ClientSsh = SshSettings & { readonly password?: string; readonly passphrase?: string };
+
+/** Where an SSH tunnel leads (connection.ssh-tunnel-target). */
+export interface TunnelTarget {
+  readonly host: string;
+  readonly port: number;
+}
+
+/** Where the tunnel leads, and the connection string the client uses on its local end. */
+export interface ClientThrough {
+  readonly target: TunnelTarget;
+  readonly connectionString: (localPort: number) => string;
+  /** Why the connection string cannot go through a tunnel: the tunnel is then not opened. */
+  readonly problem?: string;
+}
+
+/**
+ * Whether the host key of an SSH server is trusted (connection.trust-host-key): given the server and the fingerprint
+ * of its key, answers once the known hosts, or the user, have said.
+ */
+export type HostKeyCheck = (server: TunnelTarget, fingerprint: string) => Promise<boolean>;
 
 /** Everything a client is opened with, secrets included: built in the main process, never sent to the window. */
 export interface ClientSettings {
@@ -19,6 +39,10 @@ export interface ClientSettings {
   readonly connectionString: string;
   readonly tls?: ClientTls;
   readonly ssh?: ClientSsh;
+  /** With `ssh`: where the tunnel leads and the connection string through it. */
+  readonly through?: ClientThrough;
+  /** With `ssh`: the check of the SSH server's host key; a key is refused without one. */
+  readonly hostKey?: HostKeyCheck;
   /** How long to find the server: 10 seconds to connect, 5 for a test of the form. */
   readonly connectTimeoutMs: number;
 }

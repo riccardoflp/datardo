@@ -8,7 +8,16 @@ import { EngineError, type ClientSettings, type Engine, type EngineClient } from
 import { mongoEngine } from './mongodb';
 import { redisEngine } from './redis';
 
-export type { ClientSettings, ClientSsh, ClientTls, Engine, EngineClient } from './engine';
+export type {
+  ClientSettings,
+  ClientSsh,
+  ClientThrough,
+  ClientTls,
+  Engine,
+  EngineClient,
+  HostKeyCheck,
+  TunnelTarget,
+} from './engine';
 export { EngineError } from './engine';
 
 /** Carries out requests on the connections it holds a client for. */

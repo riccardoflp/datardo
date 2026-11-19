@@ -107,9 +107,11 @@ function Current(props: {
 
 function ConnectionIsland(props: { readonly input: NavInput; readonly openSwitcher: () => void }): React.JSX.Element {
   const island = islandView(props.input);
+  const color = currentOf(props.input)?.color;
   return (
     <section
       className={styles['connection-island']}
+      data-color={color}
       aria-label={text.islands.connectionIsland}
       data-island="connection"
       data-feature={islandElement}

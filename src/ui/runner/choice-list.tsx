@@ -67,6 +67,9 @@ export function ChoiceList({ shown, first, filter, onFilter, onChange, onAnswer 
                   ? { [autoFocusAttribute]: '' }
                   : {})}
               />
+              {choice.color === undefined ? null : (
+                <span className={styles['swatch']} data-color={choice.color} aria-hidden="true" />
+              )}
               <span>{choice.label}</span>
               {choice.description === undefined ? null : <span className={styles['muted']}>{choice.description}</span>}
             </label>
