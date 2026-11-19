@@ -26,6 +26,11 @@ export interface MongoRequest {
   readonly limit?: number;
   /** How long the server may work on it, in milliseconds (R9.2). */
   readonly timeLimitMs?: number;
+  /**
+   * The session the method runs in, as the engine method `startSession` named it (`playground.sessions`); absent
+   * outside a session.
+   */
+  readonly session?: string;
 }
 
 /** A command to Redis: its name and arguments as bytes, in the database the request names (R5.5). */

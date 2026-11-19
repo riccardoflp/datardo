@@ -19,6 +19,7 @@ export type {
   TunnelTarget,
 } from './engine';
 export { EngineError } from './engine';
+export { MongoEngineError } from './mongodb/errors';
 
 /** Carries out requests on the connections it holds a client for. */
 export interface EngineService {
