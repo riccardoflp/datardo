@@ -1,0 +1,263 @@
+{
+  "scan-all": [
+    [
+      {
+        "bytes": "MA=="
+      },
+      [
+        {
+          "bytes": "c2Vzc2lvbjox"
+        },
+        {
+          "bytes": "ZXZlbnRz"
+        },
+        {
+          "bytes": "ZW1wdHktc3RyZWFt"
+        },
+        {
+          "bytes": "dXNlcjr/"
+        },
+        {
+          "bytes": "b3JkZXJzOjQx"
+        },
+        {
+          "bytes": "b3JkZXJzOjQy"
+        },
+        {
+          "bytes": "dGFncw=="
+        },
+        {
+          "bytes": "Ym9hcmQ="
+        },
+        {
+          "bytes": "dXNlcjo3"
+        },
+        {
+          "bytes": "cXVldWU6bWFpbA=="
+        }
+      ]
+    ],
+    10
+  ],
+  "scan-plain": [
+    [
+      {
+        "bytes": "MA=="
+      },
+      [
+        {
+          "bytes": "dXNlcjo3"
+        }
+      ]
+    ],
+    10,
+    {
+      "bytes": "aGFzaA=="
+    }
+  ],
+  "scan-hash": [
+    [
+      {
+        "bytes": "MA=="
+      },
+      [
+        {
+          "bytes": "dXNlcjo3"
+        }
+      ]
+    ],
+    10
+  ],
+  "scan-types": [
+    {
+      "bytes": "aGFzaA=="
+    },
+    {
+      "bytes": "enNldA=="
+    },
+    {
+      "bytes": "bm9uZQ=="
+    }
+  ],
+  "details": [
+    -1,
+    88,
+    7499955,
+    64,
+    -2,
+    null
+  ],
+  "inspect-hash": [
+    {
+      "bytes": "aGFzaA=="
+    },
+    -1,
+    88,
+    {
+      "bytes": "bGlzdHBhY2s="
+    }
+  ],
+  "inspect-gone": [
+    {
+      "bytes": "bm9uZQ=="
+    },
+    -2,
+    null,
+    null
+  ],
+  "exists-taken": [
+    1
+  ],
+  "exists-free": [
+    0
+  ],
+  "type-hash": [
+    {
+      "bytes": "aGFzaA=="
+    }
+  ],
+  "type-none": [
+    {
+      "bytes": "bm9uZQ=="
+    }
+  ],
+  "unknown-command": [
+    {
+      "error": "ERR unknown command 'MEMORYX', with args beginning with: 'USAGE' 'user:7' "
+    }
+  ],
+  "renamenx-taken": [
+    0
+  ],
+  "rename-gone": [
+    {
+      "error": "ERR no such key"
+    }
+  ],
+  "persist-persistent": [
+    0
+  ],
+  "unlink-gone": [
+    0
+  ],
+  "copy-taken": [
+    0
+  ],
+  "set-nx-taken": [
+    null
+  ],
+  "expire-gone": [
+    0
+  ],
+  "pexpiretime": [
+    1798761600000
+  ],
+  "export-session:1": [
+    10,
+    {
+      "bytes": "eyJ1c2VyIjo3fQ=="
+    }
+  ],
+  "export-user:7": [
+    [
+      {
+        "bytes": "MA=="
+      },
+      [
+        {
+          "bytes": "bmFtZQ=="
+        },
+        {
+          "bytes": "QWRhIExvdmVsYWNl"
+        },
+        {
+          "bytes": "dmlzaXRz"
+        },
+        {
+          "bytes": "MTI="
+        }
+      ]
+    ]
+  ],
+  "export-queue:mail": [
+    [
+      {
+        "bytes": "YQ=="
+      },
+      {
+        "bytes": "YyBk"
+      },
+      {
+        "bytes": "AP8="
+      }
+    ]
+  ],
+  "export-tags": [
+    [
+      {
+        "bytes": "MA=="
+      },
+      [
+        {
+          "bytes": "cmVkaXM="
+        },
+        {
+          "bytes": "a2V5cw=="
+        }
+      ]
+    ]
+  ],
+  "export-board": [
+    [
+      [
+        {
+          "bytes": "YWRh"
+        },
+        1.5
+      ],
+      [
+        {
+          "bytes": "Ym9i"
+        },
+        3
+      ],
+      [
+        {
+          "bytes": "emVk"
+        },
+        {
+          "number": "Infinity"
+        }
+      ]
+    ]
+  ],
+  "export-events": [
+    [
+      [
+        {
+          "bytes": "MTcwMDAwMDAwMDAwMC0w"
+        },
+        [
+          {
+            "bytes": "dHlwZQ=="
+          },
+          {
+            "bytes": "c2lnbnVw"
+          },
+          {
+            "bytes": "dXNlcg=="
+          },
+          {
+            "bytes": "Nw=="
+          }
+        ]
+      ]
+    ]
+  ],
+  "export-empty-stream": [
+    [],
+    {
+      "bytes": "FQAAAQEAAAEBAQAMABUgj8TjlwPU"
+    }
+  ]
+}
