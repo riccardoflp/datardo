@@ -95,6 +95,24 @@ function databaseCommand(database: string, command: Json): MongoRequest {
   return { engine: 'mongodb', database, method: 'runCommand', arguments: [command] };
 }
 
+/** Whether a value is a document, not a list or a value. */
+function isPlainDocument(value: Json | undefined): value is { readonly [field: string]: Json } {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+/**
+ * mongosh writes `find(filter, projection, options)`; the engine takes `[filter, options]`, with the projection among
+ * the options.
+ */
+function findArguments(args: readonly Json[]): readonly Json[] {
+  const [filter, projection, options] = args;
+  if (projection === undefined) {
+    return args;
+  }
+  const given = isPlainDocument(options) ? options : {};
+  return [filter ?? {}, isPlainDocument(projection) ? { ...given, projection } : given];
+}
+
 /**
  * The request the main process sends for a call of a database or a collection, the method as mongosh names it
  * (engine-request, `MongoRequest.method`). Cursors and sessions are kept by the main process for the run and are not
@@ -116,6 +134,9 @@ export function callRequest(call: PlaygroundCall): MongoRequest {
       return databaseCommand('admin', commandDocument(first));
     case 'runCommand':
       return databaseCommand(call.database, commandDocument(first));
+    case 'find':
+    case 'findOne':
+      return { ...base, method: call.method, arguments: findArguments(call.arguments) };
     default:
       return { ...base, method: call.method, arguments: call.arguments };
   }

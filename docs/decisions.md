@@ -750,3 +750,8 @@ Raised while the catalog was written; each names the cards that hold the current
   balancer is refused on a connection that is not a mongos; turning on the profiler from the advisor reads the
   threshold first. (`monitor.slow-queries`, `monitor.read-slow-queries`, `monitor.step-down`, `monitor.set-balancer`,
   `monitor.read-database-stats`, `advisor.turn-on-profiler`).
+- **Q63** — The engine: a MongoDB request may name the session it runs in (`MongoRequest.session`), for the
+  sessions and transactions of playgrounds (Q51); cursors, change streams and sessions are kept by the engine by id,
+  at most 100 for each client, all closed with it; errors carry their code, its name and its labels as plain values,
+  so that a feature can tell code 40573 or `TransientTransactionError`. (`playground.sessions`, `watch.stream`,
+  `playground.runtime`).

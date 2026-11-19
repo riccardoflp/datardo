@@ -83,6 +83,18 @@ describe('playground.runtime', () => {
     expect(callRequest(call({ method: 'insert', arguments: [{ a: 1 }] })).method).toBe('insertOne');
   });
 
+  it('puts the projection of find and findOne among the options, as the engine takes it', () => {
+    expect(callRequest(call({ method: 'findOne', arguments: [{}, { name: 1 }] })).arguments).toEqual([
+      {},
+      { projection: { name: 1 } },
+    ]);
+    expect(callRequest(call({ method: 'find', arguments: [{ a: 1 }, { name: 1 }, { limit: 5 }] })).arguments).toEqual([
+      { a: 1 },
+      { limit: 5, projection: { name: 1 } },
+    ]);
+    expect(callRequest(call({ method: 'find', arguments: [{ a: 1 }] })).arguments).toEqual([{ a: 1 }]);
+  });
+
   it('sends a command by its name, and adminCommand to admin', () => {
     expect(
       callRequest({
