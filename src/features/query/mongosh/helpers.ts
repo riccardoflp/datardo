@@ -20,7 +20,6 @@ import {
   type JsonObject,
 } from './ejson';
 import { fail, fitsInt, numberValue, peek, readNumberText, skipSpace, wholeNumber, type Cursor } from './scanner';
-import { readValue } from './reader';
 
 /** An argument of a helper: a number, kept as written, or any other value; and where it starts. */
 type Argument =
@@ -41,14 +40,17 @@ function unexpectedHere(cursor: Cursor): never {
   return fail(cursor, peek(cursor) === '' ? text.parse.endsEarly : text.parse.unexpected(peek(cursor)));
 }
 
-function readArgument(cursor: Cursor): Argument {
+/** Reads any value: the reader's own `readValue`, given by the reader so that this module does not import it. */
+type ValueReader = (cursor: Cursor) => Json;
+
+function readArgument(cursor: Cursor, readValue: ValueReader): Argument {
   const at = cursor.at;
   return /[0-9+\-.]/u.test(peek(cursor))
     ? { kind: 'number', written: readNumberText(cursor), at }
     : { kind: 'value', value: readValue(cursor), at };
 }
 
-function readArguments(cursor: Cursor): readonly Argument[] {
+function readArguments(cursor: Cursor, readValue: ValueReader): readonly Argument[] {
   skipSpace(cursor);
   if (peek(cursor) !== '(') {
     unexpectedHere(cursor);
@@ -61,7 +63,7 @@ function readArguments(cursor: Cursor): readonly Argument[] {
       cursor.at += 1;
       return args;
     }
-    args.push(readArgument(cursor));
+    args.push(readArgument(cursor, readValue));
     skipSpace(cursor);
     if (peek(cursor) === ',') {
       cursor.at += 1;
@@ -279,10 +281,10 @@ export function isHelper(word: string): boolean {
 }
 
 /** Reads the arguments of a helper whose name was just read, and makes its value. */
-export function callHelper(cursor: Cursor, name: string, at: number): Json {
+export function callHelper(cursor: Cursor, name: string, at: number, readValue: ValueReader): Json {
   const helper = helpers[name];
   if (helper === undefined) {
     return fail(cursor, text.parse.unknownName(name), at);
   }
-  return helper({ cursor, name, args: readArguments(cursor), at });
+  return helper({ cursor, name, args: readArguments(cursor, readValue), at });
 }

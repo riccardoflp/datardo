@@ -607,3 +607,10 @@ Raised while the catalog was written; each names the cards that hold the current
   pattern keep the backticks of the card; the **Pin** of the row menu and the **Connect** of the keys page carry no
   element, since `nav.pin` and `connection.connect` do not list those places; `MULTI` and `EXEC` as separate steps
   need the runner to keep one client for the tab. (`key.import`, `key.new`, `key.export`, `key.show`).
+- **Q45** — The query bar and the table: some buttons stand on places their cards do not list (**Explain** and
+  **Code** in the table's toolbar, **Run again** and **Reconnect** in the empty state, **Cancel** in the query bar),
+  so they carry the nearest listed place; in YAML `y` and `n` are written without quotes, as the card's example
+  needs; a UUID of subtype 3 is written as `BinData`, and an `ISODate` without an offset is read as UTC; the button of
+  the columns counts the hidden columns of the page shown; **Export** in the row menu needs every selected document to
+  have an `_id`; **Watch** is not offered on a view. (`table.show`, `query.bar`, `table.copy-as`, `query.parse`,
+  `table.columns`, `table.row-menu`).

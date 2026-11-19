@@ -139,7 +139,7 @@ function readWordValue(cursor: Cursor): Json {
       if (!isHelper(word)) {
         fail(cursor, text.parse.unknownName(word), start);
       }
-      return callHelper(cursor, word, start);
+      return callHelper(cursor, word, start, readValue);
   }
 }
 
@@ -151,7 +151,7 @@ function readNew(cursor: Cursor): Json {
   if (word !== 'Date' && word !== 'ObjectId') {
     fail(cursor, word === '' ? text.parse.unexpected(peek(cursor)) : text.parse.unknownName(`new ${word}`), start);
   }
-  return callHelper(cursor, word, start);
+  return callHelper(cursor, word, start, readValue);
 }
 
 /** A whole number of a field of Extended JSON, which canonical Extended JSON writes as a plain number. */
