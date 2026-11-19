@@ -578,3 +578,8 @@ Raised while the catalog was written; each names the cards that hold the current
   file manager. The place of **Keep running in the tray** on the Settings page is on no card. The field names of
   `tasks/tasks.json` and `tasks/<id>.json` are not yet in [data.md](data.md). (`task.run`, `task.retention`,
   `task.notify`, `task.tray`).
+- **Q40** — Chart and Code: the **Code** button of the Chart section has no place on the card, so it carries no
+  element; the message of a stage that cannot be read in the Chart section is not on the card; saving the picture
+  needs a question that chooses a file, which the questions do not have yet (a text field stands in for it); is
+  **Copied to the clipboard** a notification or a line of the status line? (`codegen.show`, `chart.draw`,
+  `chart.save-picture`, `codegen.copy`).
