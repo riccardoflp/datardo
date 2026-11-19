@@ -33,6 +33,7 @@ export const recordText = {
 /** The texts of the **Undo history** page (`undo.show`) and of the details of a row (`undo.details`). */
 export const pageText = {
   title: 'Undo history',
+  opensNothing: 'Opening a page writes nothing.',
   filter: 'Filter by connection, target or operation',
   undoLast: 'Undo last change',
   settings: 'Settings',
@@ -156,3 +157,12 @@ export const connectionText = {
   readOnly: (name: string): string => `The connection ${name} is read-only: nothing is recorded through it.`,
   cannotUndo: 'The other entry turns it back.',
 } as const;
+
+/** The notifications of `undo/index.json` when Datardo starts or writes it. */
+export const storeText = {
+  newer:
+    'This data was written by a newer version of Datardo. Changes to the undo history are not saved until Datardo is updated.',
+  setAside: (name: string): string => `The undo history could not be read and was set aside as ${name}.`,
+  notSaved: (error: string): string => `The undo history could not be saved: ${error}`,
+  openDataFolder: 'Open data folder',
+};

@@ -14,7 +14,10 @@ describe('undo.notification', () => {
         args: { operation: 'op-1' },
       },
     ]);
-    expect(view({ level: 'success', text: 'Nothing changed.' }).actions).toEqual([]);
+    expect(shown.element).toBe('undo.notification@notification');
+    const nothing = view({ level: 'success', text: 'Nothing changed.' });
+    expect(nothing.actions).toEqual([]);
+    expect(nothing.element).toBeUndefined();
   });
 
   it('starts undo.revert on that operation, which asks what that card asks', () => {

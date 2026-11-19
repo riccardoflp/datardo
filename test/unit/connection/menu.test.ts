@@ -31,6 +31,7 @@ describe('connection.menu', () => {
       'Move to folder…',
       'Set color…',
       'Make read-only',
+      'Stop keeping undo history',
       'Link a Redis connection…',
       '—',
       'Remove connection',

@@ -45,7 +45,7 @@ function Current(props: {
       >
         <span className={styles['first-line']}>
           <span className={styles['dot']} data-dot={island.dot} aria-hidden="true" />
-          <span className={styles['name']} title={island.name}>
+          <span className={styles['name']} title={island.nameTooltip}>
             {island.name}
           </span>
           {island.readOnly === undefined ? null : <span className={styles['badge']}>{island.readOnly}</span>}

@@ -31,6 +31,7 @@ import { appPlan, appStep, navInput, startArgs } from '../nav/types';
 import { isOffered as isResetOffered } from '../settings/reset';
 import { isOffered as isCloseOffered } from '../tab/close';
 import { isOffered as isReopenOffered } from '../tab/reopen';
+import { isVariantOffered } from '../undo/per-connection';
 import { isWindowCommandOffered } from '../window/app-menu';
 import { activePin, commands, engineOf, type CommandEntry } from './commands';
 import { text } from './text';
@@ -56,6 +57,16 @@ function currentEngine(state: AppState): 'mongodb' | 'redis' | undefined {
   return current === undefined ? undefined : savedConnection(state.connections, current)?.engine;
 }
 
+/**
+ * **Stop keeping undo history** and **Keep undo history** for the current connection: the one that changes it, and
+ * both on a read-only connection, whose refusal says why nothing is recorded through it.
+ */
+function isKeepUndoOffered(state: AppState, variant: 'stop' | 'keep'): boolean {
+  const current = state.nav.current;
+  const connection = current === undefined ? undefined : savedConnection(state.connections, current);
+  return connection !== undefined && (connection.readOnly || isVariantOffered(connection, variant));
+}
+
 /** What a command's own card says of whether it is offered now. */
 function isOfferedByItsCard(state: AppState, id: string): boolean {
   const active = activeTabOf(state.tabs);
@@ -76,6 +87,10 @@ function isOfferedByItsCard(state: AppState, id: string): boolean {
       return active !== undefined && isCloseOffered(state, active);
     case 'settings.reset':
       return isResetOffered(state.settings);
+    case 'undo.per-connection:stop':
+      return isKeepUndoOffered(state, 'stop');
+    case 'undo.per-connection:keep':
+      return isKeepUndoOffered(state, 'keep');
     case 'tree.refresh':
     case 'tree.filter':
       // The tree island shows the current connection: with none, there is nothing to refresh or filter.
@@ -164,7 +179,13 @@ export function intentOf(state: AppState, id: string): Intent | undefined {
   }
   const [feature = id, variant] = id.split(':');
   const args = argsOf(state, feature, variant);
-  return { feature: featureId(feature), target: targetNow(state), ...(args === undefined ? {} : { args }) };
+  // The undo history of a connection is the current connection's, whatever tab is active (`undo.per-connection`).
+  const current = state.nav.current;
+  const target: Target =
+    feature === 'undo.per-connection' && current !== undefined
+      ? { kind: 'connection', connection: current }
+      : targetNow(state);
+  return { feature: featureId(feature), target, ...(args === undefined ? {} : { args }) };
 }
 
 /** The command asked for: `args.command`. */

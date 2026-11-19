@@ -4,7 +4,7 @@
  * (architecture, "Who may use whom").
  */
 import type { Answers, AppStep, FileStep, RunnableFeature, Platform } from '../shared/feature';
-import type { ConnectionRequest, Json } from '../shared/engine-request';
+import type { ConnectionRequest, Json, RedisRequest } from '../shared/engine-request';
 import type { ConnectionId, FeatureId } from '../shared/ids';
 import type { Question } from '../shared/question';
 import type { AppEvent, AppState } from '../shared/state';
@@ -34,6 +34,17 @@ export interface StateHolder {
   readonly dispatch: (event: AppEvent) => void;
 }
 
+/**
+ * The clients the events of redis-oplog are sent with (`oplog.publish`): one per MongoDB connection, to its linked
+ * Redis connection, opened on first use and kept. Errors hold no secret of the linked connection.
+ */
+export interface OplogClients {
+  /** Sends the commands, as one pipeline, through the client of the MongoDB connection; fails after 5 seconds. */
+  readonly send: (mongo: ConnectionId, linked: ConnectionId, requests: readonly RedisRequest[]) => Promise<void>;
+  /** What must never show in a warning: the linked connection's connection string and password. */
+  readonly secrets: (linked: ConnectionId) => readonly string[];
+}
+
 /** Everything the runner is given. */
 export interface RunnerPorts {
   readonly features: ReadonlyMap<FeatureId, RunnableFeature>;
@@ -52,6 +63,8 @@ export interface RunnerPorts {
   /** Whether a connection is connected now; every one is taken as connected until connections exist (M6). */
   readonly isConnected?: (connection: ConnectionId) => boolean;
   readonly now: () => number;
+  /** Where the events of redis-oplog go; nothing is published without it. */
+  readonly oplog?: OplogClients;
 }
 
 /** An app step, as the runner carries it out. */

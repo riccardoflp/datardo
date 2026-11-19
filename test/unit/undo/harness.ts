@@ -120,7 +120,7 @@ export function appStateWith(
     connections: { ...initialConnectionsState, loaded: true, saved: connections },
     undo,
     ...more,
-  } as AppState;
+  };
 }
 
 /** The app's state with these stored settings. */

@@ -45,6 +45,7 @@ async function carryOutOne(
         text: after.text,
         ...(after.details === undefined ? {} : { details: after.details }),
         ...(after.actions === undefined ? {} : { actions: after.actions }),
+        ...(after.element === undefined ? {} : { element: after.element }),
       });
       return;
     case 'refresh':

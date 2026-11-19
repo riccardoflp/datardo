@@ -23,6 +23,8 @@ export interface NotificationView {
   readonly level: NotificationState['level'];
   readonly text: string;
   readonly actions: readonly NotificationAction[];
+  /** The element of the notification when it has **Undo**. */
+  readonly element?: string;
 }
 
 /** **Undo** in the notification of a write: `undo.revert` on that operation. */
@@ -41,9 +43,13 @@ export function view(state: NotificationState): NotificationView {
   if (state.severalOperations === true) {
     return { level: state.level, text: `${state.text} ${revertText.severalCollections}`, actions: [] };
   }
+  if (state.recorded === undefined) {
+    return { level: state.level, text: state.text, actions: [] };
+  }
   return {
     level: state.level,
     text: state.text,
-    actions: state.recorded === undefined ? [] : [undoAction(state.recorded)],
+    actions: [undoAction(state.recorded)],
+    element: 'undo.notification@notification',
   };
 }

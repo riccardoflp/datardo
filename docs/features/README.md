@@ -470,13 +470,13 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`oplog.publish`](oplog.md#oplogpublish--publish-the-events-of-a-write-to-redis) | Publish the events of a write to Redis | Operation | M11 | Specified |
-| [`oplog.scope`](oplog.md#oplogscope--which-databases-and-collections-publish) | Which databases and collections publish | Derivation | M11 | Specified |
-| [`oplog.message`](oplog.md#oplogmessage--the-event-of-a-document-and-its-channels) | The event of a document and its channels | Derivation | M11 | Specified |
-| [`oplog.updated-fields`](oplog.md#oplogupdated-fields--the-fields-an-update-changes) | The fields an update changes | Derivation | M11 | Specified |
-| [`oplog.changes`](oplog.md#oplogchanges--the-events-of-a-write-from-the-documents-before-and-after) | The events of a write from the documents before and after | Derivation | M11 | Specified |
-| [`oplog.playground-writes`](oplog.md#oplogplayground-writes--publish-the-playgrounds-writes) | Publish the playground's writes | Operation | M11 | Specified |
-| [`oplog.publish-error`](oplog.md#oplogpublish-error--the-warning-when-redis-fails) | The warning when Redis fails | View | M11 | Specified |
+| [`oplog.publish`](oplog.md#oplogpublish--publish-the-events-of-a-write-to-redis) | Publish the events of a write to Redis | Operation | M11 | Built |
+| [`oplog.scope`](oplog.md#oplogscope--which-databases-and-collections-publish) | Which databases and collections publish | Derivation | M11 | Built |
+| [`oplog.message`](oplog.md#oplogmessage--the-event-of-a-document-and-its-channels) | The event of a document and its channels | Derivation | M11 | Built |
+| [`oplog.updated-fields`](oplog.md#oplogupdated-fields--the-fields-an-update-changes) | The fields an update changes | Derivation | M11 | Built |
+| [`oplog.changes`](oplog.md#oplogchanges--the-events-of-a-write-from-the-documents-before-and-after) | The events of a write from the documents before and after | Derivation | M11 | Built |
+| [`oplog.playground-writes`](oplog.md#oplogplayground-writes--publish-the-playgrounds-writes) | Publish the playground's writes | Operation | M11 | Built |
+| [`oplog.publish-error`](oplog.md#oplogpublish-error--the-warning-when-redis-fails) | The warning when Redis fails | View | M11 | Built |
 
 ## Go to
 
@@ -788,23 +788,23 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`undo.record`](undo.md#undorecord--record-an-operation-before-a-write) | Record an operation before a write | Operation | M11 | Specified |
-| [`undo.kept`](undo.md#undokept--which-documents-and-keys-an-operation-keeps) | Which documents and keys an operation keeps | Derivation | M11 | Specified |
-| [`undo.note`](undo.md#undonote--whether-a-write-can-be-undone-as-its-confirmation-says-it) | Whether a write can be undone, as its confirmation says it | Derivation | M11 | Specified |
-| [`undo.show`](undo.md#undoshow--the-undo-history-page) | The Undo history page | View | M11 | Specified |
-| [`undo.details`](undo.md#undodetails--what-undoing-an-operation-would-do) | What undoing an operation would do | Read | M11 | Specified |
-| [`undo.changed-since`](undo.md#undochanged-since--which-documents-and-keys-changed-since-the-operation) | Which documents and keys changed since the operation | Derivation | M11 | Specified |
-| [`undo.revert`](undo.md#undorevert--undo-an-operation) | Undo an operation | Operation | M11 | Specified |
-| [`undo.revert-plan`](undo.md#undorevert-plan--what-undo-does-to-each-document-and-key) | What undo does to each document and key | Derivation | M11 | Specified |
-| [`undo.notification`](undo.md#undonotification--undo-from-a-writes-notification) | Undo from a write's notification | View | M11 | Specified |
-| [`undo.last`](undo.md#undolast--undo-last-change) | Undo last change | Operation | M11 | Specified |
-| [`undo.clear`](undo.md#undoclear--clear-the-undo-history) | Clear the undo history | Operation | M11 | Specified |
-| [`undo.remove`](undo.md#undoremove--remove-one-operation) | Remove one operation | Operation | M11 | Specified |
-| [`undo.limits`](undo.md#undolimits--limits-and-pruning) | Limits and pruning | Operation | M11 | Specified |
-| [`undo.prune-order`](undo.md#undoprune-order--which-operations-the-limits-keep) | Which operations the limits keep | Derivation | M11 | Specified |
-| [`undo.writes-of`](undo.md#undowrites-of--datardos-writes-to-one-document) | Datardo's writes to one document | Derivation | M11 | Specified |
-| [`undo.per-connection`](undo.md#undoper-connection--stop-or-keep-the-undo-history-of-a-connection) | Stop or keep the undo history of a connection | Operation | M11 | Specified |
-| [`undo.forget-connection`](undo.md#undoforget-connection--removing-a-connection-deletes-its-operations) | Removing a connection deletes its operations | Operation | M11 | Specified |
+| [`undo.record`](undo.md#undorecord--record-an-operation-before-a-write) | Record an operation before a write | Operation | M11 | Built |
+| [`undo.kept`](undo.md#undokept--which-documents-and-keys-an-operation-keeps) | Which documents and keys an operation keeps | Derivation | M11 | Built |
+| [`undo.note`](undo.md#undonote--whether-a-write-can-be-undone-as-its-confirmation-says-it) | Whether a write can be undone, as its confirmation says it | Derivation | M11 | Built |
+| [`undo.show`](undo.md#undoshow--the-undo-history-page) | The Undo history page | View | M11 | Built |
+| [`undo.details`](undo.md#undodetails--what-undoing-an-operation-would-do) | What undoing an operation would do | Read | M11 | Built |
+| [`undo.changed-since`](undo.md#undochanged-since--which-documents-and-keys-changed-since-the-operation) | Which documents and keys changed since the operation | Derivation | M11 | Built |
+| [`undo.revert`](undo.md#undorevert--undo-an-operation) | Undo an operation | Operation | M11 | Built |
+| [`undo.revert-plan`](undo.md#undorevert-plan--what-undo-does-to-each-document-and-key) | What undo does to each document and key | Derivation | M11 | Built |
+| [`undo.notification`](undo.md#undonotification--undo-from-a-writes-notification) | Undo from a write's notification | View | M11 | Built |
+| [`undo.last`](undo.md#undolast--undo-last-change) | Undo last change | Operation | M11 | Built |
+| [`undo.clear`](undo.md#undoclear--clear-the-undo-history) | Clear the undo history | Operation | M11 | Built |
+| [`undo.remove`](undo.md#undoremove--remove-one-operation) | Remove one operation | Operation | M11 | Built |
+| [`undo.limits`](undo.md#undolimits--limits-and-pruning) | Limits and pruning | Operation | M11 | Built |
+| [`undo.prune-order`](undo.md#undoprune-order--which-operations-the-limits-keep) | Which operations the limits keep | Derivation | M11 | Built |
+| [`undo.writes-of`](undo.md#undowrites-of--datardos-writes-to-one-document) | Datardo's writes to one document | Derivation | M11 | Built |
+| [`undo.per-connection`](undo.md#undoper-connection--stop-or-keep-the-undo-history-of-a-connection) | Stop or keep the undo history of a connection | Operation | M11 | Built |
+| [`undo.forget-connection`](undo.md#undoforget-connection--removing-a-connection-deletes-its-operations) | Removing a connection deletes its operations | Operation | M11 | Built |
 
 ## Users and roles
 

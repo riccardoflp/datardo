@@ -1,15 +1,14 @@
 /**
  * What the cards of redis-oplog share: the options a MongoDB connection keeps about what it publishes, an event, the
- * linked connection of a connection, and the part of the app's state that remembers the last error of each.
- *
- * The part of the app's state (`OplogState`, its events and its reducer) is written here, pure, until it moves to
- * `src/shared/state/oplog.ts` and joins the lists of `src/shared/state/index.ts`; {@link oplogOf} reads it meanwhile.
+ * linked connection of a connection, and the part of the app's state that remembers the last error of each, which is
+ * in `src/shared/state/oplog.ts`.
  */
 import type { ConnectionView } from '../../shared/connection';
 import type { Json } from '../../shared/engine-request';
 import type { ConnectionId } from '../../shared/ids';
 import type { AppState } from '../../shared/state';
 import { savedConnection } from '../../shared/state/connections';
+import type { OplogState } from '../../shared/state/oplog';
 
 /**
  * The redis-oplog options of a MongoDB connection, as `SavedConnection.oplog` keeps them (Mongoster's names): the
@@ -68,57 +67,12 @@ export function publishingOf(state: AppState, connection: ConnectionId): Publish
     : { kind: 'missing-link' };
 }
 
-/** The last error publishing the writes of a connection, for the tool `redis_oplog_status`. */
-export interface PublishFailure {
-  readonly time: number;
-  readonly message: string;
-}
+export { initialOplogState, reduceOplog } from '../../shared/state/oplog';
+export type { OplogState, OplogStateEvent, PublishFailure } from '../../shared/state/oplog';
 
-/** The part of the app's state about publishing: by MongoDB connection, its last error and its last warning. */
-export interface OplogState {
-  readonly lastErrors: Readonly<Record<string, PublishFailure>>;
-  /** When the warning of `oplog.publish-error` was last shown. */
-  readonly warnedAt: Readonly<Record<string, number>>;
-}
-
-/** Nothing failed yet. */
-export const initialOplogState: OplogState = { lastErrors: {}, warnedAt: {} };
-
-/** The events of this part of the state. */
-export type OplogStateEvent =
-  | {
-      readonly slice: 'oplog';
-      readonly type: 'failed';
-      readonly connection: ConnectionId;
-      readonly failure: PublishFailure;
-      /** Whether the warning was shown for this failure. */
-      readonly warned: boolean;
-    }
-  | { readonly slice: 'oplog'; readonly type: 'forgotten'; readonly connection: ConnectionId };
-
-function without<T>(record: Readonly<Record<string, T>>, key: string): Readonly<Record<string, T>> {
-  return Object.fromEntries(Object.entries(record).filter(([each]) => each !== key));
-}
-
-/** Changes this part of the state. */
-export function reduceOplog(state: OplogState, event: OplogStateEvent): OplogState {
-  switch (event.type) {
-    case 'failed':
-      return {
-        lastErrors: { ...state.lastErrors, [event.connection]: event.failure },
-        warnedAt: event.warned ? { ...state.warnedAt, [event.connection]: event.failure.time } : state.warnedAt,
-      };
-    case 'forgotten':
-      return {
-        lastErrors: without(state.lastErrors, event.connection),
-        warnedAt: without(state.warnedAt, event.connection),
-      };
-  }
-}
-
-/** The publishing part of the app's state; none failed while it is not one of the parts of `AppState`. */
+/** The publishing part of the app's state. */
 export function oplogOf(state: AppState): OplogState {
-  return (state as AppState & { readonly oplog?: OplogState }).oplog ?? initialOplogState;
+  return state.oplog;
 }
 
 /** A number of a reply as canonical or relaxed EJSON: `3`, `{ $numberInt: "3" }`, `{ $numberLong: "3" }`. */

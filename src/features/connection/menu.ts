@@ -3,11 +3,14 @@
  * its card of the Home page (`@home`), on its line of the connection switcher (`@connection-switcher`) and on the
  * connection island (`@connection-island`).
  *
- * The entries of the undo history (M11) join the third group with their cards.
+ * The entries of the undo history (**Stop keeping undo history**, **Keep undo history**; `undo.per-connection`) are
+ * in the third group.
  */
 import type { ConnectionStateName, ConnectionView } from '../../shared/connection';
+import type { Json } from '../../shared/engine-request';
 import type { ConnectionId } from '../../shared/ids';
 import { connectionState, savedConnection, type ConnectionsState } from '../../shared/state/connections';
+import { isVariantOffered, variantTitle, type KeepVariant } from '../undo/per-connection';
 import { menuText } from './text';
 
 /** The places the menu is drawn in. */
@@ -19,6 +22,8 @@ export interface MenuItem {
   readonly label: string;
   readonly feature: string;
   readonly element: string;
+  /** What the feature is started with: the variant of `undo.per-connection`. */
+  readonly args?: Json;
 }
 
 /** An entry, or the line between two groups. */
@@ -112,12 +117,31 @@ const elements = {
     'connection-switcher': 'connection.unlink-redis@connection-switcher',
     'connection-island': 'connection.unlink-redis@connection-island',
   },
+  keepUndo: {
+    home: 'undo.per-connection@home',
+    'connection-switcher': 'undo.per-connection@connection-switcher',
+    'connection-island': 'undo.per-connection@connection-island',
+  },
 } as const satisfies Readonly<Record<string, Elements>>;
 
 const separator: MenuEntry = { kind: 'separator' };
 
 function item(label: string, feature: string, element: string): MenuEntry {
   return { kind: 'item', label, feature, element };
+}
+
+/** **Stop keeping undo history** or **Keep undo history**, the one that changes the connection; none when read-only. */
+function undoEntries(connection: ConnectionView, place: MenuPlace): readonly MenuEntry[] {
+  const variants: readonly KeepVariant[] = ['stop', 'keep'];
+  return variants
+    .filter((variant) => isVariantOffered(connection, variant))
+    .map((variant) => ({
+      kind: 'item',
+      label: variantTitle(variant),
+      feature: 'undo.per-connection',
+      element: elements.keepUndo[place],
+      args: variant,
+    }));
 }
 
 /** The first group: connect, disconnect or reconnect as the state allows, and **Open overview**. */
@@ -133,7 +157,7 @@ function stateEntries(state: ConnectionStateName, place: MenuPlace): readonly Me
   ];
 }
 
-/** The third group: folder, color, read-only, and for MongoDB the redis-oplog link. */
+/** The third group: folder, color, read-only, the undo history, and for MongoDB the redis-oplog link. */
 function organizeEntries(
   connections: ConnectionsState,
   connection: ConnectionView,
@@ -147,6 +171,7 @@ function organizeEntries(
     connection.readOnly
       ? item(menuText.allowChanges, 'connection.allow-changes', elements.allowChanges[place])
       : item(menuText.readOnly, 'connection.read-only', elements.readOnly[place]),
+    ...undoEntries(connection, place),
     ...(connection.engine === 'mongodb'
       ? [item(menuText.linkRedis, 'connection.link-redis', elements.linkRedis[place])]
       : []),

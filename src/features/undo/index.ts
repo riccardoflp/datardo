@@ -16,9 +16,11 @@ import * as operation from './reads/operation';
 import * as record from './record';
 import * as remove from './remove';
 import * as revert from './revert';
+import * as show from './show';
 
 /** The features of this area the runner can start. */
 export const features: readonly RunnableFeature[] = [
+  show.open,
   { kind: 'operation', id: featureId('undo.record'), plan: record.plan },
   { kind: 'operation', id: featureId('undo.revert'), plan: revert.plan },
   { kind: 'operation', id: featureId('undo.last'), plan: last.plan },

@@ -43,6 +43,8 @@ export interface SavedConnection {
   readonly status: ConnectionStatus;
   /** The Redis connection this MongoDB connection publishes its writes to (`connection.link-redis`). */
   readonly publishesTo?: ConnectionId;
+  /** `false` when the connection does not keep its undo history (`undo.per-connection`). */
+  readonly keepsUndo?: false;
 }
 
 /** What the page of the active tab has selected, for the inspector island (`nav.inspector`). */
@@ -128,6 +130,7 @@ export function navConnections(connections: ConnectionsState): readonly SavedCon
     ...(saved.folder === undefined ? {} : { folder: saved.folder }),
     ...(saved.color === undefined ? {} : { color: saved.color }),
     ...(saved.publishesTo === undefined ? {} : { publishesTo: saved.publishesTo }),
+    ...(saved.keepsUndo ? {} : { keepsUndo: false as const }),
   }));
 }
 

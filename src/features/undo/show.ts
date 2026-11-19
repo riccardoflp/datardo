@@ -4,6 +4,8 @@
  */
 import type { ConnectionView } from '../../shared/connection';
 import type { Json } from '../../shared/engine-request';
+import { noDanger, run, type OperationFeature } from '../../shared/feature';
+import { featureId } from '../../shared/ids';
 import type { SettingsState } from '../../shared/state/settings';
 import { sizeText } from '../task/show';
 import type { DetailsBox } from './details';
@@ -181,3 +183,18 @@ export function view(state: ShowState): ShowView {
     rows,
   };
 }
+
+/** Feature: undo.show. Opening the page: no step; what follows shows the one **Undo history** tab of the app. */
+export const open: OperationFeature = {
+  kind: 'operation',
+  id: featureId('undo.show'),
+  plan: () =>
+    run({
+      title: pageText.title,
+      steps: [],
+      danger: noDanger,
+      undo: { cannot: pageText.opensNothing },
+      publishes: false,
+      after: [{ kind: 'open', page: 'undo' }],
+    }),
+};

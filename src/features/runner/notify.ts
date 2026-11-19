@@ -31,6 +31,8 @@ export interface NotificationView {
   /** A screen reader is told of an *error* at once, of the others politely. */
   readonly announce: 'assertive' | 'polite';
   readonly logLine?: number;
+  /** The element it carries, when a feature draws it (`undo.notification@notification`). */
+  readonly element?: string;
 }
 
 /** What the notifications are drawn from. */
@@ -52,6 +54,7 @@ export function view(state: NotifyState): readonly NotificationView[] {
       ...(notification.details === undefined ? {} : { details: notification.details }),
       ...(goesAway ? { goesAwayAfterMs } : {}),
       ...(notification.logLine === undefined ? {} : { logLine: notification.logLine }),
+      ...(notification.element === undefined ? {} : { element: notification.element }),
     };
   });
 }

@@ -10,13 +10,13 @@ import type { ConnectionView } from '../../shared/connection';
 import type { EngineName, Json } from '../../shared/engine-request';
 import type { AppStep, Outcome } from '../../shared/feature';
 import { noDanger, run } from '../../shared/feature';
-import type { ConnectionId } from '../../shared/ids';
 import type { SettingsState } from '../../shared/state/settings';
+import type { OperationId, UndoEntry } from '../../shared/state/undo';
 import type { Target } from '../../shared/target';
 import { setting } from '../settings/read';
 
 /** The identifier of an operation of the undo history, which also names its file. */
-export type OperationId = string & { readonly __brand: 'OperationId' };
+export type { OperationId, UndoEntry } from '../../shared/state/undo';
 
 /** An operation's identifier, from the text stored for it. */
 export function operationId(identifier: string): OperationId {
@@ -66,34 +66,6 @@ export interface KeyRecord {
 export type OperationRecords =
   | { readonly kind: 'documents'; readonly docs: readonly DocumentRecord[] }
   | { readonly kind: 'keys'; readonly keys: readonly KeyRecord[] };
-
-/** What all operations of the index have. */
-interface EntryBase {
-  readonly id: OperationId;
-  /** When it was recorded, in milliseconds since 1970. */
-  readonly time: number;
-  readonly connection: ConnectionId;
-  /** The connection's name when it was recorded, shown when the connection is gone. */
-  readonly connectionName: string;
-  /** The plan's title, cut to 300 characters. */
-  readonly title: string;
-  readonly inserted: number;
-  readonly updated: number;
-  readonly deleted: number;
-  /** The bytes of its compressed file; 0 once undone. */
-  readonly size: number;
-  /** When it was undone. */
-  readonly undone?: number;
-  /** The operation this one undid. */
-  readonly undoOf?: OperationId;
-}
-
-/** An operation of the undo history (glossary, "operation"), on a collection or on a database of keys. */
-export type UndoEntry = EntryBase &
-  (
-    | { readonly engine: 'mongodb'; readonly database: string; readonly collection: string }
-    | { readonly engine: 'redis'; readonly database: number }
-  );
 
 /** What an operation is on (glossary, "target (of an operation)"). */
 export type OperationTarget = Extract<Target, { readonly kind: 'collection' } | { readonly kind: 'redis-database' }>;

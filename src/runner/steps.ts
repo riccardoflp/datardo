@@ -33,11 +33,24 @@ export interface StepsOutcome {
   readonly failedOnTheWay: readonly string[];
 }
 
-/** A plan being run: the runner's ports, its context, and its work in progress. */
+/** How a step of the plan ended: its reply, or the error it failed with. */
+export type StepEnded =
+  { readonly kind: 'done'; readonly reply: unknown } | { readonly kind: 'failed'; readonly error: unknown };
+
+/** What watches the steps of a plan as they run: the reads before a write and what it did, for redis-oplog. */
+export interface StepObserver {
+  /** Before the step is sent; what it does is its own to handle, it never stops the plan. */
+  readonly before: (step: Step, index: number) => Promise<void>;
+  /** Once the step ended, done or failed. */
+  readonly after: (step: Step, index: number, ended: StepEnded) => Promise<void>;
+}
+
+/** A plan being run: the runner's ports, its context, its work in progress, and what watches its steps. */
 export interface Running {
   readonly ports: RunnerPorts;
   readonly context: Context;
   readonly work: RunningWork;
+  readonly observer?: StepObserver;
 }
 
 /** The refusal the guard gives a step, or none: read-only, a view, not connected (R5.2). */
@@ -82,7 +95,7 @@ export async function runSteps(running: Running, plan: Plan): Promise<StepsOutco
     }
     running.work.change({ done: index, total: plan.steps.length, unit: 'steps' });
     try {
-      await runStep(running, step, plan.steps.length === 1);
+      await observed(running, step, index, () => runStep(running, step, plan.steps.length === 1));
     } catch (error: unknown) {
       if (error instanceof GuardRefusal || error instanceof Cancelled) {
         return error instanceof Cancelled
@@ -100,6 +113,20 @@ export async function runSteps(running: Running, plan: Plan): Promise<StepsOutco
     }
   }
   return { failedOnTheWay };
+}
+
+/** Runs a step between what its observer does before and after it. */
+async function observed(running: Running, step: Step, index: number, send: () => Promise<unknown>): Promise<void> {
+  const observer = running.observer;
+  await observer?.before(step, index);
+  let reply: unknown;
+  try {
+    reply = await send();
+  } catch (error: unknown) {
+    await observer?.after(step, index, { kind: 'failed', error });
+    throw error;
+  }
+  await observer?.after(step, index, { kind: 'done', reply });
 }
 
 async function afterFailure(running: Running, step: Step, error: unknown): Promise<'went-on' | 'stopped'> {
@@ -123,7 +150,7 @@ async function afterFailure(running: Running, step: Step, error: unknown): Promi
 }
 
 /** Runs one step, after the guard asks again for a step that writes (R5.2), with its two lines in the Log. */
-async function runStep(running: Running, step: Step, onlyStep: boolean): Promise<void> {
+async function runStep(running: Running, step: Step, onlyStep: boolean): Promise<unknown> {
   const { ports, context, work } = running;
   const refused = guardStep(ports, step);
   if (refused !== undefined) {
@@ -146,6 +173,7 @@ async function runStep(running: Running, step: Step, onlyStep: boolean): Promise
     throw error;
   }
   writeLog(ports, [{ feature, kind: 'outcome', text: outcomeText(reply, ports.now() - started), ...where }]);
+  return reply;
 }
 
 /** `done in 12 ms`, or `3 changed in 12 ms` when the reply says how many. */

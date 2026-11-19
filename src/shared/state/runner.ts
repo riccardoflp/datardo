@@ -54,6 +54,8 @@ export interface Notification {
   readonly details?: string;
   /** Up to two buttons. */
   readonly actions?: readonly NotificationAction[];
+  /** The element the notification carries, when a feature draws it (`undo.notification@notification`). */
+  readonly element?: string;
   /** How many times the same message arrived within 30 seconds (*×3*). */
   readonly count: number;
   readonly time: number;

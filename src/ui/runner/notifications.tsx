@@ -43,6 +43,7 @@ function NotificationItem({ item }: { readonly item: NotificationView }): React.
       ref={ref}
       className={`${styles['notification'] ?? ''} ${styles[item.level] ?? ''}`}
       data-level={item.level}
+      data-feature={item.element}
       onMouseEnter={() => {
         setHeld(true);
       }}

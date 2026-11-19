@@ -7,6 +7,7 @@ import type { Context, Outcome, ReadRequest } from '../../shared/feature';
 import { refuse } from '../../shared/feature';
 import { mongoshValue } from '../../shared/mongosh-value';
 import { savedConnection } from '../../shared/state/connections';
+import type { DetailItem, DetailsBox, FieldRow, KeyCell } from '../../shared/state/undo';
 import { sizeText } from '../task/show';
 import type { DocumentNow, KeyNow } from './changed-since';
 import { changedSince, nowByRecord, recordKey } from './changed-since';
@@ -20,46 +21,7 @@ import { base64Bytes, fieldsOf, keyNameText, operationId, sameValueKey, unitOf }
 /** At most 100 documents or keys are shown. */
 export const detailsShown = 100;
 
-/** A row of the table of a document: a field, its value now and after the undo; `—` when missing on one side. */
-export interface FieldRow {
-  readonly field: string;
-  readonly now: string;
-  readonly after: string;
-  readonly nowTooltip?: string;
-  readonly afterTooltip?: string;
-}
-
-/** A key's cell: its type, the size of its dump and its expiry, or `—` when it is missing on that side. */
-export interface KeyCell {
-  readonly text: string;
-  readonly tooltip?: string;
-}
-
-/** One document or key of the box. */
-export interface DetailItem {
-  /** The `_id` in mongosh syntax, or the key's name. */
-  readonly name: string;
-  /** `updated: the undo restores it`. */
-  readonly what: string;
-  readonly changedSince: boolean;
-  /** *Already as it was: the undo changes nothing.* or *Already deleted.* */
-  readonly note?: string;
-  readonly fields?: readonly FieldRow[];
-  readonly key?: { readonly now: KeyCell; readonly after: KeyCell };
-}
-
-/** What the expanded row shows. */
-export type DetailsBox =
-  | { readonly kind: 'loading'; readonly text: string }
-  | { readonly kind: 'refused'; readonly text: string }
-  | {
-      readonly kind: 'shown';
-      /** *First 100 of 2,500 documents.* */
-      readonly first?: string;
-      /** *3 documents changed after the operation: undoing overwrites those changes too.* */
-      readonly changed?: string;
-      readonly items: readonly DetailItem[];
-    };
+export type { DetailItem, DetailsBox, FieldRow, KeyCell } from '../../shared/state/undo';
 
 /** The box while the reads run. */
 export const loadingBox: DetailsBox = { kind: 'loading', text: detailsText.loading };
