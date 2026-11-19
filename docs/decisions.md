@@ -583,3 +583,9 @@ Raised while the catalog was written; each names the cards that hold the current
   needs a question that chooses a file, which the questions do not have yet (a text field stands in for it); is
   **Copied to the clipboard** a notification or a line of the status line? (`codegen.show`, `chart.draw`,
   `chart.save-picture`, `codegen.copy`).
+- **Q41** — The Redis console: the confirmation of `EXEC` lists the queued commands as steps that run nothing, so
+  that the dangerous one is shown; is there a better form? The fallback of `HELLO` matches the errors `NOPROTO` and
+  `ERR unknown command` by their start. What the server says of a command's flags is remembered with the runner's
+  remembered reads, per connection and per opening, not in the console's own state. The count of keys shown in a
+  confirmation (`DBSIZE`, or `INFO keyspace` for `FLUSHALL`) is a read with no card. (`console.run`,
+  `console.connect`, `console.command-flags`, `console.classify`).
