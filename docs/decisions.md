@@ -736,3 +736,9 @@ Raised while the catalog was written; each names the cards that hold the current
   search indexes are taken as unsupported on the codes 31082, 59, 115, 40324 and 6047401; reads of several requests
   are written in two styles, to make one. (`search.match`, `relation.follow`, `compare.make-like`, `structure.steps`,
   `structure.read`).
+- **Q61** — The MCP server: the protocol (JSON-RPC 2.0 over Streamable HTTP, without SSE or sessions) is written by
+  hand, with no SDK; a tool that fails answers an error result, not a refusal; the data tools write
+  `NumberDecimal("9.99")` as the query bar does, where the card writes `Decimal128("9.99")`; the setup dialog's button
+  is **Choose**; turning the server off and the default port are written as no value; the times of `write_history`
+  keep their milliseconds, so that writes in one second stay in order; watching needs a `watch` method of the engine
+  that keeps its session. (`mcp.protocol`, `mcp.data-tools`, `mcp.setup`, `mcp.change-port`, `mcp.debugging-tools`).
