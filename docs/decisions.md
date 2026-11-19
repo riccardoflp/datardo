@@ -614,3 +614,20 @@ Raised while the catalog was written; each names the cards that hold the current
   the columns counts the hidden columns of the page shown; **Export** in the row menu needs every selected document to
   have an `_id`; **Watch** is not offered on a view. (`table.show`, `query.bar`, `table.copy-as`, `query.parse`,
   `table.columns`, `table.row-menu`).
+- **Q46** — The Redis Server page: the share of memory is rounded up (the card's 97.49% reads 98%); times show their
+  two largest units and drop a second unit of 0; the first click on Age, Idle, Subscriptions or Memory sorts the
+  largest first; with the Memory section chosen, `INFO keyspace` is read too, to fill the Database menu; the notice of
+  a client disconnected needs an After that depends on the reply of its step, which plans do not have.
+  (`server.memory`, `server.clients`, `server.kill-client`).
+- **Q47** — Documents: no notification follows an inline edit or a save; `7.0` typed in a Long field stays a Long;
+  the document tab, the inspector's text and **Duplicate** write one field per line at every depth, as Mongoster did;
+  text that cannot be read asks the question again with the reader's message, with no refusal code;
+  `document.update-selected` uses the refusal codes of `document.update-many`; writes have 30 seconds for one
+  document and 600 for many; the messages that depend on a write's result need the runner to give a plan the replies
+  of its steps. (`document.inline-edit`, `document.save`, `document.update-selected`, `document.delete`).
+- **Q48** — Saved queries: `..` as a folder name becomes `_`, as the rule says, where an acceptance line says `._`;
+  the fields of a query file Datardo does not know are not kept on rewrite, as `saved-query.parse-file` says, where
+  [data.md](data.md) says they are; saving over a folder query of the same name with no connection replaces it in
+  place; moving to my queries replaces one of the same name without asking; choosing the folder needs a question
+  that opens the system's folder dialog. (`saved-query.file-path`, `saved-query.parse-file`, `saved-query.save`,
+  `saved-query.move`, `saved-query.choose-folder`).
