@@ -1,0 +1,232 @@
+{
+  "$map": [
+    [
+      {
+        "$bytes": "cGVhay5hbGxvY2F0ZWQ="
+      },
+      2710696
+    ],
+    [
+      {
+        "$bytes": "dG90YWwuYWxsb2NhdGVk"
+      },
+      2710648
+    ],
+    [
+      {
+        "$bytes": "c3RhcnR1cC5hbGxvY2F0ZWQ="
+      },
+      948384
+    ],
+    [
+      {
+        "$bytes": "cmVwbGljYXRpb24uYmFja2xvZw=="
+      },
+      0
+    ],
+    [
+      {
+        "$bytes": "Y2xpZW50cy5zbGF2ZXM="
+      },
+      0
+    ],
+    [
+      {
+        "$bytes": "Y2xpZW50cy5ub3JtYWw="
+      },
+      0
+    ],
+    [
+      {
+        "$bytes": "Y2x1c3Rlci5saW5rcw=="
+      },
+      0
+    ],
+    [
+      {
+        "$bytes": "YW9mLmJ1ZmZlcg=="
+      },
+      0
+    ],
+    [
+      {
+        "$bytes": "bHVhLmNhY2hlcw=="
+      },
+      0
+    ],
+    [
+      {
+        "$bytes": "ZnVuY3Rpb25zLmNhY2hlcw=="
+      },
+      192
+    ],
+    [
+      {
+        "$bytes": "ZGIuMTQ="
+      },
+      {
+        "$map": [
+          [
+            {
+              "$bytes": "b3ZlcmhlYWQuaGFzaHRhYmxlLm1haW4="
+            },
+            624
+          ],
+          [
+            {
+              "$bytes": "b3ZlcmhlYWQuaGFzaHRhYmxlLmV4cGlyZXM="
+            },
+            216
+          ]
+        ]
+      }
+    ],
+    [
+      {
+        "$bytes": "ZGIuMTU="
+      },
+      {
+        "$map": [
+          [
+            {
+              "$bytes": "b3ZlcmhlYWQuaGFzaHRhYmxlLm1haW4="
+            },
+            472
+          ],
+          [
+            {
+              "$bytes": "b3ZlcmhlYWQuaGFzaHRhYmxlLmV4cGlyZXM="
+            },
+            216
+          ]
+        ]
+      }
+    ],
+    [
+      {
+        "$bytes": "b3ZlcmhlYWQuZGIuaGFzaHRhYmxlLmx1dA=="
+      },
+      96
+    ],
+    [
+      {
+        "$bytes": "b3ZlcmhlYWQuZGIuaGFzaHRhYmxlLnJlaGFzaGluZw=="
+      },
+      0
+    ],
+    [
+      {
+        "$bytes": "b3ZlcmhlYWQudG90YWw="
+      },
+      950104
+    ],
+    [
+      {
+        "$bytes": "ZGIuZGljdC5yZWhhc2hpbmcuY291bnQ="
+      },
+      0
+    ],
+    [
+      {
+        "$bytes": "a2V5cy5jb3VudA=="
+      },
+      11
+    ],
+    [
+      {
+        "$bytes": "a2V5cy5ieXRlcy1wZXIta2V5"
+      },
+      160049
+    ],
+    [
+      {
+        "$bytes": "ZGF0YXNldC5ieXRlcw=="
+      },
+      1760544
+    ],
+    [
+      {
+        "$bytes": "ZGF0YXNldC5wZXJjZW50YWdl"
+      },
+      99.90239715576172
+    ],
+    [
+      {
+        "$bytes": "cGVhay5wZXJjZW50YWdl"
+      },
+      99.99822998046875
+    ],
+    [
+      {
+        "$bytes": "YWxsb2NhdG9yLmFsbG9jYXRlZA=="
+      },
+      3358624
+    ],
+    [
+      {
+        "$bytes": "YWxsb2NhdG9yLmFjdGl2ZQ=="
+      },
+      3801088
+    ],
+    [
+      {
+        "$bytes": "YWxsb2NhdG9yLnJlc2lkZW50"
+      },
+      10137600
+    ],
+    [
+      {
+        "$bytes": "YWxsb2NhdG9yLm11enp5"
+      },
+      0
+    ],
+    [
+      {
+        "$bytes": "YWxsb2NhdG9yLWZyYWdtZW50YXRpb24ucmF0aW8="
+      },
+      1.1280686855316162
+    ],
+    [
+      {
+        "$bytes": "YWxsb2NhdG9yLWZyYWdtZW50YXRpb24uYnl0ZXM="
+      },
+      366432
+    ],
+    [
+      {
+        "$bytes": "YWxsb2NhdG9yLXJzcy5yYXRpbw=="
+      },
+      2.6670258045196533
+    ],
+    [
+      {
+        "$bytes": "YWxsb2NhdG9yLXJzcy5ieXRlcw=="
+      },
+      6336512
+    ],
+    [
+      {
+        "$bytes": "cnNzLW92ZXJoZWFkLnJhdGlv"
+      },
+      0.9898989796638489
+    ],
+    [
+      {
+        "$bytes": "cnNzLW92ZXJoZWFkLmJ5dGVz"
+      },
+      -102400
+    ],
+    [
+      {
+        "$bytes": "ZnJhZ21lbnRhdGlvbg=="
+      },
+      3.8035402297973633
+    ],
+    [
+      {
+        "$bytes": "ZnJhZ21lbnRhdGlvbi5ieXRlcw=="
+      },
+      7396816
+    ]
+  ]
+}
