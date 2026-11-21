@@ -15,6 +15,7 @@ import {
   sentenceOf,
   startControl,
   valueOf,
+  type Inspection,
   type PartRead,
   type ServerControl,
 } from './types';
@@ -52,6 +53,8 @@ export interface ConfigView {
   readonly error?: string;
   readonly table?: { readonly columns: typeof text.config.columns; readonly rows: readonly ConfigRow[] };
   readonly noMatch?: string;
+  /** The parameter selected, for the inspector island: its name and its value as the row shows it. */
+  readonly inspector?: Inspection;
 }
 
 /** The value as the row shows it, and how. */
@@ -92,6 +95,7 @@ export function view(state: ConfigState): ConfigView {
   const parameters = valueOf(state.parameters);
   const shown = (parameters ?? []).filter((parameter) => isParameterShown(parameter, state.filter));
   const counted = parameters !== undefined && state.readAt !== undefined;
+  const selected = parameters?.find((parameter) => parameter.name === state.selected);
   return {
     toolbar: {
       filter: { placeholder: text.config.filter, value: state.filter },
@@ -110,5 +114,16 @@ export function view(state: ConfigState): ConfigView {
     ...(parameters !== undefined && parameters.length > 0 && shown.length === 0
       ? { noMatch: text.config.noMatch }
       : {}),
+    ...(selected === undefined ? {} : { inspector: inspection(selected) }),
+  };
+}
+
+function inspection(parameter: ConfigParameter): Inspection {
+  return {
+    title: parameter.name,
+    fields: [
+      [text.config.columns.parameter, parameter.name],
+      [text.config.columns.value, shownValue(parameter).value],
+    ],
   };
 }

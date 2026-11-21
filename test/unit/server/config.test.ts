@@ -99,4 +99,14 @@ describe('server.config', () => {
     expect(shown.table?.rows.find((row) => row.name === 'requirepass')?.value).toBe('not set');
     expect(shown.toolbar.count).toMatch(/^(\d|,)+ of (\d|,)+ parameters · 14:02:11$/u);
   });
+
+  it('selecting a row shows the parameter in the inspector island, a secret as ***', () => {
+    expect(view(state({ selected: 'requirepass' })).inspector).toEqual({
+      title: 'requirepass',
+      fields: [
+        ['Parameter', 'requirepass'],
+        ['Value', '***'],
+      ],
+    });
+  });
 });

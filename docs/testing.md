@@ -29,6 +29,13 @@ read-only connection', …) })`. `catalog.py --tests test` reports a card with n
   skips them.
 - **A second Redis with an ACL user, TLS and a password**, for the connection tests, is started the same way with a
   configuration of `test/fixtures/redis/`.
+- **A Redis whose `CONFIG` and `CLIENT` are renamed away**, as a managed service turns them off, for the Server
+  page (M17): `DATARDO_TEST_REDIS_RENAMED_URL` gives one started with `--rename-command CONFIG ""`,
+  `--rename-command CLIENT ""` and `--slowlog-log-slower-than 0`, for instance
+  `docker run -d -p 127.0.0.1:6397:6379 redis:7.4-alpine redis-server --rename-command CONFIG "" --rename-command
+  CLIENT "" --slowlog-log-slower-than 0`. The tests clear its slow log and add and remove an ACL user on it; without
+  it they are skipped. The tests of the Server page on a shared server use its databases 8 and 9 and send neither
+  `CONFIG SET`, `SLOWLOG RESET` nor `CLIENT KILL` of a client they did not open.
 - **SSH**: an `ssh2` server started in the test, with a key of `test/fixtures/ssh/`, in front of the throwaway
   servers.
 - **Search indexes** need a server with search and are skipped unless `DATARDO_TEST_SEARCH_URI` gives one; they work

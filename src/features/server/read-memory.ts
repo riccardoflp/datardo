@@ -40,7 +40,11 @@ export function request(_context: Context, args: Json): ReadRequest {
     serverCommand('MEMORY', 'STATS'),
     ...(argsOf(args)['doctor'] === true ? [serverCommand('MEMORY', 'DOCTOR')] : []),
   ];
-  return { kind: 'engine', requests: requests.map((each) => ({ connection, request: each })) };
+  return {
+    kind: 'engine',
+    requests: requests.map((each) => ({ connection, request: each })),
+    failedRequests: 'are-replies',
+  };
 }
 
 function memoryValue(reply: unknown): MemoryValue {

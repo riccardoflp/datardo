@@ -12,6 +12,9 @@ import { KeyPage } from './key/key-page';
 import { KeyInspector } from './keys/key-inspector';
 import { KeysPage } from './keys/keys-page';
 import { keysExtras } from './keys/keys-state';
+import { ServerInspector } from './server/server-inspector';
+import { ServerPage } from './server/server-page';
+import { serverExtras } from './server/server-state';
 
 /** A page as the main island draws it. */
 export type PageView = () => React.JSX.Element | null;
@@ -24,6 +27,7 @@ export const pages: Readonly<Record<string, PageView>> = {
   'connection-form': ConnectionFormPage,
   overview: OverviewPage,
   undo: UndoHistoryPage,
+  server: ServerPage,
 };
 
 /** The pages of the tabs that show a target of a connection, by the kind of what they show (`keys`, `key`). */
@@ -32,10 +36,21 @@ export const tabPages: Readonly<Partial<Record<string, PageView>>> = {
   key: KeyPage,
 };
 
-/** What the inspector island draws for one thing selected in a page, by the kind of what the active tab shows. */
+/**
+ * What the inspector island draws for one thing selected in a page, by the kind of what the active tab shows, or by
+ * the name of its page for a page tab (`server`).
+ */
 export const inspectors: Readonly<
   Partial<Record<string, (props: { readonly tabId: string }) => React.JSX.Element | null>>
-> = { keys: KeyInspector };
+> = { keys: KeyInspector, server: ServerInspector };
 
-/** What a page adds to the active tab, by its kind: what the status line counts, what the inspector island shows. */
-export const tabExtras: Readonly<Partial<Record<string, typeof keysExtras>>> = { keys: keysExtras };
+/** What a page adds to the active tab, by its kind or its page: what the status line counts, what the inspector shows. */
+export const tabExtras: Readonly<Partial<Record<string, typeof keysExtras>>> = {
+  keys: keysExtras,
+  server: serverExtras,
+};
+
+/** The name `inspectors` and `tabExtras` know a tab by: its page for a page tab, else the kind of what it shows. */
+export function extrasKey(shows: { readonly kind: string; readonly page?: string }): string {
+  return shows.kind === 'page' && shows.page !== undefined ? shows.page : shows.kind;
+}

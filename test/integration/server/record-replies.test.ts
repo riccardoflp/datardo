@@ -19,7 +19,7 @@ import * as readMemory from '../../../src/features/server/read-memory';
 import * as readSlowLog from '../../../src/features/server/read-slow-log';
 import { hexOf } from '../../../src/features/server/types';
 import type { Json, RedisReply } from '../../../src/shared/engine-request';
-import type { Context, ReadRequest } from '../../../src/shared/feature';
+import type { Context, Outcome, ReadRequest } from '../../../src/shared/feature';
 import { connectionId, featureId } from '../../../src/shared/ids';
 import { initialState } from '../../../src/shared/state';
 import { testServers } from '../servers';
@@ -64,7 +64,7 @@ async function writeText(name: string, value: unknown): Promise<void> {
 }
 
 /** Sends every request of a Read, one after the other, as the runner does. */
-async function send(engines: EngineService, read: ReadRequest): Promise<unknown[]> {
+async function send(engines: EngineService, read: ReadRequest | Outcome): Promise<unknown[]> {
   const requests = read.kind === 'engine' ? read.requests : [];
   const replies: unknown[] = [];
   for (const each of requests) {

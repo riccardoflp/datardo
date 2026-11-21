@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { view } from '../../features/nav/inspector';
 import { text } from '../../features/nav/text';
 import type { NavInput } from '../../features/nav/types';
-import { inspectors } from '../pages';
+import { extrasKey, inspectors } from '../pages';
 import { startFeature } from './intent';
 import styles from './bars.module.css';
 
@@ -28,7 +28,7 @@ function Loading({ delayMs, label }: { readonly delayMs: number; readonly label:
 /** The one thing selected, as the page of the active tab draws it (`key.inspect`). */
 function SelectedThing({ input }: { readonly input: NavInput }): React.JSX.Element | null {
   const tab = input.activeTab;
-  const Drawn = inspectors[tab.kind];
+  const Drawn = inspectors[extrasKey(tab)];
   return Drawn === undefined || tab.tab === undefined ? null : <Drawn tabId={tab.tab} />;
 }
 

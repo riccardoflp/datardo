@@ -7,6 +7,7 @@
  * own card offers it now.
  */
 import type { Intent } from '../../shared/bridge';
+import type { ConnectionView } from '../../shared/connection';
 import type { Json } from '../../shared/engine-request';
 import {
   run,
@@ -51,10 +52,15 @@ export function isRepeated(id: string): boolean {
   return repeatedCommands.has(id);
 }
 
+/** The current connection, when there is one. */
+function currentConnectionOf(state: AppState): ConnectionView | undefined {
+  const current = state.nav.current;
+  return current === undefined ? undefined : savedConnection(state.connections, current);
+}
+
 /** The engine of the current connection, when there is one. */
 function currentEngine(state: AppState): 'mongodb' | 'redis' | undefined {
-  const current = state.nav.current;
-  return current === undefined ? undefined : savedConnection(state.connections, current)?.engine;
+  return currentConnectionOf(state)?.engine;
 }
 
 /**
@@ -105,6 +111,11 @@ function isOfferedByItsCard(state: AppState, id: string): boolean {
     case 'tree.filter':
       // The tree island shows the current connection: with none, there is nothing to refresh or filter.
       return state.nav.current !== undefined;
+    case 'server.largest-keys':
+      // The search is the Memory section's: it is offered while the Server page is the active tab.
+      return active?.shows.kind === 'page' && active.shows.page === 'server';
+    case 'server.slow-log-reset':
+      return currentConnectionOf(state)?.readOnly === false;
     default:
       // The commands of the table act on the active collection tab: with none, there is no table.
       return id.startsWith('table.') ? active?.shows.kind === 'collection' : isWindowCommandOffered(state, id);

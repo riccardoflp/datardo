@@ -55,6 +55,7 @@ export function request(_context: Context, args: Json): ReadRequest {
   return {
     kind: 'engine',
     requests: [{ connection: connectionId(textArg(args, 'connection')), request: serverCommand('CLIENT', 'LIST') }],
+    failedRequests: 'are-replies',
   };
 }
 

@@ -260,6 +260,24 @@ export const text = {
     copyName: 'Copy name',
     deleteKey: 'Delete key…',
   },
+  window: {
+    sectionBar: 'Sections of the Server page',
+    toolbar: 'Toolbar of the Server page',
+    lastRead: 'The time of the last read',
+    rowMenu: 'More',
+    copy: 'Copy',
+    cancel: 'Cancel',
+    emptyLine: 'Select a row or a tile to see it here.',
+    tables: {
+      clients: 'Clients',
+      slowLog: 'Slow log',
+      config: 'Configuration',
+      databases: 'Keys per database',
+      replicas: 'Replicas',
+      overhead: 'Where the overhead goes',
+      largestKeys: 'Largest keys',
+    },
+  },
   config: {
     filter: 'Filter by parameter or value',
     count: (shown: number, read: number, at: string) =>

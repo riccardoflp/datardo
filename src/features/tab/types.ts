@@ -216,5 +216,23 @@ export function readMemory(value: unknown): TabMemory | undefined {
     return undefined;
   }
   const memory = texts(value, ['query', 'pipeline', 'pattern', 'typeFilter']);
-  return Object.keys(memory).length === 0 ? undefined : memory;
+  const choices = readChoices(value['choices']);
+  const all = choices === undefined ? memory : { ...memory, choices };
+  return Object.keys(all).length === 0 ? undefined : all;
+}
+
+/** How many choices a page keeps, and how long each may be: what is read back is bounded (R14.4). */
+const choiceLimits = { count: 40, length: 1000 } as const;
+
+/** The choices of a page of sections, read from JSON: text values only, within {@link choiceLimits}. */
+function readChoices(value: unknown): Readonly<Record<string, string>> | undefined {
+  if (!isObject(value)) {
+    return undefined;
+  }
+  const kept = Object.entries(value)
+    .filter(
+      (entry): entry is [string, string] => typeof entry[1] === 'string' && entry[1].length <= choiceLimits.length,
+    )
+    .slice(0, choiceLimits.count);
+  return kept.length === 0 ? undefined : Object.fromEntries(kept);
 }

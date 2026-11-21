@@ -28,7 +28,8 @@ import {
 export type ClientColumn =
   'id' | 'address' | 'name' | 'user' | 'db' | 'age' | 'idle' | 'command' | 'state' | 'subscriptions' | 'memory';
 
-const columns: readonly ClientColumn[] = [
+/** The columns, in the order of the table. */
+export const clientColumns: readonly ClientColumn[] = [
   'id',
   'address',
   'name',
@@ -262,7 +263,7 @@ export function view(state: ClientsState): ClientsView {
   );
   const selected = clients.find((client) => client.id === state.selected);
   const counted = read !== undefined && state.readAt !== undefined;
-  const header = columns.map((column) => ({
+  const header = clientColumns.map((column) => ({
     column,
     label: text.clients.columns[column],
     ...(state.sort.column === column ? { sorted: state.sort.direction } : {}),
