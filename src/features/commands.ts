@@ -25,6 +25,7 @@ import { commands as savedQueryCommands } from './saved-query/commands';
 import { commands as manageCommands } from './manage/commands';
 import { commands as fieldCommands } from './field/commands';
 import { areaCommands as gridfsCommands } from './gridfs/commands';
+import { commands as mcpCommands } from './mcp/commands';
 
 import type { Command } from './command';
 
@@ -55,4 +56,5 @@ export const commands: readonly Command[] = [
   ...manageCommands,
   ...fieldCommands,
   ...gridfsCommands,
+  ...mcpCommands,
 ];

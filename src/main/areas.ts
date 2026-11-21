@@ -18,6 +18,7 @@ import { start as startPlaygrounds } from './playgrounds';
 import { start as startConsoles } from './consoles';
 import { start as startSavedQueries } from './saved-queries';
 import { start as startGridFs } from './gridfs';
+import { start as startMcp } from './mcp';
 
 /** What one area does at start. */
 export type AreaStart = (services: MainServices) => Promise<void>;
@@ -38,6 +39,7 @@ const starts: readonly AreaStart[] = [
   startConsoles,
   startSavedQueries,
   startGridFs,
+  startMcp,
   startPing,
   startCheckUpdate,
 ];

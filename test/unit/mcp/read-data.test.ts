@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { allTools, toolsOffered } from '../../../src/features/mcp';
+import { allTools, builtTools, serverInstructions, toolsOffered, waitingTools } from '../../../src/features/mcp';
 import { answer } from '../../../src/features/mcp/protocol';
 import { commandShape, hiddenWithoutReadData, shapeOf, titleWithoutValues } from '../../../src/features/mcp/read-data';
-import { text } from '../../../src/features/mcp/text';
 import { mcpState } from './harness';
 
 const off = mcpState({ settings: { 'datardo.mcp.readData': false } }).settings;
@@ -23,7 +22,7 @@ describe('mcp.read-data', () => {
     const call = answer(
       { jsonrpc: '2.0', id: 1, method: 'tools/call', params: { name: 'find_documents', arguments: {} } },
       toolsOffered(off),
-      { version: '0', instructions: text.instructions },
+      { version: '0', instructions: serverInstructions() },
     );
     expect(call).toMatchObject({ kind: 'response', response: { error: { message: 'Unknown tool: find_documents' } } });
   });
@@ -35,7 +34,6 @@ describe('mcp.read-data', () => {
       'count_documents',
       'explain_query',
       'slow_queries',
-      'index_advice',
       'server_status',
       'redis_scan_keys',
       'redis_key_details',
@@ -47,7 +45,32 @@ describe('mcp.read-data', () => {
   });
 
   it('offers the seven tools again at the next request once the setting is on', () => {
-    expect(toolsOffered(on)).toHaveLength(allTools.length);
+    expect(toolsOffered(on)).toHaveLength(builtTools.length);
+    expect(toolsOffered(off)).toHaveLength(builtTools.length - hiddenWithoutReadData.length);
+  });
+
+  it('counts 42 tools, 32 for MongoDB and Datardo, 10 for Redis, and offers those whose cards are built', () => {
+    expect(allTools).toHaveLength(42);
+    expect(
+      allTools.filter((tool) => tool.name.startsWith('redis_') && tool.name !== 'redis_oplog_status'),
+    ).toHaveLength(10);
+    // index_advice, open_monitor and sharding_status wait for M30, open_search and describe_relations for M34,
+    // open_explain for M23, open_watch for M27: a tool is offered only once its feature is built.
+    expect([...waitingTools.keys()].sort()).toEqual([
+      'describe_relations',
+      'index_advice',
+      'open_explain',
+      'open_monitor',
+      'open_search',
+      'open_watch',
+      'sharding_status',
+    ]);
+    expect(builtTools).toHaveLength(35);
+    const offered = toolsOffered(on).map((tool) => tool.name);
+    for (const name of waitingTools.keys()) {
+      expect(offered).not.toContain(name);
+      expect(serverInstructions()).not.toContain(name);
+    }
   });
 
   it('writes the shapes of queries and commands with ? for every value', () => {

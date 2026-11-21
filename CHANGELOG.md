@@ -134,6 +134,12 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
   copy of another), deleted, and the stream trimmed. Every write is confirmed when it loses data, refused on a
   read-only connection, and undone with its bytes. The **Groups** section of a stream shows its consumer groups, their
   consumers and the entries they have pending.
+- An MCP server lets AI assistants on the same machine read your MongoDB and Redis connections through 35 tools that
+  never write: it is turned on from **MCP** in the top bar, whose dot says whether it runs, listens on `127.0.0.1`
+  behind an access token kept in the secret storage, and copies the command for Claude Code or the JSON configuration
+  for other assistants. A new access token, another port and the calls of the assistant in the Log are a click away;
+  a taken port is said once with **Change port**, and `datardo.mcp.readData` off keeps documents and values of keys
+  away from the assistant.
 
 ### Fixed
 

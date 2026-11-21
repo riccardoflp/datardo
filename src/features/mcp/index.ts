@@ -20,6 +20,7 @@ import { group as redisServerTools } from './redis-server-tools';
 import { plan as server } from './server';
 import { plan as setup } from './setup';
 import { group as tabTools } from './tab-tools';
+import { text } from './text';
 import type { ToolGroupOf } from './tool/schemas';
 import type { ToolCall, ToolDefinition, ToolStep } from './types';
 
@@ -46,9 +47,32 @@ export const toolGroups: readonly ToolGroupOf[] = [
 /** Every tool of the server. */
 export const allTools: readonly ToolDefinition[] = toolGroups.flatMap((group) => group.tools);
 
+/**
+ * The tools that wait for the card whose page or read they use: a tool is offered only once its feature is built
+ * (the roadmap, M29, "Beyond the cards"). Each is added in the milestone that builds its card.
+ */
+export const waitingTools: ReadonlyMap<string, string> = new Map([
+  ['open_explain', 'explain.show'],
+  ['open_watch', 'watch.show'],
+  ['index_advice', 'advisor.show'],
+  ['open_monitor', 'monitor.show'],
+  ['sharding_status', 'monitor.show'],
+  ['describe_relations', 'relation.detect'],
+  ['open_search', 'search.show'],
+]);
+
+/** The tools whose cards are built. */
+export const builtTools: readonly ToolDefinition[] = allTools.filter((tool) => !waitingTools.has(tool.name));
+
 /** The tools offered now: those that read data are left out while `datardo.mcp.readData` is off (`mcp.read-data`). */
 export function toolsOffered(settings: SettingsState): readonly ToolDefinition[] {
-  return offeredTools(allTools, mcpSettings(settings));
+  return offeredTools(builtTools, mcpSettings(settings));
+}
+
+/** The instructions of `initialize`: they name only the tools offered with `datardo.mcp.readData` on. */
+export function serverInstructions(): string {
+  const offered = new Set(offeredTools(builtTools, { readData: true }).map((tool) => tool.name));
+  return text.instructions((names) => names.filter((name) => offered.has(name)).join(', '));
 }
 
 /** What the tool of a call needs next, given the replies of its rounds so far, or how it ended. */

@@ -1070,3 +1070,28 @@ Raised while the catalog was written; each names the cards that hold the current
   `value.add-scored-member`, `value.remove-scored-members`, `value.remove-members`, `value.remove-elements`,
   `value.add-entry`, `value.delete-entries`, `value.trim-stream`, `value.read-sorted-set`, `value.change-score`,
   `value.stream-groups`, `value.show`).
+- **Q90** — *Open, for the author.* The setup of the MCP server as built in M29: the brief of the milestone spoke of a
+  one-step setup that writes the configuration files of the common assistants after showing what will be written,
+  while the card `mcp.setup` only copies the command for Claude Code or the JSON configuration to the clipboard. M29
+  follows the card: Datardo reads and writes no file of another application. Writing an assistant's file would be an
+  outward-facing action, to be confirmed each time; whether to add it, for which assistants and where their files
+  are, is for the author to decide, in a card of its own. (`mcp.setup`).
+- **Q91** — *Open, for the author.* The tools offered as built in M29: a tool is offered only once its feature is
+  built (the roadmap's rule), so seven of the 42 tools are left out of `tools/list` and answered as unknown tools
+  until their milestones: `open_explain` (`explain.show`, M23), `open_watch` (`watch.show`, M27), `index_advice`
+  (`advisor.show`, M30), `open_monitor` and `sharding_status` (`monitor.show`, M30), `describe_relations`
+  (`relation.detect`, M34) and `open_search` (`search.show`, M34). The roadmap names the monitor, the advisor, the
+  relations and the search; the explain and watch tabs are held back by the same rule. The server's instructions name
+  only the tools offered. Each milestone that builds one of these features adds its tool back to
+  `src/features/mcp/index.ts › waitingTools`. (`mcp.read-data`, `mcp.performance-tools`, `mcp.deployment-tools`,
+  `mcp.data-model-tools`, `mcp.tab-tools`).
+- **Q92** — The MCP server in the main process as built in M29, where the cards say nothing: the tools of Redis use
+  the connection's own client, which names the database of each request (Q65), so that the database of the user's
+  tabs never moves; every request a tool sends passes a guard of its own before it leaves (the methods and commands
+  that read, `profile` only as `-1`, `CONFIG GET` only of `slowlog-log-slower-than`, a pipeline without `$out` or
+  `$merge`), which answers *Datardo's MCP server only reads: <command> was not sent.*; the line *New access token: the
+  old one no longer works* is written by the server under the source **MCP** rather than by the plan of
+  `mcp.access-token`; the entries of the setup dialog carry their elements (`mcp.log@dialog`,
+  `mcp.change-port@dialog`, `mcp.access-token@dialog`) on their radio buttons; the accessible name of the top bar's
+  **MCP** button is its tooltip (*MCP server: off. Click to set it up.*), and its dot is
+  `mcp.status@top-bar`. (`mcp.server`, `mcp.access-token`, `mcp.setup`, `mcp.status`).

@@ -7,13 +7,9 @@ import { initialMcpState, type McpServerState, type McpState } from '../../../sh
 import { mcpSettings } from '../read-data';
 import { serverUrl } from '../types';
 
-/**
- * The part `mcp` of the app's state. Until the part is registered in `src/shared/state/index.ts` the state has none,
- * and the server is taken as off: once it is, this reads `state.mcp`.
- */
+/** The part `mcp` of the app's state; a state made before the part existed (a test's) is taken as the server off. */
 export function mcpStateOf(state: AppState): McpState {
-  const part = (state as unknown as Readonly<Record<string, unknown>>)['mcp'];
-  return typeof part === 'object' && part !== null && 'server' in part ? (part as McpState) : initialMcpState;
+  return (state as Partial<AppState>).mcp ?? initialMcpState;
 }
 
 /** The server's state, `off` whenever `datardo.mcp.enabled` is off. */

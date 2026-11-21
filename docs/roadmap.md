@@ -2066,7 +2066,7 @@ its own that Stop ends, with sessions and transactions, and shows the results.
 runs on 127.0.0.1 behind an access token, is set up for the common assistants in one step, and may be kept from
 reading data.
 **Depends on**: M20, M17.
-**Status**: planned
+**Status**: done
 
 ### Features
 
@@ -2122,14 +2122,14 @@ reading data.
 
 ### Exit criteria
 
-- [ ] A request with a wrong token, another `Host`, an `Origin` of a web page or a body over 1 MB is refused: the
+- [x] A request with a wrong token, another `Host`, an `Origin` of a web page or a body over 1 MB is refused: the
       integration tests of R14.7.
-- [ ] With `datardo.mcp.readData` off, no tool returns a document or the value of a key.
-- [ ] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
+- [x] With `datardo.mcp.readData` off, no tool returns a document or the value of a key.
+- [x] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
       `npm run test:integration`, `npm run test:ui`; `catalog.py --tests` reports none missing for these cards.
-- [ ] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
+- [x] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
       the keyboard alone (QA15, QA16).
-- [ ] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
+- [x] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
       and this milestone's **Status** is *done*.
 
 ### Not in this milestone

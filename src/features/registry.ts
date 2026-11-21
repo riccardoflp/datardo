@@ -28,6 +28,7 @@ import { features as savedQueryFeatures } from './saved-query';
 import { features as manageFeatures } from './manage';
 import { features as fieldFeatures } from './field';
 import { features as gridfsFeatures } from './gridfs';
+import { features as mcpFeatures } from './mcp';
 
 /** The features of every area, as each area's index lists them. */
 const areas: readonly (readonly RunnableFeature[])[] = [
@@ -55,6 +56,7 @@ const areas: readonly (readonly RunnableFeature[])[] = [
   manageFeatures,
   fieldFeatures,
   gridfsFeatures,
+  mcpFeatures,
 ];
 
 /** The features the runner can start, by identifier. */

@@ -10,8 +10,6 @@ export const windowText = {
   goToLabel: 'Go to',
   goToPlaceholder: 'Go to a collection, a key, a page or a command',
   goToKey: 'Ctrl+K',
-  mcpText: 'MCP',
-  mcpLabel: 'MCP server',
   minimize: 'Minimize',
   maximize: 'Maximize',
   restore: 'Restore',

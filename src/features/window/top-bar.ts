@@ -8,6 +8,7 @@ import type { Intent } from '../../shared/bridge';
 import { featureId } from '../../shared/ids';
 import type { AppState } from '../../shared/state';
 import { appTarget } from '../../shared/target';
+import { view as mcpStatus, type StatusDot } from '../mcp/status';
 import { frame, topBarHeight } from './frame';
 import { appName, windowText } from './text';
 import { zoomInUse } from './zoom';
@@ -40,8 +41,13 @@ export interface TopBarView {
   };
   readonly mcp: {
     readonly text: string;
+    /** The state of the server in words (`mcp.status`): the tooltip, and the name a screen reader says. */
     readonly label: string;
+    /** The dot of the state, which the label also tells: never the color alone. */
+    readonly dot: StatusDot;
     readonly element: string;
+    /** The element of the state itself, its dot (`mcp.status@top-bar`). */
+    readonly stateElement: 'mcp.status@top-bar';
     readonly intent: Intent;
     readonly enabled: boolean;
   };
@@ -107,6 +113,7 @@ export function view(state: AppState): TopBarView {
   const zoom = zoomInUse(state.settings) / 100;
   const inFullScreen = state.window.fullScreen && platform !== 'linux';
   const enabled = state.runner.dialogs.length === 0;
+  const status = mcpStatus(state);
   return {
     height: topBarHeight,
     room: inFullScreen ? { left: 0, right: 0 } : { left: theFrame.room.left / zoom, right: theFrame.room.right / zoom },
@@ -120,10 +127,12 @@ export function view(state: AppState): TopBarView {
       enabled,
     },
     mcp: {
-      text: windowText.mcpText,
-      label: windowText.mcpLabel,
+      text: status.label,
+      label: status.tooltip,
+      dot: status.dot,
       // A click opens the setup of the server (mcp.status, mcp.setup).
-      element: 'mcp.setup@top-bar',
+      element: status.element,
+      stateElement: 'mcp.status@top-bar',
       intent: intent('mcp.setup'),
       enabled,
     },

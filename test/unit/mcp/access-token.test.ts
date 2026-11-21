@@ -4,7 +4,7 @@ import { checkRequest } from '../../../src/features/mcp/server';
 import { mcpContext, planOf } from './harness';
 
 describe('mcp.access-token', () => {
-  it('stores a new token of 32 bytes, says so, and logs the line without the token', () => {
+  it('stores a new token of 32 bytes and says so; the main process writes the line of the Log under MCP', () => {
     const made = planOf(plan(mcpContext('mcp.access-token'), {}));
     expect(made.title).toBe('store a new access token of the MCP server');
     expect(made.steps).toEqual([
@@ -21,7 +21,6 @@ describe('mcp.access-token', () => {
         level: 'info',
         text: "Datardo's MCP server has a new access token: copy the configuration again.",
       },
-      { kind: 'log', text: 'New access token: the old one no longer works' },
     ]);
     expect(made.undo).toEqual({ cannot: expect.stringContaining('Cannot be undone') as unknown });
   });

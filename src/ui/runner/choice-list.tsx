@@ -53,6 +53,7 @@ export function ChoiceList({ shown, first, filter, onFilter, onChange, onAnswer 
                 name={field.key}
                 value={choice.value}
                 checked={checked}
+                {...(choice.element === undefined ? {} : { 'data-feature': choice.element })}
                 onChange={() => {
                   onChange(
                     many

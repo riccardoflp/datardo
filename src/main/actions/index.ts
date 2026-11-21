@@ -25,6 +25,7 @@ import { actions as savedQueryActions } from './saved-query';
 import { actions as manageActions } from './manage';
 import { actions as fieldActions } from './field';
 import { actions as gridfsActions } from './gridfs';
+import { actions as mcpActions } from './mcp';
 
 /** The actions of one area, by name. */
 export type AreaActions = (services: MainServices) => Readonly<Record<string, AppAction>>;
@@ -51,6 +52,7 @@ const areas: readonly AreaActions[] = [
   manageActions,
   fieldActions,
   gridfsActions,
+  mcpActions,
 ];
 
 /** Every action of every area, by name; two areas never name an action alike. */

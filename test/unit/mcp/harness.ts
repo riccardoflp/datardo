@@ -45,7 +45,7 @@ export function mcpState(options: StateOptions = {}): AppState {
   return {
     ...withSettings,
     mcp: { server: options.server ?? { kind: 'off' }, warnedPorts: options.warnedPorts ?? [] },
-  } as AppState;
+  };
 }
 
 /** A context of a feature of this area, started by the user, at {@link now}. */

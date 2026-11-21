@@ -4,11 +4,10 @@
  * The AI clients authenticate with a bearer token that Datardo creates and keeps in the secret storage; a new one
  * replaces it when the old one may have leaked. The plan is one app step, `store a new access token of the MCP
  * server`: the main process draws 32 random bytes, writes them as base64url ({@link tokenText}) in the secret storage,
- * and from then on the old token gets 401. The token never goes to the settings, the Log, the window process or a
- * tool's answer.
+ * and from then on the old token gets 401; it writes `New access token: the old one no longer works` under the source
+ * **MCP** of the Log (`mcp.log`). The token never goes to the settings, the Log, the window process or a tool's answer.
  */
 import { noDanger, run, type Answers, type Context, type Outcome } from '../../shared/feature';
-import { logLine } from './log';
 import { text } from './text';
 
 /** The app action that stores a new token: 32 random bytes drawn by the main process. */
@@ -25,10 +24,7 @@ export function plan(_context: Context, _answers: Answers): Outcome {
     danger: noDanger,
     undo: { cannot: text.token.cannot },
     publishes: false,
-    after: [
-      { kind: 'notify', level: 'info', text: text.token.notification },
-      { kind: 'log', text: logLine({ kind: 'new-token' }) },
-    ],
+    after: [{ kind: 'notify', level: 'info', text: text.token.notification }],
   });
 }
 
