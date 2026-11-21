@@ -3,10 +3,10 @@
 Datardo is a desktop client for databases: MongoDB and Redis today, in one window of its own, built so that another
 engine can be added later. It does everything Mongoster 0.8.0 does for MongoDB, and adds a Redis client.
 
-**State of the work**: milestones M0 to M13, M17, M19 and M28 are done: the workshop, the window, the islands, the runner and the
+**State of the work**: milestones M0 to M14, M17, M19 and M28 are done: the workshop, the window, the islands, the runner and the
 settings, the tabs, Go to and Home, the connections to MongoDB and Redis, their SSH tunnels, folders, colors, import
 and export, the tree, the query bar, the table of documents and the pipeline editor of a collection tab, the undo history with the
-publishing for redis-oplog, reading and writing documents, the keys tab and the Server page of Redis, and the playgrounds. The pure core of most later milestones is written ahead of their views. The next
+publishing for redis-oplog, reading and writing documents, the keys tab, the values of strings and hashes and the Server page of Redis, and the playgrounds. The pure core of most later milestones is written ahead of their views. The next
 milestones are in the [roadmap](roadmap.md).
 
 ## The documents, in the order to read them

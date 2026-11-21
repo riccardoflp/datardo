@@ -33,6 +33,7 @@ import { isOffered as isResetOffered } from '../settings/reset';
 import { isOffered as isCloseOffered } from '../tab/close';
 import { isOffered as isReopenOffered } from '../tab/reopen';
 import { isVariantOffered } from '../undo/per-connection';
+import { bytesOfHex, nameOfText } from '../key/types';
 import { isWindowCommandOffered } from '../window/app-menu';
 import { activePin, commands, engineOf, type CommandEntry } from './commands';
 import { text } from './text';
@@ -144,7 +145,11 @@ function isOfferedByItsCard(state: AppState, id: string): boolean {
     case 'server.slow-log-reset':
       return currentConnectionOf(state)?.readOnly === false;
     default:
-      // The commands of the table act on the active collection tab: with none, there is no table.
+      // The commands of the table act on the active collection tab: with none, there is no table. Those of values act
+      // on the value of the active key tab.
+      if (id.startsWith('value.')) {
+        return active?.shows.kind === 'key';
+      }
       return id.startsWith('table.') ? active?.shows.kind === 'collection' : isWindowCommandOffered(state, id);
   }
 }
@@ -190,9 +195,22 @@ function targetOfShows(shows: TabShows, current: ConnectionId | undefined): Targ
   }
 }
 
+/** The key a key tab shows, as the target of the features of values; none for another tab. */
+function keyTargetOf(shows: TabShows): Target | undefined {
+  if (shows.kind !== 'key') {
+    return undefined;
+  }
+  const key = shows.keyHex === undefined ? nameOfText(shows.key) : bytesOfHex(shows.keyHex);
+  return key === undefined ? undefined : { kind: 'key', connection: shows.connection, database: shows.database, key };
+}
+
 /** What a command is started on: the active tab, else the current connection, else the app. */
-export function targetNow(state: AppState): Target {
+export function targetNow(state: AppState, feature = ''): Target {
   const active = activeTabOf(state.tabs);
+  const key = active === undefined || !feature.startsWith('value.') ? undefined : keyTargetOf(active.shows);
+  if (key !== undefined) {
+    return key;
+  }
   if (active !== undefined) {
     return targetOfShows(active.shows, state.nav.current);
   }
@@ -233,7 +251,7 @@ export function intentOf(state: AppState, id: string): Intent | undefined {
   const target: Target =
     feature === 'undo.per-connection' && current !== undefined
       ? { kind: 'connection', connection: current }
-      : targetNow(state);
+      : targetNow(state, feature);
   return { feature: featureId(feature), target, ...(args === undefined ? {} : { args }) };
 }
 

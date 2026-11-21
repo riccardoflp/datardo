@@ -2,7 +2,7 @@
  * The page of a key tab (`key.open`): the key's details as `key.inspect` shows them, read when the tab is shown and
  * after every refresh of its connection, with the toolbar of what can be done to it (`key.rename`, `key.copy`,
  * `key.set-expiry`, `key.persist`, `key.copy-name`, `key.delete`). On a read-only connection only **Copy name** is
- * there. Its value is shown by `value.show`, which a later milestone brings; a key of a module's type says it is not.
+ * there, with **Refresh** (`value.refresh`). Under the key's lines, its value is shown by `value.show`.
  */
 import { useEffect, useState } from 'react';
 import { view, type InspectRead, type InspectedKey } from '../../../features/key/inspect';
@@ -16,6 +16,9 @@ import { useAppState } from '../../state/store';
 import { KeyDetails, useClock } from '../keys/key-inspector';
 import { factsOf } from '../keys/keys-state';
 import styles from '../keys/keys-page.module.css';
+import { refreshValue } from '../value/value-actions';
+import { ValueSection } from '../value/value-page';
+import { forgetClosedValues } from '../value/value-store';
 
 type KeyShows = Extract<TabShows, { kind: 'key' }>;
 
@@ -78,7 +81,7 @@ function useKeyRead(shows: KeyShows, keyHex: string, refreshed: number): Inspect
   return read;
 }
 
-function KeyTabPage({ shows }: { readonly shows: KeyShows }): React.JSX.Element {
+function KeyTabPage({ tabId, shows }: { readonly tabId: string; readonly shows: KeyShows }): React.JSX.Element {
   const app = useAppState();
   const now = useClock();
   const name = nameOf(shows);
@@ -87,6 +90,7 @@ function KeyTabPage({ shows }: { readonly shows: KeyShows }): React.JSX.Element 
   const shown = view({ name, readOnly: facts.readOnly, read, now });
   const target: Target = { kind: 'key', connection: shows.connection, database: shows.database, key: name };
   const hasExpiry = read.kind === 'loaded' && read.key.timeLeft !== null;
+  const keyHex = hexOf(name);
   return (
     <div className={styles['page']}>
       <div className={styles['toolbar']} role="toolbar" aria-label={shown.name}>
@@ -103,17 +107,32 @@ function KeyTabPage({ shows }: { readonly shows: KeyShows }): React.JSX.Element 
             {entry.label}
           </button>
         ))}
+        <button
+          type="button"
+          className={styles['button']}
+          data-feature="value.refresh@toolbar"
+          aria-keyshortcuts="F5"
+          title="F5"
+          onClick={() => void refreshValue(tabId)}
+        >
+          Refresh
+        </button>
       </div>
       <KeyDetails shown={shown} target={target} place="toolbar" buttons={false} />
+      <ValueSection tabId={tabId} at={{ connection: shows.connection, database: shows.database, keyHex }} app={app} />
     </div>
   );
 }
 
 /** The page of the active key tab. */
 export function KeyPage(): React.JSX.Element | null {
-  const active = activeTabOf(useAppState().tabs);
+  const tabs = useAppState().tabs;
+  const active = activeTabOf(tabs);
+  useEffect(() => {
+    forgetClosedValues(new Set(tabs.tabs.map((tab) => tab.id)));
+  }, [tabs.tabs]);
   if (active?.shows.kind !== 'key') {
     return null;
   }
-  return <KeyTabPage key={active.id} shows={active.shows} />;
+  return <KeyTabPage key={active.id} tabId={active.id} shows={active.shows} />;
 }

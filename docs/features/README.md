@@ -831,20 +831,20 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`value.show`](value.md#valueshow--the-value-of-a-key) | The value of a key | View | M14 | Specified |
-| [`value.format`](value.md#valueformat--how-bytes-are-shown) | How bytes are shown | Derivation | M14 | Specified |
-| [`value.quote`](value.md#valuequote--bytes-as-an-argument-of-a-command) | Bytes as an argument of a command | Derivation | M14 | Specified |
-| [`value.typed-bytes`](value.md#valuetyped-bytes--from-what-is-typed-to-the-bytes-saved) | From what is typed to the bytes saved | Derivation | M14 | Specified |
-| [`value.item-editor`](value.md#valueitem-editor--edit-an-item-in-its-cell) | Edit an item in its cell | View | M14 | Specified |
-| [`value.check`](value.md#valuecheck--check-that-the-key-is-still-what-the-view-shows) | Check that the key is still what the view shows | Read | M14 | Specified |
-| [`value.count`](value.md#valuecount--how-many-items-a-value-has) | How many items a value has | Read | M14 | Specified |
-| [`value.read-string`](value.md#valueread-string--read-a-string) | Read a string | Read | M14 | Specified |
-| [`value.save-string`](value.md#valuesave-string--save-a-string) | Save a string | Operation | M14 | Specified |
-| [`value.read-hash`](value.md#valueread-hash--read-the-fields-of-a-hash) | Read the fields of a hash | Read | M14 | Specified |
-| [`value.add-field`](value.md#valueadd-field--add-a-field-to-a-hash) | Add a field to a hash | Operation | M14 | Specified |
-| [`value.edit-field`](value.md#valueedit-field--change-the-value-of-a-field) | Change the value of a field | Operation | M14 | Specified |
-| [`value.rename-field`](value.md#valuerename-field--rename-a-field-of-a-hash) | Rename a field of a hash | Operation | M14 | Specified |
-| [`value.remove-fields`](value.md#valueremove-fields--remove-fields-from-a-hash) | Remove fields from a hash | Operation | M14 | Specified |
+| [`value.show`](value.md#valueshow--the-value-of-a-key) | The value of a key | View | M14 | Built |
+| [`value.format`](value.md#valueformat--how-bytes-are-shown) | How bytes are shown | Derivation | M14 | Built |
+| [`value.quote`](value.md#valuequote--bytes-as-an-argument-of-a-command) | Bytes as an argument of a command | Derivation | M14 | Built |
+| [`value.typed-bytes`](value.md#valuetyped-bytes--from-what-is-typed-to-the-bytes-saved) | From what is typed to the bytes saved | Derivation | M14 | Built |
+| [`value.item-editor`](value.md#valueitem-editor--edit-an-item-in-its-cell) | Edit an item in its cell | View | M14 | Built |
+| [`value.check`](value.md#valuecheck--check-that-the-key-is-still-what-the-view-shows) | Check that the key is still what the view shows | Read | M14 | Built |
+| [`value.count`](value.md#valuecount--how-many-items-a-value-has) | How many items a value has | Read | M14 | Built |
+| [`value.read-string`](value.md#valueread-string--read-a-string) | Read a string | Read | M14 | Built |
+| [`value.save-string`](value.md#valuesave-string--save-a-string) | Save a string | Operation | M14 | Built |
+| [`value.read-hash`](value.md#valueread-hash--read-the-fields-of-a-hash) | Read the fields of a hash | Read | M14 | Built |
+| [`value.add-field`](value.md#valueadd-field--add-a-field-to-a-hash) | Add a field to a hash | Operation | M14 | Built |
+| [`value.edit-field`](value.md#valueedit-field--change-the-value-of-a-field) | Change the value of a field | Operation | M14 | Built |
+| [`value.rename-field`](value.md#valuerename-field--rename-a-field-of-a-hash) | Rename a field of a hash | Operation | M14 | Built |
+| [`value.remove-fields`](value.md#valueremove-fields--remove-fields-from-a-hash) | Remove fields from a hash | Operation | M14 | Built |
 | [`value.read-list`](value.md#valueread-list--read-the-elements-of-a-list) | Read the elements of a list | Read | M15 | Specified |
 | [`value.push-element`](value.md#valuepush-element--push-an-element-to-a-list) | Push an element to a list | Operation | M15 | Specified |
 | [`value.edit-element`](value.md#valueedit-element--change-an-element-of-a-list) | Change an element of a list | Operation | M15 | Specified |
@@ -862,8 +862,8 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [`value.delete-entries`](value.md#valuedelete-entries--delete-entries-from-a-stream) | Delete entries from a stream | Operation | M15 | Specified |
 | [`value.trim-stream`](value.md#valuetrim-stream--trim-a-stream) | Trim a stream | Operation | M15 | Specified |
 | [`value.stream-groups`](value.md#valuestream-groups--consumer-groups-of-a-stream) | Consumer groups of a stream | View | M15 | Specified |
-| [`value.copy`](value.md#valuecopy--copy-a-value-or-a-part-of-it) | Copy a value or a part of it | Operation | M14 | Specified |
-| [`value.refresh`](value.md#valuerefresh--refresh-a-value) | Refresh a value | Operation | M14 | Specified |
+| [`value.copy`](value.md#valuecopy--copy-a-value-or-a-part-of-it) | Copy a value or a part of it | Operation | M14 | Built |
+| [`value.refresh`](value.md#valuerefresh--refresh-a-value) | Refresh a value | Operation | M14 | Built |
 
 ## Watch changes
 

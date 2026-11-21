@@ -90,6 +90,14 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
   with the advice of the server and the largest keys of a database, found with `SCAN` a bounded number at a time,
   replication, and the configuration, read-only, with its passwords hidden. A section whose command the server refuses
   says why and the rest of the page works; the section, **Auto** and the filters come back at the next start.
+- The key tab shows the value of a string in an editor, as text, formatted JSON or hexadecimal, read a megabyte at a
+  time when it is large; it is edited and saved with `Ctrl+S`, keeping the key's expiry, asking first when the value
+  changed in the database meanwhile, and undone with its bytes and its time left.
+- The key tab shows the fields of a hash in a table, a page at a time, filtered by name, sorted, with the expiry of
+  each field on Redis 7.4; fields are added, edited and renamed in their cell, removed one at a time or by selection,
+  and copied as text, hexadecimal or Redis commands; bytes that are not text are edited in hexadecimal.
+- The inspector island shows the beginning of the value of the key selected in a keys tab, and the row selected in
+  a key tab in full; **Refresh** (`F5`) reads the value again and says when the key is gone or changed type.
 
 ### Fixed
 

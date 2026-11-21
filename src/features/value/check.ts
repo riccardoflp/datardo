@@ -157,10 +157,17 @@ export interface WriteInput {
 export function writePlan(input: WriteInput): Outcome {
   const { at, confirm } = input;
   return run({
-    title: confirm?.question ?? input.name,
+    title: input.name,
     steps: input.steps,
-    danger: confirm === undefined ? noDanger : { kind: 'confirm', text: confirm.detail, button: confirm.button },
-    undo: keyKept(at, input.name),
+    danger:
+      confirm === undefined
+        ? noDanger
+        : {
+            kind: 'confirm',
+            text: confirm.detail === '' ? confirm.question : `${confirm.question}\n${confirm.detail}`,
+            button: confirm.button,
+          },
+    undo: keyKept(at),
     publishes: false,
     after: [{ kind: 'notify', level: 'success', text: input.done }, readAgain(at)],
   });

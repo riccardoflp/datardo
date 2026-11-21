@@ -6,7 +6,18 @@ import * as removeFields from '../../../src/features/value/remove-fields';
 import * as removeMembers from '../../../src/features/value/remove-members';
 import * as removeScoredMembers from '../../../src/features/value/remove-scored-members';
 import { hexOf } from '../../../src/features/value/types';
-import { keyContext, neededCommands, planOf, readAnswers, refusalOf, stepTexts, typed, utf8 } from './context';
+import {
+  detailOf,
+  keyContext,
+  neededCommands,
+  planOf,
+  questionOf,
+  readAnswers,
+  refusalOf,
+  stepTexts,
+  typed,
+  utf8,
+} from './context';
 
 const hex = (text: string): { readonly hex: string } => ({ hex: hexOf(utf8(text)) });
 
@@ -47,7 +58,7 @@ describe('value.remove-members', () => {
 
   it('asks Remove the member redis from tags? and sends SREM tags redis', () => {
     const outcome = removeMembers.plan(context, { members: [hex('redis')], ...readAnswers('set', [3]) });
-    expect(planOf(outcome).title).toBe('Remove the member redis from tags?');
+    expect(questionOf(planOf(outcome))).toBe('Remove the member redis from tags?');
     expect(stepTexts(outcome)).toEqual(['SREM tags redis']);
   });
 
@@ -71,9 +82,7 @@ describe('value.remove-members', () => {
 
   it('says the key is deleted with every member', () => {
     const plan = planOf(removeMembers.plan(context, { members: [hex('a')], ...readAnswers('set', [1]) }));
-    expect(plan.danger.kind === 'confirm' && plan.danger.text).toBe(
-      'They are all the members of tags: the key is deleted with them.',
-    );
+    expect(detailOf(plan)).toBe('They are all the members of tags: the key is deleted with them.');
   });
 });
 
@@ -142,7 +151,7 @@ describe('value.change-score', () => {
 
   it('asks Overwrite when the score was set to 2 meanwhile, and closing it writes nothing', () => {
     const changed = { ...answers, ...readAnswers('zset', [2]) };
-    expect(planOf(changeScore.plan(context, changed)).title).toBe(
+    expect(questionOf(planOf(changeScore.plan(context, changed)))).toBe(
       'The score of ada in board was changed to 2 in the database after it was loaded. Overwrite it?',
     );
     expect(refusalOf(changeScore.plan(context, { ...changed, overwrite: false }))).toMatchObject({
@@ -160,7 +169,7 @@ describe('value.remove-scored-members', () => {
 
   it('asks Remove the member ada from board? and sends ZREM board ada', () => {
     const outcome = removeScoredMembers.plan(context, { members: [hex('ada')], ...readAnswers('zset', [3]) });
-    expect(planOf(outcome).title).toBe('Remove the member ada from board?');
+    expect(questionOf(planOf(outcome))).toBe('Remove the member ada from board?');
     expect(stepTexts(outcome)).toEqual(['ZREM board ada']);
   });
 
@@ -169,8 +178,6 @@ describe('value.remove-scored-members', () => {
     const outcome = removeScoredMembers.plan(context, { members, ...readAnswers('zset', [3]) });
     expect(stepTexts(outcome)).toEqual(['ZREM board a b c']);
     const plan = planOf(outcome);
-    expect(plan.danger.kind === 'confirm' && plan.danger.text).toBe(
-      'They are all the members of board: the key is deleted with them.',
-    );
+    expect(detailOf(plan)).toBe('They are all the members of board: the key is deleted with them.');
   });
 });

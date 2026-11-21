@@ -15,6 +15,10 @@ import { keysExtras } from './keys/keys-state';
 import { ServerInspector } from './server/server-inspector';
 import { ServerPage } from './server/server-page';
 import { serverExtras } from './server/server-state';
+import { useKeysTab } from './keys/keys-store';
+import { ValueItemInspector } from './value/value-inspector';
+import { valueExtras } from './value/value-state';
+import { useValueTab } from './value/value-store';
 
 /** A page as the main island draws it. */
 export type PageView = () => React.JSX.Element | null;
@@ -42,15 +46,22 @@ export const tabPages: Readonly<Partial<Record<string, PageView>>> = {
  */
 export const inspectors: Readonly<
   Partial<Record<string, (props: { readonly tabId: string }) => React.JSX.Element | null>>
-> = { keys: KeyInspector, server: ServerInspector };
+> = { keys: KeyInspector, key: ValueItemInspector, server: ServerInspector };
 
 /** What a page adds to the active tab, by its kind or its page: what the status line counts, what the inspector shows. */
 export const tabExtras: Readonly<Partial<Record<string, typeof keysExtras>>> = {
   keys: keysExtras,
+  key: valueExtras,
   server: serverExtras,
 };
 
 /** The name `inspectors` and `tabExtras` know a tab by: its page for a page tab, else the kind of what it shows. */
 export function extrasKey(shows: { readonly kind: string; readonly page?: string }): string {
   return shows.kind === 'page' && shows.page !== undefined ? shows.page : shows.kind;
+}
+
+/** Draws the shell again whenever what a page keeps in the window changes: what a tab adds to it is drawn from that. */
+export function usePageStores(): void {
+  useKeysTab(undefined);
+  useValueTab(undefined);
 }

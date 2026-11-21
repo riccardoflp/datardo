@@ -535,7 +535,8 @@ Adds a field with its value to a hash, never over a field that is there.
 - **Entry points**: **Add field** in the toolbar of a hash (`@toolbar`); Go to as **Add field…**.
 - **Offered when**: on a connection that is not read-only, in the key tab of a hash.
 - **Asks**: the form **Add a field to user:7**: **Field** and **Value**, each typed as text, JSON or hexadecimal
-  (`value.typed-bytes`); the button **Add**. The value may be empty, the name too.
+  (`value.typed-bytes`), which **Field as** and **Value as** choose (**Text**, **JSON**, **Hex**; **Text** first);
+  the button **Add**. The value may be empty, the name too.
 - **Reads**: `value.check`; `HEXISTS <key> <field>`.
 - **Plan**: `HSET user:7 nickname Ada`.
 - **Danger**: None.
@@ -1360,7 +1361,7 @@ that would write it.
   **As a command**; **Copy**, **Copy as hexadecimal** and **Copy as command** in the context menu of a cell
   (`@cell-menu`) and of a row (`@row-menu`); **Copy** and **Copy as command** in the selection bar
   (`@selection-bar`); **Copy** in the inspector island of an item (`@inspector`); `Ctrl+C` on a selected cell or on
-  the selected rows (`@table`); Go to as **Copy value**. Text selected in an editor is copied by `Ctrl+C` as in any
+  the selected rows (`@table`); Go to as **Copy Redis value** (Q75). Text selected in an editor is copied by `Ctrl+C` as in any
   editor.
 - **Offered when**: a value is shown.
 - **Reads**: for a string that is not whole, the parts not loaded yet (`value.read-string`); nothing else: items
