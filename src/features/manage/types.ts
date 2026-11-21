@@ -10,6 +10,9 @@ import { connectionId } from '../../shared/ids';
 import { mongoshValue } from '../../shared/mongosh-value';
 import { activeTabOf, type Tab } from '../../shared/state/tabs';
 import type { Target } from '../../shared/target';
+import { noMakers, type Makers } from '../aggregate/mongosh/helpers';
+import { valueOf } from '../aggregate/mongosh/parse';
+import { wrapperKey } from '../schema/types';
 import { startArgs } from '../nav/types';
 import { stepText } from '../runner/step-text';
 import { text } from './text';
@@ -22,6 +25,11 @@ export function isDocument(value: unknown): value is JsonDocument {
   return typeof value === 'object' && value !== null && !Array.isArray(value) && !(value instanceof Uint8Array);
 }
 
+/** Whether a value typed is an object: a document that is not a value of a BSON type (`{ $numberInt: "5" }`). */
+export function isObjectValue(value: unknown): value is JsonDocument {
+  return isDocument(value) && wrapperKey(value) === undefined;
+}
+
 /**
  * Text the user typed in mongosh syntax, as `query.parse` reads it in the caller: nothing typed, a value, or the parse
  * error.
@@ -32,13 +40,14 @@ export type ParsedText =
   | { readonly kind: 'invalid'; readonly message: string };
 
 /**
- * An answer that should hold text the user typed, as {@link ParsedText}. The editors and dialogs answer with what
- * `query.parse` read; a generic form answers with the text itself, which is read here as JSON (a part of mongosh
- * syntax) until `query.parse` is given to this area.
+ * An answer that should hold text the user typed, as {@link ParsedText}. A form, a dialog and the editors of the
+ * Definition and Validation sections answer with the text itself, read here in mongosh syntax with the reader the
+ * document area uses, so that `NumberLong(5)` or `ISODate("…")` keep their types; an answer already read is taken as
+ * it is. `makers` gives `ObjectId()` and `ISODate()` without arguments the time of the context.
  */
-export function parsedAnswer(answer: unknown): ParsedText {
+export function parsedAnswer(answer: unknown, makers: Makers = noMakers): ParsedText {
   if (typeof answer === 'string') {
-    return answer.trim() === '' ? { kind: 'empty' } : readJson(answer);
+    return answer.trim() === '' ? { kind: 'empty' } : readMongosh(answer, makers);
   }
   if (
     isDocument(answer) &&
@@ -49,12 +58,9 @@ export function parsedAnswer(answer: unknown): ParsedText {
   return answer === undefined ? { kind: 'empty' } : { kind: 'value', value: answer as Json };
 }
 
-function readJson(typed: string): ParsedText {
-  try {
-    return { kind: 'value', value: JSON.parse(typed) as Json };
-  } catch (error: unknown) {
-    return { kind: 'invalid', message: error instanceof Error ? error.message : String(error) };
-  }
+function readMongosh(typed: string, makers: Makers): ParsedText {
+  const read = valueOf(typed, makers);
+  return read.ok ? { kind: 'value', value: read.value } : { kind: 'invalid', message: read.message };
 }
 
 /** A text answer without the spaces around it; `undefined` while it was not answered. */

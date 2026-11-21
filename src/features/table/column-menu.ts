@@ -7,6 +7,7 @@ import { view as dragView, type Zone } from '../query/drag';
 import type { QueryTexts } from '../query/types';
 import { topOf } from './arrange-columns';
 import { expandEntries } from './cell-menu';
+import { text as fieldText } from '../field/text';
 import { text } from './text';
 import {
   canWrite,
@@ -97,14 +98,30 @@ function fieldEntries(state: ColumnMenuState, column: ColumnNode): readonly Menu
   if (!canWrite(state.target) || isIdKey(column.key)) {
     return [];
   }
+  // A field of the elements of an expanded array names that array, which the actions refuse or guard.
+  const array = column.arrayDepth === undefined ? undefined : column.path.slice(0, column.arrayDepth).join('.');
+  const args = { key: column.key, ...(array === undefined ? {} : { array }) };
   return [
-    { kind: 'entry', label: text.columnMenu.rename, element: 'field.rename@column-menu', args: { key: column.key } },
-    { kind: 'entry', label: text.columnMenu.remove, element: 'field.remove@column-menu', args: { key: column.key } },
+    {
+      kind: 'entry',
+      label: text.columnMenu.rename,
+      element: 'field.rename@column-menu',
+      tip: fieldText.tooltips.rename,
+      args,
+    },
+    {
+      kind: 'entry',
+      label: text.columnMenu.remove,
+      element: 'field.remove@column-menu',
+      tip: fieldText.tooltips.remove,
+      args,
+    },
     {
       kind: 'entry',
       label: text.columnMenu.convert,
       element: 'field.convert-type@column-menu',
-      args: { key: column.key },
+      tip: fieldText.tooltips.convert,
+      args,
     },
   ];
 }

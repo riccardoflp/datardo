@@ -4,13 +4,15 @@
  * connection island (`@connection-island`).
  *
  * The entries of the undo history (**Stop keeping undo history**, **Keep undo history**; `undo.per-connection`) are
- * in the third group.
+ * in the third group. **Create database…** (`manage.create-database`) follows **Open overview** on the connection
+ * island.
  */
 import type { ConnectionStateName, ConnectionView } from '../../shared/connection';
 import type { Json } from '../../shared/engine-request';
 import type { ConnectionId } from '../../shared/ids';
 import { connectionState, savedConnection, type ConnectionsState } from '../../shared/state/connections';
 import { isVariantOffered, variantTitle, type KeepVariant } from '../undo/per-connection';
+import { text as manageText } from '../manage/text';
 import { menuText } from './text';
 
 /** The places the menu is drawn in. */
@@ -144,6 +146,19 @@ function undoEntries(connection: ConnectionView, place: MenuPlace): readonly Men
     }));
 }
 
+/**
+ * **Create database…** (`manage.create-database`), on the connection island only: for a MongoDB connection, connected
+ * and not read-only.
+ */
+function createEntries(connection: ConnectionView, state: ConnectionStateName, place: MenuPlace): readonly MenuEntry[] {
+  return place === 'connection-island' &&
+    connection.engine === 'mongodb' &&
+    state === 'connected' &&
+    !connection.readOnly
+    ? [item(manageText.commands.createDatabase, 'manage.create-database', 'manage.create-database@connection-island')]
+    : [];
+}
+
 /** The first group: connect, disconnect or reconnect as the state allows, and **Open overview**. */
 function stateEntries(state: ConnectionStateName, place: MenuPlace): readonly MenuEntry[] {
   const connected = state === 'connected' || state === 'connecting' || state === 'reconnecting';
@@ -203,6 +218,7 @@ export function view(state: {
     connection: connection.id,
     entries: [
       ...stateEntries(connectionState(state.connections, connection.id), place),
+      ...createEntries(connection, connectionState(state.connections, connection.id), place),
       separator,
       item(menuText.edit, 'connection.edit', elements.edit[place]),
       item(menuText.duplicate, 'connection.duplicate', elements.duplicate[place]),

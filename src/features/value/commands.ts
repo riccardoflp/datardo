@@ -14,7 +14,7 @@ export const commands: readonly Command[] = [
   command('value.save-string', 'Save value'),
   command('value.add-field', 'Add field…'),
   command('value.edit-field', 'Edit field'),
-  command('value.rename-field', 'Rename field…'),
+  command('value.rename-field', 'Rename hash field…'),
   command('value.remove-fields', 'Remove fields…'),
 ];
 

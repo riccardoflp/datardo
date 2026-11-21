@@ -109,6 +109,15 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
   the pipeline of the tab for you or as a file of the connection's queries folder in Mongoster's format, rename,
   move, delete, pin, or reveal one; the folder is watched, a file that is not valid is skipped with a warning, and Go
   to finds saved queries by their name.
+- Databases and collections are created, renamed and dropped from the tree, the menu of the connection island and Go
+  to: names are checked while typed, a drop asks to type the name of the collection or database and says how many
+  documents and indexes go with it, and a renamed collection keeps its tab, its recent and saved queries, its columns
+  and its pin. The Definition section of a view and the Validation section of a collection edit them in mongosh syntax
+  and save them with `Ctrl+S`; a collection without rules is offered a `$jsonSchema` generated from a sample.
+- A field is renamed, removed or converted to another type from the menu of its column header or Go to, in the
+  documents matching the filter of the query bar: each write is shown before it runs with the documents it touches,
+  leaves out those where a parent is an array, is refused on a read-only connection and on a view, and is recorded in
+  the undo history; the column follows a renamed or removed field.
 
 ### Fixed
 

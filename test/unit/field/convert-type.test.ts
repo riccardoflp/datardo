@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { plan } from '../../../src/features/field/convert-type';
+import { after as leftAfter, parse as parseLeft, request as leftRequest } from '../../../src/features/field/reads/left';
 import { fieldContext, planOf, readOf, started, type Start } from './harness';
 
 const context = fieldContext('field.convert-type');
@@ -99,6 +100,27 @@ describe('field.convert-type', () => {
     expect(converted.title).toBe('Convert field v to int');
     expect(converted.publishes).toBe(true);
     expect(converted.undo).toMatchObject({ keeps: { collection: 'people', written: {} } });
+  });
+
+  it('counts the values still not converted after the write, and says 1 value could not be converted', () => {
+    const converted = planOf(plan(context, started({ field: 'v' }, { types, type: 'int', reached: 3, converted: 3 })));
+    expect(converted.after[0]).toMatchObject({
+      kind: 'notify',
+      level: 'success',
+      text: 'Converted v to int in 3 documents of people.',
+    });
+    const left = converted.after.find((after) => after.kind === 'start');
+    expect(left).toMatchObject({
+      feature: 'field.convert-type:left',
+      args: { collection: 'people', filter: { v: { $exists: true, $not: { $type: ['int', 'null', 'array'] } } } },
+    });
+    expect(leftRequest(context, left?.kind === 'start' ? (left.args ?? null) : null)).toMatchObject({
+      requests: [{ request: { method: 'countDocuments' } }],
+    });
+    expect(leftAfter(parseLeft([{ $numberLong: '1' }]))).toEqual([
+      { kind: 'notify', level: 'warning', text: "1 value couldn't be converted and kept its type." },
+    ]);
+    expect(leftAfter(parseLeft([{ $numberInt: '0' }]))).toEqual([]);
   });
 
   it('is refused on a view and on a read-only connection', () => {

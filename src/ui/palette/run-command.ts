@@ -15,6 +15,8 @@ import { isAggregateCommand, runAggregateCommand } from '../pages/aggregate/aggr
 import { isSavedQueryCommand, runSavedQueryCommand } from '../pages/saved-query/saved-query-commands';
 import { queryCommandIds, runQueryCommand } from '../query/query-commands';
 import { isDocumentCommand, runDocumentCommand } from '../pages/document/document-commands';
+import { isFieldFeature, runFieldCommand } from '../pages/field/field-actions';
+import { isSectionCommand, runSectionCommand } from '../pages/manage/section-commands';
 import { isTableCommand, runTableCommand } from '../table/table-commands';
 import { runTreeCommand } from '../tree/tree-commands';
 import { openAbout } from '../window/about';
@@ -98,6 +100,14 @@ export function runCommand(id: string, state: AppState): void {
   }
   if (isSavedQueryCommand(id)) {
     runSavedQueryCommand(id, state);
+    return;
+  }
+  if (isFieldFeature(id)) {
+    runFieldCommand(id, state);
+    return;
+  }
+  if (isSectionCommand(id)) {
+    runSectionCommand(id, state);
     return;
   }
   const local = windowOnly[id];

@@ -265,7 +265,7 @@ test.describe('tree.keyboard', () => {
     const menu = window.getByRole('menu');
     await expect(menu.getByRole('menuitem', { name: 'Open' })).toBeVisible();
     await expect(menu.getByRole('menuitem', { name: 'Pin' })).toBeVisible();
-    await expect(menu.getByRole('menuitem', { name: 'Drop…' })).toHaveCount(0);
+    await expect(menu.getByRole('menuitem', { name: 'Drop…' })).toBeVisible();
     await window.keyboard.press('Escape');
     await expect(menu).toBeHidden();
     await expect(node(window, 'orders, 3 documents, collection')).toBeFocused();

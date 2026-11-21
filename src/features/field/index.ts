@@ -5,6 +5,7 @@
 import type { RunnableFeature } from '../../shared/feature';
 import { featureId } from '../../shared/ids';
 import { feature as convertType } from './convert-type';
+import { feature as left } from './reads/left';
 import { feature as remove } from './remove';
 import { feature as rename } from './rename';
 import * as typeCounts from './type-counts';
@@ -15,4 +16,5 @@ export const features: readonly RunnableFeature[] = [
   remove,
   convertType,
   { kind: 'read', id: featureId('field.type-counts'), request: typeCounts.request, parse: typeCounts.parse },
+  left,
 ];

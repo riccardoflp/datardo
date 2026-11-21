@@ -19,6 +19,7 @@ import {
 } from '../../shared/feature';
 import { featureId } from '../../shared/ids';
 import { appTarget } from '../../shared/target';
+import { indexNamesRead } from './reads/index-names';
 import { text } from './text';
 import {
   collectionTabs,
@@ -52,7 +53,7 @@ export function documentsOf(answers: Answers, collection: string): number | unde
   return typeof count === 'number' ? count : undefined;
 }
 
-/** The number of indexes `index.list` read under `indexes`; `undefined` when they could not be read. */
+/** The number of indexes `manage.drop-collection:indexes` read under `indexes`; `undefined` when they could not be read. */
 export function indexesOf(answers: Answers): number | undefined {
   const list = answers['indexes'];
   const indexes = isDocument(list) ? list['indexes'] : undefined;
@@ -78,7 +79,7 @@ function countsNeed(place: KnownPlace, answers: Answers): Outcome | undefined {
     return needRead('count', 'tree.count', { ...args, collections: [place.collection] });
   }
   return answers['indexes'] === undefined
-    ? needRead('indexes', 'index.list', { ...args, collection: place.collection, definitionsOnly: true })
+    ? needRead('indexes', indexNamesRead, { ...args, collection: place.collection })
     : undefined;
 }
 

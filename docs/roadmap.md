@@ -1562,7 +1562,7 @@ to and the pins.
 validation rules are edited; a field is renamed, removed or converted to another type across the documents of a
 collection.
 **Depends on**: M12.
-**Status**: planned
+**Status**: done
 
 ### Features
 
@@ -1617,14 +1617,14 @@ collection.
 
 ### Exit criteria
 
-- [ ] Dropping a collection asks to type its name and cannot be undone; renaming one carries its recent queries, its
+- [x] Dropping a collection asks to type its name and cannot be undone; renaming one carries its recent queries, its
       queries saved for me, its columns' layout and its pins.
-- [ ] Renaming a field of 3 documents is recorded and undone; of 50,000 it says it cannot be undone.
-- [ ] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
+- [x] Renaming a field of 3 documents is recorded and undone; of 50,000 it says it cannot be undone.
+- [x] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
       `npm run test:integration`, `npm run test:ui`; `catalog.py --tests` reports none missing for these cards.
-- [ ] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
+- [x] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
       the keyboard alone (QA15, QA16).
-- [ ] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
+- [x] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
       and this milestone's **Status** is *done*.
 
 ### Not in this milestone

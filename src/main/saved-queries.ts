@@ -28,6 +28,7 @@ import {
   savedQueriesFile,
   savedQueryOf,
   storedQueryOf,
+  withCollectionRenamed,
   withCollectionQueries,
   type SavedQueriesFile,
   type StoredSavedQuery,
@@ -50,6 +51,9 @@ export interface CollectionWhere {
   readonly database: string;
   readonly collection: string;
 }
+
+/** A collection's name before and after a rename. */
+type Renamed = { readonly from: string; readonly to: string };
 
 /** One queries folder: its last reading, what was reported of it, and its watcher. */
 interface WatchedFolder {
@@ -150,6 +154,19 @@ export class SavedQueriesData {
       throw new Error('The saved queries were written by a newer Datardo: they are not changed.');
     }
     this.changed(where.connection);
+  }
+
+  /** The queries saved for me of a collection renamed take its new name (`manage.rename-collection`), written now. */
+  async renameCollection(connection: ConnectionId, database: string, names: Renamed): Promise<void> {
+    const store = await this.mineStore(connection);
+    if (!store.get().queries.some((each) => each.database === database && each.collection === names.from)) {
+      return;
+    }
+    if (!store.set(withCollectionRenamed(store.get(), database, names))) {
+      throw new Error('The saved queries were written by a newer Datardo and were not moved.');
+    }
+    await store.flush();
+    this.changed(connection);
   }
 
   /** `saved-query.forget-connection`: deletes the file of the queries saved for me of a connection removed. */

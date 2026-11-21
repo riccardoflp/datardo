@@ -995,3 +995,28 @@ Raised while the catalog was written; each names the cards that hold the current
   data folder keeps of the connection (the read `connection.remove:counts`, which the main process answers).
   (`saved-query.save`, `saved-query.clear-recent`, `saved-query.choose-folder`, `saved-query.read-folder`,
   `connection.remove`).
+- **Q82** — Manage collections and fields as built in M21, the reads with no card: the counts of
+  `manage.drop-collection` take the names of the indexes from a read of their own,
+  `manage.drop-collection:indexes` (`getIndexes`), the sample of `manage.validation` is the read
+  `manage.validation:sample` (a `$sample` of 1,000 documents, summed up by `schemaSummary`), and the count of the
+  values still not converted after `field.convert-type` is the read `field.convert-type:left`, started by the After
+  of the write; each is named as a variant of the card that uses it and kept in a `reads/` folder, since no card
+  names them (`manage.drop-collection`, `manage.validation`, `field.convert-type`).
+- **Q83** — `field.convert-type` as built in M21, while the runner gives no Operation its replies (Q58): the
+  notification *Converted `<field>` to `<type>` in `<k>` documents of `<collection>`.* gives the count confirmed
+  before the write, and the line *`<j>` values couldn't be converted and kept their type.* comes as a second
+  notification, a warning, from the count read after the write, since the first is shown before that count is
+  known; the second has no **Undo**, which stays on the first (`field.convert-type`, `undo.notification`).
+- **Q84** — `manage.rename-collection` as built in M21: the collection's tab is not closed and opened again under
+  the new name, it is changed in place to show the new name (the tabs' `shows-changed`), so that it keeps its place
+  in the tab strip, its id and with them the query that was run and its section; the other tabs on the old name
+  stay, as the card says. The references are not forgotten, since `relation.detect` is not built yet (M34); the saved
+  queries *for me* and the recent queries are moved through the stores the main process keeps of them (`manage.rename-collection`, `tab.open`, `tab.close`, `saved-query.save`).
+- **Q85** — `manage.edit-view` and `manage.edit-validation` as built in M21: Go to offers them while the active tab
+  shows the Definition or the Validation section of a connection that is not read-only; whether the text differs
+  from what was read is known only in the window, which leaves **Save** disabled and makes `Ctrl+S` and the command
+  do nothing when it does not. **Read-only** is said by the status line, as for every page; the section's toolbar
+  does not repeat it (`manage.edit-view`, `manage.edit-validation`, `manage.definition`, `manage.validation`).
+- **Q86** — Go to keeps one row a title, and M14's `value.rename-field` and M21's `field.rename` were both **Rename
+  field…**: Go to lists the first as **Rename hash field…**, as Q75 did for **Copy Redis value**; the row menu of the
+  hash keeps **Rename field…** (`value.rename-field`, `field.rename`).

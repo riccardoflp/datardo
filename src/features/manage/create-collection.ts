@@ -16,13 +16,15 @@ import {
   type Outcome,
 } from '../../shared/feature';
 import { featureId } from '../../shared/ids';
+import { noMakers, type Makers } from '../aggregate/mongosh/helpers';
+import { makersOf } from '../aggregate/types';
 import { nameError, nameRules } from './name-rules';
 import { text } from './text';
 import {
   collectionEntries,
   collectionsNeed,
   databaseTarget,
-  isDocument,
+  isObjectValue,
   mongoRequest,
   namespaceOf,
   parsedAnswer,
@@ -38,15 +40,18 @@ import {
 export const keys = { name: 'name', options: 'options' } as const;
 
 /** Feature: manage.create-collection — the options typed: none, a document, or the message shown under the field. */
-export function optionsOf(answer: unknown): { readonly options?: JsonDocument } | { readonly problem: string } {
-  const parsed = parsedAnswer(answer);
+export function optionsOf(
+  answer: unknown,
+  makers: Makers = noMakers,
+): { readonly options?: JsonDocument } | { readonly problem: string } {
+  const parsed = parsedAnswer(answer, makers);
   switch (parsed.kind) {
     case 'empty':
       return {};
     case 'invalid':
       return { problem: text.createCollection.invalidOptions(parsed.message) };
     case 'value':
-      if (!isDocument(parsed.value)) {
+      if (!isObjectValue(parsed.value)) {
         return { problem: text.createCollection.notAnObject };
       }
       return Object.keys(parsed.value).length === 0 ? {} : { options: parsed.value };
@@ -116,7 +121,7 @@ export function plan(context: Context, answers: Answers): Outcome {
   if (name === undefined) {
     return createQuestion(place, existing, answers);
   }
-  const typed = optionsOf(answers[keys.options]);
+  const typed = optionsOf(answers[keys.options], makersOf(context));
   const problem =
     nameError('collection', name) ??
     (existing.includes(name) ? text.names.collectionExists : undefined) ??

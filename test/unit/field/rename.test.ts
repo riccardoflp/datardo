@@ -95,11 +95,13 @@ describe('field.rename', () => {
     });
     expect(all.undo).toEqual({
       keeps: {
+        kind: 'filter',
         connection: 'c-local',
         database: 'shop',
         collection: 'people',
         filter: { name: { $exists: true } },
         written: {},
+        count: 5,
       },
     });
   });
@@ -116,6 +118,28 @@ describe('field.rename', () => {
     const all = planOf(plan(context, counted({ field: 'name' }, 'fullName', over)));
     expect(all.danger).toMatchObject({ kind: 'destructive', name: 'people' });
     expect(all.touches).toBe('50,000 documents');
+    expect(all.undo).toEqual({
+      cannot: "This can't be undone: the undo history keeps operations of up to 10,000 documents.",
+    });
+  });
+
+  it('records nothing when the undo history is off, and its confirmation says so', () => {
+    const off = planOf(plan(undoOff, counted(byKind, 'fullName', { reached: 3, renamed: 3, overwrites: 0 })));
+    expect(off.undo).toHaveProperty('cannot');
+    expect(off.undo).not.toHaveProperty('keeps');
+  });
+
+  it('reads the filter of the query bar given as text, in mongosh syntax, and keeps it as written', () => {
+    const args = { ...(started({ field: 'name' })['args'] as object), filter: '{ age: { $gt: 30 } }' };
+    const outcome = plan(context, { args, name: 'fullName' });
+    expect(readOf(outcome).args).toMatchObject({
+      filter: '{ $and: [{ age: { $gt: 30 } }, { name: { $exists: true } }] }',
+    });
+    const renamed = planOf(plan(context, { args, name: 'fullName', reached: 3, renamed: 3, overwrites: 0 }));
+    expect(renamed.title).toBe('Rename field name to fullName where { age: { $gt: 30 } }');
+    const broken = { ...args, filter: '{ age: ' };
+    expect(plan(context, { args: broken })).toMatchObject({ kind: 'refuse', code: 'field.rename/invalid-filter' });
+    expect(plan(context, { args: { ...args, filter: '5' } })).toMatchObject({ code: 'field.rename/invalid-filter' });
   });
 
   it('with a filter and the undo history off, confirms with Rename and no name to type', () => {

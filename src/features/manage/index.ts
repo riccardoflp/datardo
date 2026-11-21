@@ -10,6 +10,8 @@ import { feature as dropDatabase } from './drop-database';
 import { feature as editValidation } from './edit-validation';
 import { feature as editView } from './edit-view';
 import { feature as readOptions } from './read-options';
+import { feature as indexNames } from './reads/index-names';
+import { feature as sample } from './reads/sample';
 import { feature as renameCollection } from './rename-collection';
 import { feature as validation } from './validation';
 
@@ -25,4 +27,6 @@ export const features: readonly RunnableFeature[] = [
   editView,
   validation,
   editValidation,
+  indexNames,
+  sample,
 ];

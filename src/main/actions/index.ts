@@ -22,6 +22,8 @@ import { actions as playgroundActions } from './playground';
 import { actions as saveTabActions } from './save-tab';
 import { actions as consoleActions } from './console';
 import { actions as savedQueryActions } from './saved-query';
+import { actions as manageActions } from './manage';
+import { actions as fieldActions } from './field';
 
 /** The actions of one area, by name. */
 export type AreaActions = (services: MainServices) => Readonly<Record<string, AppAction>>;
@@ -45,6 +47,8 @@ const areas: readonly AreaActions[] = [
   saveTabActions,
   consoleActions,
   savedQueryActions,
+  manageActions,
+  fieldActions,
 ];
 
 /** Every action of every area, by name; two areas never name an action alike. */

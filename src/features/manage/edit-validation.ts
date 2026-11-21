@@ -15,10 +15,12 @@ import {
   type Outcome,
 } from '../../shared/feature';
 import { featureId } from '../../shared/ids';
+import { noMakers, type Makers } from '../aggregate/mongosh/helpers';
+import { makersOf } from '../aggregate/types';
 import { text } from './text';
 import {
   databaseTarget,
-  isDocument,
+  isObjectValue,
   knownPlace,
   mongoRequest,
   namespaceOf,
@@ -41,20 +43,20 @@ function refused(outcome: Outcome): CheckedRules {
 }
 
 /** Feature: manage.edit-validation — the rules typed, checked in the order of the card. */
-export function checkRules(answer: unknown): CheckedRules {
-  const parsed = parsedAnswer(answer);
+export function checkRules(answer: unknown, makers: Makers = noMakers): CheckedRules {
+  const parsed = parsedAnswer(answer, makers);
   if (parsed.kind === 'invalid') {
     return refused(refuse('manage.edit-validation/invalid', text.definition.invalid(parsed.message)));
   }
   const value = parsed.kind === 'value' ? parsed.value : undefined;
-  if (!isDocument(value)) {
+  if (!isObjectValue(value)) {
     return refused(refuse('manage.edit-validation/not-an-object', text.definition.notAnObject));
   }
   const unknown = unknownField(value, ruleFields);
   if (unknown !== undefined) {
     return refused(refuse('manage.edit-validation/unknown-field', text.definition.unknownRulesField(unknown)));
   }
-  if (value['validator'] !== undefined && !isDocument(value['validator'])) {
+  if (value['validator'] !== undefined && !isObjectValue(value['validator'])) {
     return refused(refuse('manage.edit-validation/validator', text.definition.validator));
   }
   const rules: JsonDocument = Object.fromEntries(
@@ -75,7 +77,7 @@ export function plan(context: Context, answers: Answers): Outcome {
   if (started.view === true) {
     return refuse('manage.edit-validation/view', text.definition.noValidation);
   }
-  const checked = checkRules(started.args['rules']);
+  const checked = checkRules(started.args['rules'], makersOf(context));
   if (checked.kind === 'refuse') {
     return checked.outcome;
   }
