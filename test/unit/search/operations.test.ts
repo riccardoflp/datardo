@@ -34,13 +34,8 @@ describe('search.open-in-collection', () => {
       'open shop.orders with the filter { _id: { $in: [ObjectId("65f1c0a2b3d4e5f6a7b8c9d0"), ObjectId("65f1c0a2b3d4e5f6a7b8c9d1"), ObjectId("65f1c0a2b3d4e5f6a7b8c9d2")] } }',
     );
     expect(step.args).toMatchObject({ filterJson: { _id: { $in: [first, second, third] } }, sort: '', projection: '' });
-    expect(plan.after).toEqual([
-      {
-        kind: 'start',
-        feature: 'query.run',
-        target: { kind: 'collection', connection: local.id, database: 'shop', collection: 'orders' },
-      },
-    ]);
+    // The window shows the filter in the bar of the tab and runs it: the plan starts nothing after its step.
+    expect(plan.after).toEqual([]);
     expect(plan.danger).toEqual({ kind: 'none' });
   });
 

@@ -31,7 +31,7 @@ export const fileReadId = 'relation.export-svg:file';
 export const chooseFileAction = 'relation.choose-file';
 
 /** The app action that opens a file with the system's program for it. */
-export const openFileAction = 'nav.open-file';
+export const openFileAction = 'relation.open-file';
 
 /** The writer of the main process that writes the text given (`FileStep.content`). */
 export const svgWriter = 'relation.svg';

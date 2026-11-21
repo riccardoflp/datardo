@@ -563,20 +563,20 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`relation.detect`](relation.md#relationdetect--which-fields-are-references) | Which fields are references | Derivation | M34 | Specified |
-| [`relation.candidates`](relation.md#relationcandidates--which-fields-are-looked-up-and-where) | Which fields are looked up, and where | Derivation | M34 | Specified |
-| [`relation.fields`](relation.md#relationfields--the-fields-of-a-sample) | The fields of a sample | Derivation | M34 | Specified |
-| [`relation.name-match`](relation.md#relationname-match--whether-a-field-is-named-after-a-collection) | Whether a field is named after a collection | Derivation | M34 | Specified |
-| [`relation.read`](relation.md#relationread--read-the-references-of-a-database) | Read the references of a database | Read | M34 | Specified |
-| [`relation.diagram`](relation.md#relationdiagram--the-relationship-diagram-page) | The Relationship diagram page | View | M34 | Specified |
-| [`relation.layout`](relation.md#relationlayout--where-the-boxes-of-the-diagram-go) | Where the boxes of the diagram go | Derivation | M34 | Specified |
-| [`relation.export-mermaid`](relation.md#relationexport-mermaid--copy-the-diagram-as-mermaid) | Copy the diagram as Mermaid | Operation | M34 | Specified |
-| [`relation.export-svg`](relation.md#relationexport-svg--save-the-diagram-as-an-svg-image) | Save the diagram as an SVG image | Operation | M34 | Specified |
-| [`relation.follow`](relation.md#relationfollow--go-from-here-the-references-of-a-document) | Go from here: the references of a document | View | M34 | Specified |
-| [`relation.targets`](relation.md#relationtargets--where-a-reference-leads) | Where a reference leads | Derivation | M34 | Specified |
-| [`relation.referrers`](relation.md#relationreferrers--which-documents-refer-to-a-document) | Which documents refer to a document | Derivation | M34 | Specified |
-| [`relation.open-referenced`](relation.md#relationopen-referenced--open-the-documents-a-field-refers-to) | Open the documents a field refers to | Operation | M34 | Specified |
-| [`relation.open-referencing`](relation.md#relationopen-referencing--open-the-documents-that-refer-to-a-document) | Open the documents that refer to a document | Operation | M34 | Specified |
+| [`relation.detect`](relation.md#relationdetect--which-fields-are-references) | Which fields are references | Derivation | M34 | Built |
+| [`relation.candidates`](relation.md#relationcandidates--which-fields-are-looked-up-and-where) | Which fields are looked up, and where | Derivation | M34 | Built |
+| [`relation.fields`](relation.md#relationfields--the-fields-of-a-sample) | The fields of a sample | Derivation | M34 | Built |
+| [`relation.name-match`](relation.md#relationname-match--whether-a-field-is-named-after-a-collection) | Whether a field is named after a collection | Derivation | M34 | Built |
+| [`relation.read`](relation.md#relationread--read-the-references-of-a-database) | Read the references of a database | Read | M34 | Built |
+| [`relation.diagram`](relation.md#relationdiagram--the-relationship-diagram-page) | The Relationship diagram page | View | M34 | Built |
+| [`relation.layout`](relation.md#relationlayout--where-the-boxes-of-the-diagram-go) | Where the boxes of the diagram go | Derivation | M34 | Built |
+| [`relation.export-mermaid`](relation.md#relationexport-mermaid--copy-the-diagram-as-mermaid) | Copy the diagram as Mermaid | Operation | M34 | Built |
+| [`relation.export-svg`](relation.md#relationexport-svg--save-the-diagram-as-an-svg-image) | Save the diagram as an SVG image | Operation | M34 | Built |
+| [`relation.follow`](relation.md#relationfollow--go-from-here-the-references-of-a-document) | Go from here: the references of a document | View | M34 | Built |
+| [`relation.targets`](relation.md#relationtargets--where-a-reference-leads) | Where a reference leads | Derivation | M34 | Built |
+| [`relation.referrers`](relation.md#relationreferrers--which-documents-refer-to-a-document) | Which documents refer to a document | Derivation | M34 | Built |
+| [`relation.open-referenced`](relation.md#relationopen-referenced--open-the-documents-a-field-refers-to) | Open the documents a field refers to | Operation | M34 | Built |
+| [`relation.open-referencing`](relation.md#relationopen-referencing--open-the-documents-that-refer-to-a-document) | Open the documents that refer to a document | Operation | M34 | Built |
 
 ## The runner
 
@@ -630,13 +630,13 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`search.show`](search.md#searchshow--the-search-documents-page) | The Search documents page | View | M34 | Specified |
-| [`search.collections`](search.md#searchcollections--read-the-collections-a-search-reads) | Read the collections a search reads | Read | M34 | Specified |
-| [`search.scan`](search.md#searchscan--read-the-documents-of-the-collections-and-find-the-matches) | Read the documents of the collections and find the matches | Read | M34 | Specified |
-| [`search.text`](search.md#searchtext--what-the-typed-text-looks-for) | What the typed text looks for | Derivation | M34 | Specified |
-| [`search.match`](search.md#searchmatch--the-values-of-a-document-that-match) | The values of a document that match | Derivation | M34 | Specified |
-| [`search.open-in-collection`](search.md#searchopen-in-collection--open-the-documents-found-in-their-collection) | Open the documents found in their collection | Operation | M34 | Specified |
-| [`search.copy-id`](search.md#searchcopy-id--copy-the-_id-of-a-document-found) | Copy the _id of a document found | Operation | M34 | Specified |
+| [`search.show`](search.md#searchshow--the-search-documents-page) | The Search documents page | View | M34 | Built |
+| [`search.collections`](search.md#searchcollections--read-the-collections-a-search-reads) | Read the collections a search reads | Read | M34 | Built |
+| [`search.scan`](search.md#searchscan--read-the-documents-of-the-collections-and-find-the-matches) | Read the documents of the collections and find the matches | Read | M34 | Built |
+| [`search.text`](search.md#searchtext--what-the-typed-text-looks-for) | What the typed text looks for | Derivation | M34 | Built |
+| [`search.match`](search.md#searchmatch--the-values-of-a-document-that-match) | The values of a document that match | Derivation | M34 | Built |
+| [`search.open-in-collection`](search.md#searchopen-in-collection--open-the-documents-found-in-their-collection) | Open the documents found in their collection | Operation | M34 | Built |
+| [`search.copy-id`](search.md#searchcopy-id--copy-the-_id-of-a-document-found) | Copy the _id of a document found | Operation | M34 | Built |
 
 ## Server
 

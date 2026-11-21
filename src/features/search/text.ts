@@ -126,9 +126,22 @@ export const text = {
     openStep: 'open the Search documents page',
     scopeStep: (scope: string) => `set the scope of the search to ${scope}`,
     startStep: (typed: string) => `search “${typed}”`,
+    stopStep: 'stop the search',
     nothingWritten: 'Nothing is written; closing the tab is enough.',
   },
   commands: { show: 'Search documents' },
+  /** The words of the page the cards do not write: the names of its parts for the accessibility tree. */
+  window: {
+    text: 'Text to find',
+    searchRow: 'Search',
+    scopeRow: 'Where to search',
+    optionsRow: 'Options',
+    results: 'Documents found',
+    itemMenu: 'Document found',
+    reading: 'Reading the document…',
+    gone: 'This document is no longer in its collection.',
+    nothing: 'Select a document found to see it whole.',
+  },
 } as const;
 
 /** `1 collection`, `14 collections`, `12,400 documents`. */

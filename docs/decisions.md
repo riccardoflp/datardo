@@ -539,6 +539,39 @@ key first (one more command a key, for a question the dumps already answer), and
 changes (a second format of undo for each type).
 *Built in M11 and M13 on 2026-11-19 as Q14 describes; answers Q14 unless the author decides otherwise.*
 
+## D110 — Search and the references are read in the main process, as work on the status line
+
+The reads of the Search documents page (`search.collections`, `search.scan`) and of the references of a database
+(`relation.read`) are carried out by the main process, in `src/main/search-run.ts` and `src/main/relation-read.ts`,
+with the cursors the engines keep (`openCursor`, `cursorNext`, `closeCursor`): three collections at a time for a
+search, six for a sample. Each read is work on the status line with **Cancel**, and what it finds reaches the window
+through two slices of the app's state, `search` (by tab) and `relation` (the references kept, and the diagram tabs).
+No worker thread is started: the time goes in waiting for the server, and matching a batch of 500 documents takes
+far less than the batch takes to arrive. Rejected: a worker in `src/runner/workers`, which M34 names as a module,
+for one more boundary to cross with every batch and nothing it would take off the main process.
+For these pages Q36 is followed as it reads: a search has no time limit, only **Stop**, and the diagram says
+*relations*.
+*Built in M34 on 2026-11-21; unless the author decides otherwise.*
+
+## D111 — What a search tab and a diagram tab were given is kept with the tab
+
+The Search documents page keeps its input (the text, the mode, **In**, **Collections**, the options and **Read**) in
+the memory of its tab, as one choice named `search`; the Relationship diagram keeps **Sample**, **Keys only**, the
+boxes moved and the scale as one choice named `diagram`. Both are sent once they settle, as the server pages do, so
+`tabs.json` keeps its version and no migration is needed. What was found is not kept: a search tab restored shows its
+input and searches on `Enter`, a diagram tab restored samples again. Rejected: keeping the documents found or the
+references sampled on disk, which would keep values of the deployment where the cards keep none.
+*Built in M34 on 2026-11-21; unless the author decides otherwise.*
+
+## D112 — The references kept are forgotten after a rename or a drop
+
+The main process follows what the window starts (`followIntents` in `src/main/bridge.ts`) and, after
+`manage.rename-collection`, `manage.drop-collection` or `manage.drop-database` is done, forgets the references found
+for the database, which the next collection tab or diagram finds again; **Refresh** of the tree island makes them
+old, and a connection disconnected or removed forgets its own. This answers the part of Q84 on references. Rejected:
+an After step on each card of the manage area, which would make three cards of M21 name an action of M34.
+*Built in M34 on 2026-11-21; unless the author decides otherwise.*
+
 ## Open questions
 
 - **Q1** — *Answered on 2026-11-18 by [D7](#d7--home-is-the-first-page)*: the last active tab when tabs are restored,
@@ -1020,3 +1053,22 @@ Raised while the catalog was written; each names the cards that hold the current
 - **Q86** — Go to keeps one row a title, and M14's `value.rename-field` and M21's `field.rename` were both **Rename
   field…**: Go to lists the first as **Rename hash field…**, as Q75 did for **Copy Redis value**; the row menu of the
   hash keeps **Rename field…** (`value.rename-field`, `field.rename`).
+- **Q140** — `relation.open-referenced`, `relation.open-referencing` and `search.open-in-collection` as built in
+  M34: their plan has no After that starts `query.run`. The app step named *query.open-filtered* opens the collection tab
+  with the filter, the sort and the projection in its bar, the way a saved query is loaded, and the window runs it
+  as for a saved query; an After `query.run` would run the query before the bar holds the filter. The cards' **After**
+  (the tab active with the query run) holds (`relation.open-referenced`, `relation.open-referencing`,
+  `search.open-in-collection`, `saved-query.run`).
+- **Q141** — `relation.export-svg` as built in M34: **Open** of its notification is the app action
+  *relation.open-file*, which the area's own actions answer, instead of the *nav.open-file* its function named and
+  no area had (`relation.export-svg`).
+- **Q142** — The Search documents page as built in M34: the document of a selected item is shown in the inspector
+  island as text (canonical mongosh syntax), not as the tree of `document.inspect`, and its context menu's **Open
+  document** is listed as an entry point of `document.open` (`@item-menu`) (`search.show`, `document.open`).
+- **Q143** — A reference cell of the table is a link only while `Ctrl` is held: the window marks the page while the
+  key is down, and the cell under the pointer is underlined then; its tooltip ends on the line of `relation.follow` and, without
+  `Ctrl`, a click selects the cell as before (`relation.follow`, `table.navigate`).
+- **Q144** — The MCP tool `describe_relations` reaches `relation.detect` through the app action of that name, which
+  samples the database again with the size the tool gives, keeps what it found for the tabs as a diagram's sample
+  does, and answers with the collections and the relations; an assistant asking about a database therefore also
+  refreshes the references its tabs use (`mcp.data-model-tools`, `relation.read`).

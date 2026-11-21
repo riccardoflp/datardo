@@ -13,6 +13,7 @@ import { inspectStateOf } from './inspect-state';
 import { useInspect } from './inspect-store';
 import { InspectorButtons } from './inspector-buttons';
 import { InspectorTree } from './inspector-tree';
+import { FollowSection } from '../relation/follow-section';
 import styles from './document.module.css';
 
 /** The inspector of the collection tab `tab`, when one document is selected. */
@@ -66,6 +67,9 @@ export function DocumentInspector({ tab }: { readonly tab: TabId }): React.JSX.E
         <pre className={styles['text']} tabIndex={0} aria-label={shown.header}>
           {shown.text}
         </pre>
+      )}
+      {shown.goFromHere === undefined ? null : (
+        <FollowSection where={ref} mode={inspectState.source} document={selection.document} />
       )}
     </div>
   );

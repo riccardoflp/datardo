@@ -20,6 +20,7 @@ import { changeQuery, type CollectionTab } from '../query/collection-store';
 import { openColumnsPanel } from './columns-panel-store';
 import type { TableColumns } from './table-columns';
 import { arrange, collapseColumn, copyDocuments, expandColumn, startOnCollection } from './table-start';
+import { chooseReferenceEntry } from '../pages/relation/table-links';
 
 /** What a chosen entry acts on: the tab, the documents of the menu (the row's, or the selection), the field. */
 export interface EntryContext {
@@ -113,6 +114,9 @@ export function chooseEntry(context: EntryContext, entry: ChosenEntry): void {
       changeQuery(ref.tab, (query) => ({ ...query, selection: { keys: [] } }));
       return;
     default:
+      if (chooseReferenceEntry(ref, context.target, entry)) {
+        return;
+      }
       if (!chooseDocumentEntry({ ...context, element: entry.element }) && !chooseFieldEntry(ref, entry)) {
         writeIntoBar(context, entry, feature);
       }

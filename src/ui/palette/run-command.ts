@@ -22,6 +22,7 @@ import { runTreeCommand } from '../tree/tree-commands';
 import { openAbout } from '../window/about';
 import { openGoTo } from './go-to-store';
 import { flushPlaygrounds } from '../pages/playground/playground-store';
+import { followSelectedCell } from '../pages/relation/table-links';
 
 let switcherOpener: (() => void) | undefined;
 
@@ -108,6 +109,11 @@ export function runCommand(id: string, state: AppState): void {
   }
   if (isSectionCommand(id)) {
     runSectionCommand(id, state);
+    return;
+  }
+  // **Open referenced document** follows the reference of the selected cell, as `Ctrl+Enter` does (`relation.follow`).
+  if (id === 'relation.open-referenced') {
+    followSelectedCell(state);
     return;
   }
   const local = windowOnly[id];

@@ -24,6 +24,8 @@ import { commands as consoleCommands } from './console/commands';
 import { commands as savedQueryCommands } from './saved-query/commands';
 import { commands as manageCommands } from './manage/commands';
 import { commands as fieldCommands } from './field/commands';
+import { areaCommands as searchCommands } from './search/commands';
+import { areaCommands as relationCommands } from './relation/commands';
 
 import type { Command } from './command';
 
@@ -53,4 +55,6 @@ export const commands: readonly Command[] = [
   ...savedQueryCommands,
   ...manageCommands,
   ...fieldCommands,
+  ...searchCommands,
+  ...relationCommands,
 ];

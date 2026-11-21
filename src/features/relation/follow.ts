@@ -40,6 +40,8 @@ export interface FollowLine {
   readonly target: ReferenceTarget;
   readonly feature: 'relation.open-referenced' | 'relation.open-referencing';
   readonly element: 'relation.open-referenced@inspector' | 'relation.open-referencing@inspector';
+  /** The path of the field a line of the referenced documents leaves, without array positions. */
+  readonly path?: string;
 }
 
 /** What **Go from here** shows. */
@@ -66,7 +68,7 @@ export function tooltipOf(filterText: string): string {
 }
 
 /** The values of the document at a path without array positions, the elements of arrays gathered. */
-function valuesAt(document: Json, path: string): Json | undefined {
+export function valuesAt(document: Json, path: string): Json | undefined {
   let current: readonly Json[] = [document];
   for (const part of path.split('.')) {
     current = current.flatMap((each) => {
@@ -105,6 +107,7 @@ function referencedLines(state: FollowState, outgoing: readonly Relation[]): rea
         text: `${relation?.fieldLabel ?? field} → ${reached}${count}`,
         tooltip: tooltipOf(target.filterText),
         target,
+        path: field,
         feature: 'relation.open-referenced' as const,
         element: 'relation.open-referenced@inspector' as const,
       };

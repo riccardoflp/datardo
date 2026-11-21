@@ -65,7 +65,8 @@ export function inspectStateOf(
     mode: memory.mode,
     folding: memory.folding,
     toggled: memory.toggled,
-    references: false,
+    // **Go from here** follows the references of the document (`relation.follow`), which says when there are none.
+    references: true,
   };
 }
 

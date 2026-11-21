@@ -17,7 +17,9 @@ import { targetConnection } from '../../shared/target';
 import { appPlan, appStep, startArgs } from '../nav/types';
 import { connectionPageShows } from '../palette/sources';
 import { planOf } from '../tab/open';
+import { databaseOfAddress } from '../tree/list-databases';
 import { groupsOf, type GroupView } from './model/groups';
+import { inputChoices, inputJson, inputOf } from './model/page';
 import { isRunning } from './model/run';
 import { emptyText, summaryText } from './model/summary';
 import { text, wanted } from './text';
@@ -31,6 +33,12 @@ export const setScopeAction = 'search.set-scope';
 
 /** The app action that fills the page and starts its search (the tool `open_search`). */
 export const startAction = 'search.start';
+
+/** The app action that starts a search of a tab with what the page shows, stopping the one that runs. */
+export const runAction = 'search.run';
+
+/** The app action that stops the search of a tab: **Stop**, `Esc`. */
+export const stopAction = 'search.stop';
 
 /** A collection or a view of the database chosen in **In**, as the tree island last read it. */
 export interface ListedName {
@@ -252,6 +260,10 @@ export function plan(context: Context, answers: Answers): Outcome {
   if (connection === undefined) {
     return run({ ...appPlan(text.title, []), undo: { cannot: text.show.nothingWritten } });
   }
+  const page = pagePlan(context, connection, args);
+  if (page !== undefined) {
+    return page;
+  }
   const search = searchOf(args['search']);
   const looking = search === undefined ? undefined : wanted(search.text, search.mode, search.matchCase);
   if (looking?.kind === 'error') {
@@ -272,6 +284,48 @@ export function plan(context: Context, answers: Answers): Outcome {
       : [appStep(text.show.startStep(search.text.trim()), startAction, startArgsOf(connection, search))]),
   ];
   return run({ ...opened.plan, steps });
+}
+
+/**
+ * What the page itself starts: `{ tab, run }`, a search with what it shows (`Enter`, **Search**); `{ tab, stop }`,
+ * **Stop** and `Esc`; `{ choices }`, the input kept with the tab once it settles.
+ */
+function pagePlan(
+  context: Context,
+  connection: ConnectionId,
+  args: Readonly<Record<string, unknown>>,
+): Outcome | undefined {
+  const tab = typeof args['tab'] === 'string' ? args['tab'] : undefined;
+  const nothing = { undo: { cannot: text.show.nothingWritten } };
+  if (tab !== undefined && args['run'] !== undefined) {
+    const input = inputOf(args['run']);
+    const step = appStep(text.show.startStep(input.text.trim()), runAction, {
+      tab,
+      connection,
+      input: inputJson(input),
+      fallback: fallbackOf(context, connection),
+    });
+    return run({ ...appPlan(text.title, [step]), ...nothing });
+  }
+  if (tab !== undefined && args['stop'] === true) {
+    return run({ ...appPlan(text.title, [appStep(text.show.stopStep, stopAction, { tab })]), ...nothing });
+  }
+  const choices = args['choices'];
+  if (typeof choices === 'object' && choices !== null) {
+    const kept = inputChoices(inputOf(choices));
+    return planOf(context.state, {
+      shows: connectionPageShows(connection, searchPage),
+      background: false,
+      memory: { choices: kept },
+    });
+  }
+  return undefined;
+}
+
+/** The database searched alone when the user may not list the databases: the one the connection string names. */
+function fallbackOf(context: Context, connection: ConnectionId): string {
+  const address = savedConnection(context.state.connections, connection)?.address ?? '';
+  return databaseOfAddress(address) ?? 'test';
 }
 
 function scopeName(scope: { readonly database: string; readonly collections: readonly string[] }): string {

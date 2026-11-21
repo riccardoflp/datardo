@@ -16,6 +16,7 @@ import { appPlan, appStep, startArgs } from '../nav/types';
 import { planOf } from '../tab/open';
 import { relationText } from './detect';
 import { databasePlaceOf, type DatabasePlace } from './model/args';
+import { diagramChoices, diagramOf, sampleAction } from './model/page';
 import { drawing, type DiagramSelection, type DrawingView, type MovedBox } from './model/drawing';
 import { diagramSamples } from './read';
 import { text } from './text';
@@ -205,6 +206,30 @@ export function diagramShows(place: DatabasePlace): TabShows {
 }
 
 /**
+ * What the page itself starts: `{ tab, sample }`, the sample of its collections (when it opens, **Sample**,
+ * **Refresh**); `{ choices }`, its options kept with the tab once they settle.
+ */
+function pagePlan(
+  context: Context,
+  place: DatabasePlace,
+  args: Readonly<Record<string, unknown>>,
+): Outcome | undefined {
+  const nothing = { undo: { cannot: text.diagram.nothingWritten } };
+  const size = diagramSamples.find((each) => each === args['sample']);
+  if (typeof args['tab'] === 'string' && size !== undefined) {
+    const sample: Json = { tab: args['tab'], connection: place.connection, database: place.database, size };
+    const step = appStep(text.diagram.sampleStep(place.database, size), sampleAction, sample);
+    return run({ ...appPlan(text.diagram.page, [step]), ...nothing });
+  }
+  const choices = args['choices'];
+  if (typeof choices === 'object' && choices !== null) {
+    const memory = { choices: diagramChoices(diagramOf(choices)) };
+    return planOf(context.state, { shows: diagramShows(place), background: false, memory });
+  }
+  return undefined;
+}
+
+/**
  * Feature: relation.diagram — the tab of the database named by `args` (`{ connection, database, collection? }`), by
  * the target or by the active tab; with a collection, its box is selected and brought into view.
  */
@@ -214,6 +239,10 @@ export function plan(context: Context, answers: Answers): Outcome {
   const connection = place === undefined ? undefined : savedConnection(context.state.connections, place.connection);
   if (place === undefined || connection?.engine !== 'mongodb') {
     return run(appPlan(text.diagram.page, []));
+  }
+  const page = pagePlan(context, place, args);
+  if (page !== undefined) {
+    return page;
   }
   const opened = planOf(context.state, { shows: diagramShows(place), background: false });
   const collection =

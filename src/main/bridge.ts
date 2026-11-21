@@ -9,6 +9,7 @@ import {
   type Dismissal,
   type ExportResult,
   type Intent,
+  type IntentResult,
   type PingReply,
 } from '../shared/bridge';
 import type { WorkId } from '../shared/ids';
@@ -30,6 +31,14 @@ const ready = new Promise<RunnerPorts>((resolve) => {
   readyPorts = resolve;
 });
 
+/** What follows the features the window starts, once each has ended (the references kept, `relation.read`). */
+const followers: ((intent: Intent, result: IntentResult) => void)[] = [];
+
+/** Follows every feature the window starts, once it has ended. */
+export function followIntents(follower: (intent: Intent, result: IntentResult) => void): void {
+  followers.push(follower);
+}
+
 /** The runner's ports, once the bridge answers: what starts a feature without the window uses them. */
 export function whenRunnerReady(): Promise<RunnerPorts> {
   return ready;
@@ -47,6 +56,9 @@ export function answerTheBridge(given: RunnerPorts, state: AppStateHolder, dialo
     const result = await startWithConsoles(ports, intent);
     keepTabQuery(state, intent, result);
     keepTabPipeline(state, intent, result);
+    for (const follower of followers) {
+      follower(intent, result);
+    }
     tellTheSystem(state, Date.now() - started, result.kind === 'failed' ? result.message : undefined);
     return result;
   });

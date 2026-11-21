@@ -108,11 +108,15 @@ function countRequest(args: CollectionsArgs, each: SearchCollection): Connection
   });
 }
 
+/** The first request of the read: `listDatabases` for **Every database**, the `listCollections` of **In** otherwise. */
+export function firstRequest(args: Json): ConnectionRequest {
+  const asked = argsOf(args);
+  return asked.database === undefined ? databasesRequest(asked) : collectionsRequest(asked, asked.database);
+}
+
 /** Feature: search.collections — the first request. */
 export function request(_context: Context, args: Json): ReadRequest {
-  const asked = argsOf(args);
-  const first = asked.database === undefined ? databasesRequest(asked) : collectionsRequest(asked, asked.database);
-  return { kind: 'engine', requests: [first] };
+  return { kind: 'engine', requests: [firstRequest(args)] };
 }
 
 /** The databases searched: **In**, or those `listDatabases` answered without the three of the server. */

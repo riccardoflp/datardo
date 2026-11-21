@@ -35,6 +35,8 @@ export const text = {
   },
   diagram: {
     page: 'Relationship diagram',
+    /** The name of the second row of the toolbar for the accessibility tree. */
+    viewRow: 'Zoom and export',
     title: (database: string): string => `Diagram: ${database}`,
     collections: (count: number): string => plural(count, 'collection', 'collections'),
     relations: (count: number): string => plural(count, 'relation', 'relations'),
@@ -69,6 +71,9 @@ export const text = {
     severalMark: 'N',
     share: (percent: number): string => `in ${String(percent)}% of the sampled documents`,
     selectStep: (collection: string, database: string): string => `select ${collection} in the diagram of ${database}`,
+    sampleStep: (database: string, size: number): string =>
+      `sample the collections of ${database}, ${groupThousands(size)} documents each`,
+    nothingWritten: 'Nothing is written to a deployment.',
   },
   copied: 'Copied to the clipboard',
   mermaid: {
