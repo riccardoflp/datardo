@@ -11,6 +11,8 @@ function plural(count: number, one: string, many: string): string {
 /** The text of the explain area. */
 export const text = {
   section: 'Explain',
+  /** The menu of the section bar that holds **Explain** (product.md, the section bar). */
+  more: 'More',
   title: (kind: ExplainKind) => `Explain · ${kind}`,
   raw: 'Raw',
   summary: 'Summary',

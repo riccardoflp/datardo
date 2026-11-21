@@ -49,6 +49,8 @@ export const sampleAction = 'schema.read-sample';
 /** What the main process is asked to do: send the count, then one of the two document requests, then analyze. */
 export interface SampleWork {
   readonly connection: string;
+  /** The collection tab whose Schema section shows the sample, when it was started on one. */
+  readonly tab?: string;
   readonly count: MongoRequest;
   /** Sent when more documents match than the size. */
   readonly sampled: MongoRequest;
@@ -123,6 +125,7 @@ function readingRequest(place: PipelinePlace, filter: JsonDocument, stage: JsonD
 export function sampleWork(place: PipelinePlace, filter: JsonDocument, size: number): SampleWork {
   return {
     connection: place.connection,
+    ...(place.tab === undefined ? {} : { tab: place.tab }),
     count: countRequest(place, filter),
     sampled: readingRequest(place, filter, { $sample: { size: wholeJson(size) } }, size),
     whole: readingRequest(place, filter, { $limit: wholeJson(size) }, size),

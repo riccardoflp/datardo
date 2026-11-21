@@ -27,6 +27,7 @@ import {
   parsedAnswer,
   readArgs,
   readTarget,
+  relaxedDocument,
   subjectOf,
   writeStep,
   type IndexDefinition,
@@ -98,10 +99,13 @@ function refusal(wrong: Exclude<AnsweredDefinition, IndexDefinition>): Outcome {
   );
 }
 
-/** The keys the dialog opens with, and the options of a copy (`index.duplicate`): `{ keys, options }` of the arguments. */
+/**
+ * The keys the dialog opens with, and the options of a copy (`index.duplicate`): `{ keys, options }` of the arguments.
+ * Suggested keys may come in canonical Extended JSON (`{ status: { $numberInt: "1" } }`): they open as `{ status: 1 }`.
+ */
 function startingKeys(subject: IndexSubject): IndexDefinition | undefined {
   const { keys, options } = subject.args;
-  return isDocument(keys) ? { keys, options: isDocument(options) ? options : {} } : undefined;
+  return isDocument(keys) ? { keys: relaxedDocument(keys), options: isDocument(options) ? options : {} } : undefined;
 }
 
 /**

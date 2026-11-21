@@ -93,6 +93,15 @@ describe('index.create', () => {
     ]);
   });
 
+  it('opens on suggested keys of canonical Extended JSON as plain numbers, so the index is named status_1', () => {
+    const answers = {
+      args: { connection: 'c-local', database: 'shop', collection: 'orders', keys: { status: { $numberInt: '1' } } },
+    };
+    const asked = plan(context, { ...answers, indexes: recordedList() });
+    const question = asked.kind === 'ask' ? asked.question : undefined;
+    expect(question?.fields[0]).toMatchObject({ key: 'keys', default: '{ status: 1 }' });
+  });
+
   it('notifies Created index status_1. when the build ends', () => {
     expect(notices(planOf(plan(context, answered({ status: 1 }))))).toEqual(['Created index status_1.']);
   });

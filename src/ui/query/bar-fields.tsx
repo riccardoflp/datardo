@@ -20,9 +20,21 @@ export interface FieldsInput {
   readonly collection: CollectionTab;
   readonly fields: readonly BarField[];
   readonly dragged?: { readonly what: Dragged; readonly zones: DragView };
+  /** What `Enter` and `Ctrl+Enter` start in place of the query. */
+  readonly run?: () => void;
 }
 
-function DigitsField({ field, collectionRef }: { readonly field: BarField; readonly collectionRef: CollectionRef }) {
+function runOf(input: FieldsInput): () => void {
+  return (
+    input.run ??
+    (() => {
+      runFromBar(input.collectionRef);
+    })
+  );
+}
+
+function DigitsField({ field, input }: { readonly field: BarField; readonly input: FieldsInput }) {
+  const { collectionRef } = input;
   return (
     <input
       className={styles['digits']}
@@ -39,7 +51,7 @@ function DigitsField({ field, collectionRef }: { readonly field: BarField; reado
       onKeyDown={(event) => {
         if (event.key === 'Enter') {
           event.preventDefault();
-          runFromBar(collectionRef);
+          runOf(input)();
         }
       }}
     />
@@ -70,9 +82,7 @@ function TextField({ field, input }: { readonly field: BarField; readonly input:
       onChange={(written) => {
         editField(collectionRef, field.field, written);
       }}
-      onRun={() => {
-        runFromBar(collectionRef);
-      }}
+      onRun={runOf(input)}
       onNeedFields={() => {
         void readHints(collectionRef);
       }}
@@ -96,11 +106,7 @@ export function BarFields({ input }: { readonly input: FieldsInput }): React.JSX
         const zones = zonesOf(field, input.dragged);
         return (
           <div key={field.field} className={styles['field']} data-field={field.field}>
-            {field.digitsOnly ? (
-              <DigitsField field={field} collectionRef={input.collectionRef} />
-            ) : (
-              <TextField field={field} input={input} />
-            )}
+            {field.digitsOnly ? <DigitsField field={field} input={input} /> : <TextField field={field} input={input} />}
             {zones === undefined || input.dragged === undefined ? null : (
               <DropZones zones={zones} dragged={input.dragged.what} collectionRef={input.collectionRef} />
             )}

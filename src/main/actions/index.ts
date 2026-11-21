@@ -31,6 +31,7 @@ import { actions as historyActions } from './history';
 import { actions as watchActions } from './watch';
 import { actions as pubsubActions } from './pubsub';
 import { actions as userActions } from './user';
+import { actions as schemaActions } from './schema';
 
 /** The actions of one area, by name. */
 export type AreaActions = (services: MainServices) => Readonly<Record<string, AppAction>>;
@@ -64,6 +65,7 @@ const areas: readonly AreaActions[] = [
   watchActions,
   pubsubActions,
   userActions,
+  schemaActions,
 ];
 
 /** Every action of every area, by name; two areas never name an action alike. */

@@ -1,7 +1,9 @@
 /**
  * The query bar of a collection tab (`query.bar`): the mode switch, the five fields, **Builder**, **Queries**, **Reset**
  * and the run button, which reads **Cancel** while a query runs; under it the builder when it is open, then the error
- * line. While a cell or a column header of the table is dragged, the zones of `query.drag` cover the fields.
+ * line. While a cell or a column header of the table is dragged, the zones of `query.drag` cover the fields. In a
+ * section that runs something else from the bar (the Schema section's **Analyze**, the Explain section's **Explain**),
+ * the run button and `Enter` start that instead ({@link RunInstead}).
  */
 import { useEffect } from 'react';
 import { view, type BarButton } from '../../features/query/bar';
@@ -18,6 +20,13 @@ import { QueryBuilder } from './query-builder';
 import { QueriesButton } from '../pages/saved-query/queries-list';
 import styles from './query-bar.module.css';
 import { spokenName } from './spoken-name';
+
+/** What the run button does in a section that runs something else from the bar: its label, its element, its run. */
+export interface RunInstead {
+  readonly label: string;
+  readonly element: string;
+  readonly run: () => void;
+}
 
 function pressed(ref: CollectionRef, button: BarButton): void {
   switch (button.element) {
@@ -36,8 +45,28 @@ function pressed(ref: CollectionRef, button: BarButton): void {
   }
 }
 
-function Button({ button, collectionRef }: { readonly button: BarButton; readonly collectionRef: CollectionRef }) {
+function Button({
+  button,
+  collectionRef,
+  instead,
+}: {
+  readonly button: BarButton;
+  readonly collectionRef: CollectionRef;
+  readonly instead?: RunInstead | undefined;
+}) {
   const run = button.element === 'query.run@query-bar' || button.element === 'runner.cancel@list';
+  if (run && instead !== undefined) {
+    return (
+      <button
+        type="button"
+        className={`${styles['button'] ?? ''} ${styles['run'] ?? ''}`}
+        data-feature={instead.element}
+        onClick={instead.run}
+      >
+        {instead.label}
+      </button>
+    );
+  }
   return (
     <button
       type="button"
@@ -75,11 +104,14 @@ export function QueryBar({
   collectionRef,
   collection,
   pipeline,
+  instead,
 }: {
   readonly collectionRef: CollectionRef;
   readonly collection: CollectionTab;
   /** The pipeline editor of the aggregate area, drawn under the row in Aggregate. */
   readonly pipeline?: React.ReactNode;
+  /** What the run button and `Enter` start in place of the query. */
+  readonly instead?: RunInstead;
 }): React.JSX.Element {
   const bar = view({ query: collection.query, running: collection.running });
   const what = useDragged();
@@ -100,7 +132,13 @@ export function QueryBar({
       <div className={styles['row']}>
         <ModeMenu mode={bar.mode} collectionRef={collectionRef} />
         <BarFields
-          input={{ collectionRef, collection, fields: bar.fields, ...(dragged === undefined ? {} : { dragged }) }}
+          input={{
+            collectionRef,
+            collection,
+            fields: bar.fields,
+            ...(dragged === undefined ? {} : { dragged }),
+            ...(instead === undefined ? {} : { run: instead.run }),
+          }}
         />
         <div className={styles['buttons']}>
           {bar.buttons
@@ -116,7 +154,7 @@ export function QueryBar({
                   className={styles['button'] ?? ''}
                 />
               ) : (
-                <Button key={button.element} button={button} collectionRef={collectionRef} />
+                <Button key={button.element} button={button} collectionRef={collectionRef} instead={instead} />
               ),
             )}
         </div>

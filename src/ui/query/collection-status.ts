@@ -10,6 +10,8 @@ import { text as indexText } from '../../features/index/text';
 import { forgetClosedPipelines } from '../pages/aggregate/pipeline-store';
 import { inspectedOf } from '../pages/index/index-inspector';
 import { forgetClosedIndexes, useIndexMemory, type IndexMemory } from '../pages/index/index-store';
+import { forgetClosedSchemas } from '../pages/schema/schema-store';
+import { forgetClosedExplains } from '../pages/explain/explain-store';
 import { inspectionOf } from '../pages/document/inspect-state';
 import { collectionRefOf } from './collection-reads';
 import { forgetClosed, useCollection } from './collection-store';
@@ -26,6 +28,8 @@ export function useCollectionStatus(state: AppState, input: NavInput): NavInput 
     forgetClosed(new Set(open.map((each) => each.id)));
     forgetClosedPipelines(new Set(open.map((each) => each.id)));
     forgetClosedIndexes(new Set(open.map((each) => each.id)));
+    forgetClosedSchemas(new Set(open.map((each) => each.id)));
+    forgetClosedExplains(new Set(open.map((each) => each.id)));
   }, [open]);
   if (tab === undefined) {
     return input;

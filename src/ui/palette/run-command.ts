@@ -26,6 +26,8 @@ import { openAbout } from '../window/about';
 import { openGoTo } from './go-to-store';
 import { flushPlaygrounds } from '../pages/playground/playground-store';
 import { isPubSubCommand, runPubSubCommand } from '../pages/pubsub/pubsub-commands';
+import { isSchemaCommand, runSchemaCommand } from '../pages/schema/schema-commands';
+import { isExplainCommand, runExplainCommand } from '../pages/explain/explain-commands';
 
 let switcherOpener: (() => void) | undefined;
 
@@ -132,6 +134,14 @@ export function runCommand(id: string, state: AppState): void {
   }
   if (isIndexCommand(id)) {
     runIndexCommand(id, state);
+    return;
+  }
+  if (isSchemaCommand(id) || isExplainCommand(id)) {
+    if (isSchemaCommand(id)) {
+      runSchemaCommand(state);
+    } else {
+      runExplainCommand(state);
+    }
     return;
   }
   const local = windowOnly[id];

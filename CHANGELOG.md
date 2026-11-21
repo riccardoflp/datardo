@@ -177,6 +177,14 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
   the index again after a confirmation, and puts the old one back when the new definition is refused. Indexes are
   hidden, unhidden and dropped from their row, the keyboard or Go to. Search and Vector Search indexes are listed with
   their status, created, changed and dropped on a server with search; a server without search says what it needs.
+- The Schema section of a collection analyzes a sample of 100, 1,000 or 10,000 documents of the filter, at random
+  when more match, on a worker thread that **Cancel** stops within one batch: each field with its share of the
+  documents, its types, its most frequent values or a histogram, the sizes of its arrays, and its nested fields,
+  expanded one by one or all at once. A click on a value, a range or a type adds it to the filter and analyzes again.
+- The Explain section shows how a find or a pipeline ran: whether it read the whole collection, sorted in memory or
+  used an index, the documents returned and examined, the winning plan as a tree, shard by shard on a sharded
+  cluster, and the stages after the query; it suggests an index by the equality, sort and range rule, which
+  **Create…** opens in the index dialog, and **Raw** shows the server's output as it came.
 
 ### Fixed
 
