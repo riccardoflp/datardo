@@ -110,6 +110,13 @@ function isOfferedByItsCard(state: AppState, id: string): boolean {
     case 'aggregate.save-as-view':
       // The pipeline editor is a collection tab's; a command of it shows the editor first when Find is shown.
       return active?.shows.kind === 'collection';
+    case 'saved-query.show':
+    case 'saved-query.save':
+    case 'saved-query.save:folder':
+    case 'saved-query.clear-recent':
+      // The queries of a collection are those of its tab's query bar: with none active, there are none.
+      return active?.shows.kind === 'collection';
+    case 'saved-query.choose-folder':
     case 'tree.refresh':
     case 'tree.filter':
       // The tree island shows the current connection: with none, there is nothing to refresh or filter.

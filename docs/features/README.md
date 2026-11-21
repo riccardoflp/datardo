@@ -597,23 +597,23 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`saved-query.show`](saved-query.md#saved-queryshow--the-queries-list) | The queries list | View | M20 | Specified |
-| [`saved-query.list`](saved-query.md#saved-querylist--the-saved-and-recent-queries-of-a-collection) | The saved and recent queries of a collection | Read | M20 | Specified |
-| [`saved-query.recent`](saved-query.md#saved-queryrecent--the-recent-queries-of-a-collection) | The recent queries of a collection | Operation | M20 | Specified |
-| [`saved-query.remove-recent`](saved-query.md#saved-queryremove-recent--remove-a-recent-query) | Remove a recent query | Operation | M20 | Specified |
-| [`saved-query.clear-recent`](saved-query.md#saved-queryclear-recent--clear-the-recent-queries) | Clear the recent queries | Operation | M20 | Specified |
-| [`saved-query.save`](saved-query.md#saved-querysave--save-a-query) | Save a query | Operation | M20 | Specified |
-| [`saved-query.file-path`](saved-query.md#saved-queryfile-path--where-the-file-of-a-saved-query-goes) | Where the file of a saved query goes | Derivation | M20 | Specified |
-| [`saved-query.file-format`](saved-query.md#saved-queryfile-format--the-file-of-a-saved-query) | The file of a saved query | Derivation | M20 | Specified |
-| [`saved-query.parse-file`](saved-query.md#saved-queryparse-file--a-saved-query-read-from-its-file) | A saved query read from its file | Derivation | M20 | Specified |
-| [`saved-query.read-folder`](saved-query.md#saved-queryread-folder--the-files-of-the-queries-folder) | The files of the queries folder | Read | M20 | Specified |
-| [`saved-query.choose-folder`](saved-query.md#saved-querychoose-folder--choose-the-queries-folder-of-a-connection) | Choose the queries folder of a connection | Operation | M20 | Specified |
-| [`saved-query.run`](saved-query.md#saved-queryrun--run-a-saved-or-recent-query) | Run a saved or recent query | Operation | M20 | Specified |
-| [`saved-query.rename`](saved-query.md#saved-queryrename--rename-a-saved-query) | Rename a saved query | Operation | M20 | Specified |
-| [`saved-query.move`](saved-query.md#saved-querymove--move-a-saved-query-between-for-me-and-the-folder) | Move a saved query between for me and the folder | Operation | M20 | Specified |
-| [`saved-query.delete`](saved-query.md#saved-querydelete--delete-a-saved-query) | Delete a saved query | Operation | M20 | Specified |
-| [`saved-query.reveal-file`](saved-query.md#saved-queryreveal-file--reveal-the-file-of-a-saved-query) | Reveal the file of a saved query | Operation | M20 | Specified |
-| [`saved-query.connection-list`](saved-query.md#saved-queryconnection-list--the-saved-queries-of-a-connection-for-go-to-and-for-pins) | The saved queries of a connection, for Go to and for pins | Read | M20 | Specified |
+| [`saved-query.show`](saved-query.md#saved-queryshow--the-queries-list) | The queries list | View | M20 | Built |
+| [`saved-query.list`](saved-query.md#saved-querylist--the-saved-and-recent-queries-of-a-collection) | The saved and recent queries of a collection | Read | M20 | Built |
+| [`saved-query.recent`](saved-query.md#saved-queryrecent--the-recent-queries-of-a-collection) | The recent queries of a collection | Operation | M20 | Built |
+| [`saved-query.remove-recent`](saved-query.md#saved-queryremove-recent--remove-a-recent-query) | Remove a recent query | Operation | M20 | Built |
+| [`saved-query.clear-recent`](saved-query.md#saved-queryclear-recent--clear-the-recent-queries) | Clear the recent queries | Operation | M20 | Built |
+| [`saved-query.save`](saved-query.md#saved-querysave--save-a-query) | Save a query | Operation | M20 | Built |
+| [`saved-query.file-path`](saved-query.md#saved-queryfile-path--where-the-file-of-a-saved-query-goes) | Where the file of a saved query goes | Derivation | M20 | Built |
+| [`saved-query.file-format`](saved-query.md#saved-queryfile-format--the-file-of-a-saved-query) | The file of a saved query | Derivation | M20 | Built |
+| [`saved-query.parse-file`](saved-query.md#saved-queryparse-file--a-saved-query-read-from-its-file) | A saved query read from its file | Derivation | M20 | Built |
+| [`saved-query.read-folder`](saved-query.md#saved-queryread-folder--the-files-of-the-queries-folder) | The files of the queries folder | Read | M20 | Built |
+| [`saved-query.choose-folder`](saved-query.md#saved-querychoose-folder--choose-the-queries-folder-of-a-connection) | Choose the queries folder of a connection | Operation | M20 | Built |
+| [`saved-query.run`](saved-query.md#saved-queryrun--run-a-saved-or-recent-query) | Run a saved or recent query | Operation | M20 | Built |
+| [`saved-query.rename`](saved-query.md#saved-queryrename--rename-a-saved-query) | Rename a saved query | Operation | M20 | Built |
+| [`saved-query.move`](saved-query.md#saved-querymove--move-a-saved-query-between-for-me-and-the-folder) | Move a saved query between for me and the folder | Operation | M20 | Built |
+| [`saved-query.delete`](saved-query.md#saved-querydelete--delete-a-saved-query) | Delete a saved query | Operation | M20 | Built |
+| [`saved-query.reveal-file`](saved-query.md#saved-queryreveal-file--reveal-the-file-of-a-saved-query) | Reveal the file of a saved query | Operation | M20 | Built |
+| [`saved-query.connection-list`](saved-query.md#saved-queryconnection-list--the-saved-queries-of-a-connection-for-go-to-and-for-pins) | The saved queries of a connection, for Go to and for pins | Read | M20 | Built |
 
 ## Schema analysis
 

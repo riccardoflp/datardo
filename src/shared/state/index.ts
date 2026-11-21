@@ -23,6 +23,7 @@ import { initialTabsState, reduceTabs, type TabsEvent, type TabsState } from './
 import { initialWindowState, reduceWindow, type WindowEvent, type WindowState } from './window';
 import { initialUndoState, reduceUndo, type UndoEvent, type UndoState } from './undo';
 import { initialOplogState, reduceOplog, type OplogState, type OplogStateEvent } from './oplog';
+import { initialSavedQueryState, reduceSavedQuery, type SavedQueryEvent, type SavedQueryState } from './saved-query';
 
 /** Everything the window shows and the features decide from, apart from the results of reads. */
 export interface AppState {
@@ -37,6 +38,7 @@ export interface AppState {
   readonly undo: UndoState;
   readonly oplog: OplogState;
   readonly table: TableState;
+  readonly savedQuery: SavedQueryState;
 }
 
 /** Every change to the app's state. */
@@ -51,7 +53,8 @@ export type AppEvent =
   | PaletteEvent
   | UndoEvent
   | OplogStateEvent
-  | TableEvent;
+  | TableEvent
+  | SavedQueryEvent;
 
 /** The state at start, before anything is loaded. */
 export const initialState: AppState = {
@@ -66,6 +69,7 @@ export const initialState: AppState = {
   undo: initialUndoState,
   oplog: initialOplogState,
   table: initialTableState,
+  savedQuery: initialSavedQueryState,
 };
 
 /** The one function that changes the app's state. */
@@ -93,5 +97,7 @@ export function reduce(state: AppState, event: AppEvent): AppState {
       return { ...state, oplog: reduceOplog(state.oplog, event) };
     case 'table':
       return { ...state, table: reduceTable(state.table, event) };
+    case 'saved-query':
+      return { ...state, savedQuery: reduceSavedQuery(state.savedQuery, event) };
   }
 }

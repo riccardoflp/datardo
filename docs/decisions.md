@@ -852,3 +852,39 @@ Raised while the catalog was written; each names the cards that hold the current
   and the Chart section for their milestones. (`aggregate.show`, `aggregate.run`, `aggregate.write-output`,
   `aggregate.clear`, `aggregate.show-stage`, `aggregate.drop-condition`, `aggregate.sort-column`,
   `aggregate.stage-marks`, `aggregate.from-text`).
+- **Q76** — Go to and the saved queries as built in M20: `palette.sources` lists the saved queries of every saved
+  MongoDB connection (its acceptance line finds those of Staging, which is not connected), where
+  `saved-query.connection-list` and `saved-query.run` say *the current connection*; Go to lists every one, and a
+  query of another connection than the current one reads its connection's name first: *Staging / shop.orders · Me*.
+  A row of Go to has no line for the query on one line, and is found by its name and its context (so by its
+  collection), not by its description. The window reads `saved-query.connection-list` for each saved MongoDB
+  connection when Go to opens and again when its queries change, and hands it the databases and collections its tree
+  last read (`args.databases`, which the reply gives back). (`palette.sources`, `saved-query.connection-list`).
+- **Q77** — `saved-query.run` as built in M20: the run of the query is the window's, as for `aggregate.clear` (Q66):
+  its app step opens or activates the tab and puts the query in the app's state (the event `loaded`
+  of the saved-query part, which the main process keeps until it quits); the window then shows it in the query bar
+  or the pipeline editor and runs it as the run button does, once the connection is connected. The query builder is
+  not filled from a find loaded this way. A recent query is added after a find or a pipeline run from the bar (the
+  run button, `Enter`, **Reset**, the mode switch, a loaded query) and after `aggregate.write-output`, not after a
+  page turn or **Refresh**, which run the query as last run. (`saved-query.run`, `saved-query.recent`).
+- **Q78** — The queries folder dialog as built in M20: the system's folder dialog is a Read of its own,
+  `saved-query.choose-folder:dialog`, which the main process answers with the folder or `null`; the question a save
+  asks first, which has no field, answers `true` under its key (`Question.key`, `saved-query.choose-folder`), since
+  the runner answers a question by its fields. The dialog may create a folder. (`saved-query.choose-folder`,
+  `runner.ask`).
+- **Q79** — Pins and saved queries as built in M20: a pin of a saved query keeps its place and, for one in the folder,
+  the path of its file, for one for me the query itself, as optional fields of a pin of `pins.json`, version 1 (a
+  new optional field keeps the version, data.md); a pin follows its query renamed or moved and goes with it deleted,
+  through an app step of the same plan (*pin "Paid" in place of "Old" on Local*, *unpin "Paid"
+  on Local*), shown only when the query is pinned; the pin of a file that is no longer in the folder is taken away
+  when the folder is read again. The **Pin** entry of the **…** menu has no element of its own. (`nav.pin`,
+  `saved-query.rename`, `saved-query.move`, `saved-query.delete`, `saved-query.connection-list`).
+- **Q80** — The rest of M20: **Save query…**, **Save query in the folder…** and **Clear recent queries** are offered on
+  any collection tab, **Choose the queries folder…** when the current connection is a MongoDB connection; a file step
+  of the queries folder fails with what failed first (*Could not save the query in the folder:*, *Could not rename
+  the query:*, *Could not delete the query:*, *Could not move the query:*) and the system's reason; the warning about
+  the files skipped is given once per folder, with **Reveal file** on the first connection that has it; a queries
+  folder that does not exist yet is watched once Datardo has written in it; `connection.remove` reads first what the
+  data folder keeps of the connection (the read `connection.remove:counts`, which the main process answers).
+  (`saved-query.save`, `saved-query.clear-recent`, `saved-query.choose-folder`, `saved-query.read-folder`,
+  `connection.remove`).

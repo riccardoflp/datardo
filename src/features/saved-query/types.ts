@@ -23,7 +23,10 @@ import type { AppStep, Answers, Context, FileStep, Platform } from '../../shared
 import { noDanger, run, type Outcome } from '../../shared/feature';
 import type { ConnectionId, TabId } from '../../shared/ids';
 import { tabId } from '../../shared/ids';
+import type { Pin } from '../../shared/state/nav';
 import { placeOf, type Stage } from '../aggregate/types';
+import { isSamePin, pinText } from '../nav/pin';
+import { text } from './text';
 
 export type { Stage };
 
@@ -302,6 +305,41 @@ export function savedRef(query: SavedQuery): Json {
   return query.place === 'me'
     ? { place: 'me', name: query.name }
     : { place: 'folder', name: query.name, file: query.file };
+}
+
+/**
+ * The pin of a saved query (`nav.pin`, `saved-query.connection-list`): for one for me, its name and the query itself;
+ * for one in the folder, the path of its file inside the queries folder, so that the pin follows the file.
+ */
+export function pinOfSaved(query: SavedQuery): Extract<Pin, { kind: 'saved-query' }> {
+  const where = { kind: 'saved-query' as const, database: query.database, collection: query.collection };
+  return query.place === 'me'
+    ? { ...where, name: query.name, place: 'me', query: queryJson(query.query) }
+    : { ...where, name: query.name, place: 'folder', file: query.file };
+}
+
+/**
+ * The step that makes the pin of a saved query follow it, renamed or moved (`to`), or go with it (`to` absent); none
+ * when the query is not pinned on its connection.
+ */
+export function pinSteps(
+  context: Context,
+  scope: CollectionScope,
+  from: SavedQuery,
+  to?: SavedQuery,
+): readonly AppStep[] {
+  const before = pinOfSaved(from);
+  const pinned = (context.state.nav.pins[scope.connection] ?? []).some((each) => isSamePin(each, before));
+  if (!pinned) {
+    return [];
+  }
+  const after = to === undefined ? undefined : pinOfSaved(to);
+  const args = { connection: scope.connection, from: before as unknown as Json, to: (after ?? null) as Json };
+  const words =
+    after === undefined
+      ? text.pin.remove(pinText(before), scope.connectionName)
+      : text.pin.follow(pinText(after), pinText(before), scope.connectionName);
+  return [appStep('saved-query.set-pin', args, words)];
 }
 
 /** The saved query of a list that a reference names: for me by its name, in the folder by its file. */

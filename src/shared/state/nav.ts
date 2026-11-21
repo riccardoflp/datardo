@@ -3,6 +3,7 @@
  * they are, the connection made current last, the page the main island shows until tabs exist, the places visited for
  * Back and Forward, the pins of each connection and the latency of the current connection.
  */
+import type { Json } from '../engine-request';
 import type { ConnectionId } from '../ids';
 
 /** The widths the user gave the explorer and the inspector island, in px (`nav.resize`). */
@@ -44,11 +45,18 @@ export type Pin =
   /** A key: its name as the hexadecimal of its bytes, so that a name that is not text survives. */
   | { readonly kind: 'key'; readonly database: number; readonly keyHex: string }
   | { readonly kind: 'page'; readonly page: string; readonly title: string; readonly database?: string }
+  /**
+   * A saved query (`saved-query.connection-list`): for one for me, its name and the query itself; for one in the
+   * folder, the path of its file inside the queries folder, so that the pin follows the file and goes with it.
+   */
   | {
       readonly kind: 'saved-query';
       readonly database: string;
       readonly collection: string;
       readonly name: string;
+      readonly place?: 'me' | 'folder';
+      readonly file?: string;
+      readonly query?: Json;
     };
 
 /** The last latency read for a connection (`nav.ping`): in milliseconds, or no answer. */

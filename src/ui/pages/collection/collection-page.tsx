@@ -6,6 +6,7 @@
 import type { TabId } from '../../../shared/ids';
 import { useCollection } from '../../query/collection-store';
 import { useAppState } from '../../state/store';
+import { useQueryLoad } from '../saved-query/use-query-load';
 import { DocumentsSection } from './documents-section';
 import { collectionPageState, useCollectionRef, useCollectionStart, type CollectionShows } from './use-collection';
 import { text as tableText } from '../../../features/table/text';
@@ -22,6 +23,8 @@ export function CollectionPage({
   const state = useAppState();
   const page = collectionPageState(state, tab, shows);
   const ref = useCollectionRef(page);
+  // Before the start: a query loaded by `saved-query.run` is the tab's first query, in place of the one it kept.
+  useQueryLoad(ref, page, state.savedQuery.loads[tab]);
   useCollectionStart(ref, page);
   const collection = useCollection(tab);
   return (

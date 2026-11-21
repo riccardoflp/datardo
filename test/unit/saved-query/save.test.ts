@@ -226,8 +226,24 @@ describe('saved-query.save', () => {
       title: 'Queries folder of Bare',
       text: 'Choose the queries folder of Bare. Saved queries are written there as files, one per query, to be shared and versioned with git.',
       button: 'Choose folder…',
-      fields: [{ key: 'folder' }],
+      fields: [],
+      key: 'saved-query.choose-folder',
     });
+    // **Choose folder…** opens the system's folder dialog, titled as the question, starting in the home folder.
+    expect(plan(context, saving(args, { name: 'Paid', place: 'folder', 'saved-query.choose-folder': true }))).toEqual({
+      kind: 'read',
+      need: {
+        key: 'folder',
+        read: 'saved-query.choose-folder:dialog',
+        args: { title: 'Queries folder of Bare', start: null },
+      },
+    });
+    // The dialog closed without a folder: nothing is saved.
+    expect(
+      planOf(
+        plan(context, saving(args, { name: 'Paid', place: 'folder', 'saved-query.choose-folder': true, folder: null })),
+      ).steps,
+    ).toEqual([]);
     const chosenAnswers = { name: 'Paid', place: 'folder', folder: 'D:\\team\\queries' };
     expect(plan(context, saving(args, chosenAnswers))).toEqual({
       kind: 'read',

@@ -10,6 +10,7 @@ import { databasesArgs } from '../pages/keys/keys-path';
 import { focusNextIsland } from '../shell/focus';
 import { startIntent } from '../shell/top-bar/start';
 import { isAggregateCommand, runAggregateCommand } from '../pages/aggregate/aggregate-commands';
+import { isSavedQueryCommand, runSavedQueryCommand } from '../pages/saved-query/saved-query-commands';
 import { queryCommandIds, runQueryCommand } from '../query/query-commands';
 import { isTableCommand, runTableCommand } from '../table/table-commands';
 import { runTreeCommand } from '../tree/tree-commands';
@@ -75,6 +76,10 @@ export function runCommand(id: string, state: AppState): void {
   }
   if (isAggregateCommand(id)) {
     runAggregateCommand(id, state);
+    return;
+  }
+  if (isSavedQueryCommand(id)) {
+    runSavedQueryCommand(id, state);
     return;
   }
   const local = windowOnly[id];

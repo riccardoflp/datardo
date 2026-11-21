@@ -1,0 +1,199 @@
+/* saved-query.show: the queries list, open under Queries in the query bar. */
+
+.anchor {
+  position: relative;
+  display: inline-flex;
+}
+
+.list {
+  position: absolute;
+  top: calc(100% + var(--space-1));
+  right: 0;
+  z-index: var(--z-dialog);
+  display: flex;
+  flex-direction: column;
+  width: calc(var(--space-6) * 18);
+  max-width: 90vw;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-medium);
+  background: var(--color-raised);
+  color: var(--color-text);
+  box-shadow: 0 var(--space-1) var(--space-4) var(--color-canvas);
+}
+
+.top {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.search {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-small);
+  background: var(--color-canvas);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.search::placeholder {
+  color: var(--color-text-muted);
+}
+
+.button {
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-small);
+  background: var(--color-island);
+  color: var(--color-text);
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.sections {
+  max-height: calc(var(--space-6) * 14);
+  padding: var(--space-1) 0;
+  overflow-y: auto;
+}
+
+.message {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  color: var(--color-text-muted);
+}
+
+.heading-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: var(--space-3);
+}
+
+.heading {
+  margin: 0;
+  padding: var(--space-1) var(--space-3);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-strong);
+}
+
+.link {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--font-size-small);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.items {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0 var(--space-2);
+}
+
+.run {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+  padding: var(--space-1);
+  border: none;
+  border-radius: var(--radius-small);
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.name {
+  font-weight: var(--font-weight-strong);
+}
+
+.description {
+  color: var(--color-text-muted);
+}
+
+.line {
+  max-width: 100%;
+  overflow: hidden;
+  font-family: var(--font-family-code);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tag {
+  flex: none;
+  padding: 0 var(--space-1);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-small);
+  color: var(--color-text);
+  font-size: var(--font-size-small);
+}
+
+.time {
+  flex: none;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-small);
+  white-space: nowrap;
+}
+
+.icon-button {
+  flex: none;
+  padding: var(--space-1);
+  border: none;
+  border-radius: var(--radius-small);
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.menu {
+  z-index: var(--z-dialog);
+  padding: var(--space-1);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-medium);
+  background: var(--color-raised);
+  color: var(--color-text);
+}
+
+.menu-item {
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-small);
+  outline: none;
+  cursor: default;
+}
+
+.menu-item[data-highlighted] {
+  background: var(--color-selected);
+}
+
+.button:hover,
+.icon-button:hover,
+.run:hover {
+  background: var(--color-hover);
+}
+
+.search:focus-visible,
+.button:focus-visible,
+.run:focus-visible,
+.icon-button:focus-visible,
+.link:focus-visible {
+  outline: var(--focus-width) solid var(--color-focus);
+  outline-offset: calc(var(--focus-width) * -1);
+}

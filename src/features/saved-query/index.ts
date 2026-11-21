@@ -3,7 +3,7 @@
  * listed.
  */
 import type { RunnableFeature } from '../../shared/feature';
-import { feature as chooseFolder } from './choose-folder';
+import { feature as chooseFolder, dialogFeature as chooseFolderDialog } from './choose-folder';
 import { feature as clearRecent } from './clear-recent';
 import { feature as connectionList } from './connection-list';
 import { feature as deleteQuery } from './delete';
@@ -31,5 +31,6 @@ export const features: readonly RunnableFeature[] = [
   deleteQuery,
   revealFile,
   chooseFolder,
+  chooseFolderDialog,
   runQuery,
 ];

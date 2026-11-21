@@ -170,6 +170,11 @@ export const text = {
     sort: 'sort',
     project: 'project',
   },
+  /** The steps that make the pin of a saved query follow it or go with it. */
+  pin: {
+    follow: (pin: string, before: string, connection: string) => `pin ${pin} in place of ${before} on ${connection}`,
+    remove: (pin: string, connection: string) => `unpin ${pin} on ${connection}`,
+  },
   connectionList: {
     context: (namespace: string, place: string) => `${namespace} · ${place}`,
   },

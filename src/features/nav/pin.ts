@@ -77,7 +77,10 @@ function pinKey(pin: Pin): string {
     case 'page':
       return `page ${pin.database ?? ''} ${pin.page}`;
     case 'saved-query':
-      return `saved-query ${pin.database}.${pin.collection} ${pin.name}`;
+      // One in the folder is its file, which another file of the same name is not; one for me is its name.
+      return pin.place === 'folder' && pin.file !== undefined
+        ? `saved-query file ${pin.file}`
+        : `saved-query ${pin.database}.${pin.collection} ${pin.name}`;
   }
 }
 

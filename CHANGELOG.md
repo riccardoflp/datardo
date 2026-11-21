@@ -67,6 +67,10 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
   and a click on a header sorts the output.
 - A pipeline ending with `$out` or `$merge` runs only after a confirmation, which asks to type the name of a collection
   that `$out` replaces, and never on a read-only connection; a pipeline is saved as a view.
+- **Queries** in the query bar lists the saved and recent queries of a collection: run one again, save the query or
+  the pipeline of the tab for you or as a file of the connection's queries folder in Mongoster's format, rename,
+  move, delete, pin, or reveal one; the folder is watched, a file that is not valid is skipped with a warning, and Go
+  to finds saved queries by their name.
 
 ### Fixed
 

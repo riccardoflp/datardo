@@ -275,6 +275,7 @@ describe('saved-query.connection-list', () => {
 
   it('pins a query for me with the query itself, and one in the folder with the path of its file', () => {
     expect(pinOf(mine('Paid'))).toEqual({
+      kind: 'saved-query',
       place: 'me',
       database: 'shop',
       collection: 'orders',
@@ -291,6 +292,7 @@ describe('saved-query.connection-list', () => {
         file: 'shop/orders/p.json',
       }),
     ).toEqual({
+      kind: 'saved-query',
       place: 'folder',
       database: 'shop',
       collection: 'orders',

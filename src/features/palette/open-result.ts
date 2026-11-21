@@ -3,7 +3,7 @@
  *
  * Opens what is selected in Go to's list. It has no plan of its own: it plans what the feature of the row plans, with
  * what the row names: `tab.activate` for an open tab, `tab.open` for what a tab shows (a collection, a view, a bucket, a
- * key, a page, a recent place), `nav.switch-connection` for a connection, `palette.run-command` for a command. Opened
+ * key, a page, a recent place), `nav.switch-connection` for a connection, `palette.run-command` for a command, `saved-query.run` for a saved query. Opened
  * in the background (`Ctrl+Enter`, a click with `Ctrl` or with the middle button), a row that opens a tab leaves the
  * active tab active and Go to open.
  */
@@ -16,6 +16,7 @@ import { plan as activate } from '../tab/activate';
 import { planOf as openTab } from '../tab/open';
 import { plan as switchConnection } from '../nav/switch-connection';
 import { appPlan, startArgs } from '../nav/types';
+import { plan as runSavedQuery } from '../saved-query/run';
 import { plan as runCommand } from './run-command';
 import { text } from './text';
 import type { OpenTarget } from './types';
@@ -51,6 +52,8 @@ function readTarget(value: unknown): OpenTarget | undefined {
     case 'connection':
     case 'command':
       return readNamed(object);
+    case 'saved-query':
+      return object['args'] === undefined ? undefined : { kind: 'saved-query', args: object['args'] as Json };
     default:
       return undefined;
   }
@@ -87,6 +90,8 @@ export function plan(context: Context, answers: Answers): Outcome {
       return switchConnection(context, given({ connection: opens.connection }));
     case 'command':
       return runCommand(context, given({ command: opens.command }));
+    case 'saved-query':
+      return runSavedQuery(context, given(opens.args));
   }
 }
 

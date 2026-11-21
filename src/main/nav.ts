@@ -19,6 +19,22 @@ function isWhole(value: unknown): value is number {
   return typeof value === 'number' && Number.isInteger(value) && value >= 0;
 }
 
+/** A pinned saved query: its place, and its file or the query itself, when the pin holds them (`nav.pin`). */
+function savedQueryPin(
+  pin: Record<string, unknown>,
+  named: { readonly database: string; readonly collection: string; readonly name: string },
+): Pin {
+  const place = pin['place'] === 'me' || pin['place'] === 'folder' ? pin['place'] : undefined;
+  const query = pin['query'];
+  return {
+    kind: 'saved-query',
+    ...named,
+    ...(place === undefined ? {} : { place }),
+    ...(isText(pin['file']) ? { file: pin['file'] } : {}),
+    ...(typeof query === 'object' && query !== null && !Array.isArray(query) ? { query: query as Json } : {}),
+  };
+}
+
 /** A pin as stored, or `undefined` when it is not one (it is then left out, and the others are kept). */
 export function readPin(value: unknown): Pin | undefined {
   if (typeof value !== 'object' || value === null) {
@@ -54,7 +70,7 @@ export function readPin(value: unknown): Pin | undefined {
         : undefined;
     case 'saved-query':
       return isText(pin['database']) && isText(pin['collection']) && isText(pin['name'])
-        ? { kind: 'saved-query', database: pin['database'], collection: pin['collection'], name: pin['name'] }
+        ? savedQueryPin(pin, { database: pin['database'], collection: pin['collection'], name: pin['name'] })
         : undefined;
     default:
       return undefined;

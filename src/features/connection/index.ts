@@ -1,7 +1,7 @@
 /**
  * The Operations and the Reads of the connection area, as the runner starts them. Derivations and views are not listed.
  * The reads of the main process that import and export ask for (`connection.import:source`, `connection.import:parse`,
- * `connection.export:path`) are listed here too: each answers what its app action returns.
+ * `connection.export:path`) and what a removal deletes (`connection.remove:counts`) are listed here too: each answers what its app action returns.
  */
 import type { Json } from '../../shared/engine-request';
 import type { ReadFeature, RunnableFeature } from '../../shared/feature';
@@ -76,6 +76,7 @@ export const features: readonly RunnableFeature[] = [
   mainRead('connection.import:source', 'connection.import-source'),
   mainRead('connection.import:parse', 'connection.import-parse'),
   mainRead('connection.export:path', 'connection.export-path'),
+  mainRead('connection.remove:counts', 'connection.removal-counts'),
   { kind: 'read', id: featureId('connection.test'), request: test.request, parse: test.parse },
   { kind: 'read', id: featureId('connection.server-info'), request: serverInfo.request, parse: serverInfo.parse },
   { kind: 'read', id: featureId('connection.state'), request: state.request, parse: state.parse },

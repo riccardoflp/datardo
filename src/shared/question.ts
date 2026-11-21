@@ -65,6 +65,11 @@ export interface Question {
   readonly fields: readonly Field[];
   /** The identifier of the button that answers, when the feature's card lists the place `@dialog`. */
   readonly element?: string;
+  /**
+   * For a question with no field, which only says something before the feature goes on: the key under which its
+   * button answers `true`, so that the feature knows it was answered (`saved-query.choose-folder`).
+   */
+  readonly key?: string;
 }
 
 /** Whether a text keeps every rule of its field, and the message of the first it breaks. */

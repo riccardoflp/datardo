@@ -16,6 +16,7 @@ import { commands as queryCommands } from './query/commands';
 import { commands as tableCommands } from './table/commands';
 import { commands as keyCommands } from './key/commands';
 import { areaCommands as aggregateCommands } from './aggregate/commands';
+import { commands as savedQueryCommands } from './saved-query/commands';
 
 import type { Command } from './command';
 
@@ -37,4 +38,5 @@ export const commands: readonly Command[] = [
   ...tableCommands,
   ...keyCommands,
   ...aggregateCommands,
+  ...savedQueryCommands,
 ];
