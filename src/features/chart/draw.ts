@@ -8,6 +8,10 @@ import type { MongoServerInfo } from '../../shared/connection';
 import type { Json } from '../../shared/engine-request';
 import { refuse, type Context, type Outcome, type ReadRequest } from '../../shared/feature';
 import { connectionId, type ConnectionId } from '../../shared/ids';
+import { stagesOfEditor } from '../aggregate/edit-as-text';
+import type { Makers } from '../aggregate/mongosh/helpers';
+import { valueOf } from '../aggregate/mongosh/parse';
+import { emptyEditor, makersOf, readEditor, stageName, upToIndex } from '../aggregate/types';
 import { isVersionAtLeast, shortVersion } from '../connection/server-info';
 import { chartData, type ChartData } from './data';
 import { chartOptions } from './options';
@@ -20,6 +24,7 @@ import {
   type ChartSource,
   type EditorStage,
   type JsonDocument,
+  type ParsedText,
 } from './types';
 
 /** How long the server may work on the aggregation of a chart, in milliseconds. */
@@ -28,13 +33,64 @@ export const chartTimeLimitMs = 120_000;
 /** The version a histogram and dates grouped by a unit need (`$setWindowFields`, `$dateTrunc`). */
 const leastVersion = [5, 0];
 
-/** What a chart is drawn of: the collection or view of the tab, what the controls hold, and **Data**. */
+/**
+ * What a chart is drawn of: the collection or view of the tab, what the controls hold, and **Data**. The window sends
+ * **Data** as texts, `data` with the filter of the query bar as typed and the pipeline of the editor
+ * (`editorJson`), which are read here as `query.parse` reads them; `source` gives them already read.
+ */
 export interface DrawArgs {
   readonly connection: string;
   readonly database: string;
   readonly collection: string;
+  /** The collection tab, whose options are kept with it once drawn. */
+  readonly tab?: string;
   readonly input: ChartInput;
-  readonly source: ChartSource;
+  readonly source?: ChartSource;
+  readonly data?: 'filter' | 'pipeline';
+  readonly filter?: string;
+  readonly pipeline?: Json;
+}
+
+/** A text of the query bar or the body of a stage, read as `query.parse` reads it: nothing typed, a value, or why not. */
+export function parsedText(typed: string, makers: Makers): ParsedText {
+  if (typed.trim() === '') {
+    return { kind: 'empty' };
+  }
+  const parsed = valueOf(typed, makers);
+  return parsed.ok ? { kind: 'value', value: parsed.value } : { kind: 'invalid', message: parsed.message };
+}
+
+/**
+ * The stages of the pipeline editor as sent (`editorJson`), each body read, and the stage shown (the last while the
+ * text is shown); or why the text of the editor is not a pipeline.
+ */
+export function editorStages(
+  pipeline: Json | undefined,
+  makers: Makers,
+): { readonly stages: readonly EditorStage[]; readonly shown: number } | { readonly invalid: string } {
+  const editor = readEditor(pipeline) ?? emptyEditor;
+  const read = stagesOfEditor(editor, makers);
+  if (!read.ok) {
+    return { invalid: read.message };
+  }
+  const stages = read.stages.map((stage) => ({
+    name: stageName(stage),
+    body: parsedText(stage.body, makers),
+    enabled: stage.enabled,
+  }));
+  return { stages, shown: editor.text === undefined ? upToIndex(editor) : stages.length - 1 };
+}
+
+/** **Data** of the arguments, read: the documents of the filter, or the pipeline up to the stage shown. */
+export function sourceOf(draw: DrawArgs, makers: Makers): ChartSource | { readonly invalid: string } {
+  if (draw.source !== undefined) {
+    return draw.source;
+  }
+  if (draw.data === 'pipeline') {
+    const read = editorStages(draw.pipeline, makers);
+    return 'invalid' in read ? read : { kind: 'pipeline', stages: read.stages, shown: read.shown };
+  }
+  return { kind: 'filter', filter: parsedText(draw.filter ?? '', makers) };
 }
 
 /** The stages of the editor that are sent: the enabled ones up to the stage shown, or the first that does not parse. */
@@ -96,8 +152,9 @@ function versionRefusal(options: ChartOptions, server: MongoServerInfo | undefin
 
 /** The arguments of a draw, as the section sends them. */
 export function drawArgs(args: Json): DrawArgs {
-  if (!isJsonDocument(args) || !isJsonDocument(args['input']) || !isJsonDocument(args['source'])) {
-    throw new Error('chart.draw needs { connection, database, collection, input, source }.');
+  const sourceGiven = isJsonDocument(args) && (isJsonDocument(args['source']) || typeof args['data'] === 'string');
+  if (!isJsonDocument(args) || !isJsonDocument(args['input']) || !sourceGiven) {
+    throw new Error('chart.draw needs { connection, database, collection, input, source or data }.');
   }
   return args as unknown as DrawArgs;
 }
@@ -110,7 +167,11 @@ export function request(context: Context, args: Json): ReadRequest | Outcome {
     return refuse('chart.draw/options', result.message);
   }
   const { options } = result;
-  const before = sourceStages(draw.source);
+  const source = sourceOf(draw, makersOf(context));
+  if ('invalid' in source) {
+    return refuse('chart.draw/invalid-stage', source.invalid);
+  }
+  const before = sourceStages(source);
   if (!Array.isArray(before)) {
     return before as Outcome;
   }

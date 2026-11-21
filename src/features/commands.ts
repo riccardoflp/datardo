@@ -40,6 +40,8 @@ import { areaCommands as structureCommands } from './structure/commands';
 import { commands as taskCommands } from './task/commands';
 import { commands as schemaCommands } from './schema/commands';
 import { commands as explainCommands } from './explain/commands';
+import { commands as chartCommands } from './chart/commands';
+import { commands as codegenCommands } from './codegen/commands';
 
 import type { Command } from './command';
 
@@ -85,4 +87,6 @@ export const commands: readonly Command[] = [
   ...taskCommands,
   ...schemaCommands,
   ...explainCommands,
+  ...chartCommands,
+  ...codegenCommands,
 ];

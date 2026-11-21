@@ -1,0 +1,141 @@
+/*
+ * The Chart section of a collection tab: its first row with the types, Data, Code and Save picture; its second row
+ * with the fields and options; the line of the chart; and the chart, which fills the rest of the section.
+ */
+.section {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.toolbar,
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+}
+
+.toolbar {
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.controls {
+  align-items: flex-end;
+}
+
+.group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-0);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.label,
+.info {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-small);
+}
+
+.label {
+  margin-right: var(--space-1);
+}
+
+.info {
+  margin-left: var(--space-1);
+}
+
+.button {
+  min-height: var(--space-5);
+  padding: var(--space-0) var(--space-2);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-small);
+  background: var(--color-island);
+  color: var(--color-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.button[aria-pressed='true'] {
+  border-color: var(--color-accent);
+  background: var(--color-selected);
+}
+
+.button:disabled {
+  color: var(--color-text-muted);
+  cursor: default;
+}
+
+.button:hover:not(:disabled, [aria-pressed='true']) {
+  background: var(--color-hover);
+}
+
+.control {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0);
+}
+
+.input {
+  min-height: var(--space-5);
+  padding: var(--space-0) var(--space-1);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-small);
+  background: var(--color-island);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.input[data-kind='field'] {
+  width: calc(var(--space-6) * 5);
+}
+
+.input[data-kind='number'] {
+  width: calc(var(--space-6) * 2);
+}
+
+.input[aria-invalid='true'] {
+  border-color: var(--color-danger);
+}
+
+.message {
+  margin: 0;
+  padding: 0 var(--space-3);
+  color: var(--color-danger);
+}
+
+.line {
+  min-height: var(--space-4);
+  margin: 0;
+  padding: 0 var(--space-3);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-small);
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  padding: var(--space-1) var(--space-3) var(--space-2);
+}
+
+.state {
+  margin: 0 0 var(--space-2);
+  color: var(--color-text-muted);
+}
+
+.chart {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.chart[data-dimmed='true'] {
+  opacity: 0.4;
+}

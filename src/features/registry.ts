@@ -43,6 +43,8 @@ import { features as structureFeatures } from './structure';
 import { features as taskFeatures } from './task';
 import { features as schemaFeatures } from './schema';
 import { features as explainFeatures } from './explain';
+import { features as chartFeatures } from './chart';
+import { features as codegenFeatures } from './codegen';
 
 /** The features of every area, as each area's index lists them. */
 const areas: readonly (readonly RunnableFeature[])[] = [
@@ -85,6 +87,8 @@ const areas: readonly (readonly RunnableFeature[])[] = [
   taskFeatures,
   schemaFeatures,
   explainFeatures,
+  chartFeatures,
+  codegenFeatures,
 ];
 
 /** The features the runner can start, by identifier. */

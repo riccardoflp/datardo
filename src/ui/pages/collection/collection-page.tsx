@@ -1,8 +1,9 @@
 /**
  * The page of a collection tab: its section bar, then the section shown. **Documents** (`table.show`), with the query
- * bar (`query.bar`) above the documents of the query; **Schema** (`schema.show`); for a collection, **Indexes**
- * (`index.show`); for a view, **Definition** (`manage.definition`); for a collection, **Validation**
- * (`manage.validation`); and under **More**, **Explain** (`explain.show`). The window keeps what each tab read; the page restores the tab's
+ * bar (`query.bar`) above the documents of the query; **Schema** (`schema.show`); **Chart** (`chart.show`); for a
+ * collection, **Indexes** (`index.show`); for a view, **Definition** (`manage.definition`); for a collection,
+ * **Validation** (`manage.validation`); and under **More**, **Explain** (`explain.show`) and **Code**
+ * (`codegen.show`). The window keeps what each tab read; the page restores the tab's
  * query and runs it once the connection is connected.
  */
 import { useEffect, useMemo } from 'react';
@@ -19,7 +20,9 @@ import { IndexSection } from '../index/index-section';
 import { ExplainSection } from '../explain/explain-section';
 import { showSetFilter } from '../schema/schema-actions';
 import { SchemaSection } from '../schema/schema-section';
-import { MoreMenu, SchemaButton } from './section-more';
+import { ChartButton, MoreMenu, SchemaButton } from './section-more';
+import { ChartSection } from '../chart/chart-section';
+import { CodeSection } from '../code/code-section';
 import { DocumentsSection } from './documents-section';
 import {
   collectionPageState,
@@ -51,6 +54,7 @@ function SectionBar({ place, section }: { readonly place: SectionPlace; readonly
         {tableText.commands.show}
       </button>
       <SchemaButton place={place} section={section} />
+      <ChartButton place={place} section={section} />
       {place.view ? null : (
         <button
           type="button"
@@ -95,8 +99,15 @@ function SectionBar({ place, section }: { readonly place: SectionPlace; readonly
 }
 
 /** The sections of a view and of a collection; any other name shows the documents. */
-const viewSections: ReadonlySet<string> = new Set(['definition', 'schema', 'explain']);
-const collectionSections: ReadonlySet<string> = new Set(['validation', 'indexes', 'schema', 'explain']);
+const viewSections: ReadonlySet<string> = new Set(['definition', 'schema', 'chart', 'explain', 'code']);
+const collectionSections: ReadonlySet<string> = new Set([
+  'validation',
+  'indexes',
+  'schema',
+  'chart',
+  'explain',
+  'code',
+]);
 
 /** The section a tab shows, from the name it keeps. */
 function shownSection(section: string, view: boolean): string {
@@ -148,7 +159,11 @@ export function CollectionPage({
       {shown === 'schema' ? (
         <SchemaSection place={place} collectionRef={ref} collection={collection} page={page} />
       ) : null}
+      {shown === 'chart' ? (
+        <ChartSection collectionRef={ref} collection={collection} page={page} place={place} />
+      ) : null}
       {shown === 'explain' ? <ExplainSection collectionRef={ref} collection={collection} page={page} /> : null}
+      {shown === 'code' ? <CodeSection collectionRef={ref} /> : null}
     </div>
   );
 }

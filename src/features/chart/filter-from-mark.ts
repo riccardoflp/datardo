@@ -2,7 +2,9 @@
  * Feature: chart.filter-from-mark
  *
  * A click on a bar, a point of a line, a slice or a range adds its category, and its series, to the filter of the
- * query bar and shows the documents. It writes nothing to a deployment.
+ * query bar and shows the documents. It writes nothing to a deployment. The app step puts the filter in the bar of
+ * the tab (`query.set-filter`, the action the schema area registers); the window then shows the Documents section in
+ * **Find** and runs the query (`query.run`), which only the window can do with what it reads.
  */
 import type { Json } from '../../shared/engine-request';
 import {
@@ -15,11 +17,12 @@ import {
   type Outcome,
   type Plan,
 } from '../../shared/feature';
-import { connectionId, featureId } from '../../shared/ids';
+import { featureId } from '../../shared/ids';
 import { mongoshValue } from '../../shared/mongosh-value';
-import type { Target } from '../../shared/target';
+import { makersOf } from '../aggregate/types';
 import { startArgs } from '../nav/types';
 import { typedKey } from './data';
+import { parsedText } from './draw';
 import { text } from './text';
 import { isJsonDocument, type ChartType, type JsonDocument } from './types';
 
@@ -38,6 +41,8 @@ export interface MarkArgs {
   readonly connection: string;
   readonly database: string;
   readonly collection: string;
+  /** The collection tab whose bar gets the filter. */
+  readonly tab?: string;
   /** The chart as it was drawn: its type, its first field and its series field, and **Data** when it was drawn. */
   readonly chart: {
     readonly type: ChartType;
@@ -117,12 +122,8 @@ export function planFor(args: MarkArgs): Outcome {
     return refuse('chart.filter-from-mark/invalid-filter', text.mark.fixFilter('Filter must be an object'));
   }
   const after = filterAfterMark(before, args);
-  const target: Target = {
-    kind: 'collection',
-    connection: connectionId(args.connection),
-    database: args.database,
-    collection: args.collection,
-  };
+  const where = { connection: args.connection, database: args.database, collection: args.collection };
+  const tab = args.tab === undefined ? {} : { tab: args.tab };
   const step = text.mark.step(conditionsText(args), args.collection);
   return run({
     ...emptyPlan(),
@@ -131,20 +132,24 @@ export function planFor(args: MarkArgs): Outcome {
         kind: 'app',
         text: step,
         action: setFilterAction,
-        args: { ...target, filter: mongoshValue(after), filterJson: after },
+        args: { ...where, ...tab, filter: mongoshValue(after), filterJson: after },
       },
     ],
-    after: [{ kind: 'start', feature: featureId('query.run'), target }],
   });
 }
 
-/** Feature: chart.filter-from-mark — a click on a mark of the chart drawn. */
-export function plan(_context: Context, answers: Answers): Outcome {
+/**
+ * Feature: chart.filter-from-mark — a click on a mark of the chart drawn. The window sends the filter of the bar as
+ * typed, which is read here as `query.parse` reads it.
+ */
+export function plan(context: Context, answers: Answers): Outcome {
   const args = startArgs(answers);
   if (!isJsonDocument(args['chart'] as Json) || !isJsonDocument(args['mark'] as Json)) {
     return run(emptyPlan());
   }
-  return planFor(args as unknown as MarkArgs);
+  const typed = args['filter'];
+  const filter = typeof typed === 'string' ? parsedText(typed, makersOf(context)) : args['filter'];
+  return planFor({ ...args, filter } as unknown as MarkArgs);
 }
 
 /** The feature, as the runner starts it. */

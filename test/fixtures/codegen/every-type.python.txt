@@ -1,0 +1,42 @@
+import os
+import base64
+from datetime import datetime, timezone
+from uuid import UUID
+
+from pymongo import MongoClient
+from bson import ObjectId
+from bson.binary import Binary
+from bson.decimal128 import Decimal128
+from bson.int64 import Int64
+from bson.max_key import MaxKey
+from bson.min_key import MinKey
+from bson.regex import Regex
+from bson.timestamp import Timestamp
+
+client = MongoClient(os.environ.get("MONGODB_URI", "mongodb://localhost:27017"))
+collection = client["shop"]["orders"]
+
+query = {
+    "id": ObjectId("65f1c0de9a1b2c3d4e5f6a7b"),
+    "at": datetime(2024, 3, 1, 10, 20, 30, 123000, tzinfo=timezone.utc),
+    "long": Int64(9007199254740993),
+    "decimal": Decimal128("0.10"),
+    "int": 42,
+    "double": 2.5,
+    "big": 3000000000,
+    "regex": Regex("^ma", "i"),
+    "uuid": Binary.from_uuid(UUID("3b241101-e2bb-4255-8caf-4136c566a962")),
+    "binary": Binary(base64.b64decode("AQID"), 0),
+    "timestamp": Timestamp(1700000000, 1),
+    "min": MinKey(),
+    "max": MaxKey(),
+    "none": None,
+    "yes": True,
+    "nan": float("nan"),
+    "list": [1, "a"],
+    "empty": {}
+}
+sort = [("at", -1)]
+
+for doc in collection.find(query, sort=sort):
+    print(doc)

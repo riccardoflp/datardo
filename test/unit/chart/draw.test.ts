@@ -144,4 +144,28 @@ describe('chart.draw', () => {
       $lt: date('2024-02-01T00:00:00.000Z'),
     });
   });
+
+  it('reads the filter of the bar and the pipeline of the editor as they are typed', () => {
+    const typed = { connection: 'c-local', database: 'shop', collection: 'orders', input: bar } as const;
+    const filter = { ...typed, data: 'filter', filter: '{ total: { $gte: 100 } }' } as unknown as Json;
+    const [fromFilter] = sent(request(contextOn(), filter)).arguments;
+    expect((fromFilter as readonly Json[])[0]).toEqual({ $match: totalAtLeast100 });
+    const editor = {
+      stages: [
+        { name: '$match', body: '{ total: { $gte: 100 } }', enabled: true },
+        { name: '$limit', body: '5', enabled: true },
+        { name: '$project', body: '{ x: 1 }', enabled: true },
+      ],
+      shown: 1,
+    };
+    const pipeline = { ...typed, data: 'pipeline', pipeline: editor } as unknown as Json;
+    const [fromPipeline] = sent(request(contextOn(), pipeline)).arguments;
+    expect((fromPipeline as readonly Json[]).slice(0, 3)).toEqual([
+      { $match: totalAtLeast100 },
+      { $limit: int(5) },
+      { $unwind: { path: '$status', preserveNullAndEmptyArrays: true } },
+    ]);
+    const wrong = { ...typed, data: 'filter', filter: '{ status: ' } as unknown as Json;
+    expect(request(contextOn(), wrong)).toMatchObject({ kind: 'refuse', code: 'chart.draw/invalid-filter' });
+  });
 });

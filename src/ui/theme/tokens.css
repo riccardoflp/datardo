@@ -84,6 +84,18 @@
   --color-syntax-date: #e2c08d;
   --color-syntax-regex: #ff9492;
   --color-syntax-comment: #a7aebb;
+  --color-chart-1: #6ea8fe;
+  --color-chart-2: #ffa45c;
+  --color-chart-3: #5fcf8a;
+  --color-chart-4: #ff7a7a;
+  --color-chart-5: #c39bff;
+  --color-chart-6: #f2c35b;
+  --color-chart-7: #4ec9d6;
+  --color-chart-8: #ff8fc7;
+  --color-chart-9: #a3d977;
+  --color-chart-10: #d4a373;
+  --color-chart-11: #8fa3ff;
+  --color-chart-12: #b0b6c2;
 }
 
 @media (prefers-color-scheme: light) {
@@ -121,5 +133,17 @@
     --color-syntax-date: #7a4f00;
     --color-syntax-regex: #a3264f;
     --color-syntax-comment: #4f6b3d;
+    --color-chart-1: #2f6fde;
+    --color-chart-2: #c25e00;
+    --color-chart-3: #1b7b44;
+    --color-chart-4: #c42b2b;
+    --color-chart-5: #7a3fd1;
+    --color-chart-6: #8a6a00;
+    --color-chart-7: #0f7f8f;
+    --color-chart-8: #c2307a;
+    --color-chart-9: #4d7a12;
+    --color-chart-10: #8b5a2b;
+    --color-chart-11: #4a55c8;
+    --color-chart-12: #5b6270;
   }
 }

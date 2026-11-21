@@ -1,0 +1,78 @@
+package main
+
+import (
+	"context"
+	"fmt"
+	"math"
+	"os"
+	"time"
+
+	"go.mongodb.org/mongo-driver/v2/bson"
+	"go.mongodb.org/mongo-driver/v2/mongo"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
+)
+
+func main() {
+	uri := os.Getenv("MONGODB_URI")
+	if uri == "" {
+		uri = "mongodb://localhost:27017"
+	}
+	client, err := mongo.Connect(options.Client().ApplyURI(uri))
+	if err != nil {
+		panic(err)
+	}
+	ctx := context.Background()
+	defer client.Disconnect(ctx)
+	collection := client.Database("shop").Collection("orders")
+
+	filter := bson.D{
+		{Key: "id", Value: objectID("65f1c0de9a1b2c3d4e5f6a7b")},
+		{Key: "at", Value: bson.NewDateTimeFromTime(time.Date(2024, time.March, 1, 10, 20, 30, 123000000, time.UTC))},
+		{Key: "long", Value: int64(9007199254740993)},
+		{Key: "decimal", Value: decimal128("0.10")},
+		{Key: "int", Value: 42},
+		{Key: "double", Value: 2.5},
+		{Key: "big", Value: 3000000000},
+		{Key: "regex", Value: bson.Regex{Pattern: "^ma", Options: "i"}},
+		{Key: "uuid", Value: bson.Binary{Subtype: 0x04, Data: []byte{0x3b, 0x24, 0x11, 0x01, 0xe2, 0xbb, 0x42, 0x55, 0x8c, 0xaf, 0x41, 0x36, 0xc5, 0x66, 0xa9, 0x62}}},
+		{Key: "binary", Value: bson.Binary{Subtype: 0x00, Data: []byte{0x01, 0x02, 0x03}}},
+		{Key: "timestamp", Value: bson.Timestamp{T: 1700000000, I: 1}},
+		{Key: "min", Value: bson.MinKey{}},
+		{Key: "max", Value: bson.MaxKey{}},
+		{Key: "none", Value: nil},
+		{Key: "yes", Value: true},
+		{Key: "nan", Value: math.NaN()},
+		{Key: "list", Value: bson.A{1, "a"}},
+		{Key: "empty", Value: bson.D{}},
+	}
+	sort := bson.D{{Key: "at", Value: -1}}
+	opts := options.Find().SetSort(sort)
+
+	cursor, err := collection.Find(ctx, filter, opts)
+	if err != nil {
+		panic(err)
+	}
+	var results []bson.M
+	if err := cursor.All(ctx, &results); err != nil {
+		panic(err)
+	}
+	for _, doc := range results {
+		fmt.Println(doc)
+	}
+}
+
+func decimal128(s string) bson.Decimal128 {
+	d, err := bson.ParseDecimal128(s)
+	if err != nil {
+		panic(err)
+	}
+	return d
+}
+
+func objectID(hex string) bson.ObjectID {
+	id, err := bson.ObjectIDFromHex(hex)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}

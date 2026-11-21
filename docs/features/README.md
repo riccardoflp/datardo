@@ -104,29 +104,29 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`chart.show`](chart.md#chartshow--the-chart-section) | The Chart section | View | M24 | Specified |
-| [`chart.options`](chart.md#chartoptions--the-options-of-a-chart) | The options of a chart | Derivation | M24 | Specified |
-| [`chart.pipeline`](chart.md#chartpipeline--the-stages-a-chart-adds) | The stages a chart adds | Derivation | M24 | Specified |
-| [`chart.draw`](chart.md#chartdraw--run-the-aggregation-of-a-chart) | Run the aggregation of a chart | Read | M24 | Specified |
-| [`chart.data`](chart.md#chartdata--from-the-output-of-the-stages-to-what-is-drawn) | From the output of the stages to what is drawn | Derivation | M24 | Specified |
-| [`chart.filter-from-mark`](chart.md#chartfilter-from-mark--show-the-documents-of-a-bar-or-a-slice) | Show the documents of a bar or a slice | Operation | M24 | Specified |
-| [`chart.save-picture`](chart.md#chartsave-picture--save-the-chart-as-a-picture) | Save the chart as a picture | Operation | M24 | Specified |
+| [`chart.show`](chart.md#chartshow--the-chart-section) | The Chart section | View | M24 | Built |
+| [`chart.options`](chart.md#chartoptions--the-options-of-a-chart) | The options of a chart | Derivation | M24 | Built |
+| [`chart.pipeline`](chart.md#chartpipeline--the-stages-a-chart-adds) | The stages a chart adds | Derivation | M24 | Built |
+| [`chart.draw`](chart.md#chartdraw--run-the-aggregation-of-a-chart) | Run the aggregation of a chart | Read | M24 | Built |
+| [`chart.data`](chart.md#chartdata--from-the-output-of-the-stages-to-what-is-drawn) | From the output of the stages to what is drawn | Derivation | M24 | Built |
+| [`chart.filter-from-mark`](chart.md#chartfilter-from-mark--show-the-documents-of-a-bar-or-a-slice) | Show the documents of a bar or a slice | Operation | M24 | Built |
+| [`chart.save-picture`](chart.md#chartsave-picture--save-the-chart-as-a-picture) | Save the chart as a picture | Operation | M24 | Built |
 
 ## Code generation
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`codegen.show`](codegen.md#codegenshow--the-code-section) | The Code section | View | M24 | Specified |
-| [`codegen.source`](codegen.md#codegensource--the-query-that-is-written-as-code) | The query that is written as code | Derivation | M24 | Specified |
-| [`codegen.layout`](codegen.md#codegenlayout--how-the-code-is-laid-out) | How the code is laid out | Derivation | M24 | Specified |
-| [`codegen.types`](codegen.md#codegentypes--how-each-bson-type-is-written-in-each-language) | How each BSON type is written in each language | Derivation | M24 | Specified |
-| [`codegen.mongosh`](codegen.md#codegenmongosh--the-code-for-mongosh) | The code for mongosh | Derivation | M24 | Specified |
-| [`codegen.nodejs`](codegen.md#codegennodejs--the-code-for-nodejs) | The code for Node.js | Derivation | M24 | Specified |
-| [`codegen.python`](codegen.md#codegenpython--the-code-for-python) | The code for Python | Derivation | M24 | Specified |
-| [`codegen.java`](codegen.md#codegenjava--the-code-for-java) | The code for Java | Derivation | M24 | Specified |
-| [`codegen.csharp`](codegen.md#codegencsharp--the-code-for-c) | The code for C# | Derivation | M24 | Specified |
-| [`codegen.go`](codegen.md#codegengo--the-code-for-go) | The code for Go | Derivation | M24 | Specified |
-| [`codegen.copy`](codegen.md#codegencopy--copy-the-code) | Copy the code | Operation | M24 | Specified |
+| [`codegen.show`](codegen.md#codegenshow--the-code-section) | The Code section | View | M24 | Built |
+| [`codegen.source`](codegen.md#codegensource--the-query-that-is-written-as-code) | The query that is written as code | Derivation | M24 | Built |
+| [`codegen.layout`](codegen.md#codegenlayout--how-the-code-is-laid-out) | How the code is laid out | Derivation | M24 | Built |
+| [`codegen.types`](codegen.md#codegentypes--how-each-bson-type-is-written-in-each-language) | How each BSON type is written in each language | Derivation | M24 | Built |
+| [`codegen.mongosh`](codegen.md#codegenmongosh--the-code-for-mongosh) | The code for mongosh | Derivation | M24 | Built |
+| [`codegen.nodejs`](codegen.md#codegennodejs--the-code-for-nodejs) | The code for Node.js | Derivation | M24 | Built |
+| [`codegen.python`](codegen.md#codegenpython--the-code-for-python) | The code for Python | Derivation | M24 | Built |
+| [`codegen.java`](codegen.md#codegenjava--the-code-for-java) | The code for Java | Derivation | M24 | Built |
+| [`codegen.csharp`](codegen.md#codegencsharp--the-code-for-c) | The code for C# | Derivation | M24 | Built |
+| [`codegen.go`](codegen.md#codegengo--the-code-for-go) | The code for Go | Derivation | M24 | Built |
+| [`codegen.copy`](codegen.md#codegencopy--copy-the-code) | Copy the code | Operation | M24 | Built |
 
 ## Compare
 

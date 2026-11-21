@@ -47,11 +47,9 @@ describe('codegen.copy', () => {
     });
   });
 
-  it('says Copied to the clipboard after', () => {
+  it('sends no notification: the status line says Copied to the clipboard once the window learns it is done', () => {
     const outcome = plan(context, { args: { code: 'x\n', language: 'nodejs', collection: 'orders' } });
-    expect(outcome.kind === 'run' && outcome.plan.after).toEqual([
-      { kind: 'notify', level: 'success', text: 'Copied to the clipboard' },
-    ]);
+    expect(outcome.kind === 'run' && outcome.plan.after).toEqual([]);
   });
 
   it('copies nothing when the section shows no code', () => {

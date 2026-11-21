@@ -1,11 +1,40 @@
 import { describe, expect, it } from 'vitest';
-import { firstChoices, view, type CodeSectionState } from '../../../src/features/codegen/show';
+import { noMakers } from '../../../src/features/aggregate/mongosh/helpers';
+import {
+  choicesOfCode,
+  codeChoices,
+  codeOfTab,
+  firstChoices,
+  plan,
+  view,
+  type CodeSectionState,
+} from '../../../src/features/codegen/show';
+import type { Context } from '../../../src/shared/feature';
+import { connectionId, featureId, tabId } from '../../../src/shared/ids';
+import { initialState } from '../../../src/shared/state';
 import { codeQuery, type CodeResult } from '../../../src/features/codegen/source';
 import { nodejsCode } from '../../../src/features/codegen/nodejs';
 import { pythonCode } from '../../../src/features/codegen/python';
 import { chartStages } from '../../../src/features/chart/pipeline';
 import { codeLanguages, generatedCode } from '../../../src/features/codegen/types';
-import { findExample, lines, pipelineStages, program } from './queries';
+import { findExample, findFilter, int, lines, pipelineStages, program } from './queries';
+
+const collectionTab = {
+  id: tabId('t1'),
+  shows: { kind: 'collection' as const, connection: connectionId('c-local'), database: 'shop', collection: 'orders' },
+  memory: { query: '{ status: "paid" }', choices: { chartType: 'pie' } },
+  lastActive: 0,
+  loaded: true,
+};
+
+const context: Context = {
+  feature: featureId('codegen.show'),
+  now: 1_763_400_000_000,
+  platform: 'windows',
+  startedBy: 'user',
+  target: { kind: 'app' },
+  state: { ...initialState, tabs: { ...initialState.tabs, tabs: [collectionTab], active: collectionTab.id } },
+};
 
 const findSource: CodeResult = {
   kind: 'code',
@@ -98,5 +127,55 @@ describe('codegen.show', () => {
         expect(code).not.toMatch(/mongodb:\/\/[^"]*@|password/iu);
       }
     }
+  });
+
+  it('takes the query of the bar as typed, the enabled stages of the editor, or the aggregation of a chart', () => {
+    const tab = {
+      database: 'shop',
+      collection: 'orders',
+      mode: 'find' as const,
+      texts: {
+        filter: "{ status: 'paid', customer: ObjectId('65f1c0de9a1b2c3d4e5f6a7b') }",
+        sort: '{ createdAt: -1 }',
+        project: '',
+      },
+      pipeline: {
+        stages: [
+          { name: '$match', body: "{ status: 'paid' }", enabled: true },
+          { name: '$sort', body: '{ total: -1 }', enabled: false },
+          { name: '$limit', body: '10', enabled: true },
+        ],
+      },
+    };
+    const find = codeOfTab({ kind: 'query' }, tab, noMakers);
+    expect(find).toMatchObject({ kind: 'code', title: 'find' });
+    expect(find.kind === 'code' && find.query).toEqual({
+      kind: 'find',
+      filter: { status: 'paid', customer: findFilter.customer },
+      sort: { createdAt: int(-1) },
+    });
+    const aggregate = codeOfTab({ kind: 'query' }, { ...tab, mode: 'aggregate' }, noMakers);
+    expect(aggregate).toMatchObject({ kind: 'code', title: 'aggregate (2 stages)' });
+    const chart = { type: 'bar', first: 'status', value: 'count', limit: 20 } as const;
+    const charted = codeOfTab({ kind: 'chart', options: chart, mode: 'filter' }, tab, noMakers);
+    expect(charted).toMatchObject({ kind: 'code', title: 'bar chart' });
+    expect(charted.kind === 'code' && charted.query.kind === 'aggregate' && charted.query.pipeline.slice(1)).toEqual(
+      chartStages(chart),
+    );
+    const invalid = codeOfTab({ kind: 'query' }, { ...tab, texts: { ...tab.texts, filter: '[1]' } }, noMakers);
+    expect(invalid).toEqual({ kind: 'invalid', message: 'Invalid query: Filter must be an object' });
+  });
+
+  it('keeps the language and Full program with the tab, and reads them back', () => {
+    expect(codeChoices({ language: 'python', program: true })).toEqual({ codeLanguage: 'python', codeProgram: 'on' });
+    expect(choicesOfCode({ codeLanguage: 'python', codeProgram: 'on' })).toEqual({ language: 'python', program: true });
+    expect(choicesOfCode(undefined)).toEqual(firstChoices());
+    expect(choicesOfCode({ codeLanguage: 'cobol' })).toEqual(firstChoices());
+    const outcome = plan(context, { args: { choices: { codeLanguage: 'go', codeProgram: 'on' } } });
+    const step = outcome.kind === 'run' ? outcome.plan.steps[0] : undefined;
+    expect(step).toMatchObject({ action: 'tab.activate', args: { tab: 't1', section: 'code' } });
+    expect(step?.kind === 'app' && step.args).toMatchObject({
+      memory: { query: '{ status: "paid" }', choices: { chartType: 'pie', codeLanguage: 'go', codeProgram: 'on' } },
+    });
   });
 });

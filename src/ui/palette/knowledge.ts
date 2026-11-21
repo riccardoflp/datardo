@@ -8,6 +8,8 @@ import { useEffect, useSyncExternalStore } from 'react';
 import { commands as registeredCommands } from '../../features/commands';
 import { isStale, type FoundCollections } from '../../features/palette/find-collections';
 import { offeredCommands } from '../../features/palette/run-command';
+import { isChartOfferedNow } from '../pages/chart/chart-commands';
+import { isCodeOfferedNow } from '../pages/code/code-commands';
 import type { KnownCollections, PaletteKnowledge } from '../../features/palette/types';
 import type { Json } from '../../shared/engine-request';
 import { featureId, type ConnectionId } from '../../shared/ids';
@@ -91,7 +93,11 @@ export function useKnowledge(state: AppState, looking: boolean): PaletteKnowledg
       }
     }
   }, [looking, connectedKey]);
-  const commands = offeredCommands(registeredCommands, state, state.app.platform).map((entry) => ({
+  // The picture of a chart and the copy of the code are offered only once the window has them to give.
+  const offered = offeredCommands(registeredCommands, state, state.app.platform).filter(
+    (entry) => isChartOfferedNow(entry.id, state) && isCodeOfferedNow(entry.id, state),
+  );
+  const commands = offered.map((entry) => ({
     id: entry.id,
     title: entry.title,
     ...(entry.shownKey === undefined ? {} : { key: entry.shownKey }),

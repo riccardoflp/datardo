@@ -12,6 +12,9 @@ function count(value: number, one: string, many: string): string {
 export const text = {
   section: 'Chart',
   chartName: 'Chart',
+  /** The names of the groups of the section for assistive technology. */
+  typesLabel: 'Chart type',
+  optionsLabel: 'Fields and options',
   types: {
     bar: { label: 'Bar', hint: 'Count or measure per category' },
     line: { label: 'Line', hint: 'Count or measure along a field, usually a date' },
@@ -84,6 +87,12 @@ export const text = {
   measure: (value: Exclude<ChartValue, 'count'>, field: string) => `${value} of ${field}`,
   axis: (field: string, unit?: DateUnit) => (unit === undefined ? field : `${field} (${unit})`),
   clickHint: 'Click to show the documents',
+  tips: {
+    /** What a slice of a pie says: its value and its share with one decimal, *700 (69.7%)*. */
+    slice: (value: string, share: number) => `${value} (${share.toFixed(1)}%)`,
+    /** What a point of a scatter chart says, *qty 2, total 42.5*, with its series before it when there are several. */
+    point: (x: string, y: string, series?: string) => `${series === undefined ? '' : `${series}: `}${x}, ${y}`,
+  },
   line: {
     categories: (shown: number, limit: number) =>
       `${count(shown, 'category', 'categories')}${shown >= limit ? ` (the top ${groupThousands(limit)})` : ''}`,

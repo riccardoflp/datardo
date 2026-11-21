@@ -6,11 +6,12 @@
  * shows its Chart section.
  */
 import { noDanger, run, type Answers, type Context, type OperationFeature, type Outcome } from '../../shared/feature';
+import type { Json } from '../../shared/engine-request';
 import { featureId } from '../../shared/ids';
-import { activeTabOf } from '../../shared/state/tabs';
-import { chartLine, type ChartData } from './data';
+import { activeTabOf, type TabMemory } from '../../shared/state/tabs';
+import { chartLine, typedKey, type ChartData } from './data';
 import { isClickable } from './filter-from-mark';
-import { chartOptions } from './options';
+import { chartOptions, firstInput } from './options';
 import { text } from './text';
 import {
   chartLimits,
@@ -21,6 +22,8 @@ import {
   type ChartInput,
   type ChartOptions,
   type ChartType,
+  type ChartValue,
+  type DateUnit,
 } from './types';
 
 /** The section's tab name, as `tab.activate` takes it. */
@@ -240,7 +243,10 @@ function drawnPart(state: ChartSectionState): Pick<ChartSectionView, 'message' |
   const message = state.checked && options.kind === 'wrong' ? options.message : undefined;
   const { drawn } = state;
   if (drawn === undefined) {
-    return { ...(message === undefined ? {} : { message }), ...(state.running ? {} : { state: text.states.choose }) };
+    return {
+      ...(message === undefined ? {} : { message }),
+      ...(state.running ? {} : { state: state.error ?? text.states.choose }),
+    };
   }
   const dimmed = state.running || state.error !== undefined;
   return {
@@ -281,6 +287,86 @@ export function view(state: ChartSectionState): ChartSectionView {
     draw: { label: text.draw, element: 'chart.draw@toolbar' },
     ...drawnPart(state),
   };
+}
+
+/** The choices of the section as the tab keeps them (`TabMemory.choices`), by name. */
+export function chartChoices(input: ChartInput): Readonly<Record<string, string>> {
+  return {
+    chartType: input.type,
+    chartFirst: input.first,
+    chartSecond: input.second,
+    chartValue: input.value,
+    chartSeries: input.series,
+    chartUnit: input.unit ?? '',
+    chartLimit: String(input.limit),
+  };
+}
+
+/** What the tab keeps once a chart is drawn: its other memory, with the choices of the section. */
+export function keptChartMemory(memory: TabMemory | undefined, input: ChartInput): TabMemory {
+  return { ...memory, choices: { ...memory?.choices, ...chartChoices(input) } };
+}
+
+/** The input the tab kept, each choice that is missing or not valid as the section shows it at first. */
+export function inputOfChoices(choices: Readonly<Record<string, string>> | undefined): ChartInput {
+  if (choices?.['chartType'] === undefined) {
+    return firstInput;
+  }
+  const type = chartTypes.find((each) => each === choices['chartType']) ?? firstInput.type;
+  const value: ChartValue = chartValues.find((each) => each === choices['chartValue']) ?? 'count';
+  const unit: DateUnit | undefined = dateUnits.find((each) => each === choices['chartUnit']);
+  return {
+    type,
+    first: choices['chartFirst'] ?? '',
+    second: choices['chartSecond'] ?? '',
+    value,
+    series: choices['chartSeries'] ?? '',
+    ...(unit === undefined ? {} : { unit }),
+    limit: choices['chartLimit'] ?? chartLimits[type].first,
+  };
+}
+
+function pathsOf(value: Json, prefix: string, seen: Map<string, boolean>, depth: number): void {
+  if (depth > 4 || typeof value !== 'object' || value === null) {
+    return;
+  }
+  if (Array.isArray(value)) {
+    (value as readonly Json[]).forEach((each) => {
+      pathsOf(each, prefix, seen, depth + 1);
+    });
+    return;
+  }
+  for (const [key, inner] of Object.entries(value)) {
+    const path = prefix === '' ? key : `${prefix}.${key}`;
+    const document = isPlainDocument(inner);
+    seen.set(path, (seen.get(path) ?? true) && document);
+    if (document || Array.isArray(inner)) {
+      pathsOf(inner, path, seen, depth + 1);
+    }
+  }
+}
+
+function isPlainDocument(value: Json): boolean {
+  return typeof value === 'object' && value !== null && !Array.isArray(value) && typedKey(value) === undefined;
+}
+
+/**
+ * The fields suggested in the section: with **Filter** those of the collection (`query.field-hints`), with
+ * **Pipeline** those of the documents the stage shown puts out; never a field that holds only objects.
+ */
+export function suggestedFields(
+  mode: ChartDataMode,
+  hints: readonly { readonly path: string; readonly types: readonly string[] }[],
+  documents: readonly Json[],
+): readonly string[] {
+  if (mode === 'filter') {
+    return hints.filter((hint) => hint.types.some((type) => type !== 'object')).map((hint) => hint.path);
+  }
+  const seen = new Map<string, boolean>();
+  documents.forEach((document) => {
+    pathsOf(document, '', seen, 0);
+  });
+  return [...seen].filter(([, onlyObjects]) => !onlyObjects).map(([path]) => path);
 }
 
 /** Feature: chart.show — Go to's **Chart**: the active collection tab shows its Chart section. */
