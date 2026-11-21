@@ -28,6 +28,8 @@ import { areaCommands as gridfsCommands } from './gridfs/commands';
 import { commands as mcpCommands } from './mcp/commands';
 import { commands as transferCommands } from './transfer/commands';
 import { commands as backupCommands } from './backup/commands';
+import { commands as historyCommands } from './history/commands';
+import { commands as watchCommands } from './watch/commands';
 
 import type { Command } from './command';
 
@@ -61,4 +63,6 @@ export const commands: readonly Command[] = [
   ...mcpCommands,
   ...transferCommands,
   ...backupCommands,
+  ...historyCommands,
+  ...watchCommands,
 ];

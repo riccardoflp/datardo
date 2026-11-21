@@ -14,7 +14,7 @@ import { startIntent } from '../shell/top-bar/start';
 import { isAggregateCommand, runAggregateCommand } from '../pages/aggregate/aggregate-commands';
 import { isSavedQueryCommand, runSavedQueryCommand } from '../pages/saved-query/saved-query-commands';
 import { queryCommandIds, runQueryCommand } from '../query/query-commands';
-import { isDocumentCommand, runDocumentCommand } from '../pages/document/document-commands';
+import { historyIntentOf, isDocumentCommand, runDocumentCommand } from '../pages/document/document-commands';
 import { isFieldFeature, runFieldCommand } from '../pages/field/field-actions';
 import { isSectionCommand, runSectionCommand } from '../pages/manage/section-commands';
 import { isGridFsCommand, runGridFsCommand } from '../pages/gridfs/gridfs-commands';
@@ -56,9 +56,12 @@ const windowOnly: Readonly<Record<string, () => void>> = {
 
 /**
  * What only the window knows, added to an intent: **Switch database…** lists the databases as the tree last read
- * them (`key.switch-database`).
+ * them (`key.switch-database`); **Document history** is on the selected row of a collection tab (`history.show`).
  */
-function withWindowArgs(intent: Intent): Intent {
+function withWindowArgs(intent: Intent, state: AppState): Intent {
+  if (intent.feature === 'history.show') {
+    return historyIntentOf(state, intent) ?? intent;
+  }
   const target = intent.target;
   if (intent.feature !== 'key.switch-database' || target.kind !== 'redis-database') {
     return intent;
@@ -122,6 +125,6 @@ export function runCommand(id: string, state: AppState): void {
   }
   const intent = intentOf(state, id);
   if (intent !== undefined) {
-    startIntent(withWindowArgs(intent));
+    startIntent(withWindowArgs(intent, state));
   }
 }

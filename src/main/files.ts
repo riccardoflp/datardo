@@ -54,10 +54,17 @@ function playgroundText(args: Json): Promise<string> {
   return Promise.resolve(typeof text === 'string' ? text : '');
 }
 
+/** watch.export { text }: the change events as JSON Lines, made when the plan was. */
+function watchText(args: Json): Promise<string> {
+  const text = jsonFields(args)['text'];
+  return Promise.resolve(typeof text === 'string' ? text : '');
+}
+
 /** The writers of the content of a file, by name. */
 const writers: Readonly<Record<string, (args: Json) => Promise<string>>> = {
   'connection.write-file': connectionsFile,
   'playground.text': playgroundText,
+  'watch.export': watchText,
 };
 
 /**

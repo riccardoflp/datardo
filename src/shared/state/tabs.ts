@@ -9,6 +9,7 @@
 import type { EngineName } from '../engine-request';
 import type { ConnectionId, TabId } from '../ids';
 import { tabId } from '../ids';
+import type { EventCategory } from './watch';
 
 /** What a tab shows (`tab.same-target`); the kinds of tabs of the product page, "What a tab is". */
 export type TabShows =
@@ -92,6 +93,13 @@ export interface TabMemory {
   readonly typeFilter?: string;
   /** What a page of sections keeps of its controls, by name: **Auto**, the filters, the sorts (`server.show`). */
   readonly choices?: Readonly<Record<string, string>>;
+  /** The **Filter**, **Current document on update**, the types hidden and the search of a Watch changes page. */
+  readonly watch?: {
+    readonly filter: string;
+    readonly fullDocument: boolean;
+    readonly hiddenTypes: readonly EventCategory[];
+    readonly search: string;
+  };
 }
 
 /** The unsaved text of a document tab or a playground tab, kept aside so that a crash does not lose it (D33). */

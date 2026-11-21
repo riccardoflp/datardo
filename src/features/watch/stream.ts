@@ -171,5 +171,27 @@ export function streamError(error: unknown): Refusal | undefined {
   return facts.code === 40573 || /only supported on replica sets/iu.test(facts.text) ? standalone() : undefined;
 }
 
-/** The feature, as the runner starts it. */
-export const feature: ReadFeature = { kind: 'read', id: featureId('watch.stream'), request, parse };
+/** The action of the main process that opens the stream of a page and keeps it open (`src/main/watch-streams.ts`). */
+export const openStreamAction = 'watch.open-stream';
+
+/**
+ * Feature: watch.stream — as a control of the page starts it: a filter that cannot be read is refused at once, and
+ * the stream the page had stays as it was; otherwise the app action that opens the stream and keeps it open, asking
+ * again each time the server answers. The main process asks {@link request} again, says its other refusals on the
+ * page (a standalone server), sends what it builds, and reads each answer with {@link parse}; the read itself answers
+ * once the stream has answered for the first time.
+ */
+export function pageRequest(context: Context, args: Json): ReadRequest | Outcome {
+  const asked = request(context, args);
+  return asked.kind === 'refuse' && asked.code === 'watch.stream/invalid-filter'
+    ? asked
+    : { kind: 'app', action: openStreamAction, args };
+}
+
+/** The feature, as the runner starts it: from a page, the stream the main process keeps open. */
+export const feature: ReadFeature = {
+  kind: 'read',
+  id: featureId('watch.stream'),
+  request: pageRequest,
+  parse: (replies) => replies[0] ?? null,
+};

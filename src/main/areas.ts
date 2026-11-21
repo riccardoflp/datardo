@@ -19,6 +19,7 @@ import { start as startConsoles } from './consoles';
 import { start as startSavedQueries } from './saved-queries';
 import { start as startGridFs } from './gridfs';
 import { start as startMcp } from './mcp';
+import { start as startWatch } from './watch';
 
 /** What one area does at start. */
 export type AreaStart = (services: MainServices) => Promise<void>;
@@ -33,6 +34,8 @@ const starts: readonly AreaStart[] = [
   startNav,
   // Before the tabs are restored, so that the playground of each restored tab is loaded.
   startPlaygrounds,
+  // Before the tabs are restored, so that each restored Watch changes tab gets its page.
+  startWatch,
   startTabs,
   startPalette,
   startTable,

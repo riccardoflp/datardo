@@ -147,6 +147,13 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
 - A connection, a database or a collection is backed up in mongodump's formats (an archive, or a folder compressed
   or not) and restored from them, with a checksum that stops a damaged archive; a restore, a copy and an import can be
   undone from the Undo history.
+- **History** of a document, from its inspector, its row menu or its tab, lists the writes the oplog still holds,
+  newest first, with what each changed and the versions they made, marking those written from Datardo; a version is
+  copied, or restored after a confirmation and recorded for undo, refused on a read-only connection.
+- **Watch changes** follows a collection, a database or the whole deployment live through a change stream: the change
+  events arrive newest first, are filtered by the server and by type and text in the page, show what each changed in
+  the inspector, can be paused, stopped, resumed from the last one, cleared, copied and exported as JSON Lines, and a
+  collection can be made to record pre-images.
 
 ### Fixed
 

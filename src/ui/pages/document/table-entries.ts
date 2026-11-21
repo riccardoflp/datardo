@@ -7,6 +7,7 @@
 import type { Cell } from '../../../features/table/rows';
 import type { Document, TableTarget } from '../../../features/table/types';
 import { canWrite } from '../../../features/table/types';
+import { oneLineText } from '../../../features/document/write/values';
 import { featureOfElement } from '../../query/built';
 import type { CollectionRef } from '../../query/collection-reads';
 import type { CollectionTab } from '../../query/collection-store';
@@ -45,6 +46,13 @@ export function chooseDocumentEntry(entry: DocumentEntry): boolean {
     case 'document.delete':
       void startOnDocuments(ref, element, { id: first?.['_id'] ?? null });
       return true;
+    case 'history.show': {
+      const id = first?.['_id'];
+      if (id !== undefined) {
+        void startOnDocuments(ref, element, { id, idText: oneLineText(id) });
+      }
+      return true;
+    }
     case 'document.update-selected':
     case 'document.delete-selected':
       void startOnDocuments(ref, element, { ids: idsOf(documents) });

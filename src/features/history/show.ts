@@ -383,7 +383,28 @@ export function historyOf(context: Context, answers: Answers): HistoryOf | undef
   return activeDocument(context);
 }
 
-/** Feature: history.show — opens the page of the document, or makes its tab active; it then reads the oplog again. */
+/**
+ * The key under which `history.show` remembers the page it opened last, with when: a page already open reads the
+ * oplog again when it is opened again.
+ */
+export const historyOpenedKey = 'history.show';
+
+/** The page opened last, and when, as `history.show` remembered it; `undefined` when none was. */
+export function lastOpened(
+  remembered: Json | undefined,
+): { readonly shows: TabShows; readonly at: number } | undefined {
+  const fields = objectOf(remembered);
+  const shows = fields['shows'];
+  const at = fields['at'];
+  return typeof at === 'number' && shows !== undefined && shows !== null && typeof shows === 'object'
+    ? { shows: shows as unknown as TabShows, at }
+    : undefined;
+}
+
+/**
+ * Feature: history.show — opens the page of the document, or makes its tab active; it then reads the oplog again. It
+ * first remembers the page it opens, with the time, so that a page already open knows it is to read again.
+ */
 export function plan(context: Context, answers: Answers): Outcome {
   const of = historyOf(context, answers);
   if (of === undefined) {
@@ -396,6 +417,11 @@ export function plan(context: Context, answers: Answers): Outcome {
     undo: { cannot: copyText.cannotUndo },
     publishes: false,
     after: [
+      {
+        kind: 'remember',
+        key: historyOpenedKey,
+        value: { shows: historyShows(of) as unknown as Json, at: context.now },
+      },
       {
         kind: 'start',
         feature: featureId('tab.open'),

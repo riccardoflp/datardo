@@ -9,6 +9,9 @@ import type { TabId } from '../../../shared/ids';
 import { collectionRefOf } from '../../query/collection-reads';
 import { useCollection } from '../../query/collection-store';
 import { useAppState } from '../../state/store';
+import { isBuilt } from '../../query/built';
+import { oneLineText } from '../../../features/document/write/values';
+import { startOnDocuments } from './document-actions';
 import { inspectStateOf } from './inspect-state';
 import { useInspect } from './inspect-store';
 import { InspectorButtons } from './inspector-buttons';
@@ -66,6 +69,23 @@ export function DocumentInspector({ tab }: { readonly tab: TabId }): React.JSX.E
         <pre className={styles['text']} tabIndex={0} aria-label={shown.header}>
           {shown.text}
         </pre>
+      )}
+      {shown.history === undefined || !isBuilt(shown.history.element ?? '') ? null : (
+        <button
+          type="button"
+          className={styles['button']}
+          data-feature={shown.history.element}
+          disabled={!shown.history.enabled}
+          title={shown.history.tooltip}
+          onClick={() => {
+            const id = selection.document['_id'];
+            if (id !== undefined) {
+              void startOnDocuments(ref, 'history.show@inspector', { id, idText: oneLineText(id) });
+            }
+          }}
+        >
+          {shown.history.label}
+        </button>
       )}
     </div>
   );

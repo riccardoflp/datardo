@@ -7,6 +7,7 @@
  * makes its tab active; Playground opens a new playground tab each time. The filter does not hide them.
  */
 import type { ConnectionView } from '../../shared/connection';
+import type { ConnectionId } from '../../shared/ids';
 import type { Pin } from '../../shared/state/nav';
 import { connectionPageShows, connectionPages } from '../palette/sources';
 import { text as paletteText } from '../palette/text';
@@ -18,6 +19,7 @@ import {
   nodeId,
   nodeLabel,
   openControl,
+  type Control,
   type MenuEntry,
   type TreeInput,
   type TreeNode,
@@ -70,6 +72,23 @@ export function pinOfPage(page: ConnectionPage): Pin {
   return { kind: 'page', page, title: paletteText.pages[page] };
 }
 
+/**
+ * The control of a page: it opens the page's tab; **Watch changes** starts `watch.show` on the whole connection, which
+ * connects it first and names its tab after the connection.
+ */
+function pageControl(name: string, connection: ConnectionId, page: ConnectionPage): Control {
+  if (page === 'watch') {
+    return {
+      kind: 'start',
+      label: name,
+      element: elements.watch,
+      feature: 'watch.show',
+      target: { kind: 'connection', connection },
+    };
+  }
+  return openControl(name, elements[page], connectionPageShows(connection, page));
+}
+
 /** Feature: tree.pages — the nodes of the part **Pages of <name>**, in their order. */
 export function view(input: TreeInput): readonly TreeNode[] {
   const connection = currentConnection(input.state);
@@ -93,7 +112,7 @@ export function view(input: TreeInput): readonly TreeNode[] {
       expanded: false,
       selected: input.island.selected === id,
       label: nodeLabel({ name, kind: text.kinds.page }),
-      click: openControl(name, elements[page], connectionPageShows(connection.id, page)),
+      click: pageControl(name, connection.id, page),
       buttons: [],
       hasMenu: true,
     };

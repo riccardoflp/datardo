@@ -1932,7 +1932,7 @@ handled, old outputs are removed, and the page shows each task's last runs.
 one; the Watch changes page follows a change stream live, filters it, shows what each change event changed and exports
 the list.
 **Depends on**: M12.
-**Status**: planned
+**Status**: done
 
 ### Features
 
@@ -1988,13 +1988,13 @@ the list.
 
 ### Exit criteria
 
-- [ ] A document inserted, updated twice and deleted shows four writes and its versions; restoring the second version
+- [x] A document inserted, updated twice and deleted shows four writes and its versions; restoring the second version
       puts it back and is recorded in the undo history.
-- [ ] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
+- [x] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
       `npm run test:integration`, `npm run test:ui`; `catalog.py --tests` reports none missing for these cards.
-- [ ] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
+- [x] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
       the keyboard alone (QA15, QA16).
-- [ ] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
+- [x] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
       and this milestone's **Status** is *done*.
 
 ### Not in this milestone

@@ -26,6 +26,12 @@ import { useConsoleTab } from './console/console-store';
 import { GridFsInspector } from './gridfs/gridfs-inspector';
 import { GridFsPage } from './gridfs/gridfs-page';
 import { gridFsExtras } from './gridfs/gridfs-state';
+import { HistoryInspector, historyExtras } from './history/history-inspector';
+import { HistoryPage } from './history/history-page';
+import { useHistoryChanges } from './history/history-store';
+import { WatchInspector, watchExtras } from './watch/watch-inspector';
+import { WatchPage } from './watch/watch-page';
+import { useWatchChanges } from './watch/watch-store';
 
 /** A page as the main island draws it. */
 export type PageView = () => React.JSX.Element | null;
@@ -40,6 +46,8 @@ export const pages: Readonly<Record<string, PageView>> = {
   undo: UndoHistoryPage,
   server: ServerPage,
   gridfs: GridFsPage,
+  history: HistoryPage,
+  watch: WatchPage,
 };
 
 /** The pages of the tabs that show a target of a connection, by the kind of what they show (`keys`, `key`). */
@@ -51,7 +59,7 @@ export const tabPages: Readonly<Partial<Record<string, PageView>>> = {
 
 /**
  * What the inspector island draws for one thing selected in a page, by the kind of what the active tab shows, or by
- * the name of its page for a page tab (`server`, `gridfs`).
+ * the name of its page for a page tab (`server`, `gridfs`, `history`, `watch`).
  */
 export const inspectors: Readonly<
   Partial<Record<string, (props: { readonly tabId: string }) => React.JSX.Element | null>>
@@ -61,6 +69,8 @@ export const inspectors: Readonly<
   server: ServerInspector,
   console: ConsoleInspector,
   gridfs: GridFsInspector,
+  history: HistoryInspector,
+  watch: WatchInspector,
 };
 
 /** What a page adds to the active tab, by its kind or its page: what the status line counts, what the inspector shows. */
@@ -70,6 +80,8 @@ export const tabExtras: Readonly<Partial<Record<string, typeof keysExtras>>> = {
   server: serverExtras,
   console: consoleExtras,
   gridfs: gridFsExtras,
+  history: historyExtras,
+  watch: watchExtras,
 };
 
 /** The name `inspectors` and `tabExtras` know a tab by: its page for a page tab, else the kind of what it shows. */
@@ -79,10 +91,12 @@ export function extrasKey(shows: { readonly kind: string; readonly page?: string
 
 /**
  * Draws the shell again whenever what a page keeps in the window changes: what a tab adds to it is drawn from that (the
- * key selected in a keys tab, the item of a value, the string selected in a console's output).
+ * key selected in a keys tab, the item of a value, the string selected in a console's output, the history, Watch changes).
  */
 export function usePageStores(): void {
   useKeysTab(undefined);
   useValueTab(undefined);
   useConsoleTab(undefined);
+  useHistoryChanges();
+  useWatchChanges();
 }

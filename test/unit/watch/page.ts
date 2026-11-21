@@ -39,7 +39,7 @@ export function changeEvent(number: number, type = 'insert', fields: Readonly<Re
 
 /** The app's state with the page on its tab. */
 export function stateWithPage(page: WatchPage, topology: 'standalone' | 'replica-set' = 'replica-set'): AppState {
-  return { ...mongoState(topology), watch: { [tab]: page } } as unknown as AppState;
+  return { ...mongoState(topology), watch: { [tab]: page } };
 }
 
 /** A context of a feature started on the page's tab. */

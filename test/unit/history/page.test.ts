@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { plan as copyVersion } from '../../../src/features/history/copy-version';
 import { ownWrites } from '../../../src/features/history/own-writes';
-import { plan as showPlan, view as showView, type HistoryPageInput } from '../../../src/features/history/show';
+import {
+  lastOpened,
+  plan as showPlan,
+  view as showView,
+  type HistoryPageInput,
+} from '../../../src/features/history/show';
 import type { DocumentWrite } from '../../../src/features/history/types';
 import { view as detailView, type VersionDetailInput } from '../../../src/features/history/version-detail';
 import { documentHistory } from '../../../src/features/history/versions';
@@ -198,24 +203,24 @@ describe('history.show', () => {
   it('opens one tab for the document, and refuses Go to with no document', () => {
     const state = mongoState();
     const target = { kind: 'collection', connection: local.id, database: 'shop', collection: 'orders' } as const;
-    const opened = planOf(showPlan(contextOf('history.show', state, target), { args: { id: int(7), idText: '7' } }));
+    const context = contextOf('history.show', state, target);
+    const opened = planOf(showPlan(context, { args: { id: int(7), idText: '7' } }));
+    const shows = {
+      kind: 'page',
+      connection: local.id,
+      page: 'history',
+      title: 'History: 7',
+      database: 'shop',
+      of: ['orders', '{"$numberInt":"7"}'],
+    };
     expect(opened.after).toEqual([
-      {
-        kind: 'start',
-        feature: 'tab.open',
-        target,
-        args: {
-          shows: {
-            kind: 'page',
-            connection: local.id,
-            page: 'history',
-            title: 'History: 7',
-            database: 'shop',
-            of: ['orders', '{"$numberInt":"7"}'],
-          },
-        },
-      },
+      { kind: 'remember', key: 'history.show', value: { shows, at: context.now } },
+      { kind: 'start', feature: 'tab.open', target, args: { shows } },
     ]);
+    expect(lastOpened(opened.after[0]?.kind === 'remember' ? opened.after[0].value : null)).toEqual({
+      shows,
+      at: context.now,
+    });
     expect(showPlan(contextOf('history.show', state, { kind: 'tab', tab: tabId('t1') }), {})).toEqual({
       kind: 'refuse',
       code: 'history.show/no-document',

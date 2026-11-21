@@ -8,6 +8,7 @@ import { connectionId, tabId, type ConnectionId, type TabId } from '../../shared
 import type { AppState } from '../../shared/state';
 import type { Tab, TabMemory, TabShows, TabsState } from '../../shared/state/tabs';
 import { tabConnectionOf } from '../../shared/state/tabs';
+import type { EventCategory, WatchMemory } from '../../shared/state/watch';
 import { pageTitle } from '../nav/text';
 import { text } from './text';
 
@@ -219,8 +220,13 @@ export function readMemory(value: unknown): TabMemory | undefined {
   }
   const memory = texts(value, ['query', 'pipeline', 'pattern', 'typeFilter']);
   const choices = readChoices(value['choices']);
-  const all = choices === undefined ? memory : { ...memory, choices };
-  return Object.keys(all).length === 0 ? undefined : all;
+  const watch = readWatchMemory(value['watch']);
+  const read: TabMemory = {
+    ...memory,
+    ...(choices === undefined ? {} : { choices }),
+    ...(watch === undefined ? {} : { watch }),
+  };
+  return Object.keys(read).length === 0 ? undefined : read;
 }
 
 /** How many choices a page keeps, and how long each may be: what is read back is bounded (R14.4). */
@@ -237,4 +243,20 @@ function readChoices(value: unknown): Readonly<Record<string, string>> | undefin
     )
     .slice(0, choiceLimits.count);
   return kept.length === 0 ? undefined : Object.fromEntries(kept);
+}
+
+const categories: readonly EventCategory[] = ['insert', 'update', 'replace', 'delete', 'other'];
+
+/** What a Watch changes page remembers, read from JSON; `undefined` when it is not that. */
+function readWatchMemory(value: unknown): WatchMemory | undefined {
+  if (!isObject(value) || !isText(value['filter']) || !isText(value['search'])) {
+    return undefined;
+  }
+  const hidden = Array.isArray(value['hiddenTypes']) ? (value['hiddenTypes'] as readonly unknown[]) : [];
+  return {
+    filter: value['filter'],
+    fullDocument: value['fullDocument'] !== false,
+    hiddenTypes: categories.filter((each) => hidden.includes(each)),
+    search: value['search'],
+  };
 }

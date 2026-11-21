@@ -1,0 +1,301 @@
+/* watch.show and watch.event-detail: the toolbar, the filters, the count and the list of the change events, and the
+   change event selected in the inspector island. */
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.toolbar,
+.filterBar,
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.watched {
+  font-weight: var(--font-weight-strong);
+}
+
+.state {
+  color: var(--color-text-muted);
+}
+
+.state[data-status='watching'] {
+  color: var(--color-success);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.button,
+.toggle {
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-small);
+  background: var(--color-island);
+  color: var(--color-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.button[aria-disabled='true'] {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.button:hover,
+.toggle:hover {
+  background: var(--color-hover);
+}
+
+.toggle[aria-pressed='false'] {
+  color: var(--color-text-muted);
+  text-decoration: line-through;
+}
+
+.toggle[aria-pressed='true'] {
+  background: var(--color-selected);
+}
+
+.toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.count {
+  margin: 0;
+  padding: var(--space-1) var(--space-3);
+  color: var(--color-text-muted);
+}
+
+.toggle .count {
+  padding: 0;
+}
+
+.input {
+  min-width: 240px;
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-small);
+  background: var(--color-canvas);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.filter {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.filter .input {
+  flex: 1;
+  font-family: var(--font-family-code);
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.preImages {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-muted);
+}
+
+.error,
+.message {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--color-danger);
+}
+
+.message {
+  padding: var(--space-1) var(--space-3);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.scroller {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.note {
+  margin: 0;
+  padding: var(--space-3);
+  color: var(--color-text-muted);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.heading {
+  position: sticky;
+  top: 0;
+  padding: var(--space-1) var(--space-3);
+  background: var(--color-island);
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-normal);
+  text-align: left;
+}
+
+.row > td {
+  padding: var(--space-1) var(--space-3);
+  border-top: var(--border-width) solid var(--color-border);
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.row {
+  cursor: pointer;
+}
+
+.row:hover {
+  background: var(--color-hover);
+}
+
+.row[data-fresh='true'] {
+  background: var(--color-raised);
+  transition: background var(--duration-flash);
+}
+
+.row[aria-selected='true'] {
+  background: var(--color-selected);
+}
+
+.code {
+  font-family: var(--font-family-code);
+}
+
+.row > td.changes {
+  max-width: 0;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: var(--font-family-code);
+}
+
+.menu {
+  position: fixed;
+  z-index: var(--z-suggestions);
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+  padding: var(--space-1);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-medium);
+  background: var(--color-raised);
+}
+
+.menuItem {
+  padding: var(--space-1) var(--space-2);
+  border: 0;
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.menuItem:hover {
+  background: var(--color-hover);
+}
+
+/* The inspector island. */
+.detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  overflow: auto;
+}
+
+.detailHeading {
+  margin: 0;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-strong);
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--space-1) var(--space-3);
+  margin: 0;
+}
+
+.facts dt {
+  color: var(--color-text-muted);
+}
+
+.facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.summary {
+  cursor: pointer;
+}
+
+.document {
+  margin: 0;
+  font-family: var(--font-family-code);
+  font-size: var(--font-size-small);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.changesTable {
+  border-collapse: collapse;
+  font-family: var(--font-family-code);
+  font-size: var(--font-size-small);
+}
+
+.changesTable th,
+.changesTable td {
+  padding: var(--space-0) var(--space-2);
+  border: var(--border-width) solid var(--color-border);
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+.changesTable thead th {
+  font-family: var(--font-family-ui);
+  font-weight: var(--font-weight-normal);
+  color: var(--color-text-muted);
+}
+
+.muted {
+  color: var(--color-text-muted);
+}
+
+/* The focus, last: it wins over the states above. */
+.button:focus-visible,
+.toggle:focus-visible,
+.table:focus-visible,
+.menuItem:focus-visible {
+  outline: var(--focus-width) solid var(--color-focus);
+  outline-offset: calc(-1 * var(--focus-width));
+}

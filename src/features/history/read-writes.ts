@@ -16,7 +16,8 @@ import { connectionId, featureId } from '../../shared/ids';
 import { documentWrites, idKey, timestampOf } from './document-writes';
 import { errorFacts, isNotAuthorized, type OplogPoint, type Refusal } from './oplog-window';
 import { oplogText } from './text';
-import { objectOf, type DocumentWrite } from './types';
+import type { RecordedOperation } from './own-writes';
+import { objectOf, type DocumentWrite, type JsonObject } from './types';
 
 /** The most writes of the document one read returns, give or take those of the oplog entry that completes them. */
 export const mostWrites = 100;
@@ -280,5 +281,45 @@ export function windowFailed(window: WindowArgs, error: unknown): ReadStep | Ref
   return { kind: 'stop', stop: { readBackTo: window.to, complete: false, timedOut: true } };
 }
 
+/** What one read of the page gives. */
+export type HistoryRead =
+  | {
+      readonly kind: 'read';
+      readonly oplog: { readonly first?: OplogPoint; readonly last?: OplogPoint };
+      /** The writes of the document this read found, newest first. */
+      readonly writes: readonly DocumentWrite[];
+      readonly stop: ReadStop;
+      readonly durationMs: number;
+      /** The document as it is now; `null` when it no longer exists. */
+      readonly current: JsonObject | null;
+      /** The operations of the undo history that wrote the document around the writes found. */
+      readonly recorded: readonly RecordedOperation[];
+    }
+  | { readonly kind: 'refused'; readonly code: string; readonly message: string }
+  | { readonly kind: 'error'; readonly message: string };
+
+/** The action of the main process that reads the history of a document whole (`src/main/history-reads.ts`). */
+export const readHistoryAction = 'history.read';
+
+/**
+ * Feature: history.read-writes — as the page starts it, with the document (`{ connection, database, collection, id,
+ * readBackTo? }`): the app action that makes one read, window after window, as the rules say; it answers with the
+ * oplog's ends, the writes, where the read stopped, the document as it is now and Datardo's own writes. Started with
+ * a window, the query of that window.
+ */
+export function pageRequest(context: Context, args: Json): ReadRequest {
+  return windowOf(args) === undefined ? { kind: 'app', action: readHistoryAction, args } : request(context, args);
+}
+
+/** Feature: history.read-writes — what the main process read, or the writes of one window. */
+export function pageParse(replies: readonly unknown[], args: Json): unknown {
+  return windowOf(args) === undefined ? (replies[0] ?? null) : parse(replies, args);
+}
+
 /** The feature, as the runner starts it. */
-export const feature: ReadFeature = { kind: 'read', id: featureId('history.read-writes'), request, parse };
+export const feature: ReadFeature = {
+  kind: 'read',
+  id: featureId('history.read-writes'),
+  request: pageRequest,
+  parse: pageParse,
+};

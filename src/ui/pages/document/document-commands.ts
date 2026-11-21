@@ -6,6 +6,8 @@
  * document**. A command not offered now does nothing.
  */
 import { intentOf } from '../../../features/palette/run-command';
+import { oneLineText } from '../../../features/document/write/values';
+import type { Intent } from '../../../shared/bridge';
 import type { Document } from '../../../features/table/types';
 import type { AppState } from '../../../shared/state';
 import { rememberedColumns } from '../../../shared/state/table';
@@ -51,6 +53,24 @@ function rowOf(on: On): number | undefined {
 function documentOf(on: On): Document | undefined {
   const row = rowOf(on);
   return row === undefined ? undefined : on.collection.documents[row];
+}
+
+/**
+ * **Document history** from Go to on a collection tab (`history.show`): the intent on the selected row's document,
+ * with its `_id`; `undefined` when no row is selected, and the intent goes as it is (the active document tab).
+ */
+export function historyIntentOf(state: AppState, intent: Intent): Intent | undefined {
+  const on = onActive(state);
+  const id = on === undefined ? undefined : documentOf(on)?.['_id'];
+  if (on === undefined || id === undefined) {
+    return undefined;
+  }
+  const { ref } = on;
+  return {
+    ...intent,
+    target: { kind: 'collection', connection: ref.connection, database: ref.database, collection: ref.collection },
+    args: { id, idText: oneLineText(id) },
+  };
 }
 
 function editValue(state: AppState, on: On): void {

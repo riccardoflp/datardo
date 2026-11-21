@@ -32,6 +32,7 @@ import {
 import { initialConsolesState, reduceConsoles, type ConsolesEvent, type ConsolesState } from './consoles';
 import { initialSavedQueryState, reduceSavedQuery, type SavedQueryEvent, type SavedQueryState } from './saved-query';
 import { initialMcpState, reduceMcp, type McpEvent, type McpState } from './mcp';
+import { initialWatchState, reduceWatch, type WatchPages, type WatchStateEvent } from './watch';
 
 /** Everything the window shows and the features decide from, apart from the results of reads. */
 export interface AppState {
@@ -50,6 +51,7 @@ export interface AppState {
   readonly consoles: ConsolesState;
   readonly savedQuery: SavedQueryState;
   readonly mcp: McpState;
+  readonly watch: WatchPages;
 }
 
 /** Every change to the app's state. */
@@ -68,7 +70,8 @@ export type AppEvent =
   | PlaygroundsEvent
   | ConsolesEvent
   | SavedQueryEvent
-  | McpEvent;
+  | McpEvent
+  | WatchStateEvent;
 
 /** The state at start, before anything is loaded. */
 export const initialState: AppState = {
@@ -87,6 +90,7 @@ export const initialState: AppState = {
   consoles: initialConsolesState,
   savedQuery: initialSavedQueryState,
   mcp: initialMcpState,
+  watch: initialWatchState,
 };
 
 /** The one function that changes the app's state. */
@@ -122,5 +126,7 @@ export function reduce(state: AppState, event: AppEvent): AppState {
       return { ...state, savedQuery: reduceSavedQuery(state.savedQuery, event) };
     case 'mcp':
       return { ...state, mcp: reduceMcp(state.mcp, event) };
+    case 'watch':
+      return { ...state, watch: reduceWatch(state.watch, event) };
   }
 }

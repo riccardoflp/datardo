@@ -7,6 +7,8 @@ import {
 import {
   afterWindow,
   firstWindow,
+  pageParse,
+  pageRequest,
   parse as parseWrites,
   request as writesRequest,
   windowFailed,
@@ -147,5 +149,15 @@ describe('history.read-writes', () => {
       stop: { timedOut: true },
     });
     expect(windowFailed(args, { code: 2, message: 'other' })).toBeUndefined();
+  });
+  it('is read by the main process when the page starts it with the document, window by window otherwise', () => {
+    const context = contextOf('history.read-writes', mongoState(), { kind: 'app' });
+    const whole = { ...document } as unknown as Json;
+    expect(pageRequest(context, whole)).toEqual({ kind: 'app', action: 'history.read', args: whole });
+    expect(pageParse([{ kind: 'error', message: 'x' }], whole)).toEqual({ kind: 'error', message: 'x' });
+    expect(pageParse([], whole)).toBeNull();
+    const args = firstWindow(document, { first, last }, undefined, 0) as WindowArgs;
+    expect(pageRequest(context, args as unknown as Json).kind).toBe('engine');
+    expect((pageParse([recordedEntries()], args as unknown as Json) as { writes: unknown[] }).writes).toHaveLength(7);
   });
 });

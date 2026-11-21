@@ -16,6 +16,8 @@ import type { Place, TabId } from '../../../shared/ids';
 import { MongoshEditor } from '../../components/editor/mongosh-editor';
 import { Dialog, DialogButton } from '../../shell/dialog';
 import { useAppState } from '../../state/store';
+import { isBuilt } from '../../query/built';
+import { startFeature } from '../../shell/intent';
 import { placeOfCollection } from './document-actions';
 import {
   copyTabDocument,
@@ -97,6 +99,19 @@ function CopyAs({ props, document }: { readonly props: PageProps; readonly docum
   );
 }
 
+/** **History**: the document history page of the tab's document (`history.show`). */
+function showHistory(shows: DocumentShows): void {
+  if (shows.idJson === undefined) {
+    return;
+  }
+  const { connection, database, collection } = shows;
+  startFeature('history.show', {
+    place: 'toolbar',
+    target: { kind: 'collection', connection, database, collection },
+    args: { id: JSON.parse(shows.idJson) as Json, idText: shows.id },
+  });
+}
+
 function Toolbar({
   props,
   shown,
@@ -135,6 +150,20 @@ function Toolbar({
         </button>
       ) : null}
       {props.shows.newDocument === undefined ? <CopyAs props={props} document={loaded} /> : null}
+      {props.shows.newDocument === undefined && isBuilt(shown.history.element ?? '') ? (
+        <button
+          type="button"
+          className={styles['button']}
+          data-feature={shown.history.element}
+          disabled={!shown.history.enabled}
+          title={shown.history.tooltip}
+          onClick={() => {
+            showHistory(props.shows);
+          }}
+        >
+          {shown.history.label}
+        </button>
+      ) : null}
       {shown.readOnly === undefined ? null : (
         <span
           className={styles['mark']}

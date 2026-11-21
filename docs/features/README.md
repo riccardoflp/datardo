@@ -284,16 +284,16 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`history.show`](history.md#historyshow--the-document-history-page) | The document history page | View | M27 | Specified |
-| [`history.oplog-window`](history.md#historyoplog-window--whether-there-is-an-oplog-and-how-far-back-it-goes) | Whether there is an oplog, and how far back it goes | Read | M27 | Specified |
-| [`history.read-writes`](history.md#historyread-writes--read-a-documents-writes-from-the-oplog-a-part-at-a-time) | Read a document's writes from the oplog, a part at a time | Read | M27 | Specified |
-| [`history.document-writes`](history.md#historydocument-writes--the-writes-of-an-oplog-entry-to-one-document) | The writes of an oplog entry to one document | Derivation | M27 | Specified |
-| [`history.update-changes`](history.md#historyupdate-changes--the-fields-an-update-set-and-unset) | The fields an update set and unset | Derivation | M27 | Specified |
-| [`history.versions`](history.md#historyversions--rebuild-the-versions-of-a-document) | Rebuild the versions of a document | Derivation | M27 | Specified |
-| [`history.diff`](history.md#historydiff--the-difference-between-two-versions) | The difference between two versions | Derivation | M27 | Specified |
-| [`history.own-writes`](history.md#historyown-writes--which-writes-were-datardos-own) | Which writes were Datardo's own | Derivation | M27 | Specified |
-| [`history.version-detail`](history.md#historyversion-detail--a-version-in-the-inspector) | A version in the inspector | View | M27 | Specified |
-| [`history.copy-version`](history.md#historycopy-version--copy-a-version-of-the-document) | Copy a version of the document | Operation | M27 | Specified |
+| [`history.show`](history.md#historyshow--the-document-history-page) | The document history page | View | M27 | Built |
+| [`history.oplog-window`](history.md#historyoplog-window--whether-there-is-an-oplog-and-how-far-back-it-goes) | Whether there is an oplog, and how far back it goes | Read | M27 | Built |
+| [`history.read-writes`](history.md#historyread-writes--read-a-documents-writes-from-the-oplog-a-part-at-a-time) | Read a document's writes from the oplog, a part at a time | Read | M27 | Built |
+| [`history.document-writes`](history.md#historydocument-writes--the-writes-of-an-oplog-entry-to-one-document) | The writes of an oplog entry to one document | Derivation | M27 | Built |
+| [`history.update-changes`](history.md#historyupdate-changes--the-fields-an-update-set-and-unset) | The fields an update set and unset | Derivation | M27 | Built |
+| [`history.versions`](history.md#historyversions--rebuild-the-versions-of-a-document) | Rebuild the versions of a document | Derivation | M27 | Built |
+| [`history.diff`](history.md#historydiff--the-difference-between-two-versions) | The difference between two versions | Derivation | M27 | Built |
+| [`history.own-writes`](history.md#historyown-writes--which-writes-were-datardos-own) | Which writes were Datardo's own | Derivation | M27 | Built |
+| [`history.version-detail`](history.md#historyversion-detail--a-version-in-the-inspector) | A version in the inspector | View | M27 | Built |
+| [`history.copy-version`](history.md#historycopy-version--copy-a-version-of-the-document) | Copy a version of the document | Operation | M27 | Built |
 
 ## Home
 
@@ -869,20 +869,20 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`watch.show`](watch.md#watchshow--the-watch-changes-page) | The Watch changes page | View | M27 | Specified |
-| [`watch.stream`](watch.md#watchstream--open-the-change-stream) | Open the change stream | Read | M27 | Specified |
-| [`watch.pipeline`](watch.md#watchpipeline--the-filter-the-server-applies) | The filter the server applies | Derivation | M27 | Specified |
-| [`watch.event-summary`](watch.md#watchevent-summary--the-line-of-a-change-event) | The line of a change event | Derivation | M27 | Specified |
-| [`watch.visible-events`](watch.md#watchvisible-events--the-change-events-the-list-shows) | The change events the list shows | Derivation | M27 | Specified |
-| [`watch.pause`](watch.md#watchpause--pause-and-resume-the-list) | Pause and resume the list | Operation | M27 | Specified |
-| [`watch.stop`](watch.md#watchstop--stop-and-start-the-stream) | Stop and start the stream | Operation | M27 | Specified |
-| [`watch.resume`](watch.md#watchresume--start-again-from-the-last-change-event) | Start again from the last change event | Operation | M27 | Specified |
-| [`watch.clear`](watch.md#watchclear--clear-the-list) | Clear the list | Operation | M27 | Specified |
-| [`watch.event-detail`](watch.md#watchevent-detail--a-change-event-in-the-inspector) | A change event in the inspector | View | M27 | Specified |
-| [`watch.event-diff`](watch.md#watchevent-diff--what-a-change-event-changed) | What a change event changed | Derivation | M27 | Specified |
-| [`watch.enable-pre-images`](watch.md#watchenable-pre-images--record-pre-images-of-a-collection) | Record pre-images of a collection | Operation | M27 | Specified |
-| [`watch.copy-events`](watch.md#watchcopy-events--copy-change-events) | Copy change events | Operation | M27 | Specified |
-| [`watch.export`](watch.md#watchexport--export-the-change-events-to-a-file) | Export the change events to a file | Operation | M27 | Specified |
+| [`watch.show`](watch.md#watchshow--the-watch-changes-page) | The Watch changes page | View | M27 | Built |
+| [`watch.stream`](watch.md#watchstream--open-the-change-stream) | Open the change stream | Read | M27 | Built |
+| [`watch.pipeline`](watch.md#watchpipeline--the-filter-the-server-applies) | The filter the server applies | Derivation | M27 | Built |
+| [`watch.event-summary`](watch.md#watchevent-summary--the-line-of-a-change-event) | The line of a change event | Derivation | M27 | Built |
+| [`watch.visible-events`](watch.md#watchvisible-events--the-change-events-the-list-shows) | The change events the list shows | Derivation | M27 | Built |
+| [`watch.pause`](watch.md#watchpause--pause-and-resume-the-list) | Pause and resume the list | Operation | M27 | Built |
+| [`watch.stop`](watch.md#watchstop--stop-and-start-the-stream) | Stop and start the stream | Operation | M27 | Built |
+| [`watch.resume`](watch.md#watchresume--start-again-from-the-last-change-event) | Start again from the last change event | Operation | M27 | Built |
+| [`watch.clear`](watch.md#watchclear--clear-the-list) | Clear the list | Operation | M27 | Built |
+| [`watch.event-detail`](watch.md#watchevent-detail--a-change-event-in-the-inspector) | A change event in the inspector | View | M27 | Built |
+| [`watch.event-diff`](watch.md#watchevent-diff--what-a-change-event-changed) | What a change event changed | Derivation | M27 | Built |
+| [`watch.enable-pre-images`](watch.md#watchenable-pre-images--record-pre-images-of-a-collection) | Record pre-images of a collection | Operation | M27 | Built |
+| [`watch.copy-events`](watch.md#watchcopy-events--copy-change-events) | Copy change events | Operation | M27 | Built |
+| [`watch.export`](watch.md#watchexport--export-the-change-events-to-a-file) | Export the change events to a file | Operation | M27 | Built |
 
 ## The window
 
