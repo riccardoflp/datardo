@@ -14,6 +14,10 @@ files:
   - package.json
   - '!**/*.map'
   - '!node_modules'
+# The worker thread of a comparison is started from a file on the disk, with the chunks it imports.
+asarUnpack:
+  - out/main/pairing.js
+  - out/main/chunks/**
 extraResources:
   - from: resources/notices.txt
     to: notices.txt
