@@ -27,9 +27,12 @@ import { text } from './text';
 import {
   answerText,
   connectionPlace,
+  isRecord,
   roleKey,
   rolesOf,
   rolesText,
+  startArgs,
+  textOf,
   userKey,
   type RoleRef,
   type UserPlace,
@@ -54,26 +57,69 @@ export function startingRoles(place: UserPlace): readonly RoleRef[] {
   return place.database === '' ? [] : [{ role: 'readWrite', db: place.database }];
 }
 
-function userForm(place: UserPlace): Outcome {
+/**
+ * What the dialog is opened again with after the server refused the user (`args.retry`, `args.failure`): the answers
+ * as they were, but the password, which the window kept, and the server's error.
+ */
+interface Retry {
+  readonly name: string;
+  readonly database: string;
+  readonly roles: string;
+  readonly customData: string;
+  readonly failure: string;
+}
+
+function retryOf(answers: Answers): Retry | undefined {
+  const args = startArgs(answers);
+  const retry = args['retry'];
+  if (!isRecord(retry)) {
+    return undefined;
+  }
+  return {
+    name: textOf(retry, 'name') ?? '',
+    database: textOf(retry, 'database') ?? '',
+    roles: rolesText(rolesOf(retry['roles'], textOf(retry, 'database') ?? '')),
+    customData: textOf(retry, 'customData') ?? '',
+    failure: textOf(args, 'failure') ?? '',
+  };
+}
+
+function userForm(place: UserPlace, retry: Retry | undefined): Outcome {
   return ask({
     title: text.create.title,
     button: text.create.button,
+    about: {
+      connection: place.connection,
+      ...(retry === undefined || retry.failure === '' ? {} : { failure: retry.failure }),
+    },
     fields: [
       {
         kind: 'text',
         key: 'name',
         label: text.create.name,
         placeholder: text.create.namePlaceholder,
+        ...(retry === undefined ? {} : { default: retry.name }),
         rules: [{ kind: 'not-empty', message: text.create.emptyName }],
       },
-      { kind: 'text', key: 'database', label: text.create.database, default: startingDatabase(place) },
+      {
+        kind: 'text',
+        key: 'database',
+        label: text.create.database,
+        default: retry?.database ?? startingDatabase(place),
+      },
       passwordQuestionField,
-      { kind: 'text', key: 'roles', label: text.create.roles, default: rolesText(startingRoles(place)) },
+      {
+        kind: 'text',
+        key: 'roles',
+        label: text.create.roles,
+        default: retry?.roles ?? rolesText(startingRoles(place)),
+      },
       {
         kind: 'text',
         key: 'customData',
         label: text.create.customData,
         placeholder: text.create.customDataPlaceholder,
+        ...(retry === undefined ? {} : { default: retry.customData }),
       },
     ],
   });
@@ -123,7 +169,7 @@ export function plan(context: Context, answers: Answers): Outcome {
   }
   const typedName = answerText(answers, 'name');
   if (typedName === undefined) {
-    return userForm(page);
+    return userForm(page, retryOf(answers));
   }
   const name = typedName.trim();
   if (name === '') {

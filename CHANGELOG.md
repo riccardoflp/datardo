@@ -163,6 +163,12 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
   the page says so, subscribes again by itself and marks the gap in the list. **Follow events** on a MongoDB
   connection linked to Redis shows each redis-oplog event as one row with its operation, collection, document and
   fields. The subscriptions, the filter and **Events of** come back with the tab.
+- The Users and roles page of a MongoDB connection lists the users and the roles of one database or of all, with who
+  the connection is signed in as, a filter and the built-in roles on request; the inspector shows a user's roles as
+  chips that revoke, grants a role, and shows a role's privileges, the roles it inherits and the users that have it.
+  Users are created with a generated password, their password changed and deleted; custom roles are created, edited
+  and deleted. A password is written `***` in every step, confirmation and line of the Log, and the new password of
+  the connection's own user can be saved in the connection.
 
 ### Fixed
 

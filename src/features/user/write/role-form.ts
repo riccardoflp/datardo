@@ -43,6 +43,8 @@ export function privilegesText(privileges: readonly Privilege[]): string {
 
 /** What the dialog starts with. */
 export interface RoleFormStart {
+  /** The connection, for the names the rows of **Inherits** suggest (its custom roles). */
+  readonly connection: string;
   readonly title: string;
   readonly button: string;
   readonly name: string;
@@ -75,5 +77,5 @@ export function roleQuestion(start: RoleFormStart): Question {
     },
     { kind: 'text', key: 'inherits', label: text.createRole.inherits, default: start.inherits },
   ];
-  return { title: start.title, button: start.button, fields };
+  return { title: start.title, button: start.button, about: { connection: start.connection }, fields };
 }

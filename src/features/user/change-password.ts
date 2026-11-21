@@ -23,6 +23,7 @@ import {
   type Outcome,
 } from '../../shared/feature';
 import { featureId } from '../../shared/ids';
+import { withSecrets, withoutSecrets } from '../connection/string-secrets';
 import { appPlan, appStep } from '../nav/types';
 import { signedInOf } from './signed-in';
 import { text } from './text';
@@ -39,6 +40,15 @@ import { commandStep, notifySuccess, refusedReadOnly, writePlan } from './write/
 
 /** The action of the main process that keeps a new password in a connection's secrets (D49). */
 export const savePasswordAction = 'connection.save-password';
+
+/**
+ * The connection string a connection signs in with once **Save in the connection** kept the new password: the saved
+ * one with its password replaced, percent-encoded as a connection string writes it, and everything else as it was.
+ */
+export function connectionStringWithPassword(saved: string, password: string): string {
+  const { connectionString, secrets } = withoutSecrets(saved, 'shown');
+  return withSecrets(connectionString, { ...secrets, password: encodeURIComponent(password) });
+}
 
 /** **Save in the connection**, which starts this feature again to keep the password in the connection. */
 function saveAction(place: UserPlace, user: string, password: string): NotificationAction {

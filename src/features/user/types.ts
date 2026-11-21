@@ -253,7 +253,10 @@ export interface Started {
   readonly database: string;
 }
 
-/** A control that starts a feature on the database of a user or a role. */
+/**
+ * A control that starts a feature on the database of a user or a role, named in its arguments. Its target is the
+ * connection, so that the Log names the database of each step whole: `db.getSiblingDB("shop")`.
+ */
 export function startControl(
   label: string,
   ids: { readonly element: string; readonly feature: string; readonly tooltip?: string },
@@ -266,7 +269,7 @@ export function startControl(
     ...(ids.tooltip === undefined ? {} : { tooltip: ids.tooltip }),
     element: ids.element,
     feature: ids.feature,
-    target: { kind: 'database', connection: on.connection, database: on.database },
+    target: { kind: 'connection', connection: on.connection },
     args: { connection: on.connection, database: on.database, ...args },
   };
 }

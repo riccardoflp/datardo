@@ -2283,7 +2283,7 @@ oplog entries, and the sharded cluster with its balancer, and lets the primary s
 **Goal**: The Users and roles page lists the users and the roles of a database, and creates users, changes passwords,
 grants and revokes roles, and creates, edits and deletes custom roles.
 **Depends on**: M12.
-**Status**: planned
+**Status**: done
 
 ### Features
 
@@ -2323,12 +2323,12 @@ grants and revokes roles, and creates, edits and deletes custom roles.
 
 ### Exit criteria
 
-- [ ] Creating a user writes its password in no step, no confirmation, no line of the Log and no file.
-- [ ] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
+- [x] Creating a user writes its password in no step, no confirmation, no line of the Log and no file.
+- [x] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
       `npm run test:integration`, `npm run test:ui`; `catalog.py --tests` reports none missing for these cards.
-- [ ] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
+- [x] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
       the keyboard alone (QA15, QA16).
-- [ ] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
+- [x] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
       and this milestone's **Status** is *done*.
 
 ### Not in this milestone

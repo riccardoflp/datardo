@@ -77,6 +77,7 @@ export function plan(context: Context, answers: Answers): Outcome {
   if (answerText(answers, 'privileges') === undefined) {
     return ask(
       roleQuestion({
+        connection: place.connection,
         title: text.editRole.title(whole),
         button: text.editRole.button,
         name,

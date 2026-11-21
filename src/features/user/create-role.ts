@@ -35,6 +35,7 @@ export function plan(context: Context, answers: Answers): Outcome {
   if (typedName === undefined) {
     return ask(
       roleQuestion({
+        connection: page.connection,
         title: text.createRole.title,
         button: text.createRole.button,
         name: '',

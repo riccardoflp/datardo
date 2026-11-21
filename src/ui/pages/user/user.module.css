@@ -1,0 +1,73 @@
+/* user.show and user.inspect: what the Users and roles page adds to the styles of the Server page: the tables dimmed
+   while they are read, the chips of the roles and **Grant**. */
+.table {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.dimmed {
+  opacity: 0.6;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0 var(--space-2);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-round);
+  background: var(--color-island);
+}
+
+.chip-remove {
+  padding: 0 var(--space-1);
+  border: 0;
+  border-radius: var(--radius-round);
+  background: transparent;
+  color: var(--color-text-muted);
+  font: inherit;
+  cursor: pointer;
+}
+
+.chip-remove:hover {
+  background: var(--color-hover);
+  color: var(--color-text);
+}
+
+.grant {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.grant .input,
+.grant input {
+  min-width: 0;
+}
+
+.database {
+  width: 110px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.password {
+  flex: 1;
+  font-family: var(--font-family-code);
+}
