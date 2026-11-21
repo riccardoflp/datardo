@@ -1447,7 +1447,9 @@ Raised while the catalog was written; each names the cards that hold the current
   under **More**, after **Explain**, and **More** reads as pressed while either is shown. Cancelling `chart.draw` is
   as Q124: the aggregation goes on on the server until its time limit (`chart.draw`, `chart.show`,
   `codegen.show`, `palette.run-command`).
-- **Q130** — The Monitor page as built in M30 shows only the sections that are built, **Operations** and **Slow
+- **Q130** — *Settled in M31, where the three other sections are built*: the section bar shows the five sections,
+  Go to offers the six commands, and the tool `sharding_status` is offered. As it was in M30: the Monitor page as
+  built in M30 shows only the sections that are built, **Operations** and **Slow
   queries**: its section bar leaves out **Stats**, **Replication** and **Sharding**, Go to offers **Monitor**,
   **Monitor: Operations** and **Monitor: Slow queries** only, and a section asked for that is not built
   (`open_monitor` with `replication`, a tab restored on one) shows **Operations**. The tool `sharding_status` waits for
@@ -1475,3 +1477,35 @@ Raised while the catalog was written; each names the cards that hold the current
   action `advisor.analyze`), for a database or one collection. The stand-ins of `mcp/tool/explain.ts` (`explain_query`)
   and `mcp/tool/slow-ops.ts` (`slow_queries`) are not replaced by the features of M23 and M30: they read the same
   fields, and replacing them changes what those tools write (`mcp.performance-tools`, `advisor.analyze`).
+- **Q136** — The replies recorded for the Stats, Replication and Sharding sections are of MongoDB 8.2 only
+  (`test/fixtures/replies/mongodb-8.2-monitor-*.json`): no server of 4.2, 6.0 or 8.0 was at hand, where the exit
+  criteria of M31 ask for all three. The replies of a mongos and of a shard are built by hand in
+  `test/unit/monitor/sharding-replies.ts` after the shapes MongoDB documents; the integration tests also run the
+  Sharding reads, the balancer and the balancing of a collection against a cluster of their own (a config server, two
+  shards and a mongos of 8.2, started from the binaries next to `MONGOMS_SYSTEM_BINARY`, skipped without a mongos).
+  To be recorded again from older servers when they are available (`monitor.read-server-status`,
+  `monitor.read-database-stats`, `monitor.read-collection-stats`, `monitor.read-replication`, `monitor.read-oplog`,
+  `monitor.read-sharding`, `monitor.read-sharding-events`).
+- **Q137** — `monitor.set-collection-balancing` as built in M31 always says the way of `configureCollectionBalancing`
+  in its notification and in the section, also when a server older than 5.3 ran the step `config.collections`
+  (`noBalance`) instead, and it never refuses with `monitor.set-collection-balancing/not-sharded` after the update
+  matched nothing: both follow the replies of its steps, which the runner does not give an Operation until Q58 is
+  decided. Its `afterReplies` is written and tested but not called (`monitor.set-collection-balancing`, `runner.run`).
+- **Q138** — The reads of the Stats, Replication and Sharding sections that take several steps are sent by the window
+  one after the other, each step a Read of its own through the bridge: the databases listed, then their `dbStats` 8
+  at a time, a batch after the other (so never more than 8 at once); the collections of a database the same way;
+  `hello`, then on a replica set the 5 requests of the set; the cluster through a mongos step by step
+  (`parts/sharding-reading.ts`). The tool `sharding_status` sends the same steps through the runner of the main
+  process (the app action `monitor.sharding`, as Q135 does for `index_advice`). The **After** of
+  `monitor.step-down`, `monitor.set-balancer` and `monitor.set-collection-balancing` starts a Read whose result the
+  section does not receive: the section reads itself again 1.5 s (Replication) or 1 s (Sharding) after the Operation
+  is done, and shows the Operation's sentence in a status line above its tables as well as in the notification
+  (`monitor.stats`, `monitor.replication`, `monitor.sharding`).
+- **Q139** — What M31 shows that the cards do not name: a database or a collection selected in the Stats section is
+  shown whole in the inspector island, with **Copy**; a member of the replica set as its entries of
+  `replSetGetStatus` and `replSetGetConfig`; the shards and the Distribution bar take the colors `--color-chart-1` to
+  `--color-chart-12` in the order of the shards. A section of several tables keeps its height and the panel scrolls,
+  each table showing up to 10 rows; a table of the Server page and of the Monitor page with up to 10 rows now takes
+  the height of its rows and of its horizontal scroll bar, which hid the last row under the header. The filters and
+  the choices of the sections change only the window or start the section's own reads and carry no element, as Q133
+  says for M30 (`monitor.stats`, `monitor.replication`, `monitor.sharding`, `server.show`).

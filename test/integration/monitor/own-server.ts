@@ -2,7 +2,9 @@
  * A mongod of its own for the tests of the Monitor page and of the Index advisor (testing.md, "Throwaway servers"):
  * their profiler threshold (`slowms`) is the server's, so changing it on the shared servers would change what the
  * other test files log. The runner is given the features of the registry, the engine connected to this server, and
- * the app actions of the MCP server's `advisor.analyze`; the confirmations answer as each test says.
+ * the app actions of the MCP server's `advisor.analyze`; the confirmations answer as each test says. A test may give
+ * a deployment of its own instead (a replica set it steps down, a sharded cluster), with the topology the connection
+ * found.
  */
 import { MongoMemoryServer } from 'mongodb-memory-server-core';
 import { createEngines, type EngineService } from '../../../src/engines';
@@ -10,7 +12,7 @@ import { runnableFeatures } from '../../../src/features/registry';
 import type { RunnerPorts } from '../../../src/runner/ports';
 import { start } from '../../../src/runner/start';
 import type { IntentResult } from '../../../src/shared/bridge';
-import { noSecretsSaved, type ConnectionView } from '../../../src/shared/connection';
+import { noSecretsSaved, type ConnectionView, type MongoTopology } from '../../../src/shared/connection';
 import type { Json } from '../../../src/shared/engine-request';
 import type { Answers } from '../../../src/shared/feature';
 import { connectionId, featureId, type ConnectionId } from '../../../src/shared/ids';
@@ -44,6 +46,27 @@ export interface OwnServer {
   readonly close: () => Promise<void>;
 }
 
+/** A deployment started for one test file, and how to stop it. */
+export interface OwnDeployment {
+  readonly uri: string;
+  readonly topology: MongoTopology;
+  readonly stop: () => Promise<void>;
+}
+
+async function ownMongod(): Promise<OwnDeployment> {
+  const binary = process.env['MONGOMS_SYSTEM_BINARY'];
+  const server = await MongoMemoryServer.create(
+    binary === undefined || binary === '' ? {} : { binary: { systemBinary: binary } },
+  );
+  return {
+    uri: server.getUri(),
+    topology: { kind: 'standalone' },
+    stop: async () => {
+      await server.stop();
+    },
+  };
+}
+
 function saved(id: ConnectionId, name: string, readOnly: boolean): ConnectionView {
   return {
     id,
@@ -56,13 +79,14 @@ function saved(id: ConnectionId, name: string, readOnly: boolean): ConnectionVie
   };
 }
 
-/** Starts the server, connects both connections, and makes the runner. */
-export async function ownServer(): Promise<OwnServer> {
-  const binary = process.env['MONGOMS_SYSTEM_BINARY'];
-  const server = await MongoMemoryServer.create(
-    binary === undefined || binary === '' ? {} : { binary: { systemBinary: binary } },
-  );
-  const uri = server.getUri();
+/**
+ * Starts the server (a mongod of its own, unless `deployment` starts another), connects both connections, and makes
+ * the runner.
+ */
+export async function ownServer(deployment: () => Promise<OwnDeployment> = ownMongod): Promise<OwnServer> {
+  const started = await deployment();
+  const uri = started.uri;
+  const server = { engine: 'mongodb' as const, version: '', topology: started.topology, hosts: [] };
   const engines = createEngines();
   for (const id of [ownId, readOnlyId]) {
     await engines.connect(
@@ -77,6 +101,10 @@ export async function ownServer(): Promise<OwnServer> {
       ...initialConnectionsState,
       loaded: true,
       saved: [saved(ownId, 'Local', false), saved(readOnlyId, 'Production', true)],
+      live: {
+        [ownId]: { state: 'connected', server },
+        [readOnlyId]: { state: 'connected', server },
+      },
     },
     nav: { ...initialState.nav, current: ownId },
   };
@@ -124,7 +152,7 @@ export async function ownServer(): Promise<OwnServer> {
       ),
     close: async () => {
       await engines.disconnectAll();
-      await server.stop();
+      await started.stop();
     },
   };
 }

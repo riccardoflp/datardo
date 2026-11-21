@@ -38,6 +38,31 @@ describe('monitor.show', () => {
     ]);
   });
 
+  it('keeps the database, the sorts, the oplog filter and the events filter of Stats, Replication and Sharding', () => {
+    const choices = {
+      ...initialMonitorChoices(),
+      statsDatabase: 'shop',
+      databaseSort: { column: 'storage' as const, descending: true },
+      collectionSort: { column: 'name' as const, descending: false },
+      oplogText: 'shop.orders',
+      oplogOperation: 'update' as const,
+      oplogLast: 200 as const,
+      shardedFilter: 'customerId',
+      shardedSort: { column: 'chunks' as const, descending: true },
+      eventsText: 'moveChunk',
+      eventsScope: 'every' as const,
+    };
+    const kept = monitorChoicesRecord(choices);
+    expect(kept).toMatchObject({ databaseSort: 'storage descending', oplogLast: '200', eventsScope: 'every' });
+    expect(monitorChoicesOf(kept)).toEqual(choices);
+    expect(monitorChoicesOf({ ...kept, oplogLast: '7', eventsScope: 'some', shardedSort: 'nothing up' })).toEqual({
+      ...choices,
+      oplogLast: 50,
+      eventsScope: 'balancer',
+      shardedSort: undefined,
+    });
+  });
+
   it('starts a tab that kept nothing, or something not valid, with Auto at 5 s, the profiler, the last hour, by query', () => {
     expect(monitorChoicesOf(undefined)).toEqual(initialMonitorChoices());
     expect(monitorChoicesOf({ auto: '7', since: 'soon', runningAtLeast: '-3', sort: 'nothing up' })).toEqual(
@@ -52,13 +77,19 @@ describe('monitor.show', () => {
     ]);
   });
 
-  it('offers Monitor, Monitor: Operations and Monitor: Slow queries while the other sections are not built', () => {
+  it('offers Monitor and its five sections on a connection, and nothing without one', () => {
     const state = monitorState();
-    expect(builtSections).toEqual(['operations', 'slow-queries']);
+    expect(builtSections).toEqual(['operations', 'slow-queries', 'stats', 'replication', 'sharding']);
     expect(
-      ['monitor.show', 'monitor.show:operations', 'monitor.show:slow-queries'].map((id) => isOffered(state, id)),
-    ).toEqual([true, true, true]);
-    expect(isOffered(state, 'monitor.show:stats')).toBe(false);
+      [
+        'monitor.show',
+        'monitor.show:operations',
+        'monitor.show:slow-queries',
+        'monitor.show:stats',
+        'monitor.show:replication',
+        'monitor.show:sharding',
+      ].map((id) => isOffered(state, id)),
+    ).toEqual([true, true, true, true, true, true]);
     expect(isOffered({ ...state, nav: { ...state.nav, current: undefined } }, 'monitor.show')).toBe(false);
   });
 });

@@ -4,8 +4,11 @@
  */
 import type { Inspection } from '../../../features/nav/types';
 import { view as operationsView, type OperationsState } from '../../../features/monitor/operations';
+import type { ReplicationState } from '../../../features/monitor/replication';
+import type { ShardingState } from '../../../features/monitor/sharding';
 import { builtSections, firstSection } from '../../../features/monitor/show';
 import { view as slowView, type SlowQueriesState } from '../../../features/monitor/slow-queries';
+import type { StatsState } from '../../../features/monitor/stats';
 import { text } from '../../../features/monitor/text';
 import type { MonitorSection } from '../../../features/monitor/types';
 import type { ConnectionId } from '../../../shared/ids';
@@ -94,6 +97,70 @@ export function slowState(tab: MonitorTab, connection: PageConnection): SlowQuer
   };
 }
 
+/** The state of the Stats section: the collections shown are those of the database chosen. */
+export function statsState(tab: MonitorTab): StatsState {
+  const { choices, stats } = tab;
+  const database = choices.statsDatabase;
+  const collections = database !== undefined && stats.collectionsOf === database ? stats.collections : undefined;
+  return {
+    ...(stats.server === undefined ? {} : { server: stats.server }),
+    ...(stats.rates === undefined ? {} : { rates: stats.rates }),
+    ...(stats.databases === undefined ? {} : { databases: stats.databases }),
+    ...(choices.databaseSort === undefined ? {} : { databaseSort: choices.databaseSort }),
+    ...(database === undefined ? {} : { chosenDatabase: database }),
+    ...(collections === undefined ? {} : { collections }),
+    ...(choices.collectionSort === undefined ? {} : { collectionSort: choices.collectionSort }),
+  };
+}
+
+/** The state of the Replication section. */
+export function replicationState(tab: MonitorTab, connection: PageConnection): ReplicationState {
+  const { choices, replication } = tab;
+  return {
+    connection,
+    ...(replication.server === undefined ? {} : { server: replication.server }),
+    ...(replication.replicaSet === undefined ? {} : { replicaSet: replication.replicaSet }),
+    ...(replication.oplog === undefined ? {} : { oplog: replication.oplog }),
+    oplogText: choices.oplogText,
+    oplogOperation: choices.oplogOperation,
+    oplogLast: choices.oplogLast,
+    readAt: tab.readAt.replication ?? tab.readAt.oplog ?? 0,
+  };
+}
+
+/** The state of the Sharding section. */
+export function shardingState(tab: MonitorTab, connection: PageConnection): ShardingState {
+  const { choices, sharding } = tab;
+  return {
+    connection,
+    ...(sharding.server === undefined ? {} : { server: sharding.server }),
+    ...(sharding.cluster === undefined ? {} : { cluster: sharding.cluster }),
+    readAt: tab.readAt.sharding ?? 0,
+    collectionFilter: choices.shardedFilter,
+    ...(choices.shardedSort === undefined ? {} : { collectionSort: choices.shardedSort }),
+    ...(tab.selected.sharding === undefined ? {} : { chosen: tab.selected.sharding }),
+    ...(sharding.events === undefined ? {} : { events: sharding.events }),
+    eventsText: choices.eventsText,
+    eventsScope: choices.eventsScope,
+  };
+}
+
+/** The title of what is selected in the Stats, Replication or Sharding section, or `undefined` when nothing is. */
+function sectionSelectedTitle(tab: MonitorTab, section: MonitorSection): string | undefined {
+  const selected = tab.selected;
+  switch (section) {
+    case 'stats':
+      return selected.statsCollection ?? tab.choices.statsDatabase;
+    case 'replication':
+      return selected.replication?.key;
+    case 'sharding':
+      return selected.sharding?.key;
+    case 'operations':
+    case 'slow-queries':
+      return undefined;
+  }
+}
+
 /** The title of what is selected in the section shown, or `undefined` when nothing is. */
 function selectedTitle(app: AppState, tab: MonitorTab, section: MonitorSection): string | undefined {
   const connection = connectionOf(app, tab.connection);
@@ -104,8 +171,10 @@ function selectedTitle(app: AppState, tab: MonitorTab, section: MonitorSection):
     const shown = operationsView(operationsState(tab, connection)).inspector;
     return shown === undefined ? undefined : `${text.operations.columns.opid} ${String(tab.selected.operation)}`;
   }
-  const shown = slowView(slowState(tab, connection)).inspector;
-  return shown?.record.title;
+  if (section === 'slow-queries') {
+    return slowView(slowState(tab, connection)).inspector?.record.title;
+  }
+  return sectionSelectedTitle(tab, section);
 }
 
 /** What a Monitor page tab adds to the active tab: what the inspector island shows. */

@@ -422,23 +422,23 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [`monitor.clear-profiler`](monitor.md#monitorclear-profiler--clear-the-operations-the-profiler-recorded) | Clear the operations the profiler recorded | Operation | M30 | Built |
 | [`monitor.create-suggested-index`](monitor.md#monitorcreate-suggested-index--create-the-index-a-slow-query-suggests) | Create the index a slow query suggests | Operation | M30 | Built |
 | [`monitor.open-slow-query`](monitor.md#monitoropen-slow-query--open-a-slow-query-in-its-collection) | Open a slow query in its collection | Operation | M30 | Built |
-| [`monitor.stats`](monitor.md#monitorstats--the-stats-section) | The Stats section | View | M31 | Specified |
-| [`monitor.read-server-status`](monitor.md#monitorread-server-status--read-the-servers-status) | Read the server's status | Read | M31 | Specified |
-| [`monitor.read-database-stats`](monitor.md#monitorread-database-stats--read-the-statistics-of-the-databases) | Read the statistics of the databases | Read | M31 | Specified |
-| [`monitor.read-collection-stats`](monitor.md#monitorread-collection-stats--read-the-statistics-of-a-databases-collections) | Read the statistics of a database's collections | Read | M31 | Specified |
-| [`monitor.rates`](monitor.md#monitorrates--rates-between-two-reads-and-their-last-values) | Rates between two reads, and their last values | Derivation | M31 | Specified |
-| [`monitor.replication`](monitor.md#monitorreplication--the-replication-section) | The Replication section | View | M31 | Specified |
-| [`monitor.read-replication`](monitor.md#monitorread-replication--read-the-replica-set) | Read the replica set | Read | M31 | Specified |
-| [`monitor.replication-lag`](monitor.md#monitorreplication-lag--members-and-their-lag) | Members and their lag | Derivation | M31 | Specified |
-| [`monitor.read-oplog`](monitor.md#monitorread-oplog--read-the-last-oplog-entries) | Read the last oplog entries | Read | M31 | Specified |
-| [`monitor.oplog-summary`](monitor.md#monitoroplog-summary--what-an-oplog-entry-changes) | What an oplog entry changes | Derivation | M31 | Specified |
-| [`monitor.step-down`](monitor.md#monitorstep-down--make-the-primary-step-down) | Make the primary step down | Operation | M31 | Specified |
-| [`monitor.sharding`](monitor.md#monitorsharding--the-sharding-section) | The Sharding section | View | M31 | Specified |
-| [`monitor.read-sharding`](monitor.md#monitorread-sharding--read-the-sharded-cluster) | Read the sharded cluster | Read | M31 | Specified |
-| [`monitor.read-sharding-events`](monitor.md#monitorread-sharding-events--read-the-recent-events-of-the-cluster) | Read the recent events of the cluster | Read | M31 | Specified |
-| [`monitor.balance`](monitor.md#monitorbalance--whether-a-sharded-collection-is-balanced) | Whether a sharded collection is balanced | Derivation | M31 | Specified |
-| [`monitor.set-balancer`](monitor.md#monitorset-balancer--stop-or-start-the-balancer) | Stop or start the balancer | Operation | M31 | Specified |
-| [`monitor.set-collection-balancing`](monitor.md#monitorset-collection-balancing--disable-or-enable-the-balancing-of-a-collection) | Disable or enable the balancing of a collection | Operation | M31 | Specified |
+| [`monitor.stats`](monitor.md#monitorstats--the-stats-section) | The Stats section | View | M31 | Built |
+| [`monitor.read-server-status`](monitor.md#monitorread-server-status--read-the-servers-status) | Read the server's status | Read | M31 | Built |
+| [`monitor.read-database-stats`](monitor.md#monitorread-database-stats--read-the-statistics-of-the-databases) | Read the statistics of the databases | Read | M31 | Built |
+| [`monitor.read-collection-stats`](monitor.md#monitorread-collection-stats--read-the-statistics-of-a-databases-collections) | Read the statistics of a database's collections | Read | M31 | Built |
+| [`monitor.rates`](monitor.md#monitorrates--rates-between-two-reads-and-their-last-values) | Rates between two reads, and their last values | Derivation | M31 | Built |
+| [`monitor.replication`](monitor.md#monitorreplication--the-replication-section) | The Replication section | View | M31 | Built |
+| [`monitor.read-replication`](monitor.md#monitorread-replication--read-the-replica-set) | Read the replica set | Read | M31 | Built |
+| [`monitor.replication-lag`](monitor.md#monitorreplication-lag--members-and-their-lag) | Members and their lag | Derivation | M31 | Built |
+| [`monitor.read-oplog`](monitor.md#monitorread-oplog--read-the-last-oplog-entries) | Read the last oplog entries | Read | M31 | Built |
+| [`monitor.oplog-summary`](monitor.md#monitoroplog-summary--what-an-oplog-entry-changes) | What an oplog entry changes | Derivation | M31 | Built |
+| [`monitor.step-down`](monitor.md#monitorstep-down--make-the-primary-step-down) | Make the primary step down | Operation | M31 | Built |
+| [`monitor.sharding`](monitor.md#monitorsharding--the-sharding-section) | The Sharding section | View | M31 | Built |
+| [`monitor.read-sharding`](monitor.md#monitorread-sharding--read-the-sharded-cluster) | Read the sharded cluster | Read | M31 | Built |
+| [`monitor.read-sharding-events`](monitor.md#monitorread-sharding-events--read-the-recent-events-of-the-cluster) | Read the recent events of the cluster | Read | M31 | Built |
+| [`monitor.balance`](monitor.md#monitorbalance--whether-a-sharded-collection-is-balanced) | Whether a sharded collection is balanced | Derivation | M31 | Built |
+| [`monitor.set-balancer`](monitor.md#monitorset-balancer--stop-or-start-the-balancer) | Stop or start the balancer | Operation | M31 | Built |
+| [`monitor.set-collection-balancing`](monitor.md#monitorset-collection-balancing--disable-or-enable-the-balancing-of-a-collection) | Disable or enable the balancing of a collection | Operation | M31 | Built |
 
 ## Getting around
 

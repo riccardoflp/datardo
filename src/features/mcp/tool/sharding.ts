@@ -1,8 +1,8 @@
 /**
  * The text of `sharding_status` (`mcp.deployment-tools`). Reading a sharded cluster (`listShards`, `balancerStatus`,
- * `balancerCollectionStatus`, `getShardMap`, the `config` database) is the monitor's (`monitor.sharding`, M30), which
- * is not on this branch: on a mongos the main process answers the app action `monitor.sharding` `{ connection,
- * events }` with a {@link ShardingReply} once it is built, and this writes it. Read only: it never starts or stops the
+ * `balancerCollectionStatus`, `getShardMap`, the `config` database) is the monitor's (`monitor.sharding`): on a mongos the
+ * main process answers the app action `monitor.sharding` `{ connection, events }` with a {@link ShardingReply}
+ * (`sharding-reply.ts`), and this writes it. Read only: it never starts or stops the
  * balancer.
  */
 import { counted } from '../output-limits';

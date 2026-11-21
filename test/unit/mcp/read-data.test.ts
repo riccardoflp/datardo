@@ -54,16 +54,15 @@ describe('mcp.read-data', () => {
     expect(
       allTools.filter((tool) => tool.name.startsWith('redis_') && tool.name !== 'redis_oplog_status'),
     ).toHaveLength(10);
-    // sharding_status waits for M31, open_search and describe_relations for M34, open_explain for M23, open_watch
-    // for M27: a tool is offered only once its feature is built.
+    // open_search and describe_relations wait for M34, open_explain for M23, open_watch for M27: a tool is offered
+    // only once its feature is built.
     expect([...waitingTools.keys()].sort()).toEqual([
       'describe_relations',
       'open_explain',
       'open_search',
       'open_watch',
-      'sharding_status',
     ]);
-    expect(builtTools).toHaveLength(37);
+    expect(builtTools).toHaveLength(38);
     const offered = toolsOffered(on).map((tool) => tool.name);
     for (const name of waitingTools.keys()) {
       expect(offered).not.toContain(name);

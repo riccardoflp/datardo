@@ -1,6 +1,6 @@
 /**
- * `monitor.show`: the page of a Monitor tab, drawn from its View: the section bar (`@section-bar`) with the sections
- * that are built, the toolbar with **Auto** and **Refresh**, and the section shown. The section is read when it is
+ * `monitor.show`: the page of a Monitor tab, drawn from its View: the section bar (`@section-bar`) with its five
+ * sections, the toolbar with **Auto** and **Refresh**, and the section shown. The section is read when it is
  * chosen and with **Refresh**, and by itself every few seconds while the tab is the active tab and the window is
  * visible.
  */
@@ -16,9 +16,19 @@ import { useAppState } from '../../state/store';
 import { changeChoices, chooseSection, holdChoices, keepHeldChoices, select } from './monitor-changes';
 import { OperationsSection } from './monitor-operations';
 import { readSection } from './monitor-reads';
+import { ReplicationSection } from './monitor-replication';
+import { ShardingSection } from './monitor-sharding';
 import { SlowSection } from './monitor-slow';
-import { connectionOf, sectionOf } from './monitor-state';
-import { forgetClosedMonitorTabs, freshMonitorTab, keepMonitorTab, monitorTabOf, useMonitorTab } from './monitor-store';
+import { connectionOf, sectionOf, type PageConnection } from './monitor-state';
+import { StatsSection } from './monitor-stats';
+import {
+  forgetClosedMonitorTabs,
+  freshMonitorTab,
+  keepMonitorTab,
+  monitorTabOf,
+  useMonitorTab,
+  type MonitorTab,
+} from './monitor-store';
 import styles from '../server/server-page.module.css';
 
 type PageShows = Extract<TabShows, { kind: 'page' }>;
@@ -145,6 +155,27 @@ function PageToolbar(props: {
   );
 }
 
+function Section(props: {
+  readonly tabId: string;
+  readonly tab: MonitorTab;
+  readonly connection: PageConnection;
+  readonly section: MonitorSection;
+}): React.JSX.Element {
+  const { tabId, tab, connection } = props;
+  switch (props.section) {
+    case 'operations':
+      return <OperationsSection tabId={tabId} tab={tab} connection={connection} />;
+    case 'slow-queries':
+      return <SlowSection tabId={tabId} tab={tab} connection={connection} />;
+    case 'stats':
+      return <StatsSection tabId={tabId} tab={tab} />;
+    case 'replication':
+      return <ReplicationSection tabId={tabId} tab={tab} connection={connection} />;
+    case 'sharding':
+      return <ShardingSection tabId={tabId} tab={tab} connection={connection} />;
+  }
+}
+
 function MonitorTabPage(props: { readonly tabId: string; readonly shows: PageShows; readonly app: AppState }) {
   const { tabId, shows, app } = props;
   const section = sectionOf(app, tabId);
@@ -168,11 +199,7 @@ function MonitorTabPage(props: { readonly tabId: string; readonly shows: PageSho
       <SectionBar tabId={tabId} bar={bar} />
       <PageToolbar tabId={tabId} section={section} shown={shown} />
       <div role="tabpanel" aria-label={text.sections[section]} className={styles['panel']}>
-        {section === 'operations' ? (
-          <OperationsSection tabId={tabId} tab={tab} connection={connection} />
-        ) : (
-          <SlowSection tabId={tabId} tab={tab} connection={connection} />
-        )}
+        <Section tabId={tabId} tab={tab} connection={connection} section={section} />
       </div>
     </div>
   );

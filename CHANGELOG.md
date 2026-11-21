@@ -227,6 +227,18 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
   keys of the advice, and **Turn on…** turns on the profiler of a database after a confirmation.
 - The MCP server offers `index_advice`, the advice of the Index advisor as text, read only, and `open_monitor`, which
   opens the Monitor page; no tool changes the profiler.
+- The Stats section of the Monitor page shows the server's version, uptime, connections, operations, network and
+  memory, with the rates since the last refresh drawn as a line, the size of every database, and the collections of
+  the database chosen, each table sorted by a click on a header.
+- The Replication section shows the members of a replica set with their state, lag, heartbeat and ping, the window of
+  the oplog and its last entries filtered by namespace and by operation; **Step down…** asks the primary to step down
+  after a confirmation. A standalone server and a mongos say why they have no replication.
+- The Sharding section of a mongos shows the shards in their colors, the sharded collections with their shard key,
+  chunks, data per shard and whether the balancer finds them balanced, and the recent migrations and splits;
+  **Stop balancer…** and **Start balancer…**, and **Disable balancing…** and **Enable balancing…** of a collection,
+  run after a confirmation, and never on a read-only connection.
+- The MCP server offers `sharding_status`: the shards, the balancer, the sharded collections and the recent events of
+  a cluster, read through its mongos.
 
 ### Fixed
 
@@ -234,6 +246,8 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
 - The window opens again with exactly the size it was left with when Windows scales the display by a fraction such as
   125%, instead of growing by a few pixels at each start.
 - A menu of the tree taller than the window scrolls, instead of leaving its first entries out of reach.
+- A table of the Server page with a horizontal scroll bar and few rows shows its last row, instead of hiding it under
+  the header.
 
 ### Security
 

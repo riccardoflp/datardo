@@ -43,7 +43,7 @@ STANDARD_EXIT = [
 # its cards, or a pair of an area and the names of some of them, or of an area and "rest"), what it builds beyond
 # the cards, its own exit criteria, and what is left out on purpose.
 # The status of each milestone that is not planned: in progress, or done (its exit criteria are then ticked).
-STATUS: dict[int, str] = {0: "done", 1: "done", 2: "done", 3: "done", 4: "done", 5: "done", 6: "done", 7: "done", 8: "done", 9: "done", 10: "done", 11: "done", 12: "done", 13: "done", 14: "done", 15: "done", 16: "done", 17: "done", 18: "done", 19: "done", 20: "done", 21: "done", 22: "done", 23: "done", 24: "done", 25: "done", 26: "done", 27: "done", 28: "done", 29: "done", 30: "done", 32: "done", 33: "done", 34: "done", 35: "done"}
+STATUS: dict[int, str] = {0: "done", 1: "done", 2: "done", 3: "done", 4: "done", 5: "done", 6: "done", 7: "done", 8: "done", 9: "done", 10: "done", 11: "done", 12: "done", 13: "done", 14: "done", 15: "done", 16: "done", 17: "done", 18: "done", 19: "done", 20: "done", 21: "done", 22: "done", 23: "done", 24: "done", 25: "done", 26: "done", 27: "done", 28: "done", 29: "done", 30: "done", 31: "done", 32: "done", 33: "done", 34: "done", 35: "done"}
 
 MILESTONES = [
     dict(n=1, title="A window of its own",
@@ -475,7 +475,8 @@ MILESTONES = [
                  "([testing.md](testing.md#throwaway-servers)); where a test cannot have one, the `parse` "
                  "functions are tested on recorded replies."],
          exit=["Every `parse` function of this milestone reads the replies recorded from MongoDB 4.2, 6.0 and "
-               "8.0 in `test/fixtures`."],
+               "8.0 in `test/fixtures` (recorded from 8.2 only, and a cluster of its own in the integration "
+               "tests: Q136)."],
          notin=[]),
     dict(n=32, title="Users and roles",
          goal="The Users and roles page lists the users and the roles of a database, and creates users, changes "

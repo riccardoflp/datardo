@@ -36,11 +36,10 @@ export { autoIntervals, defaultAuto, type AutoInterval } from './parts/intervals
 export const firstSection: MonitorSection = 'operations';
 
 /**
- * The sections that are built, in the order of the section bar: the Stats, Replication and Sharding sections join
- * them with their milestone (M31); until then the section bar shows these, and a section asked for that is not built
- * shows the first.
+ * The sections that are built, in the order of the section bar: all five since M31. A section asked for that is not
+ * among them shows the first.
  */
-export const builtSections: readonly MonitorSection[] = ['operations', 'slow-queries'];
+export const builtSections: readonly MonitorSection[] = monitorSections;
 
 /** The page's name in a tab and in its path. */
 export const monitorPage = 'monitor';

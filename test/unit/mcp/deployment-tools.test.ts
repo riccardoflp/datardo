@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import type { MongoRequest } from '../../../src/shared/engine-request';
 import type { ShardingReply } from '../../../src/features/mcp/tool/sharding';
+import { shardingReply } from '../../../src/features/mcp/tool/sharding-reply';
+import { clusterOf } from '../../../src/features/monitor/read-sharding';
+import { parse as eventsOf } from '../../../src/features/monitor/read-sharding-events';
+import { now } from '../monitor/context';
+import { changelog, clusterReplies } from '../monitor/sharding-replies';
 import { answerOf, drive, failed, hello, nameOf } from './harness';
 
 type Kind = 'primary' | 'standalone' | 'mongos';
@@ -107,6 +112,26 @@ describe('mcp.deployment-tools', () => {
     expect(driven.apps).toEqual([{ action: 'monitor.sharding', args: { connection: 'c-local', events: 20 } }]);
     expect(answerOf(driven)).toContain('Shards (1)');
     wroteNothing(driven.sent);
+  });
+
+  it('answers monitor.sharding with the shards, the collections and the newest events of the cluster', () => {
+    const events = eventsOf([changelog, []]);
+    const reply = shardingReply(clusterOf(clusterReplies(), now), events, 2);
+    expect(reply.shards.map((shard) => shard.name)).toEqual(['shard01', 'shard02']);
+    expect(reply.shards[0]).toMatchObject({ replSet: 'shard01', members: ['s1a:27018', 's1b:27018'], zones: ['east'] });
+    expect(reply.balancer).toMatchObject({ enabled: true, mode: 'full', running: false });
+    const orders = reply.collections.find((each) => each.ns === 'shop.orders');
+    expect(orders).toMatchObject({ key: '{ customerId: 1, _id: "hashed" }', balancing: true });
+    expect(reply.collections.find((each) => each.ns === 'shop.users')).toMatchObject({
+      unique: true,
+      balancing: false,
+    });
+    expect(reply.events).toHaveLength(2);
+    expect(reply.events?.[0]?.time).toMatch(/^\d{4}-\d\d-\d\dT/u);
+    expect(shardingReply(clusterOf(clusterReplies(), now), events, 0).events).toBeUndefined();
+    expect(
+      shardingReply(clusterOf(clusterReplies(), now), { kind: 'failed', failure: { message: 'refused' } }, 20),
+    ).toMatchObject({ eventsError: 'refused' });
   });
 
   it('lists the two largest of five databases with limit 2, and says three more are not listed', () => {

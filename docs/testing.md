@@ -22,6 +22,11 @@ read-only connection', …) })`. `catalog.py --tests test` reports a card with n
 - **MongoDB**: `test/integration/servers.ts` starts a standalone `mongod` and a single-node replica set (for
   sessions, transactions, change streams and the oplog) with `mongodb-memory-server`. It downloads MongoDB the first
   time; `MONGOMS_SYSTEM_BINARY` points it at an installed one instead.
+- **Deployments of a test file's own** (M30, M31): the Monitor page's tests that change the server start their own
+  (`test/integration/monitor/own-server.ts`, `own-deployments.ts`): a `mongod`, a replica set of three members that
+  **Step down…** makes elect another primary, and a sharded cluster (a config server, two shards of one member each,
+  a `mongos`) started from the binaries next to `MONGOMS_SYSTEM_BINARY` on free ports and stopped at the end, its
+  tests skipped when there is no `mongos` there. They never step down or stop the balancer of a shared server.
 - **Redis**: the same file starts `redis-server` on a free port with no persistence, from `DATARDO_TEST_REDIS_BINARY`
   when set, else from the `PATH`. On Windows, where Redis has no build of its own, set `DATARDO_TEST_REDIS_URL` to a
   server that may be emptied (Redis in WSL or in Docker, or Memurai): the tests that empty a database use 14 and 15

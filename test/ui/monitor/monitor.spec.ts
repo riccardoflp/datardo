@@ -1,10 +1,13 @@
 /**
  * The Monitor page driven through the window (`monitor.show`, `monitor.operations`, `monitor.kill-operation`,
- * `monitor.slow-queries`, `monitor.set-profiler`, `monitor.create-suggested-index`), on a mongod of this file: opened
- * from Go to, its sections chosen with the keyboard, the operations in progress with **Kill…** from the menu of a row,
- * the slow queries by query shape with the index one suggests created from the inspector island, and the profiler
- * set from the section. Each section is checked for accessibility in both themes (QA15, QA16). The profiler is turned
- * off after each test.
+ * `monitor.slow-queries`, `monitor.set-profiler`, `monitor.create-suggested-index`, `monitor.stats`,
+ * `monitor.replication` and `monitor.sharding` on a standalone server), on a mongod of this file: opened from Go to,
+ * its sections chosen with the keyboard, the operations in progress with **Kill…** from the menu of a row, the slow
+ * queries by query shape with the index one suggests created from the inspector island, the profiler set from the
+ * section, the statistics of the server, of its databases and of the collections of one, and the sentences of a
+ * standalone server. Each section is checked for accessibility in both themes (QA15, QA16). The profiler is turned
+ * off after each test. `replication.spec.ts` and `sharding.spec.ts` drive the other two sections on a replica set and
+ * on a sharded cluster.
  */
 import { expect, test, type Page } from '@playwright/test';
 import { Int32 } from 'mongodb';
@@ -61,7 +64,7 @@ test.describe('monitor.show', () => {
     test.setTimeout(120_000);
     const window = await openMonitor();
     const bar = window.getByRole('tablist', { name: 'Sections of the Monitor page' });
-    await expect(bar.getByRole('tab')).toHaveText(['Operations', 'Slow queries']);
+    await expect(bar.getByRole('tab')).toHaveText(['Operations', 'Slow queries', 'Stats', 'Replication', 'Sharding']);
     await expect(bar.getByRole('tab', { name: 'Operations' })).toHaveAttribute('aria-selected', 'true');
     await expect(window.getByRole('toolbar', { name: 'Toolbar of the Monitor page' })).toContainText('Auto');
     await bothThemes(window);
@@ -164,6 +167,44 @@ test.describe('monitor.slow-queries', () => {
       .toBe(1);
     await panel.getByRole('button', { name: 'All' }).click();
     await expect(panel.getByRole('columnheader').first()).toHaveText('Time');
+    await bothThemes(window);
+  });
+});
+
+test.describe('monitor.stats', () => {
+  test('shows the tiles of the server and its databases, and the collections of the database a click chooses', async () => {
+    test.setTimeout(120_000);
+    const window = await openMonitor();
+    await window.getByRole('tab', { name: 'Stats' }).click();
+    const panel = panelOf(window, 'Stats');
+    await expect(panel).toContainText('Uptime');
+    await expect(panel).toContainText('Connections');
+    const databases = panel.getByRole('region', { name: 'Databases' });
+    const shop = databases.getByRole('row').filter({ hasText: /^shop/u });
+    await expect(shop).toHaveCount(1);
+    await shop.click();
+    const collections = panel.getByRole('region', { name: 'Collections of shop' });
+    await expect(collections.getByRole('row').filter({ hasText: 'orders' })).toContainText('300');
+    await collections.getByRole('row').filter({ hasText: 'orders' }).click();
+    await expect(window.getByText(/storageSize/u).first()).toBeVisible();
+    await bothThemes(window);
+  });
+});
+
+test.describe('monitor.replication', () => {
+  test('says a standalone server has no replication, and the Sharding section that it is no cluster', async () => {
+    test.setTimeout(120_000);
+    const window = await openMonitor();
+    await window.getByRole('tab', { name: 'Replication' }).click();
+    await expect(panelOf(window, 'Replication')).toContainText(
+      'is a standalone server: it is not part of a replica set',
+    );
+    await bothThemes(window);
+    await window.getByRole('tab', { name: 'Sharding' }).click();
+    await expect(panelOf(window, 'Sharding')).toContainText(
+      'is a standalone server: it is not part of a sharded cluster',
+    );
+    await expect(window.locator('[data-feature="monitor.set-balancer@toolbar"]')).toHaveCount(0);
     await bothThemes(window);
   });
 });

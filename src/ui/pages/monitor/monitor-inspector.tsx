@@ -3,32 +3,20 @@
  * For an operation in progress, **Kill…** (`monitor.kill-operation@inspector`); for a slow query, why an index could
  * help with **Create index…** (`monitor.create-suggested-index@inspector`), **Open in collection** and **Explain**
  * (`monitor.open-slow-query@inspector`), **Copy query**, and for a group **Show operations** and its example line.
+ * The Stats, Replication and Sharding sections draw theirs in `monitor-section-inspector.tsx`.
  */
 import { view as operationsView } from '../../../features/monitor/operations';
 import type { SlowQueryInspector } from '../../../features/monitor/parts/slow-query-inspector';
 import { view as slowView } from '../../../features/monitor/slow-queries';
 import { text } from '../../../features/monitor/text';
-import { formattedValue } from '../../../features/query/format';
-import type { Json } from '../../../shared/engine-request';
 import { useAppState } from '../../state/store';
 import { changeChoices, select } from './monitor-changes';
 import { ControlButton, CopyButton } from './monitor-parts';
+import { InspectedRecord as Record } from './monitor-record';
+import { SectionInspector } from './monitor-section-inspector';
 import { connectionOf, operationsState, sectionOf, slowState } from './monitor-state';
 import { useMonitorTab } from './monitor-store';
 import styles from '../server/server-page.module.css';
-
-function Record(props: { readonly title?: string; readonly value: Json }): React.JSX.Element {
-  const shown = formattedValue(props.value, 'pretty');
-  return (
-    <>
-      {props.title === undefined ? null : <h3 className={styles['title']}>{props.title}</h3>}
-      <div className={styles['buttons']}>
-        <CopyButton label={text.copy} text={shown} />
-      </div>
-      <pre className={styles['advice']}>{shown}</pre>
-    </>
-  );
-}
 
 function SlowQuery(props: { readonly tabId: string; readonly shown: SlowQueryInspector }): React.JSX.Element {
   const { tabId, shown } = props;
@@ -84,7 +72,11 @@ export function MonitorInspector({ tabId }: { readonly tabId: string }): React.J
   if (tab === undefined || connection === undefined) {
     return null;
   }
-  if (sectionOf(app, tabId) === 'operations') {
+  const section = sectionOf(app, tabId);
+  if (section === 'stats' || section === 'replication' || section === 'sharding') {
+    return <SectionInspector tabId={tabId} tab={tab} connection={connection} section={section} />;
+  }
+  if (section === 'operations') {
     const shown = operationsView(operationsState(tab, connection)).inspector;
     if (shown === undefined) {
       return null;
