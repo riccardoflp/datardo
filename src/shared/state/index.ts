@@ -29,6 +29,7 @@ import {
   type PlaygroundsEvent,
   type PlaygroundsState,
 } from './playgrounds';
+import { initialConsolesState, reduceConsoles, type ConsolesEvent, type ConsolesState } from './consoles';
 
 /** Everything the window shows and the features decide from, apart from the results of reads. */
 export interface AppState {
@@ -44,6 +45,7 @@ export interface AppState {
   readonly oplog: OplogState;
   readonly table: TableState;
   readonly playgrounds: PlaygroundsState;
+  readonly consoles: ConsolesState;
 }
 
 /** Every change to the app's state. */
@@ -59,7 +61,8 @@ export type AppEvent =
   | UndoEvent
   | OplogStateEvent
   | TableEvent
-  | PlaygroundsEvent;
+  | PlaygroundsEvent
+  | ConsolesEvent;
 
 /** The state at start, before anything is loaded. */
 export const initialState: AppState = {
@@ -75,6 +78,7 @@ export const initialState: AppState = {
   oplog: initialOplogState,
   table: initialTableState,
   playgrounds: initialPlaygroundsState,
+  consoles: initialConsolesState,
 };
 
 /** The one function that changes the app's state. */
@@ -104,5 +108,7 @@ export function reduce(state: AppState, event: AppEvent): AppState {
       return { ...state, table: reduceTable(state.table, event) };
     case 'playgrounds':
       return { ...state, playgrounds: reducePlaygrounds(state.playgrounds, event) };
+    case 'consoles':
+      return { ...state, consoles: reduceConsoles(state.consoles, event) };
   }
 }

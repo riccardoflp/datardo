@@ -8,45 +8,21 @@ import type { Context } from '../../shared/feature';
 import type { ConnectionId } from '../../shared/ids';
 import { connectionId } from '../../shared/ids';
 import type { AppState } from '../../shared/state';
+import type { CommandArguments, ConsoleState } from '../../shared/state/consoles';
+import type { TypedReply } from '../../shared/typed-reply';
 
-/** The arguments of a command, the name first, each as the bytes the server receives. */
-export type CommandArguments = readonly Uint8Array[];
+export type {
+  CommandArguments,
+  ConsoleSession,
+  ConsoleState,
+  ConsolesState,
+  OutputEntry,
+  Protocol,
+  Transaction,
+} from '../../shared/state/consoles';
 
-/** The protocol the console's connection reads replies in. */
-export type Protocol = 2 | 3;
-
-/**
- * A reply of the server with every RESP type kept apart (`console.reply`): a bulk string as bytes, an integer as a
- * 64-bit integer, a simple string apart from a bulk one, a set apart from an array.
- */
-export type Reply =
-  | { readonly kind: 'null' }
-  | { readonly kind: 'integer'; readonly value: bigint }
-  | { readonly kind: 'simple'; readonly text: string }
-  | { readonly kind: 'bulk'; readonly bytes: Uint8Array }
-  | { readonly kind: 'verbatim'; readonly format: string; readonly text: string }
-  | { readonly kind: 'double'; readonly value: number }
-  | { readonly kind: 'boolean'; readonly value: boolean }
-  | { readonly kind: 'big-number'; readonly digits: string }
-  | { readonly kind: 'error'; readonly message: string }
-  | { readonly kind: 'array'; readonly items: readonly Reply[] }
-  | { readonly kind: 'set'; readonly items: readonly Reply[] }
-  | { readonly kind: 'push'; readonly items: readonly Reply[] }
-  | { readonly kind: 'map'; readonly entries: readonly (readonly [Reply, Reply])[] };
-
-/** A transaction of the console: the commands queued, and whether the server rejected one of them. */
-export interface Transaction {
-  readonly queued: readonly CommandArguments[];
-  readonly rejected: boolean;
-}
-
-/** What the console's connection is in (glossary, "session (of the console)"). */
-export interface ConsoleSession {
-  readonly database: number;
-  readonly transaction?: Transaction;
-  readonly watching: boolean;
-  readonly protocol: Protocol;
-}
+/** A reply of the server with every RESP type kept apart (`console.reply`). */
+export type Reply = TypedReply;
 
 /** What the server says a command does (`console.command-flags`). */
 export type CommandFlags =
@@ -101,56 +77,25 @@ export interface KeyCounts {
   readonly server?: { readonly keys: number; readonly databases: number };
 }
 
-/** One command of the output and what came of it (`console.output`). */
-export interface OutputEntry {
-  readonly id: number;
-  /** The prompt it was typed at: `db0>`. */
-  readonly prompt: string;
-  /** The line as typed, each secret argument written `***`. */
-  readonly line: string;
-  /** When it was sent, in milliseconds since 1970. */
-  readonly sentAt: number;
-  /** How long the reply took, once it arrived. */
-  readonly tookMs?: number;
-  readonly reply?: Reply;
-  /** The protocol the reply was read in. */
-  readonly protocol: Protocol;
-  readonly refusal?: { readonly code: string; readonly message: string; readonly offersPubSub: boolean };
-  /** The notes under the reply: a transaction that did not run, a stop, a connection opened again. */
-  readonly notes: readonly string[];
-}
-
-/** The console of one connection, as the main process keeps it. */
-export interface ConsoleState {
-  readonly connection: ConnectionId;
-  readonly status: 'connecting' | 'ready' | 'running' | 'closed';
-  /** The name of the command waiting for its reply, in upper case. */
-  readonly running?: string;
-  readonly session: ConsoleSession;
-  /** How many times the console's connection was opened: the flags read are kept for one opening. */
-  readonly opened: number;
-  readonly entries: readonly OutputEntry[];
-  /** The history of commands of the connection, the oldest first (`console.history`). */
-  readonly history: readonly string[];
-  /** How long the last reply took. */
-  readonly lastReplyMs?: number;
-}
-
-/** The consoles, by connection. */
-export type ConsolesState = Readonly<Record<string, ConsoleState>>;
-
 /** The console of a connection in the app's state, when one is open (the part of the state named `consoles`). */
 export function consoleOf(state: AppState, connection: ConnectionId): ConsoleState | undefined {
-  const consoles = (state as AppState & { readonly consoles?: ConsolesState }).consoles;
-  return consoles?.[connection];
+  return state.consoles[connection];
 }
+
+/** What the id of the console's client adds to the id of its connection. */
+const consoleSuffix = '#console';
 
 /**
  * The client of the console's own connection, as the engines know it: one apart from the ordinary client of the
  * connection, so that `SELECT`, `MULTI` and a command that waits change nothing for the other pages.
  */
 export function consoleClient(connection: ConnectionId): ConnectionId {
-  return connectionId(`${connection}#console`);
+  return connectionId(`${connection}${consoleSuffix}`);
+}
+
+/** The connection whose console a client of the engines is, or none when it is an ordinary client. */
+export function consoleOwner(client: ConnectionId): ConnectionId | undefined {
+  return client.endsWith(consoleSuffix) ? connectionId(client.slice(0, -consoleSuffix.length)) : undefined;
 }
 
 /** The connection a feature of the console was started on. */

@@ -188,25 +188,25 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`console.show`](console.md#consoleshow--the-console-tab) | The console tab | View | M16 | Specified |
-| [`console.connect`](console.md#consoleconnect--open-the-consoles-own-connection) | Open the console's own connection | Operation | M16 | Specified |
-| [`console.input`](console.md#consoleinput--the-command-input) | The command input | View | M16 | Specified |
-| [`console.parse-line`](console.md#consoleparse-line--read-a-command-line-into-arguments) | Read a command line into arguments | Derivation | M16 | Specified |
-| [`console.run`](console.md#consolerun--run-one-command) | Run one command | Operation | M16 | Specified |
-| [`console.command-flags`](console.md#consolecommand-flags--what-the-server-says-a-command-does) | What the server says a command does | Read | M16 | Specified |
-| [`console.classify`](console.md#consoleclassify--what-is-run-refused-and-confirmed) | What is run, refused and confirmed | Derivation | M16 | Specified |
-| [`console.session`](console.md#consolesession--the-consoles-database-and-transaction) | The console's database and transaction | Derivation | M16 | Specified |
-| [`console.secret-arguments`](console.md#consolesecret-arguments--which-arguments-of-a-command-are-secrets) | Which arguments of a command are secrets | Derivation | M16 | Specified |
-| [`console.reply`](console.md#consolereply--a-reply-as-text-by-its-type) | A reply as text, by its type | Derivation | M16 | Specified |
-| [`console.output`](console.md#consoleoutput--the-output-commands-and-their-replies) | The output: commands and their replies | View | M16 | Specified |
-| [`console.copy-reply`](console.md#consolecopy-reply--copy-a-reply) | Copy a reply | Operation | M16 | Specified |
-| [`console.clear`](console.md#consoleclear--clear-the-output) | Clear the output | Operation | M16 | Specified |
-| [`console.history`](console.md#consolehistory--the-history-of-commands) | The history of commands | Derivation | M16 | Specified |
-| [`console.clear-history`](console.md#consoleclear-history--clear-the-history-of-commands) | Clear the history of commands | Operation | M16 | Specified |
-| [`console.command-docs`](console.md#consolecommand-docs--the-commands-the-server-knows-and-their-arguments) | The commands the server knows, and their arguments | Read | M16 | Specified |
-| [`console.autocomplete`](console.md#consoleautocomplete--complete-the-names-of-commands) | Complete the names of commands | Derivation | M16 | Specified |
-| [`console.argument-hint`](console.md#consoleargument-hint--the-hint-of-a-commands-arguments) | The hint of a command's arguments | Derivation | M16 | Specified |
-| [`console.stop`](console.md#consolestop--stop-waiting-for-a-reply) | Stop waiting for a reply | Operation | M16 | Specified |
+| [`console.show`](console.md#consoleshow--the-console-tab) | The console tab | View | M16 | Built |
+| [`console.connect`](console.md#consoleconnect--open-the-consoles-own-connection) | Open the console's own connection | Operation | M16 | Built |
+| [`console.input`](console.md#consoleinput--the-command-input) | The command input | View | M16 | Built |
+| [`console.parse-line`](console.md#consoleparse-line--read-a-command-line-into-arguments) | Read a command line into arguments | Derivation | M16 | Built |
+| [`console.run`](console.md#consolerun--run-one-command) | Run one command | Operation | M16 | Built |
+| [`console.command-flags`](console.md#consolecommand-flags--what-the-server-says-a-command-does) | What the server says a command does | Read | M16 | Built |
+| [`console.classify`](console.md#consoleclassify--what-is-run-refused-and-confirmed) | What is run, refused and confirmed | Derivation | M16 | Built |
+| [`console.session`](console.md#consolesession--the-consoles-database-and-transaction) | The console's database and transaction | Derivation | M16 | Built |
+| [`console.secret-arguments`](console.md#consolesecret-arguments--which-arguments-of-a-command-are-secrets) | Which arguments of a command are secrets | Derivation | M16 | Built |
+| [`console.reply`](console.md#consolereply--a-reply-as-text-by-its-type) | A reply as text, by its type | Derivation | M16 | Built |
+| [`console.output`](console.md#consoleoutput--the-output-commands-and-their-replies) | The output: commands and their replies | View | M16 | Built |
+| [`console.copy-reply`](console.md#consolecopy-reply--copy-a-reply) | Copy a reply | Operation | M16 | Built |
+| [`console.clear`](console.md#consoleclear--clear-the-output) | Clear the output | Operation | M16 | Built |
+| [`console.history`](console.md#consolehistory--the-history-of-commands) | The history of commands | Derivation | M16 | Built |
+| [`console.clear-history`](console.md#consoleclear-history--clear-the-history-of-commands) | Clear the history of commands | Operation | M16 | Built |
+| [`console.command-docs`](console.md#consolecommand-docs--the-commands-the-server-knows-and-their-arguments) | The commands the server knows, and their arguments | Read | M16 | Built |
+| [`console.autocomplete`](console.md#consoleautocomplete--complete-the-names-of-commands) | Complete the names of commands | Derivation | M16 | Built |
+| [`console.argument-hint`](console.md#consoleargument-hint--the-hint-of-a-commands-arguments) | The hint of a command's arguments | Derivation | M16 | Built |
+| [`console.stop`](console.md#consolestop--stop-waiting-for-a-reply) | Stop waiting for a reply | Operation | M16 | Built |
 
 ## Documents
 

@@ -163,8 +163,8 @@ export const text = {
     clear: 'Clear console output',
     clearHistory: 'Clear console history',
     stop: 'Stop console command',
-    copyReply: 'Copy reply',
-    copyValue: 'Copy value',
-    copyCommand: 'Copy command',
+    copyReply: 'Copy console reply',
+    copyValue: 'Copy console value',
+    copyCommand: 'Copy console command',
   },
 } as const;

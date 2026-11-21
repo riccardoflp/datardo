@@ -945,3 +945,17 @@ Raised while the catalog was written; each names the cards that hold the current
   above it; lists, sets, sorted sets and streams show their table read-only with **Load more**, their toolbars coming
   with M15. (`value.copy`, `value.refresh`, `value.save-string`, `value.add-field`, `value.edit-field`,
   `value.rename-field`, `value.remove-fields`, `value.show`).
+- **Q76** — The Redis console as built in M16: after a command that writes, the tree and the keys tabs are read
+  again even when the server answered with an error, and every time, not at most once a second, since a plan does not
+  see the reply (Q58); `SELECT` of the saved database and `CLIENT SETNAME` (for a server without `HELLO`) are steps of
+  the main process on the console's own client, since an engine step names the connection's ordinary client; a refusal
+  is shown under its line in the output and also as every refusal is (`runner.refuse`); *The console's connection
+  closed.* and *Connected again on db6.* are entries of the output that follow no command; a line that cannot be read
+  is written in the output by its words, each secret argument `***`; the console's client sends `KEYS`, which the
+  ordinary client refuses, since the user typed it after its count was confirmed; a command answered with an error is
+  written in the Log as `error in 12 ms: WRONGTYPE`, its code alone, since a reply is never logged (D51); **Copy
+  value** and a click on a line take its last string; Go to lists **Copy console reply**, **Copy console value** and
+  **Copy console command**, since **Copy value** is the table's; the database menu of the toolbar lists the databases
+  the tree island read, and only the console's own database while it has read none; the line of a reply selected for
+  the inspector island carries `aria-current`, since a line of the output is not an option.
+  (`console.run`, `console.connect`, `console.output`, `console.copy-reply`, `console.show`).

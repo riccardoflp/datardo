@@ -7,6 +7,7 @@
  * last 500 commands, shows the first 1,000 elements of an array and the first 10,000 characters of a line, and follows
  * the newest reply unless the user scrolled up.
  */
+import { entriesWith } from '../../shared/state/consoles';
 import { groupThousands } from '../../shared/text-units';
 import { replyLines, type ReplyLine } from './reply';
 import { commandArguments } from './parse-line';
@@ -14,8 +15,7 @@ import { holdsSecret } from './secret-arguments';
 import { text } from './text';
 import type { ConsoleState, OutputEntry, Reply } from './types';
 
-/** The output keeps the last 500 commands with their replies (Datardo's choice). */
-export const outputKeeps = 500;
+export { outputKeeps } from '../../shared/state/consoles';
 
 /** An array, a map or a set shows its first 1,000 elements, then **Show 1,000 more** (Datardo's choice). */
 export const elementsShown = 1000;
@@ -28,8 +28,7 @@ export const replyKeptBytes = 16 * 1024 * 1024;
 
 /** The output once an entry is added: the oldest dropped from the top beyond 500. */
 export function entriesAfter(entries: readonly OutputEntry[], entry: OutputEntry): readonly OutputEntry[] {
-  const after = [...entries, entry];
-  return after.length > outputKeeps ? after.slice(after.length - outputKeeps) : after;
+  return entriesWith(entries, entry);
 }
 
 /** How long a reply took: `0.4 ms`, `12 ms`, `1.24 s`, `12.4 s`. */
@@ -98,6 +97,8 @@ export interface OutputItem {
     readonly message: string;
     readonly openPubSub?: { readonly label: string; readonly feature: string };
   };
+  /** What went wrong before a reply could arrive, in the error color. */
+  readonly failure?: string;
   readonly notes: readonly string[];
   readonly menu: readonly MenuEntry[];
 }
@@ -152,6 +153,9 @@ function cutLines(lines: readonly ReplyLine[]): { readonly lines: readonly Reply
 }
 
 function menuOf(entry: OutputEntry): readonly MenuEntry[] {
+  if (entry.line === '') {
+    return [];
+  }
   const copy = (label: string, variant: string): MenuEntry => ({
     label,
     feature: 'console.copy-reply',
@@ -226,6 +230,7 @@ function itemOf(entry: OutputEntry, input: OutputInput): OutputItem {
               : {}),
           },
         }),
+    ...(entry.failure === undefined ? {} : { failure: entry.failure }),
     notes: entry.notes,
     menu: menuOf(entry),
   };

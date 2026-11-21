@@ -8,13 +8,12 @@
  * `CLIENT SETNAME` instead, and the console reads replies in RESP2.
  */
 import type { ConnectionView } from '../../shared/connection';
-import { redisCommand } from '../../shared/engine-request';
-import type { Answers, AppStep, Context, EngineStep, Outcome, Step } from '../../shared/feature';
+import type { Answers, AppStep, Context, Outcome, Step } from '../../shared/feature';
 import { noDanger, refuse, run } from '../../shared/feature';
 import { connectionState, savedConnection } from '../../shared/state/connections';
 import { maskedArgument } from './secret-arguments';
 import { text } from './text';
-import { consoleClient, consoleConnection, consoleOf } from './types';
+import { consoleConnection, consoleOf } from './types';
 
 /** The name the server sees for the console's connection (`CLIENT LIST` shows `name=datardo-console`). */
 export const consoleClientName = 'datardo-console';
@@ -58,13 +57,17 @@ function appStep(stepText: string, action: string, connection: ConnectionView, u
   };
 }
 
-function consoleCommand(connection: ConnectionView, database: number, ...words: string[]): EngineStep {
+/**
+ * `CLIENT SETNAME datardo-console` or `SELECT 2`, sent by the main process on the console's connection. They are app
+ * steps, not engine steps, so that the steps of `console.stop` do not wait in the runner's queue behind the command
+ * they stop, which holds the console's connection.
+ */
+function consoleCommand(connection: ConnectionView, action: string, words: readonly string[]): AppStep {
   return {
-    kind: 'engine',
-    connection: consoleClient(connection.id),
-    request: redisCommand(database, ...words),
-    writes: false,
+    kind: 'app',
     text: words.join(' '),
+    action,
+    args: { connection: connection.id, words: [...words] },
   };
 }
 
@@ -74,7 +77,7 @@ function helloStep(connection: ConnectionView): AppStep {
   const auth = user === undefined ? '' : ` AUTH ${user} ${maskedArgument}`;
   const instead: Step[] = [
     ...(user === undefined ? [] : [appStep(`AUTH ${user} ${maskedArgument}`, 'console.auth', connection, user)]),
-    consoleCommand(connection, 0, 'CLIENT', 'SETNAME', consoleClientName),
+    consoleCommand(connection, 'console.setname', ['CLIENT', 'SETNAME', consoleClientName]),
   ];
   return {
     ...appStep(`HELLO 3${auth} SETNAME ${consoleClientName}`, 'console.hello', connection, user),
@@ -87,7 +90,7 @@ export function connectSteps(connection: ConnectionView, database: number): read
   return [
     appStep(text.connect.open(connection.hosts), 'console.open', connection),
     helloStep(connection),
-    ...(database === 0 ? [] : [consoleCommand(connection, database, 'SELECT', String(database))]),
+    ...(database === 0 ? [] : [consoleCommand(connection, 'console.select', ['SELECT', String(database)])]),
   ];
 }
 

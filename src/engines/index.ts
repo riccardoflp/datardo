@@ -7,6 +7,7 @@ import type { ConnectionRequest, EngineName } from '../shared/engine-request';
 import { EngineError, type ClientSettings, type Engine, type EngineClient } from './engine';
 import { mongoEngine } from './mongodb';
 import { redisEngine } from './redis';
+import { openConsoleClient } from './redis/console-client';
 
 export type {
   ClientSettings,
@@ -21,6 +22,8 @@ export type {
 export { EngineError } from './engine';
 export { MongoEngineError } from './mongodb/errors';
 export { bsonBytes } from './mongodb/bson-bytes';
+export { redisAddress } from './redis';
+export { closedBeforeReply } from './redis/console-client';
 
 /** Carries out requests on the connections it holds a client for. */
 export interface EngineService {
@@ -28,6 +31,12 @@ export interface EngineService {
   readonly send: (request: ConnectionRequest, signal: AbortSignal) => Promise<unknown>;
   /** Opens the client of a connection, closing the one it had. */
   readonly connect: (connection: ConnectionId, settings: ClientSettings, signal: AbortSignal) => Promise<void>;
+  /**
+   * Opens the console's own connection to a Redis server (`console.connect`) under an id of its own, closing the one
+   * it had: a socket that sends what it is given and answers each command with a `ConsoleAnswer`, the server's errors
+   * included.
+   */
+  readonly openConsole: (connection: ConnectionId, settings: ClientSettings, signal: AbortSignal) => Promise<void>;
   /** Closes the client of a connection, if it has one. */
   readonly disconnect: (connection: ConnectionId) => Promise<void>;
   /** Closes every client: when Datardo quits. */
@@ -57,9 +66,7 @@ export function createEngines(options: EngineOptions = {}): EngineService {
     clients.delete(connection);
     await client?.close();
   };
-  const connect = async (connection: ConnectionId, settings: ClientSettings, signal: AbortSignal): Promise<void> => {
-    await disconnect(connection);
-    const client = await engines[settings.engine].open(settings, signal);
+  const keep = (connection: ConnectionId, client: EngineClient): void => {
     clients.set(connection, client);
     client.onDrop((reason) => {
       if (clients.get(connection) !== client) {
@@ -72,7 +79,16 @@ export function createEngines(options: EngineOptions = {}): EngineService {
       }
     });
   };
+  const connect = async (connection: ConnectionId, settings: ClientSettings, signal: AbortSignal): Promise<void> => {
+    await disconnect(connection);
+    keep(connection, await engines[settings.engine].open(settings, signal));
+  };
+  const openConsole = async (connection: ConnectionId, settings: ClientSettings, signal: AbortSignal) => {
+    await disconnect(connection);
+    keep(connection, await openConsoleClient(settings, signal));
+  };
   return {
+    openConsole,
     send: (request, signal) => {
       const client = clients.get(request.connection);
       if (client === undefined) {

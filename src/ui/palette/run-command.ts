@@ -6,6 +6,7 @@
 import { intentOf } from '../../features/palette/run-command';
 import type { Intent } from '../../shared/bridge';
 import type { AppState } from '../../shared/state';
+import { runActiveConsole } from '../pages/console/console-actions';
 import { databasesArgs } from '../pages/keys/keys-path';
 import { isValueCommand, runValueCommand } from '../pages/value/value-commands';
 import { focusNextIsland } from '../shell/focus';
@@ -88,6 +89,10 @@ export function runCommand(id: string, state: AppState): void {
   }
   if (isValueCommand(id, state)) {
     runValueCommand(id, state);
+    return;
+  }
+  // **Run console command** runs the lines of the active console's input, as `Enter` does (`console.input`).
+  if (id === 'console.run' && runActiveConsole(state)) {
     return;
   }
   const local = windowOnly[id];

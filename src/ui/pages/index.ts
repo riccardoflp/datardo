@@ -19,6 +19,10 @@ import { useKeysTab } from './keys/keys-store';
 import { ValueItemInspector } from './value/value-inspector';
 import { valueExtras } from './value/value-state';
 import { useValueTab } from './value/value-store';
+import { ConsoleInspector } from './console/console-inspector';
+import { ConsolePage } from './console/console-page';
+import { consoleExtras } from './console/console-state';
+import { useConsoleTab } from './console/console-store';
 
 /** A page as the main island draws it. */
 export type PageView = () => React.JSX.Element | null;
@@ -38,6 +42,7 @@ export const pages: Readonly<Record<string, PageView>> = {
 export const tabPages: Readonly<Partial<Record<string, PageView>>> = {
   keys: KeysPage,
   key: KeyPage,
+  console: ConsolePage,
 };
 
 /**
@@ -46,13 +51,14 @@ export const tabPages: Readonly<Partial<Record<string, PageView>>> = {
  */
 export const inspectors: Readonly<
   Partial<Record<string, (props: { readonly tabId: string }) => React.JSX.Element | null>>
-> = { keys: KeyInspector, key: ValueItemInspector, server: ServerInspector };
+> = { keys: KeyInspector, key: ValueItemInspector, server: ServerInspector, console: ConsoleInspector };
 
 /** What a page adds to the active tab, by its kind or its page: what the status line counts, what the inspector shows. */
 export const tabExtras: Readonly<Partial<Record<string, typeof keysExtras>>> = {
   keys: keysExtras,
   key: valueExtras,
   server: serverExtras,
+  console: consoleExtras,
 };
 
 /** The name `inspectors` and `tabExtras` know a tab by: its page for a page tab, else the kind of what it shows. */
@@ -60,8 +66,12 @@ export function extrasKey(shows: { readonly kind: string; readonly page?: string
   return shows.kind === 'page' && shows.page !== undefined ? shows.page : shows.kind;
 }
 
-/** Draws the shell again whenever what a page keeps in the window changes: what a tab adds to it is drawn from that. */
+/**
+ * Draws the shell again whenever what a page keeps in the window changes: what a tab adds to it is drawn from that (the
+ * key selected in a keys tab, the item of a value, the string selected in a console's output).
+ */
 export function usePageStores(): void {
   useKeysTab(undefined);
   useValueTab(undefined);
+  useConsoleTab(undefined);
 }

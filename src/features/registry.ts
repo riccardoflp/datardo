@@ -23,6 +23,7 @@ import { features as playgroundFeatures } from './playground';
 import { features as documentFeatures } from './document';
 import { features as serverFeatures } from './server';
 import { features as valueFeatures } from './value';
+import { features as consoleFeatures } from './console';
 
 /** The features of every area, as each area's index lists them. */
 const areas: readonly (readonly RunnableFeature[])[] = [
@@ -45,6 +46,7 @@ const areas: readonly (readonly RunnableFeature[])[] = [
   documentFeatures,
   serverFeatures,
   valueFeatures,
+  consoleFeatures,
 ];
 
 /** The features the runner can start, by identifier. */

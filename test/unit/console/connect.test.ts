@@ -32,7 +32,12 @@ describe('console.connect', () => {
       'HELLO 3 AUTH app *** SETNAME datardo-console',
       'SELECT 2',
     ]);
-    expect(opened.steps[2]).toMatchObject({ kind: 'engine', connection: 'c-cache#console', writes: false });
+    // Sent on the console's connection by the main process, so that console.stop never waits behind the command.
+    expect(opened.steps[2]).toMatchObject({
+      kind: 'app',
+      action: 'console.select',
+      args: { connection: 'c-cache', words: ['SELECT', '2'] },
+    });
     expect(opened.danger).toEqual({ kind: 'none' });
     expect(JSON.stringify(opened)).not.toContain('s3cret');
   });

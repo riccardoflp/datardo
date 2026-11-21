@@ -7,52 +7,20 @@
 import type { Json } from '../shared/engine-request';
 import { connectionId, type ConnectionId } from '../shared/ids';
 import { columnsKey, rememberedColumns, type RememberedColumns, type RememberedLayout } from '../shared/state/table';
-import { columnsIn, connectionStateFile, withColumns, type ConnectionStateFile } from '../storage/connection-state';
-import { Store, type JsonObject } from '../storage/store';
+import { columnsIn, withColumns, type ConnectionStateFile } from '../storage/connection-state';
+import type { JsonObject, Store } from '../storage/store';
+import { forgetStateStore, stateStoreOf } from './connection-state';
 import type { MainServices } from './services';
 
-/** The store of each connection's state file, opened once. */
-const stores = new Map<ConnectionId, Promise<Store<ConnectionStateFile>>>();
-
-function logLine(services: MainServices, text: string): void {
-  services.state.dispatch({
-    slice: 'runner',
-    type: 'logged',
-    lines: [{ time: Date.now(), source: 'table.columns', kind: 'info', text: `[table.columns] ${text}` }],
-  });
-}
-
-async function opened(services: MainServices, connection: ConnectionId): Promise<Store<ConnectionStateFile>> {
-  const store = new Store(services.dataFolder, connectionStateFile(connection), (error) => {
-    logLine(services, `The columns could not be saved: ${String(error)}`);
-  });
-  try {
-    const found = await store.load();
-    if (found.kind === 'damaged') {
-      logLine(services, `What Datardo remembers of a connection was set aside as ${found.setAsideAs}.`);
-    }
-  } catch (error: unknown) {
-    logLine(services, `What Datardo remembers of a connection could not be read: ${String(error)}`);
-  }
-  services.onQuit(() => store.flush());
-  return store;
-}
-
 /**
- * The store of a connection's state file, read the first time it is needed; the one store of that file, which the
- * playgrounds use too (playground.save).
+ * The store of a connection's state file, read the first time it is needed; the one store of that file, shared with the
+ * other areas that keep something there (the playgrounds, the console).
  */
 export function connectionStateStore(
   services: MainServices,
   connection: ConnectionId,
 ): Promise<Store<ConnectionStateFile>> {
-  const known = stores.get(connection);
-  if (known !== undefined) {
-    return known;
-  }
-  const store = opened(services, connection);
-  stores.set(connection, store);
-  return store;
+  return stateStoreOf(services, connection);
 }
 
 function rememberedOf(layout: JsonObject, expanded: readonly string[]): RememberedColumns {
@@ -78,7 +46,7 @@ export async function start(services: MainServices): Promise<void> {
   }
   services.state.listen((event) => {
     if (event.slice === 'tabs' && event.type === 'connection-removed') {
-      stores.delete(event.connection);
+      forgetStateStore(event.connection);
       services.state.dispatch({ slice: 'table', type: 'connection-forgotten', connection: event.connection });
     }
   });

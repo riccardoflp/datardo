@@ -15,6 +15,7 @@ import { start as startUndo } from './undo';
 import { start as startOplog } from './oplog';
 import { start as startTable } from './table';
 import { start as startPlaygrounds } from './playgrounds';
+import { start as startConsoles } from './consoles';
 
 /** What one area does at start. */
 export type AreaStart = (services: MainServices) => Promise<void>;
@@ -32,6 +33,7 @@ const starts: readonly AreaStart[] = [
   startTabs,
   startPalette,
   startTable,
+  startConsoles,
   startPing,
   startCheckUpdate,
 ];
