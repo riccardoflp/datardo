@@ -27,7 +27,7 @@ import { featureId } from '../../shared/ids';
 import type { Question } from '../../shared/question';
 import { stagesOfEditor } from '../aggregate/edit-as-text';
 import { makersOf, readEditor } from '../aggregate/types';
-import { chosenFolder, chosenNotice, folderQuestion, folderStep } from './choose-folder';
+import { chosenFolder, chosenNotice, folderNeed, folderStep } from './choose-folder';
 import { queryFileText } from './file-format';
 import { queryFilePath } from './file-path';
 import { matchesCollection, type CollectionQueries } from './list';
@@ -164,16 +164,21 @@ function folderFiles(scope: CollectionScope, folder: FolderQueries): Pick<Collec
 export function folderWrite(
   context: Context,
   answers: Answers,
-  where: { readonly scope: CollectionScope; readonly list: CollectionQueries },
+  where: { readonly scope: CollectionScope; readonly list: CollectionQueries; readonly failure?: string },
   saving: Saving,
 ): FolderWrite | Outcome {
   const { scope } = where;
   const connection = context.state.connections.saved.find((each) => each.id === scope.connection);
   const chosen = scope.queriesFolder === undefined ? chosenFolder(answers) : undefined;
-  if (scope.queriesFolder === undefined && (connection === undefined || chosen === undefined)) {
-    return connection === undefined
-      ? nothingToDo(text.save.title, text.save.cannotUndo)
-      : ask(folderQuestion(connection, 'save'));
+  if (scope.queriesFolder === undefined) {
+    const need = connection === undefined ? undefined : folderNeed(connection, answers, 'save');
+    if (need !== undefined) {
+      return need;
+    }
+    if (connection === undefined || chosen === undefined) {
+      // No connection, or the system's folder dialog closed without a folder: nothing is saved.
+      return nothingToDo(text.save.title, text.save.cannotUndo);
+    }
   }
   if (chosen !== undefined && !('chosen' in answers)) {
     return needRead('chosen', 'saved-query.read-folder', { connection: scope.connection, queriesFolder: chosen });
@@ -197,7 +202,7 @@ export function folderWrite(
     'write',
     { queriesFolder: folder, file, platform: context.platform },
     text.steps.write(fullPath(folder, file, context.platform)),
-    { text: content },
+    { text: content, failure: where.failure ?? text.save.couldNotSave },
   );
   return {
     steps: [...(chosen === undefined || connection === undefined ? [] : [folderStep(connection, chosen)]), write],

@@ -20,7 +20,6 @@ import {
   pipeline,
   planOf,
   production,
-  questionOf,
   repoFolder,
   stepTexts,
 } from './harness';
@@ -53,18 +52,8 @@ describe('saved-query.run', () => {
       tab: 't1',
       query: { kind: 'find', filter: '{ status: "paid" }', sort: '{ createdAt: -1 }', projection: '' },
     });
-    expect(planOf(outcome).after).toEqual([
-      {
-        kind: 'start',
-        feature: 'query.run',
-        target: { kind: 'collection', connection: 'c-local', database: 'shop', collection: 'orders' },
-        args: {
-          tab: 't1',
-          query: { filter: '{ status: "paid" }', sort: '{ createdAt: -1 }', projection: '' },
-          page: 1,
-        },
-      },
-    ]);
+    // The window shows the query in the tab and runs its first page, as its run button does (`query.run`).
+    expect(planOf(outcome).after).toEqual([]);
   });
 
   it('switches to the pipeline editor with its stages, disabled ones disabled, and runs the whole pipeline', () => {
@@ -74,19 +63,14 @@ describe('saved-query.run', () => {
       answersWith({ query: queryJson(stages) }),
     );
     expect(stepTexts(outcome)).toEqual(['set the query of orders to aggregate $match']);
-    expect(planOf(outcome).after).toMatchObject([
-      {
-        kind: 'start',
-        feature: 'aggregate.run',
-        args: { tab: 't1', pipeline: { stages: stages.stages }, page: 1, whole: true },
-      },
-    ]);
+    // The window switches the tab to Aggregate with the whole pipeline shown, and runs it (`aggregate.run`).
+    expect(appArgs(outcome, 'saved-query.load')['query']).toEqual(queryJson(stages));
   });
 
   it('leaves aggregate.run to hand a pipeline ending with $out to aggregate.write-output, and writes nothing itself', () => {
     const outcome = plan(contextOn('saved-query.run'), answersWith({ query: queryJson(pipeline(['$out', '"copy"'])) }));
     expect(planOf(outcome).steps.every((step) => step.kind === 'app')).toBe(true);
-    expect(planOf(outcome).after).toMatchObject([{ feature: 'aggregate.run' }]);
+    expect(planOf(outcome).after).toEqual([]);
   });
 
   it('opens a tab of shop.orders when none is open, from Go to', () => {
@@ -94,9 +78,9 @@ describe('saved-query.run', () => {
       contextOn('saved-query.run', undefined, withTabs([collectionTab('t2', 'sales')], 't2')),
       answersWith({ query: queryJson(paidThisMonth) }),
     );
+    // With no tab named, the main process opens the tab of shop.orders and loads the query there.
     expect(appArgs(outcome, 'saved-query.load')['tab']).toBeUndefined();
-    expect(planOf(outcome).after[0]).toMatchObject({ args: { page: 1 } });
-    expect((planOf(outcome).after[0] as { args: Record<string, unknown> }).args['tab']).toBeUndefined();
+    expect(appArgs(outcome, 'saved-query.load')).toMatchObject({ database: 'shop', collection: 'orders' });
   });
 
   it('fills a filter that is not valid mongosh as it is: query.run marks it as invalid and sends nothing', () => {
@@ -165,12 +149,15 @@ describe('saved-query.reveal-file', () => {
 
 describe('saved-query.choose-folder', () => {
   it('asks the folder in the dialog titled Queries folder of Local, starting in the folder the connection has', () => {
-    const question = questionOf(choosePlan(contextOn('saved-query.choose-folder'), { args: {} }));
-    expect(question).toMatchObject({
-      title: 'Queries folder of Local',
-      fields: [{ key: 'folder', default: repoFolder }],
+    const outcome = choosePlan(contextOn('saved-query.choose-folder'), { args: {} });
+    expect(outcome).toMatchObject({
+      kind: 'read',
+      need: {
+        key: 'folder',
+        read: 'saved-query.choose-folder:dialog',
+        args: { title: 'Queries folder of Local', start: repoFolder },
+      },
     });
-    expect(question.text).toBeUndefined();
   });
 
   it('saves the connection with the folder chosen, the folder itself, and says where queries go', () => {

@@ -10,6 +10,7 @@ import type { ConnectionId } from '../../shared/ids';
 import type { Pin } from '../../shared/state/nav';
 import type { TabShows } from '../../shared/state/tabs';
 import { hexOfText, isSamePin, textOfHex } from '../nav/pin';
+import { pinRunArgs } from '../saved-query/connection-list';
 import { setting } from '../settings/read';
 import { text } from './text';
 import {
@@ -104,9 +105,10 @@ function openOf(
     // A click on a pinned key is `key.open`'s entry point in the tree, as one on a pinned namespace is `key.show`'s.
     return openControl(label, element === 'tree.pinned@tree' && pin.kind === 'key' ? 'key.open@tree' : element, shows);
   }
-  return startControl(label, element, 'saved-query.run', {
+  // A click on a pinned saved query is `saved-query.run`'s entry point in the tree.
+  return startControl(label, element === 'tree.pinned@tree' ? 'saved-query.run@tree' : element, 'saved-query.run', {
     connection,
-    args: { connection, ...(pin as unknown as Readonly<Record<string, Json>>) },
+    args: pin.kind === 'saved-query' ? pinRunArgs(connection, pin) : { connection },
   });
 }
 

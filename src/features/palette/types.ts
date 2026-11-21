@@ -2,9 +2,11 @@
  * What the features of Go to share: the sources it looks in, a candidate and what opening it starts, and what the
  * window knows besides the app's state (the names read by `palette.find-collections`, the commands offered now).
  */
+import type { Json } from '../../shared/engine-request';
 import type { ConnectionId, TabId } from '../../shared/ids';
 import type { TabShows } from '../../shared/state/tabs';
 import type { CommandId } from '../command';
+import type { ConnectionQueries } from '../saved-query/connection-list';
 import type { Rankable } from './rank';
 
 /** The sources of Go to (`palette.sources`). */
@@ -45,7 +47,9 @@ export type OpenTarget =
   /** A connection: `nav.switch-connection`, with it chosen. */
   | { readonly kind: 'connection'; readonly connection: ConnectionId }
   /** A command: `palette.run-command`. */
-  | { readonly kind: 'command'; readonly command: CommandId };
+  | { readonly kind: 'command'; readonly command: CommandId }
+  /** A saved query: `saved-query.run`, with these arguments (`saved-query.connection-list › runArgs`). */
+  | { readonly kind: 'saved-query'; readonly args: Json };
 
 /** One thing Go to can list. */
 export interface Candidate extends Rankable {
@@ -90,4 +94,6 @@ export interface PaletteKnowledge {
   readonly collections: Readonly<Record<string, KnownCollections>>;
   /** The commands `palette.run-command` offers now. */
   readonly commands: readonly OfferedCommand[];
+  /** The saved queries of each saved MongoDB connection (`saved-query.connection-list`), by connection id. */
+  readonly savedQueries?: Readonly<Record<string, ConnectionQueries>>;
 }

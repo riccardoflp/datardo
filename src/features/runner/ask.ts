@@ -67,7 +67,10 @@ export function initialValues(question: Question): Readonly<Record<string, Field
 
 /** The answers sent back, by the keys of the fields. */
 export function answersOf(question: Question, values: Readonly<Record<string, FieldValue>>): Answers {
-  return Object.fromEntries(question.fields.map((field) => [field.key, values[field.key] ?? defaultOf(field)]));
+  return {
+    ...(question.key === undefined ? {} : { [question.key]: true }),
+    ...Object.fromEntries(question.fields.map((field) => [field.key, values[field.key] ?? defaultOf(field)])),
+  };
 }
 
 function defaultOf(field: Field): FieldValue {

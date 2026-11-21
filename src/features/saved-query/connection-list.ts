@@ -15,7 +15,8 @@ import { mineOf, savedInOrder } from './list';
 import { folderQueriesOf, noFolderQueries, queriesFolderOf } from './read-folder';
 import { queryLine } from './show';
 import { text } from './text';
-import { fieldsOf, namespaceOf, queryJson, type SavedQuery } from './types';
+import type { Pin } from '../../shared/state/nav';
+import { fieldsOf, namespaceOf, pinOfSaved, queryJson, type SavedQuery } from './types';
 
 /** The app read that the main process answers with the saved queries of a connection. */
 export const connectionListAction = 'saved-query.connection-list';
@@ -100,10 +101,22 @@ export function isFound(item: ConnectionQueryItem, typed: string): boolean {
  * inside the queries folder, so that the pin follows the file and is gone with it.
  */
 export function pinOf(query: SavedQuery): Json {
-  const where = { database: query.database, collection: query.collection, name: query.name };
-  return query.place === 'me'
-    ? { place: 'me', ...where, query: queryJson(query.query) }
-    : { place: 'folder', ...where, file: query.file };
+  return pinOfSaved(query);
+}
+
+/**
+ * What a click on a pinned saved query starts `saved-query.run` with: the query it names, read from the list, so that
+ * a query saved again runs as it is now; for one for me, the query the pin holds when it is no longer listed.
+ */
+export function pinRunArgs(connection: string, pin: Extract<Pin, { kind: 'saved-query' }>): Json {
+  const place = pin.place ?? 'me';
+  return {
+    connection,
+    database: pin.database,
+    collection: pin.collection,
+    saved: { place, name: pin.name, ...(pin.file === undefined ? {} : { file: pin.file }) },
+    ...(pin.query === undefined ? {} : { query: pin.query }),
+  };
 }
 
 /** What choosing an item, or its pin, starts `saved-query.run` with. */
@@ -117,14 +130,23 @@ export function runArgs(connection: string, query: SavedQuery): Json {
   };
 }
 
-/** Asks Datardo's data for the saved queries of `args.connection`, or of the current connection. */
+/**
+ * Asks Datardo's data for the saved queries of `args.connection`, or of the current connection; `args.databases`, the
+ * names the tree of the window last read, is handed on and comes back in the reply.
+ */
 export function request(context: Context, args: Json): ReadRequest {
-  const named = fieldsOf(args)['connection'];
+  const fields = fieldsOf(args);
+  const named = fields['connection'];
+  const databases = fields['databases'];
   const connection = typeof named === 'string' ? named : (context.state.nav.current ?? '');
   return {
     kind: 'app',
     action: connectionListAction,
-    args: { connection, queriesFolder: queriesFolderOf(context, connection) ?? null },
+    args: {
+      connection,
+      queriesFolder: queriesFolderOf(context, connection) ?? null,
+      ...(Array.isArray(databases) ? { databases } : {}),
+    },
   };
 }
 

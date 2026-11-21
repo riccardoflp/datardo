@@ -9,7 +9,7 @@ import type { Json } from '../../shared/engine-request';
 import { pipelineSummary, pipelineText } from '../aggregate/to-text';
 import type { CollectionQueries } from './list';
 import { text } from './text';
-import { queryJson, savedRef, type QueryText, type RecentQuery, type SavedQuery } from './types';
+import { pinOfSaved, queryJson, savedRef, type QueryText, type RecentQuery, type SavedQuery } from './types';
 
 /** **Queries**, in the query bar and in the toolbar of the pipeline editor, which opens the list. */
 export const queriesButton = { label: text.commands.show, element: 'saved-query.show@query-bar' } as const;
@@ -197,7 +197,7 @@ function menuOf(query: SavedQuery, args: { readonly [key: string]: Json }): read
   const pin = {
     label: text.show.pin,
     feature: 'nav.pin',
-    args: { pin: { kind: 'saved-query', database: query.database, collection: query.collection, name: query.name } },
+    args: { action: 'pin', connection: args['connection'] ?? null, pin: pinOfSaved(query) as unknown as Json },
   };
   if (query.place === 'me') {
     const move = { label: text.show.moveToFolder, tooltip: text.move.toFolderDescription };

@@ -71,6 +71,11 @@ export interface Question {
    * area (the insert dialog, the form of **Update many**): the collection, the options of the dialog.
    */
   readonly about?: Json;
+  /**
+   * For a question with no field, which only says something before the feature goes on: the key under which its
+   * button answers `true`, so that the feature knows it was answered (`saved-query.choose-folder`).
+   */
+  readonly key?: string;
 }
 
 /** Whether a text keeps every rule of its field, and the message of the first it breaks. */

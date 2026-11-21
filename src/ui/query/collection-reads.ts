@@ -14,6 +14,7 @@ import { setting } from '../../features/settings/read';
 import type { IntentResult } from '../../shared/bridge';
 import type { Json } from '../../shared/engine-request';
 import { featureId, type ConnectionId, type TabId, type WorkId } from '../../shared/ids';
+import { recordRecent } from '../pages/saved-query/queries-store';
 import { currentAppState } from '../state/store';
 import { changeCollection, collectionOf, textsRan, type CollectionTab } from './collection-store';
 
@@ -274,6 +275,11 @@ async function afterRun(ref: CollectionRef, how: RunHow, result: IntentResult): 
       changeCollection(ref.tab, (tab) => ({ ...tab, count: { kind: 'failed' } }));
     }
     return;
+  }
+  if (how.texts === 'bar') {
+    // A find that ran without an error is added to the recent queries of its collection (`saved-query.recent`).
+    const { filter, sort, project } = textsRan(collectionOf(ref.tab));
+    recordRecent(ref, { kind: 'find', filter, sort, projection: project });
   }
   if (how.count) {
     await countQuery(ref, 'with-query');

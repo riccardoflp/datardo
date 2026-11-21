@@ -25,11 +25,17 @@ function operationOn(id: string): UndoEntry {
 }
 
 describe('connection.remove', () => {
+  it('reads first what the data folder keeps of the connection', () => {
+    expect(plan(contextOf('connection.remove', stateWith([local]), on(local)), {})).toEqual({
+      kind: 'read',
+      need: { key: 'counts', read: 'connection.remove:counts', args: { connection: local.id } },
+    });
+  });
+
   it('confirms, then disconnects, deletes the secrets and removes the connection', () => {
-    const outcome = plan(
-      contextOf('connection.remove', stateWith([local], { [local.id]: 'connected' }), on(local)),
-      {},
-    );
+    const outcome = plan(contextOf('connection.remove', stateWith([local], { [local.id]: 'connected' }), on(local)), {
+      counts: {},
+    });
     expect(outcome).toMatchObject({
       kind: 'run',
       plan: {
@@ -84,7 +90,9 @@ describe('connection.remove', () => {
     const cache = redisConnection();
     const staging = mongoConnection({ id: connectionId('c-staging'), name: 'Staging', publishesTo: cache.id });
     const linked = mongoConnection({ publishesTo: cache.id });
-    const outcome = plan(contextOf('connection.remove', stateWith([linked, staging, cache]), on(cache)), {});
+    const outcome = plan(contextOf('connection.remove', stateWith([linked, staging, cache]), on(cache)), {
+      counts: {},
+    });
     if (outcome.kind !== 'run' || outcome.plan.danger.kind !== 'confirm') {
       throw new Error('no confirmation');
     }
@@ -102,7 +110,7 @@ describe('connection.remove', () => {
   it('keeps the linked Redis connection of a MongoDB connection it removes', () => {
     const cache = redisConnection();
     const linked = mongoConnection({ publishesTo: cache.id });
-    const outcome = plan(contextOf('connection.remove', stateWith([linked, cache]), on(linked)), {});
+    const outcome = plan(contextOf('connection.remove', stateWith([linked, cache]), on(linked)), { counts: {} });
     expect(outcome.kind === 'run' ? outcome.plan.steps.map((step) => step.text) : []).toEqual([
       'delete the secrets of Local',
       'remove the connection Local',
@@ -118,7 +126,7 @@ describe('connection.remove', () => {
         pins: { [local.id]: [{ kind: 'collection' as const, database: 'shop', collection: 'orders' }] },
       },
     };
-    const outcome = plan(contextOf('connection.remove', pinned, on(local)), {});
+    const outcome = plan(contextOf('connection.remove', pinned, on(local)), { counts: {} });
     expect(outcome.kind === 'run' && outcome.plan.danger.kind === 'confirm' ? outcome.plan.danger.text : '').toContain(
       '1 pins',
     );
@@ -137,7 +145,7 @@ describe('connection.remove', () => {
       unsaved: true,
     };
     const withTab = { ...state, tabs: { ...state.tabs, tabs: [tab], active: tab.id } };
-    const asked = plan(contextOf('connection.remove', withTab, on(local)), {});
+    const asked = plan(contextOf('connection.remove', withTab, on(local)), { counts: {} });
     expect(asked).toMatchObject({
       kind: 'ask',
       question: {
@@ -146,7 +154,10 @@ describe('connection.remove', () => {
         fields: [{ kind: 'pick-one', key: `changes:${tab.id}`, default: 'save' }],
       },
     });
-    const removed = plan(contextOf('connection.remove', withTab, on(local)), { [`changes:${tab.id}`]: 'save' });
+    const removed = plan(contextOf('connection.remove', withTab, on(local)), {
+      counts: {},
+      [`changes:${tab.id}`]: 'save',
+    });
     expect(removed.kind === 'run' ? removed.plan.danger : undefined).toEqual({ kind: 'none' });
     expect(removed.kind === 'run' ? removed.plan.steps.map((step) => step.kind === 'app' && step.action) : []).toEqual([
       'tab.save',

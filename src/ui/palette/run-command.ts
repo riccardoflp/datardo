@@ -12,6 +12,7 @@ import { isValueCommand, runValueCommand } from '../pages/value/value-commands';
 import { focusNextIsland } from '../shell/focus';
 import { startIntent } from '../shell/top-bar/start';
 import { isAggregateCommand, runAggregateCommand } from '../pages/aggregate/aggregate-commands';
+import { isSavedQueryCommand, runSavedQueryCommand } from '../pages/saved-query/saved-query-commands';
 import { queryCommandIds, runQueryCommand } from '../query/query-commands';
 import { isDocumentCommand, runDocumentCommand } from '../pages/document/document-commands';
 import { isTableCommand, runTableCommand } from '../table/table-commands';
@@ -93,6 +94,10 @@ export function runCommand(id: string, state: AppState): void {
   }
   // **Run console command** runs the lines of the active console's input, as `Enter` does (`console.input`).
   if (id === 'console.run' && runActiveConsole(state)) {
+    return;
+  }
+  if (isSavedQueryCommand(id)) {
+    runSavedQueryCommand(id, state);
     return;
   }
   const local = windowOnly[id];

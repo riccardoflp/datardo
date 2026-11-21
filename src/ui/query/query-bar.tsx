@@ -15,6 +15,7 @@ import { draggedOver, endDrag, useDragged } from './drag-data';
 import { ErrorLine } from './error-line';
 import { ModeMenu } from './mode-menu';
 import { QueryBuilder } from './query-builder';
+import { QueriesButton } from '../pages/saved-query/queries-list';
 import styles from './query-bar.module.css';
 import { spokenName } from './spoken-name';
 
@@ -104,9 +105,20 @@ export function QueryBar({
         <div className={styles['buttons']}>
           {bar.buttons
             .filter((button) => isBuilt(button.element))
-            .map((button) => (
-              <Button key={button.element} button={button} collectionRef={collectionRef} />
-            ))}
+            .map((button) =>
+              button.element === 'saved-query.show@query-bar' ? (
+                <QueriesButton
+                  key={button.element}
+                  collectionRef={collectionRef}
+                  label={button.label}
+                  spoken={spokenName(button.name, button.label)}
+                  {...(button.tip === undefined ? {} : { tip: button.tip })}
+                  className={styles['button'] ?? ''}
+                />
+              ) : (
+                <Button key={button.element} button={button} collectionRef={collectionRef} />
+              ),
+            )}
         </div>
       </div>
       {bar.pipeline ? pipeline : null}

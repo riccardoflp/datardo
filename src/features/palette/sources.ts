@@ -10,6 +10,8 @@ import type { ConnectionId } from '../../shared/ids';
 import type { AppState } from '../../shared/state';
 import { connectionState } from '../../shared/state/connections';
 import { connectionOfShows, type TabShows } from '../../shared/state/tabs';
+import { runArgs } from '../saved-query/connection-list';
+import type { SavedQuery } from '../saved-query/types';
 import { targetKey } from '../tab/same-target';
 import { iconOf } from '../tab/strip';
 import { titledTabs } from '../tab/title';
@@ -258,6 +260,36 @@ function commandCandidates(input: SourcesInput): readonly Candidate[] {
   }));
 }
 
+/** What a saved query is, among those of its connection: its file, or its place, collection and name. */
+function savedQueryKey(query: SavedQuery): string {
+  return query.place === 'folder' ? `folder:${query.file}` : `me:${query.database}.${query.collection}:${query.name}`;
+}
+
+/**
+ * The saved queries of every saved MongoDB connection, connected or not, by name (`saved-query.connection-list`): the
+ * context is *shop.orders · Folder*, with the connection's name first for another connection than the current one.
+ */
+function savedQueryCandidates(input: SourcesInput, facts: Facts): readonly Candidate[] {
+  const known = input.knowledge.savedQueries ?? {};
+  return input.state.connections.saved
+    .filter((saved) => saved.engine === 'mongodb')
+    .flatMap((saved) =>
+      (known[saved.id]?.items ?? []).map((item) => ({
+        id: `saved-queries:${saved.id}:${encodeURIComponent(savedQueryKey(item.query))}`,
+        source: 'saved-queries' as const,
+        kind: 'saved-query' as const,
+        name: item.title,
+        context: saved.id === facts.current ? item.context : `${saved.name} / ${item.context}`,
+        icon: 'bookmark',
+        opens: { kind: 'saved-query' as const, args: runArgs(saved.id, item.query) },
+        open: false,
+        recent: false,
+        current: saved.id === facts.current,
+      })),
+    )
+    .sort((one, other) => compare(one.name, other.name));
+}
+
 function candidatesOf(input: SourcesInput, facts: Facts, source: SourceName, whole: boolean): readonly Candidate[] {
   switch (source) {
     case 'tabs':
@@ -270,9 +302,10 @@ function candidatesOf(input: SourcesInput, facts: Facts, source: SourceName, who
       return connectionCandidates(input, facts);
     case 'commands':
       return [...commandCandidates(input)].sort((one, other) => compare(one.name, other.name));
-    case 'keys':
     case 'saved-queries':
-      // Keys come from their own scan (`palette.find-keys`); saved queries come with their area (M20).
+      return savedQueryCandidates(input, facts);
+    case 'keys':
+      // Keys come from their own scan (`palette.find-keys`).
       return [];
   }
 }

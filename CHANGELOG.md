@@ -105,6 +105,10 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
   a read-only connection every command that writes, confirms the commands that lose data or change the server, writes
   passwords as `***`, and **Stop** stops a command that waits. The output is cleared with `Ctrl+L`, a reply, one of
   its values or the command is copied, a command is run again from its menu, and the history can be cleared.
+- **Queries** in the query bar lists the saved and recent queries of a collection: run one again, save the query or
+  the pipeline of the tab for you or as a file of the connection's queries folder in Mongoster's format, rename,
+  move, delete, pin, or reveal one; the folder is watched, a file that is not valid is skipped with a warning, and Go
+  to finds saved queries by their name.
 
 ### Fixed
 

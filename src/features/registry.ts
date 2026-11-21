@@ -24,6 +24,7 @@ import { features as documentFeatures } from './document';
 import { features as serverFeatures } from './server';
 import { features as valueFeatures } from './value';
 import { features as consoleFeatures } from './console';
+import { features as savedQueryFeatures } from './saved-query';
 
 /** The features of every area, as each area's index lists them. */
 const areas: readonly (readonly RunnableFeature[])[] = [
@@ -47,6 +48,7 @@ const areas: readonly (readonly RunnableFeature[])[] = [
   serverFeatures,
   valueFeatures,
   consoleFeatures,
+  savedQueryFeatures,
 ];
 
 /** The features the runner can start, by identifier. */

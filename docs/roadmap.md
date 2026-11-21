@@ -1493,7 +1493,7 @@ stages and text, runs pipelines that write only after a confirmation, and saves 
 of the connection, as a file a team shares through git, and run, renamed, moved and deleted from the queries list, Go
 to and the pins.
 **Depends on**: M19.
-**Status**: planned
+**Status**: done
 
 ### Features
 
@@ -1542,14 +1542,14 @@ to and the pins.
 
 ### Exit criteria
 
-- [ ] A folder of saved query files written by Mongoster 0.8.0 is listed, each query runs, and a query saved by
+- [x] A folder of saved query files written by Mongoster 0.8.0 is listed, each query runs, and a query saved by
       Datardo is a file Mongoster reads: a test with recorded files of both.
-- [ ] An invalid file is skipped with a warning and stops nothing.
-- [ ] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
+- [x] An invalid file is skipped with a warning and stops nothing.
+- [x] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
       `npm run test:integration`, `npm run test:ui`; `catalog.py --tests` reports none missing for these cards.
-- [ ] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
+- [x] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
       the keyboard alone (QA15, QA16).
-- [ ] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
+- [x] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
       and this milestone's **Status** is *done*.
 
 ### Not in this milestone

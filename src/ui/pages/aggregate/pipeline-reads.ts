@@ -23,6 +23,8 @@ import { featureId, type Place } from '../../../shared/ids';
 import type { CollectionRef, RunHow } from '../../query/collection-reads';
 import { changeCollection, changeQuery, collectionOf, type CollectionTab } from '../../query/collection-store';
 import { changeDraft, changePipeline, expectKept, pipelineOf } from './pipeline-store';
+import { queryJson } from '../../../features/saved-query/types';
+import { recordRecent } from '../saved-query/queries-store';
 
 /** The run of each tab: a newer run makes an older one's result be dropped. */
 const runs = new Map<string, number>();
@@ -192,6 +194,11 @@ export async function runPipeline(ref: CollectionRef, how: RunHow): Promise<void
     return;
   }
   changeCollection(ref.tab, (tab) => afterRead(tab, result, Date.now() - now));
+  const output = result.kind === 'read' ? (result.result as PipelineOutput) : undefined;
+  if (how.texts === 'bar' && output !== undefined && output.failure === undefined) {
+    // A pipeline that ran without an error is added to the recent queries of its collection (`saved-query.recent`).
+    recordRecent(ref, queryJson({ kind: 'pipeline', stages: editor.stages }));
+  }
 }
 
 /** The text of the stage that writes, as the messages name its target: `"paid_orders"`, `{ into: "totals" }`. */
@@ -219,6 +226,7 @@ async function writePipeline(ref: CollectionRef, editor: PipelineEditor, stage: 
     ran: editor,
     note: text.results.written(stage.name, writesTo(stage)),
   }));
+  recordRecent(ref, queryJson({ kind: 'pipeline', stages: editor.stages }));
   changeCollection(ref.tab, (tab) => {
     const { error: _gone, ...query } = tab.query;
     return {

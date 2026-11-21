@@ -21,6 +21,7 @@ import {
   mineStep,
   namespaceOf,
   nothingToDo,
+  pinSteps,
   savedRefOf,
   scopeOf,
   type CollectionScope,
@@ -40,16 +41,24 @@ function toFolder(context: Context, answers: Answers, where: Where, query: MySav
     ...(query.description === undefined ? {} : { description: query.description }),
     query: query.query,
   };
-  const write = folderWrite(context, answers, where, saving);
+  const write = folderWrite(context, answers, { ...where, failure: text.move.couldNotMove }, saving);
   if (!('steps' in write)) {
     return write;
   }
   const remaining = mineIn(where.list.saved).filter((each) => each !== query);
   const forget = mineStep(scope, remaining, text.move.removeMine(query.name, namespaceOf(scope), scope.connectionName));
   const replaced = write.replaced;
+  const moved: FolderSavedQuery = {
+    place: 'folder',
+    name: query.name,
+    database: scope.database,
+    collection: scope.collection,
+    query: query.query,
+    file: write.file,
+  };
   return run({
     title: replaced === undefined ? text.move.toFolderTitle : text.save.replaceQuestion(scope.collection, query.name),
-    steps: [...write.steps, forget],
+    steps: [...write.steps, forget, ...pinSteps(context, scope, query, moved)],
     danger:
       replaced === undefined
         ? noDanger
@@ -81,7 +90,10 @@ function toMine(context: Context, where: Where, query: FolderSavedQuery): Outcom
     title: text.move.question(query.name),
     steps: [
       mineStep(scope, mine, text.save.forMeStep(query.name, namespaceOf(scope), scope.connectionName)),
-      fileStep('delete', place, text.steps.delete(fullPath(folder, query.file, context.platform))),
+      fileStep('delete', place, text.steps.delete(fullPath(folder, query.file, context.platform)), {
+        failure: text.move.couldNotMove,
+      }),
+      ...pinSteps(context, scope, query, entry),
     ],
     danger: { kind: 'confirm', text: text.move.text(query.file), button: text.move.button },
     undo: { cannot: text.move.cannotUndo },

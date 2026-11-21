@@ -30,6 +30,7 @@ import {
   mineStep,
   namespaceOf,
   nothingToDo,
+  pinSteps,
   savedRefOf,
   scopeOf,
   type CollectionScope,
@@ -74,9 +75,19 @@ function plainPlan(steps: Parameters<typeof run>[0]['steps']): Outcome {
   });
 }
 
-function renameMine(scope: CollectionScope, list: CollectionQueries, query: MySavedQuery, name: string): Outcome {
-  const queries = mineIn(list.saved).map((each) => (each === query ? { ...each, name } : each));
-  return plainPlan([mineStep(scope, queries, text.rename.forMeStep(query.name, namespaceOf(scope), name))]);
+function renameMine(context: Context, where: Where, query: MySavedQuery, name: string): Outcome {
+  const { scope } = where;
+  const renamed = { ...query, name };
+  const queries = mineIn(where.list.saved).map((each) => (each === query ? renamed : each));
+  return plainPlan([
+    mineStep(scope, queries, text.rename.forMeStep(query.name, namespaceOf(scope), name)),
+    ...pinSteps(context, scope, query, renamed),
+  ]);
+}
+
+interface Where {
+  readonly scope: CollectionScope;
+  readonly list: CollectionQueries;
 }
 
 function renameFile(
@@ -95,19 +106,20 @@ function renameFile(
     'write',
     { queriesFolder: folder, file, platform: context.platform },
     text.steps.write(fullPath(folder, file, context.platform)),
-    { text: queryFileText({ ...content, name }) },
+    { text: queryFileText({ ...content, name }), failure: text.rename.couldNotRename },
   );
+  const pins = pinSteps(context, where.scope, query, { ...query, name, file });
   if (file === query.file) {
-    return plainPlan([write]);
+    return plainPlan([write, ...pins]);
   }
   const newName = file.slice(file.lastIndexOf('/') + 1);
   const renameStep = fileStep(
     'rename',
     { queriesFolder: folder, file: query.file, platform: context.platform },
     text.steps.rename(fullPath(folder, query.file, context.platform), newName),
-    { to: file },
+    { to: file, failure: text.rename.couldNotRename },
   );
-  return plainPlan([renameStep, write]);
+  return plainPlan([renameStep, write, ...pins]);
 }
 
 /** Feature: saved-query.rename — asks the new name, then renames the query for me, or the file and its `name`. */
@@ -134,7 +146,7 @@ export function plan(context: Context, answers: Answers): Outcome {
     return nothingToDo(text.rename.title, text.rename.cannotUndo);
   }
   return query.place === 'me'
-    ? renameMine(scope, list, query, name)
+    ? renameMine(context, { scope, list }, query, name)
     : renameFile(context, { scope, list }, query, name);
 }
 

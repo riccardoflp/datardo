@@ -30,6 +30,7 @@ import {
   type PlaygroundsState,
 } from './playgrounds';
 import { initialConsolesState, reduceConsoles, type ConsolesEvent, type ConsolesState } from './consoles';
+import { initialSavedQueryState, reduceSavedQuery, type SavedQueryEvent, type SavedQueryState } from './saved-query';
 
 /** Everything the window shows and the features decide from, apart from the results of reads. */
 export interface AppState {
@@ -46,6 +47,7 @@ export interface AppState {
   readonly table: TableState;
   readonly playgrounds: PlaygroundsState;
   readonly consoles: ConsolesState;
+  readonly savedQuery: SavedQueryState;
 }
 
 /** Every change to the app's state. */
@@ -62,7 +64,8 @@ export type AppEvent =
   | OplogStateEvent
   | TableEvent
   | PlaygroundsEvent
-  | ConsolesEvent;
+  | ConsolesEvent
+  | SavedQueryEvent;
 
 /** The state at start, before anything is loaded. */
 export const initialState: AppState = {
@@ -79,6 +82,7 @@ export const initialState: AppState = {
   table: initialTableState,
   playgrounds: initialPlaygroundsState,
   consoles: initialConsolesState,
+  savedQuery: initialSavedQueryState,
 };
 
 /** The one function that changes the app's state. */
@@ -110,5 +114,7 @@ export function reduce(state: AppState, event: AppEvent): AppState {
       return { ...state, playgrounds: reducePlaygrounds(state.playgrounds, event) };
     case 'consoles':
       return { ...state, consoles: reduceConsoles(state.consoles, event) };
+    case 'saved-query':
+      return { ...state, savedQuery: reduceSavedQuery(state.savedQuery, event) };
   }
 }

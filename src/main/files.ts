@@ -10,12 +10,14 @@ import { connectionsToText, type ExportFormat, type ExportSecrets } from '../fea
 import { fileOfConnection, isFileProblem, jsonFields } from '../features/connection/types';
 import { transferText } from '../features/connection/text';
 import { saveFailedMessage } from '../features/playground/save';
+import { queryFileWriter } from '../features/saved-query/types';
 import { writeAtomically } from '../storage/store';
 import { notify } from '../runner/notify';
 import { whenRunnerReady } from './bridge';
 import { connectionEngines, fullConnectionString, savedConnections, savedOptionSecrets } from './connections';
 import { nodeFileCrypto } from './file-crypto';
 import { keyExportOf, writeKeyExport } from './key-export';
+import { savedQueriesData } from './saved-queries';
 
 const formats: readonly ExportFormat[] = ['datardo', 'compass', 'list'];
 const modes: readonly ExportSecrets[] = ['remove', 'include', 'encrypt'];
@@ -69,8 +71,34 @@ async function writePlayground(path: string, content: string): Promise<void> {
   }
 }
 
+/**
+ * `saved-query.file` `{ queriesFolder, file, text?, to?, failure? }`: a file of a queries folder written, renamed or
+ * deleted by its path inside the folder, which it never leaves; the error starts with `failure`.
+ */
+async function queryFile(step: FileStep, args: Json): Promise<void> {
+  const fields = jsonFields(args);
+  const textOf = (name: string): string | undefined => (typeof fields[name] === 'string' ? fields[name] : undefined);
+  const action = step.action === 'create-folder' ? undefined : step.action;
+  const queriesFolder = textOf('queriesFolder');
+  const file = textOf('file');
+  if (action === undefined || queriesFolder === undefined || file === undefined) {
+    throw new Error(`Datardo has no writer for ${step.path}.`);
+  }
+  const text = textOf('text');
+  const to = textOf('to');
+  await savedQueriesData().changeFile(
+    action,
+    { queriesFolder, file, ...(text === undefined ? {} : { text }), ...(to === undefined ? {} : { to }) },
+    textOf('failure') ?? '',
+  );
+}
+
 /** Carries out a file step: writes, deletes or creates the folder at its path. */
 export const fileWriter: FileWriter = async (step: FileStep, signal: AbortSignal) => {
+  if (step.content?.writer === queryFileWriter) {
+    await queryFile(step, step.content.args);
+    return;
+  }
   switch (step.action) {
     case 'delete':
       await rm(step.path, { force: true });

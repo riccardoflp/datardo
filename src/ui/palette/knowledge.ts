@@ -1,7 +1,8 @@
 /**
  * What Go to knows besides the app's state (`palette.sources`): the names of the collections of each connected MongoDB
  * connection, read by `palette.find-collections` when something is typed and kept until the connection is disconnected
- * or the names are older than 5 minutes; and the commands offered now (`palette.run-command`).
+ * or the names are older than 5 minutes; the commands offered now (`palette.run-command`); and the saved queries of
+ * each saved MongoDB connection (`saved-query.connection-list`).
  */
 import { useEffect, useSyncExternalStore } from 'react';
 import { commands as registeredCommands } from '../../features/commands';
@@ -12,6 +13,7 @@ import type { Json } from '../../shared/engine-request';
 import { featureId, type ConnectionId } from '../../shared/ids';
 import type { AppState } from '../../shared/state';
 import { connectionState } from '../../shared/state/connections';
+import { useSavedQueries } from './saved-queries';
 
 let known: Readonly<Record<string, KnownCollections>> = {};
 const reading = new Set<string>();
@@ -94,5 +96,6 @@ export function useKnowledge(state: AppState, looking: boolean): PaletteKnowledg
     title: entry.title,
     ...(entry.shownKey === undefined ? {} : { key: entry.shownKey }),
   }));
-  return { collections, commands };
+  const savedQueries = useSavedQueries(state);
+  return { collections, commands, savedQueries };
 }

@@ -17,6 +17,7 @@ import {
   mineStep,
   namespaceOf,
   nothingToDo,
+  pinSteps,
   savedRefOf,
   scopeOf,
   type CollectionScope,
@@ -25,11 +26,20 @@ import {
 } from './types';
 import type { CollectionQueries } from './list';
 
-function deleteMine(scope: CollectionScope, list: CollectionQueries, query: MySavedQuery): Outcome {
-  const queries = mineIn(list.saved).filter((each) => each !== query);
+interface Where {
+  readonly scope: CollectionScope;
+  readonly list: CollectionQueries;
+}
+
+function deleteMine(context: Context, where: Where, query: MySavedQuery): Outcome {
+  const { scope } = where;
+  const queries = mineIn(where.list.saved).filter((each) => each !== query);
   return run({
     title: text.delete.title,
-    steps: [mineStep(scope, queries, text.delete.forMeStep(query.name, namespaceOf(scope), scope.connectionName))],
+    steps: [
+      mineStep(scope, queries, text.delete.forMeStep(query.name, namespaceOf(scope), scope.connectionName)),
+      ...pinSteps(context, scope, query),
+    ],
     danger: noDanger,
     undo: { cannot: text.delete.cannotUndo },
     publishes: false,
@@ -45,7 +55,12 @@ function deleteFile(context: Context, scope: CollectionScope, query: FolderSaved
   const where = { queriesFolder: folder, file: query.file, platform: context.platform };
   return run({
     title: text.delete.question(query.name),
-    steps: [fileStep('delete', where, text.steps.delete(fullPath(folder, query.file, context.platform)))],
+    steps: [
+      fileStep('delete', where, text.steps.delete(fullPath(folder, query.file, context.platform)), {
+        failure: text.delete.couldNotDelete,
+      }),
+      ...pinSteps(context, scope, query),
+    ],
     danger: { kind: 'confirm', text: text.delete.text(query.file), button: text.delete.button },
     undo: { cannot: text.delete.cannotUndo },
     publishes: false,
@@ -68,7 +83,7 @@ export function plan(context: Context, answers: Answers): Outcome {
   if (query === undefined) {
     return nothingToDo(text.delete.title, text.delete.cannotUndo);
   }
-  return query.place === 'me' ? deleteMine(scope, list, query) : deleteFile(context, scope, query);
+  return query.place === 'me' ? deleteMine(context, { scope, list }, query) : deleteFile(context, scope, query);
 }
 
 /** The feature, as the runner starts it. */

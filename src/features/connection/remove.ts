@@ -3,7 +3,7 @@
  */
 import type { ConnectionView } from '../../shared/connection';
 import type { Answers, Context, Outcome, Step } from '../../shared/feature';
-import { ask, noDanger, run } from '../../shared/feature';
+import { ask, needRead, noDanger, run } from '../../shared/feature';
 import type { Tab } from '../../shared/state/tabs';
 import { changesAnswer, closeSteps, titleOf } from '../tab/close';
 import { text as tabText } from '../tab/text';
@@ -17,9 +17,10 @@ import { operationCount } from '../undo/forget-connection';
 
 /**
  * What belongs to the connection in the other areas. The pins are counted in the app's state (`nav.pin`). The queries
- * saved for me are counted by the read of their area (`saved-query.save`, M20), which gives `answers.counts`: until
- * that area exists nothing gives it, the count is 0, and its step (`saved-query.forget-connection`) is left out of the
- * plan. The operations of the undo history are counted in the app's state (`undo.forget-connection`).
+ * saved for me (`saved-query.save`) and whether Datardo remembers anything else of it (its file of `state/`) are read
+ * from the data folder by `connection.remove:counts`, which gives `answers.counts`; a count of 0 leaves its step
+ * (`saved-query.forget-connection`, `connection.forget-state`) out of the plan. The operations of the undo history are
+ * counted in the app's state (`undo.forget-connection`).
  */
 export interface RemovalCounts {
   readonly savedQueries: number;
@@ -130,6 +131,9 @@ export function plan(context: Context, answers: Answers): Outcome {
   const connection = targetConnection(context);
   if (connection === undefined) {
     return nothingToDo('Remove connection', planText.cannotUndoRemove);
+  }
+  if (!('counts' in answers)) {
+    return needRead('counts', 'connection.remove:counts', { connection: connection.id });
   }
   const { state } = context;
   const connections = connectionsOf(state);

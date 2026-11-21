@@ -9,7 +9,7 @@ import { connectionId, type ConnectionId } from '../shared/ids';
 import { columnsKey, rememberedColumns, type RememberedColumns, type RememberedLayout } from '../shared/state/table';
 import { columnsIn, withColumns, type ConnectionStateFile } from '../storage/connection-state';
 import type { JsonObject, Store } from '../storage/store';
-import { forgetStateStore, stateStoreOf } from './connection-state';
+import { forgetConnectionState, stateStoreOf } from './connection-state';
 import type { MainServices } from './services';
 
 /**
@@ -46,7 +46,7 @@ export async function start(services: MainServices): Promise<void> {
   }
   services.state.listen((event) => {
     if (event.slice === 'tabs' && event.type === 'connection-removed') {
-      forgetStateStore(event.connection);
+      forgetConnectionState(services.dataFolder, event.connection);
       services.state.dispatch({ slice: 'table', type: 'connection-forgotten', connection: event.connection });
     }
   });

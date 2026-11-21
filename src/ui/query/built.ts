@@ -26,6 +26,8 @@ export function isBuilt(element: string): boolean {
     feature.startsWith('query.') ||
     feature.startsWith('table.') ||
     feature.startsWith('aggregate.') ||
-    feature === 'runner.cancel'
+    feature === 'runner.cancel' ||
+    // The queries list is a View of the saved-query area, which the window draws itself.
+    feature === 'saved-query.show'
   );
 }

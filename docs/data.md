@@ -37,6 +37,10 @@ the undo history (`connection.remove`, `undo.forget-connection`); Mongoster left
 `saved-queries/`, what belongs to a collection follows its rename (`manage.rename-collection`) and stays when it is
 dropped ([D34](decisions.md#d34--removing-a-connection-removes-what-datardo-keeps-about-it)).
 
+A pin of a saved query in `pins.json` names its database, collection and name, and may also keep `place` (`me` or
+`folder`), `file` (the path of its file inside the queries folder) and `query` (the query of one for me): optional
+fields of version 1, which an older Datardo leaves out when it reads the file ([Q80](decisions.md#open-questions)).
+
 The Log is kept in memory and is never written to disk ([security](security.md#what-can-go-wrong), T1). Datardo writes
 no crash report and no usage data.
 

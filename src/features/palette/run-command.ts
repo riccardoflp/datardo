@@ -76,8 +76,8 @@ function isKeepUndoOffered(state: AppState, variant: 'stop' | 'keep'): boolean {
 
 /**
  * The commands of a collection tab: the query bar's; the pipeline editor's, which shows the editor first when Find is
- * shown; and the document commands, which act on the selected row or on the collection. With no collection tab
- * active, there is nothing for them to act on.
+ * shown; the document commands, which act on the selected row or on the collection; and the queries of the query bar.
+ * With no collection tab active, there is nothing for them to act on.
  */
 const collectionTabCommands: ReadonlySet<string> = new Set([
   'query.bar',
@@ -103,6 +103,10 @@ const collectionTabCommands: ReadonlySet<string> = new Set([
   'document.delete',
   'document.update-many',
   'document.delete-many',
+  'saved-query.show',
+  'saved-query.save',
+  'saved-query.save:folder',
+  'saved-query.clear-recent',
 ]);
 
 /** What a command's own card says of whether it is offered now. */
@@ -135,6 +139,7 @@ function isOfferedByItsCard(state: AppState, id: string): boolean {
     case 'document.save':
       // A document tab of an existing document, with unsaved changes.
       return active?.shows.kind === 'document' && active.shows.newDocument === undefined && active.unsaved === true;
+    case 'saved-query.choose-folder':
     case 'tree.refresh':
     case 'tree.filter':
       // The tree island shows the current connection: with none, there is nothing to refresh or filter.
