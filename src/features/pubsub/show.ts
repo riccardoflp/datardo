@@ -6,6 +6,7 @@
  * the toolbar, the state, the banner and the status line show; the lists are the views of their own cards. `plan` is
  * what **Pub/Sub** of the tree island and Go to start: it opens the tab, connecting the connection first.
  */
+import type { Json } from '../../shared/engine-request';
 import type { After, Answers, Context, Outcome } from '../../shared/feature';
 import { noDanger, run } from '../../shared/feature';
 import type { ConnectionId } from '../../shared/ids';
@@ -18,8 +19,9 @@ import { isPauseOffered, pauseLabel } from './pause';
 import { bannerOf, secondsToRetry } from './reconnect';
 import type { MenuEntry } from './subscriptions';
 import { text } from './text';
-import type { NameKind, PubSubPage } from './types';
-import { nameText, pageConnectionOf } from './types';
+import { emptyKept } from './keep';
+import type { MessageFilter, NameKind, OplogLink, PubSubPage, Subscription } from './types';
+import { namedSubscription, nameText, openedPage, pageConnectionOf, startArgs, subscriptionArgs } from './types';
 
 /** The tab of the Pub/Sub page of a connection. */
 export function pubsubTab(connection: ConnectionId): TabShows {
@@ -223,8 +225,115 @@ export function isOffered(context: Context, connection: ConnectionId): boolean {
   return savedConnection(context.state.connections, connection)?.engine === 'redis';
 }
 
-/** Feature: pubsub.show — opens the Pub/Sub tab of the Redis connection, connecting it first when it is not. */
-export function plan(context: Context, _answers: Answers): Outcome {
+/**
+ * What the tab keeps of the page (`tab.restore`): the subscriptions, the kind of the field, the filter, **Events of**
+ * and the channel published to last, as text by name. The messages and the pause are not kept.
+ */
+export function pageChoices(page: PubSubPage): Readonly<Record<string, string>> {
+  const marked = page.filter.subscription;
+  return {
+    subscriptions: JSON.stringify(page.subscriptions.map(subscriptionArgs)),
+    nameKind: page.nameKind,
+    filter: page.filter.text,
+    ...(marked === undefined ? {} : { filterSubscription: JSON.stringify(subscriptionArgs(marked)) }),
+    ...(page.eventsOf === undefined ? {} : { eventsOf: page.eventsOf }),
+    ...(page.lastChannel === undefined ? {} : { lastChannel: page.lastChannel }),
+  };
+}
+
+function parsed(text: string | undefined): unknown {
+  try {
+    return text === undefined ? undefined : (JSON.parse(text) as unknown);
+  } catch {
+    // What the tab kept cannot be read: the page starts without it.
+    return undefined;
+  }
+}
+
+function nameKindOf(value: unknown): NameKind {
+  return value === 'channel' || value === 'pattern' ? value : 'auto';
+}
+
+/** The kind of the field and the filter, from what the tab kept or what the page asks to keep. */
+export function choicesAsked(
+  choices: Readonly<Record<string, unknown>>,
+): { readonly nameKind: NameKind; readonly filter: MessageFilter } | undefined {
+  if (choices['nameKind'] === undefined && choices['filter'] === undefined) {
+    return undefined;
+  }
+  const marked = namedSubscription(
+    typeof choices['filterSubscription'] === 'string'
+      ? parsed(choices['filterSubscription'])
+      : choices['filterSubscription'],
+  );
+  const text = typeof choices['filter'] === 'string' ? choices['filter'] : '';
+  return {
+    nameKind: nameKindOf(choices['nameKind']),
+    filter: { text, ...(marked === undefined ? {} : { subscription: marked }) },
+  };
+}
+
+/**
+ * The page of a tab opened or restored, from what the tab kept: its subscriptions, not answered yet; no message; not
+ * paused. `link` is that of the MongoDB connection of **Events of**, when it is still linked.
+ */
+export function restoredPage(
+  connection: ConnectionId,
+  choices: Readonly<Record<string, string>>,
+  offsetMinutes: number,
+  link: OplogLink | undefined,
+): PubSubPage {
+  const listed = parsed(choices['subscriptions']);
+  const subscriptions: Subscription[] = (Array.isArray(listed) ? listed : []).flatMap((each: unknown) => {
+    const named = namedSubscription(each);
+    return named === undefined ? [] : [{ ...named, answered: false, received: 0 }];
+  });
+  const asked = choicesAsked(choices);
+  const eventsOf = link === undefined ? undefined : choices['eventsOf'];
+  return {
+    ...openedPage(connection, offsetMinutes),
+    subscriptions: subscriptions.slice(0, 100),
+    ...(asked ?? {}),
+    ...(eventsOf === undefined ? {} : { eventsOf: eventsOf as ConnectionId }),
+    ...(choices['lastChannel'] === undefined ? {} : { lastChannel: choices['lastChannel'] }),
+    kept: link === undefined ? emptyKept : { ...emptyKept, link },
+  };
+}
+
+/** `{ choices }` from the page: the app step that keeps the kind of the field and the filter with the tab. */
+function choicesPlan(context: Context, choices: Readonly<Record<string, unknown>>): Outcome {
+  const id = pageConnectionOf(context);
+  const connection = id === undefined ? undefined : savedConnection(context.state.connections, id);
+  const steps =
+    connection === undefined
+      ? []
+      : [
+          {
+            kind: 'app' as const,
+            text: text.show.keepStep(connection.name),
+            action: 'pubsub.choices',
+            args: { connection: connection.id, ...(choices as Readonly<Record<string, Json>>) },
+          },
+        ];
+  return run({
+    title: text.show.title,
+    steps,
+    danger: noDanger,
+    undo: { cannot: text.show.nothingWritten },
+    publishes: false,
+    after: [],
+  });
+}
+
+/**
+ * Feature: pubsub.show — opens the Pub/Sub tab of the Redis connection, connecting it first when it is not. The page
+ * starts it with `{ choices }` when the kind of the field or the filter changes, so that they are kept with the tab.
+ */
+export function plan(context: Context, answers: Answers): Outcome {
+  const choices = startArgs(answers)['choices'];
+  if (typeof choices === 'object' && choices !== null) {
+    return choicesPlan(context, choices as Readonly<Record<string, unknown>>);
+  }
   const id = pageConnectionOf(context);
   const connection = id === undefined ? undefined : savedConnection(context.state.connections, id);
   const after: After[] = [];

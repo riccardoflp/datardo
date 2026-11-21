@@ -17,6 +17,7 @@ import { start as startTable } from './table';
 import { start as startPlaygrounds } from './playgrounds';
 import { start as startConsoles } from './consoles';
 import { start as startSavedQueries } from './saved-queries';
+import { start as startPubSub } from './pubsub';
 
 /** What one area does at start. */
 export type AreaStart = (services: MainServices) => Promise<void>;
@@ -35,6 +36,7 @@ const starts: readonly AreaStart[] = [
   startPalette,
   startTable,
   startConsoles,
+  startPubSub,
   startSavedQueries,
   startPing,
   startCheckUpdate,

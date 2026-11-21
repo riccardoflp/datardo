@@ -18,6 +18,7 @@ import { connectionEngines, fullConnectionString, savedConnections, savedOptionS
 import { nodeFileCrypto } from './file-crypto';
 import { keyExportOf, writeKeyExport } from './key-export';
 import { savedQueriesData } from './saved-queries';
+import { messagesFile } from './pubsub-commands';
 
 const formats: readonly ExportFormat[] = ['datardo', 'compass', 'list'];
 const modes: readonly ExportSecrets[] = ['remove', 'include', 'encrypt'];
@@ -50,6 +51,7 @@ function playgroundText(args: Json): Promise<string> {
 const writers: Readonly<Record<string, (args: Json) => Promise<string>>> = {
   'connection.write-file': connectionsFile,
   'playground.text': playgroundText,
+  'pubsub.messages': messagesFile,
 };
 
 /**

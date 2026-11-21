@@ -1355,7 +1355,7 @@ the largest keys, replication, and the configuration as read.
 **Goal**: A page subscribes to channels and patterns, lists the messages as they arrive, pauses, filters, copies and
 exports them, publishes one, and follows the redis-oplog events of a linked MongoDB connection.
 **Depends on**: M11, M14.
-**Status**: planned
+**Status**: done
 
 ### Features
 
@@ -1401,14 +1401,14 @@ exports them, publishes one, and follows the redis-oplog events of a linked Mong
 
 ### Exit criteria
 
-- [ ] A write to a document through a linked MongoDB connection shows as one row of the page that follows its events,
+- [x] A write to a document through a linked MongoDB connection shows as one row of the page that follows its events,
       with the collection, the `_id` and the fields.
-- [ ] The page receiving 5,000 messages a second stays usable and keeps the newest 10,000.
-- [ ] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
+- [x] The page receiving 5,000 messages a second stays usable and keeps the newest 10,000.
+- [x] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
       `npm run test:integration`, `npm run test:ui`; `catalog.py --tests` reports none missing for these cards.
-- [ ] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
+- [x] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
       the keyboard alone (QA15, QA16).
-- [ ] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
+- [x] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
       and this milestone's **Status** is *done*.
 
 ### Not in this milestone

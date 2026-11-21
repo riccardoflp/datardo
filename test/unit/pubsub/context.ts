@@ -68,7 +68,7 @@ export function pubsubState(
     ...base,
     connections: { ...base.connections, live },
     pubsubPages: Object.fromEntries(pages.map((each) => [each.connection, each])),
-  } as AppState;
+  };
 }
 
 /** A context of a feature of the area started on a connection. */

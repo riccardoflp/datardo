@@ -19,8 +19,10 @@ import { actions as tableActions } from './table';
 import { actions as keyActions } from './key';
 import { actions as aggregateActions } from './aggregate';
 import { actions as playgroundActions } from './playground';
+import { actions as saveTabActions } from './save-tab';
 import { actions as consoleActions } from './console';
 import { actions as savedQueryActions } from './saved-query';
+import { actions as pubsubActions } from './pubsub';
 
 /** The actions of one area, by name. */
 export type AreaActions = (services: MainServices) => Readonly<Record<string, AppAction>>;
@@ -41,8 +43,10 @@ const areas: readonly AreaActions[] = [
   keyActions,
   aggregateActions,
   playgroundActions,
+  saveTabActions,
   consoleActions,
   savedQueryActions,
+  pubsubActions,
 ];
 
 /** Every action of every area, by name; two areas never name an action alike. */

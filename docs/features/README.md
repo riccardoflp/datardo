@@ -516,24 +516,24 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`pubsub.show`](pubsub.md#pubsubshow--the-pubsub-page) | The Pub/Sub page | View | M18 | Specified |
-| [`pubsub.subscribe`](pubsub.md#pubsubsubscribe--subscribe-to-a-channel-or-to-a-pattern) | Subscribe to a channel or to a pattern | Operation | M18 | Specified |
-| [`pubsub.subscriptions`](pubsub.md#pubsubsubscriptions--the-list-of-subscriptions) | The list of subscriptions | View | M18 | Specified |
-| [`pubsub.unsubscribe`](pubsub.md#pubsubunsubscribe--remove-a-subscription) | Remove a subscription | Operation | M18 | Specified |
-| [`pubsub.channels`](pubsub.md#pubsubchannels--the-channels-active-on-the-server) | The channels active on the server | Read | M18 | Specified |
-| [`pubsub.messages`](pubsub.md#pubsubmessages--the-list-of-messages) | The list of messages | View | M18 | Specified |
-| [`pubsub.keep`](pubsub.md#pubsubkeep--which-messages-the-list-keeps) | Which messages the list keeps | Derivation | M18 | Specified |
-| [`pubsub.pause`](pubsub.md#pubsubpause--pause-and-resume-the-list) | Pause and resume the list | Operation | M18 | Specified |
-| [`pubsub.clear`](pubsub.md#pubsubclear--clear-the-list-of-messages) | Clear the list of messages | Operation | M18 | Specified |
-| [`pubsub.filter`](pubsub.md#pubsubfilter--filter-the-list-of-messages) | Filter the list of messages | Derivation | M18 | Specified |
-| [`pubsub.inspect`](pubsub.md#pubsubinspect--a-message-in-the-inspector-island) | A message in the inspector island | View | M18 | Specified |
-| [`pubsub.copy`](pubsub.md#pubsubcopy--copy-messages) | Copy messages | Operation | M18 | Specified |
-| [`pubsub.export`](pubsub.md#pubsubexport--export-the-messages-to-a-file) | Export the messages to a file | Operation | M18 | Specified |
-| [`pubsub.publish`](pubsub.md#pubsubpublish--publish-a-message) | Publish a message | Operation | M18 | Specified |
-| [`pubsub.reconnect`](pubsub.md#pubsubreconnect--when-the-pubsub-connection-drops) | When the Pub/Sub connection drops | Operation | M18 | Specified |
-| [`pubsub.follow-oplog`](pubsub.md#pubsubfollow-oplog--follow-the-redis-oplog-events-of-a-mongodb-connection) | Follow the redis-oplog events of a MongoDB connection | Operation | M18 | Specified |
-| [`pubsub.oplog-event`](pubsub.md#pubsuboplog-event--read-a-message-as-a-redis-oplog-event) | Read a message as a redis-oplog event | Derivation | M18 | Specified |
-| [`pubsub.event-rows`](pubsub.md#pubsubevent-rows--one-row-per-event) | One row per event | Derivation | M18 | Specified |
+| [`pubsub.show`](pubsub.md#pubsubshow--the-pubsub-page) | The Pub/Sub page | View | M18 | Built |
+| [`pubsub.subscribe`](pubsub.md#pubsubsubscribe--subscribe-to-a-channel-or-to-a-pattern) | Subscribe to a channel or to a pattern | Operation | M18 | Built |
+| [`pubsub.subscriptions`](pubsub.md#pubsubsubscriptions--the-list-of-subscriptions) | The list of subscriptions | View | M18 | Built |
+| [`pubsub.unsubscribe`](pubsub.md#pubsubunsubscribe--remove-a-subscription) | Remove a subscription | Operation | M18 | Built |
+| [`pubsub.channels`](pubsub.md#pubsubchannels--the-channels-active-on-the-server) | The channels active on the server | Read | M18 | Built |
+| [`pubsub.messages`](pubsub.md#pubsubmessages--the-list-of-messages) | The list of messages | View | M18 | Built |
+| [`pubsub.keep`](pubsub.md#pubsubkeep--which-messages-the-list-keeps) | Which messages the list keeps | Derivation | M18 | Built |
+| [`pubsub.pause`](pubsub.md#pubsubpause--pause-and-resume-the-list) | Pause and resume the list | Operation | M18 | Built |
+| [`pubsub.clear`](pubsub.md#pubsubclear--clear-the-list-of-messages) | Clear the list of messages | Operation | M18 | Built |
+| [`pubsub.filter`](pubsub.md#pubsubfilter--filter-the-list-of-messages) | Filter the list of messages | Derivation | M18 | Built |
+| [`pubsub.inspect`](pubsub.md#pubsubinspect--a-message-in-the-inspector-island) | A message in the inspector island | View | M18 | Built |
+| [`pubsub.copy`](pubsub.md#pubsubcopy--copy-messages) | Copy messages | Operation | M18 | Built |
+| [`pubsub.export`](pubsub.md#pubsubexport--export-the-messages-to-a-file) | Export the messages to a file | Operation | M18 | Built |
+| [`pubsub.publish`](pubsub.md#pubsubpublish--publish-a-message) | Publish a message | Operation | M18 | Built |
+| [`pubsub.reconnect`](pubsub.md#pubsubreconnect--when-the-pubsub-connection-drops) | When the Pub/Sub connection drops | Operation | M18 | Built |
+| [`pubsub.follow-oplog`](pubsub.md#pubsubfollow-oplog--follow-the-redis-oplog-events-of-a-mongodb-connection) | Follow the redis-oplog events of a MongoDB connection | Operation | M18 | Built |
+| [`pubsub.oplog-event`](pubsub.md#pubsuboplog-event--read-a-message-as-a-redis-oplog-event) | Read a message as a redis-oplog event | Derivation | M18 | Built |
+| [`pubsub.event-rows`](pubsub.md#pubsubevent-rows--one-row-per-event) | One row per event | Derivation | M18 | Built |
 
 ## The query bar
 

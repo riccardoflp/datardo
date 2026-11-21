@@ -995,3 +995,26 @@ Raised while the catalog was written; each names the cards that hold the current
   data folder keeps of the connection (the read `connection.remove:counts`, which the main process answers).
   (`saved-query.save`, `saved-query.clear-recent`, `saved-query.choose-folder`, `saved-query.read-folder`,
   `connection.remove`).
+- **Q95** — The Pub/Sub page as built in M18: the rows selected, the row inspected, the name typed, the format of the
+  inspector and the list **Active channels** live in the window; the kind of the field and the filter are kept with
+  the tab 600 ms after the last change, as the Server page keeps its choices, by `pubsub.show` with `{ choices }`,
+  whose app step writes one line in the Log (*keep the kind and the filter of the Pub/Sub page of
+  Cache local with its tab*); **Copy**, **Export…** and their commands in Go to are started with the rows the window
+  has selected and the filter it shows. The page is built as Q34 says (one row per event, 10,000 rows, an empty
+  prefix follows every message), which stays open for the author. (`pubsub.show`, `pubsub.filter`, `pubsub.copy`,
+  `pubsub.export`, `pubsub.inspect`).
+- **Q96** — The file of `pubsub.export` as built in M18: the system's save dialog is a Read of its own,
+  `pubsub.export:file`, which the main process answers with the path or `null`, opened in the Documents folder with
+  the name the card gives; a dialog closed writes no file and notifies nothing. The notification has no **Show in
+  folder**: no feature reveals an exported file (`key.export` has none either), and one would be a card of its own.
+  (`pubsub.export`, `runner.notify`).
+- **Q97** — The Pub/Sub connection as built in M18: `pubsub.follow-oplog`'s step *open the Pub/Sub page of Cache
+  local* opens or activates the tab itself, as `tab.open` does, since a plan started from a step waits in the
+  runner's line behind the plan of that step when neither has an engine step; a page that comes back after its
+  connection closed shows **● Listening** only once the row of the gap is in its list. (`pubsub.follow-oplog`,
+  `pubsub.reconnect`, `runner.run`).
+- **Q98** — The list **Active channels** as built in M18: a refused `PUBSUB CHANNELS` shows the server's own words in
+  the sentences of the card and, as every Read that fails, a notification; the list is then read again only with
+  **Refresh** or a change of its filter, not every 5 seconds, so that the notification does not come back by itself.
+  **Subscribe** on a channel sends its name as `console.reply` writes a string when it needs quotes. (`pubsub.channels`,
+  `runner.notify`).

@@ -22,6 +22,7 @@ import { commands as serverCommands } from './server/commands';
 import { commands as valueCommands } from './value/commands';
 import { commands as consoleCommands } from './console/commands';
 import { commands as savedQueryCommands } from './saved-query/commands';
+import { commands as pubsubCommands } from './pubsub/commands';
 
 import type { Command } from './command';
 
@@ -49,4 +50,5 @@ export const commands: readonly Command[] = [
   ...valueCommands,
   ...consoleCommands,
   ...savedQueryCommands,
+  ...pubsubCommands,
 ];

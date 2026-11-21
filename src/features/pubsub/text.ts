@@ -35,6 +35,8 @@ export const text = {
     noPrefix: (mongo: string, redis: string): string =>
       `${mongo} has no channel prefix: the pattern * receives every message of ${redis}, not only the events of redis-oplog.`,
     nothingWritten: 'Nothing is written: the page only opens.',
+    keepStep: (connection: string): string =>
+      `keep the kind and the filter of the Pub/Sub page of ${connection} with its tab`,
   },
   subscribe: {
     title: (names: string): string => `Subscribe to ${names}`,
@@ -207,6 +209,7 @@ export const text = {
     document: 'Document',
     fields: 'Fields',
     channels: 'Channels',
+    format: 'Format',
     formats: { text: 'Text', json: 'JSON', hex: 'Hexadecimal' },
   },
   commands: {

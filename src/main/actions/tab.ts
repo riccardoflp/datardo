@@ -163,7 +163,8 @@ function keepDraft(services: MainServices, args: Json): Promise<void> {
  * Saves a tab before it closes (`tab.close`, **Save**): the save of its page, as `Ctrl+S` there; a refusal or a
  * failure stops the plan, and the tab stays open with its changes.
  */
-async function saveTab(services: MainServices, args: Json): Promise<void> {
+/** Saves a document tab: `document.save`, or `document.insert-from-tab` for a new document (`tab.save`). */
+export async function saveDocumentTab(services: MainServices, args: Json): Promise<void> {
   const tab = tabOf(services, args);
   const shows = tab.shows;
   if (shows.kind !== 'document') {
@@ -251,6 +252,5 @@ export const actions: AreaActions = (services) => ({
     }),
   'tab.save-session': () => saveTabsNow(services),
   'tab.keep-draft': (args) => keepDraft(services, args),
-  'tab.save': (args) => saveTab(services, args),
   'tab.open-saved': () => openSavedTabs(services),
 });

@@ -20,8 +20,9 @@ import { writeAtomically } from '../storage/store';
 import type { AppStateHolder } from './app-state';
 import type { WindowDialogs } from './dialogs';
 import { keepTabPipeline } from './aggregate';
-import { startWithConsoles } from './console-commands';
 import { consolesReady } from './consoles';
+import { startWithPubSub } from './pubsub-commands';
+import { pubsubReady } from './pubsub';
 import { keepTabQuery } from './query';
 import { withTestFeatures } from './test-features';
 
@@ -40,11 +41,12 @@ export function answerTheBridge(given: RunnerPorts, state: AppStateHolder, dialo
   const ports = process.env['DATARDO_TEST'] === '1' ? withTestFeatures(given) : given;
   readyPorts(ports);
   consolesReady(ports);
+  pubsubReady(ports);
   ipcMain.handle(bridgeChannel.ping, (): PingReply => ({ name: 'Datardo', version: app.getVersion() }));
   ipcMain.handle(bridgeChannel.state, () => state.get());
   ipcMain.handle(bridgeChannel.start, async (_event, intent: Intent) => {
     const started = Date.now();
-    const result = await startWithConsoles(ports, intent);
+    const result = await startWithPubSub(ports, intent);
     keepTabQuery(state, intent, result);
     keepTabPipeline(state, intent, result);
     tellTheSystem(state, Date.now() - started, result.kind === 'failed' ? result.message : undefined);

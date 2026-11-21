@@ -33,6 +33,7 @@ import { writeLog } from '../runner/log';
 import { notify } from '../runner/notify';
 import { connectText } from '../features/connection/text';
 import { consoleOwner } from '../features/console/types';
+import { pubsubOwner } from '../features/pubsub/types';
 import { text as navText } from '../features/nav/text';
 import type { AreaStart } from './areas';
 import type { MainServices } from './services';
@@ -127,7 +128,7 @@ export function findConnection(id: ConnectionId): SavedConnection | undefined {
 
 /** The saved connection a client belongs to: the connection itself, or the one whose console it is. */
 function ownerOf(id: ConnectionId): ConnectionId {
-  return consoleOwner(id) ?? id;
+  return consoleOwner(id) ?? pubsubOwner(id) ?? id;
 }
 
 /** The name of a connection for the messages, the console's client named as its connection; its id when not saved. */

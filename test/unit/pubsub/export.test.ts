@@ -100,12 +100,13 @@ describe('pubsub.export', () => {
     ]);
   });
 
-  it('asks for the file, named pubsub-cache-local-20251117-182000.jsonl, and writes it when one is chosen', () => {
+  it('asks the system’s file dialog for the file, named pubsub-cache-local-20251117-182000.jsonl, and writes it', () => {
     const page = pageOf({ kept: two, selected: [2] });
     const asked = exportOf(page, { messages: 'selected', format: 'jsonl' });
-    expect(asked.kind === 'ask' ? asked.question.fields[0]?.default : undefined).toBe(
-      'pubsub-cache-local-20251117-182000.jsonl',
-    );
+    expect(asked).toEqual({
+      kind: 'read',
+      need: { key: 'file', read: 'pubsub.export:file', args: { name: 'pubsub-cache-local-20251117-182000.jsonl' } },
+    });
     const file = 'C:\\Users\\ada\\Documents\\pubsub-cache-local-20251117-182000.jsonl';
     const planned = planOf(exportOf(page, { messages: 'selected', format: 'jsonl', file }));
     expect(planned.title).toBe('Export 1 message');
@@ -117,9 +118,23 @@ describe('pubsub.export', () => {
     expect(exportFileName('Cache local', now, offset, 'csv')).toBe('pubsub-cache-local-20251117-182000.csv');
   });
 
-  it('writes no file until the form and the file dialog are answered', () => {
+  it('writes no file until the form and the file dialog are answered, and none when either is cancelled', () => {
     expect(exportOf(pageOf({ kept: two }), {}).kind).toBe('ask');
-    expect(exportOf(pageOf({ kept: two }), { messages: 'all', format: 'csv' }).kind).toBe('ask');
+    expect(exportOf(pageOf({ kept: two }), { messages: 'all', format: 'csv' }).kind).toBe('read');
+    const cancelled = planOf(exportOf(pageOf({ kept: two }), { messages: 'all', format: 'csv', file: null }));
+    expect(cancelled.steps).toEqual([]);
+    expect(cancelled.after).toEqual([]);
+  });
+
+  it('offers the rows the window has selected and shows, given with the intent', () => {
+    const page = pageOf({ kept: two });
+    const asked = exportOf(page, { args: { selected: [1], filter: { text: 'paid' } } });
+    const choices = asked.kind === 'ask' ? asked.question.fields[0] : undefined;
+    expect(choices?.kind === 'pick-one' ? choices.choices.map((each) => each.label) : []).toEqual([
+      'The 1 selected',
+      'The 1 shown by the filter',
+      'All 2',
+    ]);
   });
 
   it('refuses an empty list with pubsub.export/empty', () => {

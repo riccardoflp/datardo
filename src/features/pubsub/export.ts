@@ -7,15 +7,26 @@
  * file is written are not in it; the main process writes them with {@link exportedText}.
  */
 import type { Json } from '../../shared/engine-request';
-import type { Answers, Context, Outcome } from '../../shared/feature';
-import { ask, noDanger, refuse, run } from '../../shared/feature';
+import type { Answers, Context, Outcome, ReadFeature } from '../../shared/feature';
+import { ask, needRead, noDanger, refuse, run } from '../../shared/feature';
+import { featureId } from '../../shared/ids';
 import type { Question } from '../../shared/question';
 import { savedConnection } from '../../shared/state/connections';
 import { isFiltering, messageCount, shownMessages } from './filter';
 import { gapText } from './reconnect';
 import { text } from './text';
-import type { Gap, Message, PubSubPage, Row } from './types';
-import { hexOf, localTime, messagesOf, pageConnectionOf, pubsubPageOf, rowsNumbered, textOf } from './types';
+import type { Gap, Message, MessageFilter, PubSubPage, Row } from './types';
+import {
+  hexOf,
+  localTime,
+  messagesOf,
+  namedSubscription,
+  pageConnectionOf,
+  pubsubPageOf,
+  rowsNumbered,
+  startArgs,
+  textOf,
+} from './types';
 
 /** The formats of the file. */
 export type ExportFormat = 'jsonl' | 'json' | 'csv';
@@ -25,6 +36,9 @@ export type ExportedRows = 'selected' | 'shown' | 'all';
 
 /** The extension of each format. */
 export const extensions: Readonly<Record<ExportFormat, string>> = { jsonl: '.jsonl', json: '.json', csv: '.csv' };
+
+/** The identifier of the read of the file, with the system's file dialog. */
+export const fileReadId = 'pubsub.export:file';
 
 /** The writer of the main process that writes the rows a plan names (`FileStep.content`). */
 export const messagesWriter = 'pubsub.messages';
@@ -146,14 +160,6 @@ export function exportQuestion(page: PubSubPage): Question {
   };
 }
 
-function fileQuestion(name: string): Question {
-  return {
-    title: text.export.question,
-    button: text.export.button,
-    fields: [{ kind: 'text', key: 'file', label: text.export.file, default: name }],
-  };
-}
-
 function formatOf(value: unknown): ExportFormat {
   return value === 'json' || value === 'csv' ? value : 'jsonl';
 }
@@ -162,42 +168,80 @@ function baseName(path: string): string {
   return path.split(/[\\/]/u).pop() ?? path;
 }
 
+/**
+ * The page as the window shows it: the rows selected and the filter live in the window, which starts the export with
+ * them (`{ selected, filter }`); without them, those of the page.
+ */
+export function shownPage(page: PubSubPage, args: Readonly<Record<string, unknown>>): PubSubPage {
+  const selected = args['selected'];
+  const filter = args['filter'];
+  const fields =
+    typeof filter === 'object' && filter !== null ? (filter as Readonly<Record<string, unknown>>) : undefined;
+  const marked = namedSubscription(fields?.['subscription']);
+  const shownFilter: MessageFilter | undefined =
+    fields === undefined
+      ? undefined
+      : {
+          text: typeof fields['text'] === 'string' ? fields['text'] : '',
+          ...(marked === undefined ? {} : { subscription: marked }),
+        };
+  return {
+    ...page,
+    ...(Array.isArray(selected) ? { selected: selected.filter((each) => typeof each === 'number') } : {}),
+    ...(shownFilter === undefined ? {} : { filter: shownFilter }),
+  };
+}
+
 /** Feature: pubsub.export — asks which messages and the format, then the file, and writes it. */
 export function plan(context: Context, answers: Answers): Outcome {
   const id = pageConnectionOf(context);
   const connection = id === undefined ? undefined : savedConnection(context.state.connections, id);
-  const page = id === undefined ? undefined : pubsubPageOf(context.state, id);
-  if (connection === undefined || page === undefined || messageCount(page.kept.listed) === 0) {
+  const kept = id === undefined ? undefined : pubsubPageOf(context.state, id);
+  if (connection === undefined || kept === undefined || messageCount(kept.kept.listed) === 0) {
     return refuse('pubsub.export/empty', text.export.empty);
   }
+  const page = shownPage(kept, startArgs(answers));
   if (answers['messages'] === undefined) {
     return ask(exportQuestion(page));
   }
   const format = formatOf(answers['format']);
   const file = answers['file'];
-  if (typeof file !== 'string' || file.trim() === '') {
-    return ask(fileQuestion(exportFileName(connection.name, context.now, page.offsetMinutes, format)));
+  if (file === undefined) {
+    return needRead('file', fileReadId, {
+      name: exportFileName(connection.name, context.now, page.offsetMinutes, format),
+    });
   }
   const choices = rowChoices(page);
   const rows = (choices.find((each) => each.value === answers['messages']) ?? choices[choices.length - 1])?.rows ?? [];
   const messages = messagesOf(rows).filter((each) => each.kind === 'message').length;
+  const chosen = typeof file === 'string' && file !== '';
   return run({
     title: text.export.title(messages),
-    steps: [
-      {
-        kind: 'file',
-        text: `write ${file}`,
-        action: 'write',
-        path: file,
-        content: {
-          writer: messagesWriter,
-          args: { connection: connection.id, format, rows: rows.map((r) => r.number) },
-        },
-      },
-    ],
+    steps: chosen
+      ? [
+          {
+            kind: 'file',
+            text: `write ${file}`,
+            action: 'write',
+            path: file,
+            content: {
+              writer: messagesWriter,
+              args: { connection: connection.id, format, rows: rows.map((r) => r.number) },
+            },
+          },
+        ]
+      : [],
     danger: noDanger,
     undo: { cannot: text.export.cannotUndo },
     publishes: false,
-    after: [{ kind: 'notify', level: 'success', text: text.export.exported(messages, baseName(file)) }],
+    after: chosen ? [{ kind: 'notify', level: 'success', text: text.export.exported(messages, baseName(file)) }] : [],
   });
 }
+
+/** `pubsub.export:file`: the system's save dialog, an app read that answers the path, or null when it was closed. */
+export const fileRead: ReadFeature = {
+  kind: 'read',
+  id: featureId(fileReadId),
+  request: (_context: Context, args: Json) => ({ kind: 'app', action: 'pubsub.choose-file', args }),
+  parse: (replies) => (typeof replies[0] === 'string' ? replies[0] : null),
+};

@@ -109,6 +109,15 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
   the pipeline of the tab for you or as a file of the connection's queries folder in Mongoster's format, rename,
   move, delete, pin, or reveal one; the folder is watched, a file that is not valid is skipped with a warning, and Go
   to finds saved queries by their name.
+- A Redis connection opens a Pub/Sub page, on a connection of its own named `datardo-pubsub`: subscribe to channels
+  and patterns by typing them or from the list of the channels active on the server, and see the messages as they
+  arrive, the newest at the top, with the time they arrived, their channel and what they say; the list keeps the
+  newest 10,000, pauses and resumes, is cleared and filtered, and a message is shown whole in the inspector island.
+  Messages are copied in four ways, exported as JSON Lines, JSON or CSV, and published from a form, which says how many
+  clients received them; a read-only connection subscribes and does not publish. When the page's connection drops,
+  the page says so, subscribes again by itself and marks the gap in the list. **Follow events** on a MongoDB
+  connection linked to Redis shows each redis-oplog event as one row with its operation, collection, document and
+  fields. The subscriptions, the filter and **Events of** come back with the tab.
 
 ### Fixed
 

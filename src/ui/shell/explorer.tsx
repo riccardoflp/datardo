@@ -7,6 +7,7 @@ import { islandElement, switcherElement, view as islandView } from '../../featur
 import type { CurrentConnectionView } from '../../features/nav/connection-island';
 import { currentOf } from '../../features/nav/current-connection';
 import { text } from '../../features/nav/text';
+import { text as pubsubText } from '../../features/pubsub/text';
 import type { NavInput } from '../../features/nav/types';
 import type { ConnectionId } from '../../shared/ids';
 import { ConnectionMenuButton } from '../connection/connection-menu';
@@ -20,6 +21,9 @@ export interface ExplorerProps {
   readonly width: number;
   readonly openSwitcher: () => void;
 }
+
+/** **Follow events** on the linked connection of a MongoDB connection (`pubsub.follow-oplog`). */
+const followEvents = pubsubText.follow.followEvents;
 
 function onConnection(connection: ConnectionId): { readonly kind: 'connection'; readonly connection: ConnectionId } {
   return { kind: 'connection', connection };
@@ -74,31 +78,44 @@ function Current(props: {
         )}
       </div>
       {island.linked.map((row) => (
-        <button
-          key={row.kind === 'connection' ? row.connection : 'more'}
-          type="button"
-          className={styles['linked']}
-          data-feature={row.element}
-          title={row.kind === 'connection' ? row.tooltip : undefined}
-          onClick={() => {
-            if (row.kind === 'more') {
-              props.openSwitcher();
-            } else {
-              startFeature('nav.switch-connection', {
-                place: 'connection-island',
-                args: { connection: row.connection },
-              });
-            }
-          }}
-        >
-          {row.kind === 'connection' ? (
-            <>
-              <span className={styles['dot']} data-dot={row.dot} aria-hidden="true" /> {row.name} · {row.engine}
-            </>
-          ) : (
-            row.label
-          )}
-        </button>
+        <div key={row.kind === 'connection' ? row.connection : 'more'} className={styles['linked-row']}>
+          <button
+            type="button"
+            className={styles['linked']}
+            data-feature={row.element}
+            title={row.kind === 'connection' ? row.tooltip : undefined}
+            onClick={() => {
+              if (row.kind === 'more') {
+                props.openSwitcher();
+              } else {
+                startFeature('nav.switch-connection', {
+                  place: 'connection-island',
+                  args: { connection: row.connection },
+                });
+              }
+            }}
+          >
+            {row.kind === 'connection' ? (
+              <>
+                <span className={styles['dot']} data-dot={row.dot} aria-hidden="true" /> {row.name} · {row.engine}
+              </>
+            ) : (
+              row.label
+            )}
+          </button>
+          {row.kind === 'connection' && current?.engine === 'mongodb' && target !== undefined ? (
+            <button
+              type="button"
+              className={styles['small-button']}
+              data-feature="pubsub.follow-oplog@connection-island"
+              onClick={() => {
+                startFeature('pubsub.follow-oplog', { place: 'connection-island', target });
+              }}
+            >
+              {followEvents}
+            </button>
+          ) : null}
+        </div>
       ))}
     </>
   );
