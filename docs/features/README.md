@@ -845,23 +845,23 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [`value.edit-field`](value.md#valueedit-field--change-the-value-of-a-field) | Change the value of a field | Operation | M14 | Built |
 | [`value.rename-field`](value.md#valuerename-field--rename-a-field-of-a-hash) | Rename a field of a hash | Operation | M14 | Built |
 | [`value.remove-fields`](value.md#valueremove-fields--remove-fields-from-a-hash) | Remove fields from a hash | Operation | M14 | Built |
-| [`value.read-list`](value.md#valueread-list--read-the-elements-of-a-list) | Read the elements of a list | Read | M15 | Specified |
-| [`value.push-element`](value.md#valuepush-element--push-an-element-to-a-list) | Push an element to a list | Operation | M15 | Specified |
-| [`value.edit-element`](value.md#valueedit-element--change-an-element-of-a-list) | Change an element of a list | Operation | M15 | Specified |
-| [`value.remove-elements`](value.md#valueremove-elements--remove-elements-from-a-list) | Remove elements from a list | Operation | M15 | Specified |
-| [`value.trim-list`](value.md#valuetrim-list--trim-a-list) | Trim a list | Operation | M15 | Specified |
-| [`value.read-set`](value.md#valueread-set--read-the-members-of-a-set) | Read the members of a set | Read | M15 | Specified |
-| [`value.add-member`](value.md#valueadd-member--add-a-member-to-a-set) | Add a member to a set | Operation | M15 | Specified |
-| [`value.remove-members`](value.md#valueremove-members--remove-members-from-a-set) | Remove members from a set | Operation | M15 | Specified |
-| [`value.read-sorted-set`](value.md#valueread-sorted-set--read-the-members-of-a-sorted-set) | Read the members of a sorted set | Read | M15 | Specified |
-| [`value.add-scored-member`](value.md#valueadd-scored-member--add-a-member-to-a-sorted-set) | Add a member to a sorted set | Operation | M15 | Specified |
-| [`value.change-score`](value.md#valuechange-score--change-the-score-of-a-member) | Change the score of a member | Operation | M15 | Specified |
-| [`value.remove-scored-members`](value.md#valueremove-scored-members--remove-members-from-a-sorted-set) | Remove members from a sorted set | Operation | M15 | Specified |
-| [`value.read-stream`](value.md#valueread-stream--read-the-entries-of-a-stream) | Read the entries of a stream | Read | M15 | Specified |
-| [`value.add-entry`](value.md#valueadd-entry--add-an-entry-to-a-stream) | Add an entry to a stream | Operation | M15 | Specified |
-| [`value.delete-entries`](value.md#valuedelete-entries--delete-entries-from-a-stream) | Delete entries from a stream | Operation | M15 | Specified |
-| [`value.trim-stream`](value.md#valuetrim-stream--trim-a-stream) | Trim a stream | Operation | M15 | Specified |
-| [`value.stream-groups`](value.md#valuestream-groups--consumer-groups-of-a-stream) | Consumer groups of a stream | View | M15 | Specified |
+| [`value.read-list`](value.md#valueread-list--read-the-elements-of-a-list) | Read the elements of a list | Read | M15 | Built |
+| [`value.push-element`](value.md#valuepush-element--push-an-element-to-a-list) | Push an element to a list | Operation | M15 | Built |
+| [`value.edit-element`](value.md#valueedit-element--change-an-element-of-a-list) | Change an element of a list | Operation | M15 | Built |
+| [`value.remove-elements`](value.md#valueremove-elements--remove-elements-from-a-list) | Remove elements from a list | Operation | M15 | Built |
+| [`value.trim-list`](value.md#valuetrim-list--trim-a-list) | Trim a list | Operation | M15 | Built |
+| [`value.read-set`](value.md#valueread-set--read-the-members-of-a-set) | Read the members of a set | Read | M15 | Built |
+| [`value.add-member`](value.md#valueadd-member--add-a-member-to-a-set) | Add a member to a set | Operation | M15 | Built |
+| [`value.remove-members`](value.md#valueremove-members--remove-members-from-a-set) | Remove members from a set | Operation | M15 | Built |
+| [`value.read-sorted-set`](value.md#valueread-sorted-set--read-the-members-of-a-sorted-set) | Read the members of a sorted set | Read | M15 | Built |
+| [`value.add-scored-member`](value.md#valueadd-scored-member--add-a-member-to-a-sorted-set) | Add a member to a sorted set | Operation | M15 | Built |
+| [`value.change-score`](value.md#valuechange-score--change-the-score-of-a-member) | Change the score of a member | Operation | M15 | Built |
+| [`value.remove-scored-members`](value.md#valueremove-scored-members--remove-members-from-a-sorted-set) | Remove members from a sorted set | Operation | M15 | Built |
+| [`value.read-stream`](value.md#valueread-stream--read-the-entries-of-a-stream) | Read the entries of a stream | Read | M15 | Built |
+| [`value.add-entry`](value.md#valueadd-entry--add-an-entry-to-a-stream) | Add an entry to a stream | Operation | M15 | Built |
+| [`value.delete-entries`](value.md#valuedelete-entries--delete-entries-from-a-stream) | Delete entries from a stream | Operation | M15 | Built |
+| [`value.trim-stream`](value.md#valuetrim-stream--trim-a-stream) | Trim a stream | Operation | M15 | Built |
+| [`value.stream-groups`](value.md#valuestream-groups--consumer-groups-of-a-stream) | Consumer groups of a stream | View | M15 | Built |
 | [`value.copy`](value.md#valuecopy--copy-a-value-or-a-part-of-it) | Copy a value or a part of it | Operation | M14 | Built |
 | [`value.refresh`](value.md#valuerefresh--refresh-a-value) | Refresh a value | Operation | M14 | Built |
 

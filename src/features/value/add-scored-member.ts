@@ -4,7 +4,16 @@
  */
 import type { Answers, Context, Outcome } from '../../shared/feature';
 import { ask, refuse } from '../../shared/feature';
-import { currentReplies, guard, readCurrent, readOnlyRefusal, typedAnswer, writePlan } from './check';
+import {
+  currentReplies,
+  formatChoices,
+  guard,
+  readCurrent,
+  readOnlyRefusal,
+  typedAnswer,
+  typedIn,
+  writePlan,
+} from './check';
 import { scoreText } from './read-sorted-set';
 import { memberText } from './text';
 import { keyOf, nameText, textOf, writeStep } from './types';
@@ -41,11 +50,12 @@ export function plan(context: Context, answers: Answers): Outcome {
       button: 'Add',
       fields: [
         { kind: 'text', key: 'member', label: 'Member' },
+        { kind: 'pick-one', key: 'memberFormat', label: memberText.memberAs, choices: formatChoices, default: 'text' },
         { kind: 'text', key: 'score', label: 'Score', default: '0' },
       ],
     });
   }
-  const member = typedAnswer(answers['member']);
+  const member = typedAnswer(typedIn(answers, 'member', 'memberFormat'));
   if ('problem' in member) {
     return refuse('value.add-scored-member/invalid', member.problem);
   }

@@ -1,7 +1,7 @@
 /**
  * What the runner shows above every island: its dialogs one at a time (`nav.dialog`, `runner.ask`,
  * `runner.confirm`), a question drawn by its feature's own dialog (the insert dialog and the form of **Update many**
- * of the document area), its notifications (`runner.notify`), and the list of work in progress (`runner.progress`).
+ * of the document area, the form of an entry of a stream), its notifications (`runner.notify`), and the list of work in progress (`runner.progress`).
  */
 import { useEffect } from 'react';
 import { view as dialogView } from '../../features/nav/dialog';
@@ -10,6 +10,7 @@ import type { QuestionId } from '../../shared/ids';
 import { InsertDialog } from '../pages/document/insert-dialog';
 import { followInsert } from '../pages/document/insert-memory';
 import { UpdateForm } from '../pages/document/update-form';
+import { EntryForm, isEntryForm } from '../pages/value/entry-form';
 import { useAppState } from '../state/store';
 import { ConfirmationDialog } from './confirmation-dialog';
 import { Notifications } from './notifications';
@@ -38,6 +39,9 @@ function RunnerDialog(): React.JSX.Element | null {
     }
     if (dialog.question.element === 'document.update-many@form') {
       return <UpdateForm key={dialog.id} question={dialog.question} onAnswer={onAnswer} />;
+    }
+    if (isEntryForm(dialog.question)) {
+      return <EntryForm key={dialog.id} question={dialog.question} onAnswer={onAnswer} />;
     }
     return (
       <QuestionDialog

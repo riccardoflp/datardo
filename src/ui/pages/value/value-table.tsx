@@ -2,55 +2,35 @@
  * The table of a value that is not a string (`value.show`): only the rows on screen are drawn. A click selects a row
  * and shows it in the inspector island, `Ctrl` and `Shift` with a click add and extend, the arrows move; a double click,
  * `Enter` or `F2` on a cell that can be changed opens `value.item-editor`, and on a member or an entry says why it
- * cannot; `Delete` removes the selected fields, `Ctrl+C` copies the cell or the rows, `Ctrl+A` selects every row
- * loaded, `Esc` clears; the context menu (`Shift+F10`) copies the cell or the rows, edits, renames and removes. A click
- * on the header of a hash or a set sorts the rows loaded.
+ * cannot; `Delete` removes the selected fields, elements, members or entries, `Ctrl+C` copies the cell or the rows,
+ * `Ctrl+A` selects every row loaded, `Esc` clears; the context menu (`Shift+F10`, `value-menus.ts`) copies the cell or
+ * the rows, edits, renames and removes. A click on the header of a hash or a set sorts the rows loaded.
  */
 import { useRef, useState } from 'react';
-import { selectionAfter, type SelectGesture } from '../../../features/key/select';
-import { rowName, type Column, type ValueRow, type ValueView } from '../../../features/value/show';
-import { hexOf, nameText } from '../../../features/value/types';
-import { KeysMenu, type MenuItem, type OpenKeysMenu } from '../keys/keys-menu';
+import { rowName, type Column, type ValueRow } from '../../../features/value/show';
+import { hexOf } from '../../../features/value/types';
+import { KeysMenu, type OpenKeysMenu } from '../keys/keys-menu';
 import { CellEditor } from './item-editor';
-import { copyCell, copyRows, removeRows, rowsInOrder, selectedRows, cellOf } from './value-actions';
-import { changeValue, type ValueTab } from './value-store';
+import { cellMenuOf, edit, rowMenuOf, select, type ValueTableProps } from './value-menus';
+import { cellOf, copyCell, copyRows, removeRows, rowsInOrder, selectedRows } from './value-actions';
+import { changeValue } from './value-store';
 import styles from './value.module.css';
+
+export type { ValueTableProps } from './value-menus';
 
 /** The height of a row, in px. */
 const rowHeight = 28;
 
-/** What the table starts from its keys (`@table`): the editor, the removal and the copy. */
-const tableElements = ['value.item-editor@table', 'value.remove-fields@table', 'value.copy@table'].join(' ');
-
-/** What the table is drawn with. */
-export interface ValueTableProps {
-  readonly tabId: string;
-  readonly tab: ValueTab;
-  readonly table: NonNullable<ValueView['table']>;
-  readonly readOnly: boolean;
-}
-
-function select(props: ValueTableProps, gesture: SelectGesture, column?: string): void {
-  const names = rowsInOrder(props.tab).map(rowName);
-  changeValue(props.tabId, (now) => ({
-    ...now,
-    selection: selectionAfter(now.selection, gesture, names),
-    ...(column === undefined ? {} : { column }),
-  }));
-}
-
-/** Opens the editor on a cell, or says why the cell cannot be changed. */
-function edit(props: ValueTableProps, row: ValueRow, column: Column | undefined, say: (text: string) => void): void {
-  if (column?.tooltip !== undefined) {
-    say(column.tooltip);
-    return;
-  }
-  if (column?.cell === undefined || props.readOnly) {
-    return;
-  }
-  const cell = column.cell;
-  changeValue(props.tabId, (now) => ({ ...now, editing: { row: hexOf(rowName(row)), column: column.name, cell } }));
-}
+/** What the table starts from its keys (`@table`): the editor, the removals and the copy. */
+const tableElements = [
+  'value.item-editor@table',
+  'value.remove-fields@table',
+  'value.remove-elements@table',
+  'value.remove-members@table',
+  'value.remove-scored-members@table',
+  'value.delete-entries@table',
+  'value.copy@table',
+].join(' ');
 
 /** The column `F2` and `Enter` edit: the one last clicked when it can be changed, else the first that can. */
 function editedColumn(props: ValueTableProps): Column | undefined {
@@ -63,105 +43,6 @@ function editedColumn(props: ValueTableProps): Column | undefined {
         columns[0]);
 }
 
-/** The rows a gesture on a row acts on: the selection when the row is in it, else the row alone. */
-function rowsFor(props: ValueTableProps, row: ValueRow): readonly ValueRow[] {
-  const selected = selectedRows(props.tab);
-  return selected.some((each) => hexOf(rowName(each)) === hexOf(rowName(row))) ? selected : [row];
-}
-
-/** **Edit**, **Rename field…** and **Remove…** of a row of a hash, on a connection that is not read-only. */
-function rowWrites(props: ValueTableProps, row: ValueRow): readonly MenuItem[] {
-  if (props.readOnly || props.tab.type !== 'hash') {
-    return [];
-  }
-  const column = (name: string): Column | undefined => props.table.columns.find((each) => each.name === name);
-  const ignore = (): void => undefined;
-  return [
-    {
-      label: 'Edit',
-      element: 'value.item-editor@row-menu',
-      choose: () => {
-        edit(props, row, column('Value'), ignore);
-      },
-    },
-    {
-      label: 'Rename field…',
-      element: 'value.rename-field@row-menu',
-      choose: () => {
-        edit(props, row, column('Field'), ignore);
-      },
-    },
-  ];
-}
-
-function removal(props: ValueTableProps, row: ValueRow): readonly MenuItem[] {
-  return props.readOnly || props.tab.type !== 'hash'
-    ? []
-    : [
-        {
-          label: 'Remove…',
-          element: 'value.remove-fields@row-menu',
-          choose: () => void removeRows(props.tabId, rowsFor(props, row), 'row-menu'),
-        },
-      ];
-}
-
-/** The context menu of a row (`Shift+F10`): **Edit**, **Rename field…**, **Copy**, **Copy as command**, **Remove…**. */
-export function rowMenuOf(props: ValueTableProps, row: ValueRow, x: number, y: number): OpenKeysMenu {
-  const rows = rowsFor(props, row);
-  const items: readonly MenuItem[] = [
-    ...rowWrites(props, row),
-    {
-      label: 'Copy',
-      element: 'value.copy@row-menu',
-      choose: () => void copyRows(props.tabId, rows, 'rows', 'row-menu'),
-    },
-    {
-      label: 'Copy as command',
-      element: 'value.copy@row-menu',
-      choose: () => void copyRows(props.tabId, rows, 'command', 'row-menu'),
-    },
-    ...removal(props, row),
-  ];
-  return { label: nameText(rowName(row)), x, y, items };
-}
-
-/** The context menu of a cell: **Copy**, **Copy as hexadecimal**, **Copy as command**, then what the row's has. */
-export function cellMenuOf(
-  props: ValueTableProps,
-  row: ValueRow,
-  column: Column,
-  at: { readonly x: number; readonly y: number },
-): OpenKeysMenu {
-  const cell = cellOf(row, column.name);
-  const { tabId } = props;
-  const copies: readonly MenuItem[] =
-    props.tab.type === 'stream'
-      ? []
-      : [
-          {
-            label: 'Copy',
-            element: 'value.copy@cell-menu',
-            choose: () => void copyCell(tabId, cell, 'value', 'cell-menu'),
-          },
-          {
-            label: 'Copy as hexadecimal',
-            element: 'value.copy@cell-menu',
-            choose: () => void copyCell(tabId, cell, 'hex', 'cell-menu'),
-          },
-        ];
-  const items: readonly MenuItem[] = [
-    ...copies,
-    {
-      label: 'Copy as command',
-      element: 'value.copy@cell-menu',
-      choose: () => void copyRows(tabId, [row], 'command', 'cell-menu'),
-    },
-    ...rowWrites(props, row),
-    ...removal(props, row),
-  ];
-  return { label: column.name, x: at.x, y: at.y, items };
-}
 function onTableKey(
   props: ValueTableProps,
   event: React.KeyboardEvent,
@@ -196,7 +77,7 @@ function onTableKey(
             ? () => {
                 edit(props, current, editedColumn(props), say);
               }
-            : event.key === 'Delete' && !props.readOnly && props.tab.type === 'hash'
+            : event.key === 'Delete' && !props.readOnly
               ? () => void removeRows(props.tabId, selectedRows(props.tab), 'table')
               : undefined;
   if (action !== undefined) {

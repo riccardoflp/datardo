@@ -1,19 +1,25 @@
 /**
  * What the controls of a key tab's value start: the writes of a string and of a hash (`value.save-string`,
- * `value.add-field`, `value.edit-field`, `value.rename-field`, `value.remove-fields`), `value.copy` and
- * `value.refresh`, each through the bridge with the key as its target and what the window read as its arguments. The
- * window decides nothing about them (R10.7); it only says under the editor what a write refused or did not save.
+ * `value.add-field`, `value.edit-field`, `value.rename-field`, `value.remove-fields`), the removals of the other types
+ * (`value.remove-elements`, `value.remove-members`, `value.remove-scored-members`, `value.delete-entries`), the writes
+ * of a cell (`value.edit-element`, `value.change-score`), the writes that ask their own form (`value.push-element`,
+ * `value.trim-list`, `value.add-member`, `value.add-scored-member`, `value.add-entry`, `value.trim-stream`),
+ * `value.copy` and `value.refresh`, each through the bridge with the key as its target and what the window read as its
+ * arguments. The window decides nothing about them (R10.7); it only says under the editor what a write refused or did
+ * not save.
  */
 import { shown, type Format } from '../../../features/value/format';
+import type { TypedText } from '../../../features/value/typed-bytes';
 import type { CopyAs } from '../../../features/value/copy';
 import { rowName, sortedRows, type ValueRow } from '../../../features/value/show';
 import { bytesShown } from '../../../features/value/read-string';
-import { hashText } from '../../../features/value/text';
+import { hashText, memberText } from '../../../features/value/text';
 import { hexOf, isValueType, utf8, type ValueType } from '../../../features/value/types';
 import type { IntentResult } from '../../../shared/bridge';
 import type { Json } from '../../../shared/engine-request';
 import { featureId, type Place } from '../../../shared/ids';
-import { keyTarget, messageOf } from './value-reads';
+import { firstArg } from './value-pages';
+import { keyTarget, messageOf } from './value-start';
 import { changeValue, valueTabOf, type ValueTab } from './value-store';
 
 /** Bytes as an argument: `{ hex }`. */
@@ -161,24 +167,120 @@ export async function copyRows(tab: string, rows: readonly ValueRow[], as: CopyA
   await start(state, 'value.copy', place, { as, type, items });
 }
 
-/** **Remove…**: the fields of the rows, after the confirmation (`value.remove-fields`). */
+/** The 32 hexadecimal digits of the marker of `value.remove-elements`, drawn for each removal. */
+function drawnMarker(): string {
+  return hexOf(crypto.getRandomValues(new Uint8Array(16)));
+}
+
+/** The removal each type starts, with the rows as its arguments. */
+function removalOf(type: string, rows: readonly ValueRow[]): readonly [string, Json] | undefined {
+  const names = rows.map((row) => hexJson(rowName(row)));
+  switch (type) {
+    case 'hash':
+      return ['value.remove-fields', { fields: names }];
+    case 'list': {
+      const elements = rows.map((row) => ({
+        index: Number(row.cells['Index']),
+        element: hexJson(cellBytes(row, 'Element')),
+      }));
+      return ['value.remove-elements', { elements, marker: drawnMarker() }];
+    }
+    case 'set':
+      return ['value.remove-members', { members: names }];
+    case 'zset':
+      return ['value.remove-scored-members', { members: names }];
+    case 'stream':
+      return ['value.delete-entries', { ids: rows.map((row) => row.entry?.id ?? '') }];
+    default:
+      return undefined;
+  }
+}
+
+/**
+ * **Remove…** (**Delete entry…** of a stream): the fields, elements, members or entries of the rows, after the
+ * confirmation (`value.remove-fields`, `value.remove-elements`, `value.remove-members`, `value.remove-scored-members`,
+ * `value.delete-entries`).
+ */
 export async function removeRows(tab: string, rows: readonly ValueRow[], place: From): Promise<void> {
   const state = valueTabOf(tab);
-  if (state?.type !== 'hash' || rows.length === 0) {
+  const removal = state === undefined || rows.length === 0 ? undefined : removalOf(state.type, rows);
+  if (state !== undefined && removal !== undefined) {
+    await start(state, removal[0], place, removal[1]);
+  }
+}
+
+/** The writes of a toolbar that ask their own form, by the type of the value. */
+export type FormWrite =
+  | 'value.add-field'
+  | 'value.push-element'
+  | 'value.trim-list'
+  | 'value.add-member'
+  | 'value.add-scored-member'
+  | 'value.add-entry'
+  | 'value.trim-stream';
+
+/**
+ * **Push…**, **Trim…**, **Add member** or **Add entry**: the form of the write. A new entry of a stream read newest
+ * first is the first row once it is read again, and is selected; **Add a copy…** gives the pairs of an entry.
+ */
+export async function startForm(
+  tab: string,
+  feature: FormWrite,
+  place: From = 'toolbar',
+  args: Json = null,
+): Promise<void> {
+  const state = valueTabOf(tab);
+  if (state === undefined) {
     return;
   }
-  await start(state, 'value.remove-fields', place, { fields: rows.map((row) => hexJson(rowName(row))) });
+  const newestFirst = feature === 'value.add-entry' && firstArg(state, 'order') !== 'oldest';
+  if (newestFirst) {
+    changeValue(tab, (now) => ({ ...now, selectFirst: true }));
+  }
+  const result = await start(state, feature, place, args);
+  if (newestFirst && result.kind !== 'done') {
+    changeValue(tab, ({ selectFirst: _selectFirst, ...now }) => now);
+  }
 }
 
 /** **Add field**: the form of `value.add-field`. */
 export async function addField(tab: string, place: From = 'toolbar'): Promise<void> {
-  const state = valueTabOf(tab);
-  if (state !== undefined) {
-    await start(state, 'value.add-field', place, null);
+  await startForm(tab, 'value.add-field', place);
+}
+
+/** The write of the cell being edited, with what the window read of its row: the name, the bytes or score shown. */
+function cellWrite(cell: string, row: ValueRow, typed: TypedText): readonly [string, Json] {
+  const value = { text: typed.text, format: typed.format };
+  switch (cell) {
+    case 'name':
+      return ['value.rename-field', { field: hexJson(rowName(row)), name: value }];
+    case 'element':
+      return [
+        'value.edit-element',
+        { index: Number(row.cells['Index']), loaded: hexJson(cellBytes(row, 'Element')), value },
+      ];
+    case 'score': {
+      const score = row.cells['Score'];
+      const loaded = typeof score === 'string' ? score : '';
+      return ['value.change-score', { member: hexJson(cellBytes(row, 'Member')), loaded, score: typed.text }];
+    }
+    default:
+      return ['value.edit-field', { field: hexJson(rowName(row)), loaded: hexJson(cellBytes(row, 'Value')), value }];
   }
 }
 
-/** **Save** of the item editor: the value of a field (`value.edit-field`) or its name (`value.rename-field`). */
+/** What the editor says when the question **Overwrite** was closed; none for a write that asks no question. */
+function notSavedOf(cell: string): string | undefined {
+  if (cell === 'name' || cell === 'element') {
+    return undefined;
+  }
+  return cell === 'score' ? memberText.notSavedScore : hashText.notSaved;
+}
+
+/**
+ * **Save** of the item editor: the value of a field (`value.edit-field`), its name (`value.rename-field`), an element
+ * (`value.edit-element`) or a score (`value.change-score`).
+ */
 export async function saveCell(tab: string, text: string, format: Format, place: From = 'editor'): Promise<void> {
   const state = valueTabOf(tab);
   const editing = state?.editing;
@@ -186,15 +288,8 @@ export async function saveCell(tab: string, text: string, format: Format, place:
   if (state === undefined || editing === undefined || row === undefined) {
     return;
   }
-  const field = hexJson(rowName(row));
-  const result =
-    editing.cell === 'name'
-      ? await start(state, 'value.rename-field', place, { field, name: { text, format } })
-      : await start(state, 'value.edit-field', place, {
-          field,
-          loaded: hexJson(cellBytes(row, 'Value')),
-          value: { text, format },
-        });
+  const [feature, args] = cellWrite(editing.cell, row, { text, format });
+  const result = await start(state, feature, place, args);
   changeValue(tab, (now) => {
     if (now.editing === undefined) {
       return now;
@@ -204,10 +299,11 @@ export async function saveCell(tab: string, text: string, format: Format, place:
       return rest;
     }
     const { refused: _refused, ...open } = now.editing;
-    if (result.kind === 'cancelled' && editing.cell === 'name') {
+    const notSaved = notSavedOf(editing.cell);
+    if (result.kind === 'cancelled' && notSaved === undefined) {
       return { ...now, editing: { ...open, typed: text } };
     }
-    const refused = result.kind === 'cancelled' ? hashText.notSaved : messageOf(result);
+    const refused = result.kind === 'cancelled' ? (notSaved ?? '') : messageOf(result);
     return { ...now, editing: { ...open, typed: text, refused } };
   });
 }

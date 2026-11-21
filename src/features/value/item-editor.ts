@@ -86,6 +86,9 @@ export function cellEditing(
   if (type === 'stream') {
     return { tooltip: viewText.entryFixed };
   }
+  if (type === 'zset' && column === 'Member') {
+    return { tooltip: viewText.memberFixed };
+  }
   if (readOnly) {
     return {};
   }

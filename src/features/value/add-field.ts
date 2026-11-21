@@ -4,16 +4,18 @@
  */
 import type { Answers, Context, Outcome } from '../../shared/feature';
 import { ask, refuse } from '../../shared/feature';
-import { currentReplies, guard, readCurrent, readOnlyRefusal, typedAnswer, writePlan } from './check';
+import {
+  currentReplies,
+  formatChoices,
+  guard,
+  readCurrent,
+  readOnlyRefusal,
+  typedAnswer,
+  typedIn,
+  writePlan,
+} from './check';
 import { hashText } from './text';
 import { keyOf, nameText, replyNumber, writeStep } from './types';
-
-/** The formats a text of the form is typed in, as **Field as** and **Value as** offer them. */
-const formatChoices = [
-  { value: 'text', label: 'Text' },
-  { value: 'json', label: 'JSON' },
-  { value: 'hex', label: 'Hex' },
-];
 
 /**
  * The form **Add a field to user:7**: **Field** and **Value**, each typed as text, JSON or hexadecimal, as chosen in
@@ -30,12 +32,6 @@ function addForm(key: string): Outcome {
       { kind: 'pick-one', key: 'valueFormat', label: hashText.valueAs, choices: formatChoices, default: 'text' },
     ],
   });
-}
-
-/** What was typed in a text of the form, with the format chosen beside it; `{ text, format }` as a window sends it. */
-function typedIn(answers: Answers, name: string, format: string): unknown {
-  const given = answers[name];
-  return typeof given === 'string' ? { text: given, format: answers[format] ?? 'text' } : given;
 }
 
 /**

@@ -116,6 +116,28 @@ describe('value.show', () => {
     expect(show.columnsOf('zset', { ranged: true })).toEqual(['Member', 'Score']);
     expect(show.columnsOf('zset', {})).toEqual(['Rank', 'Member', 'Score']);
   });
+
+  it('says how many members a range of scores holds, and that the list has no element beyond its end', () => {
+    const zset = { ...hashState(), key: 'board', type: 'zset', count: 300, rows: [] };
+    const ranged = show.view({
+      ...zset,
+      ranged: true,
+      inRange: 12,
+      rows: [{ cells: { Member: utf8('ada'), Score: '1' } }],
+    });
+    expect(ranged.table?.note).toBe('12 members of 300');
+    const beyond = 'There is no element at index 5000: the list has 1,204 elements.';
+    const list = show.view({ ...hashState(), key: 'queue:mail', type: 'list', count: 1204, rows: [], beyond });
+    expect(list.table?.note ?? list.message?.text).toBe(beyond);
+  });
+
+  it('opens no editor on a member of a sorted set, with its tooltip, and opens one on its score', () => {
+    const rows = [{ cells: { Rank: '0', Member: utf8('ada'), Score: '1.5' } }];
+    const view = show.view({ ...hashState(), key: 'board', type: 'zset', count: 1, rows });
+    const member = view.table?.columns.find((column) => column.name === 'Member');
+    expect(member?.tooltip).toBe('A member cannot be changed: remove it and add another.');
+    expect(view.table?.columns.find((column) => column.name === 'Score')?.cell).toBe('score');
+  });
 });
 
 describe('value.item-editor', () => {

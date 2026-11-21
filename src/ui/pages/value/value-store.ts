@@ -9,6 +9,7 @@ import { noSelection, type KeySelection } from '../../../features/key/select';
 import type { Format } from '../../../features/value/format';
 import type { EditedCell } from '../../../features/value/item-editor';
 import type { ScanState } from '../../../features/value/read-hash';
+import type { GroupsState } from '../../../features/value/stream-groups';
 import type { StringLoad } from '../../../features/value/read-string';
 import type { ValueRow } from '../../../features/value/show';
 import type { Json } from '../../../shared/engine-request';
@@ -60,6 +61,25 @@ export interface ValueTab {
   readonly scan?: ScanState<ValueRow>;
   /** The arguments of **Load more** for a list, a sorted set or a stream; none when everything is loaded. */
   readonly next?: Json;
+  /**
+   * The arguments of the first page of a list, a sorted set or a stream, as the toolbar last set them (the end, the
+   * order, **Go to index**, the range of scores or of IDs); none for the type's default. A refresh reads them again.
+   */
+  readonly first?: Json;
+  /** What is typed in the toolbar's fields, by label: **Go to index**, **Min score**, **Max score**, **From**, **To**. */
+  readonly typed: Readonly<Record<string, string>>;
+  /** What a read started from the toolbar refused (an index, a score, an ID that cannot be read), under the toolbar. */
+  readonly problem?: string;
+  /** **Go to index** beyond the ends of a list: *No element at index 5000: the list has 1,204.* */
+  readonly beyond?: string;
+  /** How many members the range of scores of a sorted set holds (`ZCOUNT`). */
+  readonly inRange?: number;
+  /** The section of a stream's key tab: **Entries** or **Groups** (`value.stream-groups`). */
+  readonly section: 'entries' | 'groups';
+  /** What the **Groups** section has read, and the group and consumer selected. */
+  readonly groups?: GroupsState;
+  /** The first row is selected once the first page is read again: an entry just added, newest first. */
+  readonly selectFirst?: boolean;
   readonly loadingMore: boolean;
   /** What is typed in **Filter fields**, and the filter the rows were read with. */
   readonly field: string;
@@ -112,6 +132,8 @@ export function freshValue(where: ValueWhere, refreshes: number): ValueTab {
     fieldExpiry: false,
     selection: noSelection,
     choices: {},
+    typed: {},
+    section: 'entries',
     ownRefresh: false,
     refreshes,
   };

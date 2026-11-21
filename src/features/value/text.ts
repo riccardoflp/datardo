@@ -104,6 +104,7 @@ export const listText = {
   pushForm: (key: string): string => `Push to ${key}`,
   pushTitle: (key: string): string => `Push to ${key}`,
   pushed: (end: 'head' | 'tail', key: string): string => `Pushed an element to the ${end} of ${key}.`,
+  elementAs: 'Element as',
   editTitle: (index: number, key: string): string => `Edit element ${String(index)} of ${key}`,
   saved: (index: number, key: string): string => `Saved the element ${String(index)} of ${key}.`,
   changed: (index: number, key: string): string =>
@@ -129,6 +130,7 @@ export const listText = {
 /** The texts of the writes to sets and sorted sets. */
 export const memberText = {
   addForm: (key: string): string => `Add a member to ${key}`,
+  memberAs: 'Member as',
   addTitle: (member: string, key: string): string => `Add member ${member} to ${key}`,
   added: (member: string, key: string): string => `Added the member ${member} to ${key}.`,
   exists: (member: string, key: string): string => `${member} is already a member of ${key}.`,
@@ -148,6 +150,9 @@ export const streamText = {
   addForm: (key: string): string => `Add an entry to ${key}`,
   addTitle: (key: string): string => `Add entry to ${key}`,
   added: (id: string, key: string): string => `Added the entry ${id} to ${key}.`,
+  /** Before the server answers with the ID it gave (Q58): the notification knows no ID. */
+  addedNew: (key: string): string => `Added an entry to ${key}.`,
+  idNotGreater: (last: string): string => `The ID must be greater than the last one, ${last}.`,
   noPair: 'An entry needs at least one field with a name.',
   badId: 'Enter *, or an ID such as 1700000000000-0.',
   needsFullId: 'This server needs * or a full ID.',

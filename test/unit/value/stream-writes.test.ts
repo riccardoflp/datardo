@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import * as addEntry from '../../../src/features/value/add-entry';
 import * as deleteEntries from '../../../src/features/value/delete-entries';
 import * as trimStream from '../../../src/features/value/trim-stream';
+import { hexOf } from '../../../src/features/value/types';
 import {
   detailOf,
   keyContext,
@@ -12,6 +13,7 @@ import {
   refusalOf,
   stepTexts,
   typed,
+  utf8,
 } from './context';
 
 describe('value.add-entry', () => {
@@ -33,9 +35,40 @@ describe('value.add-entry', () => {
     ]);
   });
 
+  /** The reply of `XINFO STREAM events`, as RESP2 gives it: names and values in turn. */
+  const info = (last: string): readonly unknown[] => [[utf8('length'), 2, utf8('last-generated-id'), utf8(last)]];
+
   it('sends an ID 1700000000000-5 in the place of *', () => {
-    const outcome = addEntry.plan(context, { pairs, id: '1700000000000-5', ...readAnswers('stream') });
+    const answers = { pairs, id: '1700000000000-5' };
+    expect(neededCommands(addEntry.plan(context, { ...answers, ...readAnswers('stream') }), context)).toEqual([
+      'XINFO STREAM events',
+    ]);
+    const outcome = addEntry.plan(context, { ...answers, ...readAnswers('stream', info('1700000000000-4')) });
     expect(stepTexts(outcome)).toEqual(['XADD events NOMKSTREAM 1700000000000-5 type signup user 7']);
+    expect(planOf(outcome).after[0]).toMatchObject({
+      kind: 'notify',
+      text: 'Added the entry 1700000000000-5 to events.',
+    });
+  });
+
+  it('refuses an ID that is not greater than the last one', () => {
+    const answers = { pairs, id: '1700000000000-4', ...readAnswers('stream', info('1700000000000-4')) };
+    expect(refusalOf(addEntry.plan(context, answers))).toEqual({
+      code: 'value.add-entry/invalid',
+      message: 'The ID must be greater than the last one, 1700000000000-4.',
+    });
+    expect(addEntry.isAfterLast('1700000000000-*', '1700000000000-4')).toBe(true);
+    expect(addEntry.isAfterLast('1699999999999-*', '1700000000000-4')).toBe(false);
+    expect(addEntry.isAfterLast('1-1', '0-0')).toBe(true);
+  });
+
+  it('opens the form of Add a copy… with the fields of the entry', () => {
+    const copy = [{ field: { hex: hexOf(utf8('type')) }, value: { hex: '00ff' } }];
+    const outcome = addEntry.plan(context, { copy });
+    expect(outcome.kind === 'ask' && outcome.question.about).toEqual({
+      form: 'value.add-entry',
+      pairs: [{ field: { text: 'type', format: 'text' }, value: { text: '00 ff', format: 'hex' } }],
+    });
   });
 
   it('refuses a form without a pair, and an ID that is not one', () => {
