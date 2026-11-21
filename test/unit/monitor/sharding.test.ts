@@ -8,6 +8,8 @@ import {
   type ShardingServer,
 } from '../../../src/features/monitor/read-sharding';
 import { parse as parseEvents } from '../../../src/features/monitor/read-sharding-events';
+import { isWordColumn, unsortedColumns } from '../../../src/features/monitor/parts/sharding-tables';
+import { nextSort } from '../../../src/features/monitor/parts/tiles';
 import { clockText } from '../../../src/features/monitor/parts/units';
 import { view, type ClusterView, type ShardingState } from '../../../src/features/monitor/sharding';
 import type { MonitorConnection } from '../../../src/features/monitor/types';
@@ -167,6 +169,13 @@ describe('monitor.sharding', () => {
     expect(shown.collections.rows.map((row) => row.namespace)).toEqual(['shop.orders']);
     expect(shown.collections.count).toBe('1 of 3 collections');
     expect(clusterView({ collectionFilter: 'nothing' }).collections.empty).toBe('No collection matches the filter.');
+  });
+
+  it('sorts Chunks the largest first and Namespace from A on a first click, and not Distribution', () => {
+    expect(nextSort(undefined, 'chunks', isWordColumn)).toEqual({ column: 'chunks', descending: true });
+    expect(nextSort(undefined, 'namespace', isWordColumn)).toEqual({ column: 'namespace', descending: false });
+    expect(nextSort({ column: 'chunks', descending: true }, 'chunks', isWordColumn).descending).toBe(false);
+    expect(unsortedColumns).toEqual(['chunksPerShard', 'distribution']);
   });
 
   it('lists a shard removed since that still owns chunks in the tooltip of Distribution, without a color', () => {

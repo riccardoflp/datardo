@@ -18,7 +18,7 @@ import { shardingText, type ShardingReply } from './tool/sharding';
 import { connectionProp, endOf, groupOf, integerProp } from './tool/schemas';
 import { isFailed, type ToolCall, type ToolEnd, type ToolStep } from './types';
 
-/** The app action the monitor answers on a mongos (`monitor.sharding`, not on this branch). */
+/** The app action the main process answers on a mongos with the reads of the Sharding section (`monitor.sharding`). */
 export const shardingAction = 'monitor.sharding';
 
 /** The server's message without the command it quotes, and the role it needs when it is a missing privilege. */

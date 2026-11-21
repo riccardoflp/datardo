@@ -19,12 +19,16 @@ export interface GridColumn {
   readonly onSort?: () => void;
 }
 
-/** A cell: its text, its tooltip, its color, and the marks after its text (**Datardo**, **this page**). */
+/**
+ * A cell: its text, its tooltip, its color, the marks after its text (**Datardo**, **this page**), and what is drawn
+ * before its text (the color of a shard, a bar), which says nothing the text and the tooltip do not.
+ */
 export interface GridCell {
   readonly text: string;
   readonly title?: string | undefined;
   readonly tone?: Tone | 'dim' | undefined;
   readonly marks?: readonly string[];
+  readonly lead?: React.ReactNode;
 }
 
 /** A row, by what names it. */
@@ -141,6 +145,7 @@ function Row(props: { readonly grid: ServerGridProps; readonly row: GridRow; rea
           title={cell.title ?? cell.text}
           data-tone={cell.tone}
         >
+          {cell.lead}
           {cell.text}
           {(cell.marks ?? []).map((mark) => (
             <span key={mark} className={styles['mark']}>
@@ -176,7 +181,9 @@ export function ServerGrid(props: ServerGridProps): React.JSX.Element {
   const [range, setRange] = useState({ first: 0, count: 40 });
   const rows = props.rows;
   const current = rows.findIndex((row) => row.selected);
-  const height = props.fill === true ? undefined : (Math.min(rows.length, 10) + 1) * rowHeight + 2;
+  // Up to 10 rows the table takes the height of its rows, and of its horizontal scroll bar when it has one; a fixed
+  // height would let the scroll bar hide the last row under the header.
+  const height = props.fill === true || rows.length <= 10 ? undefined : 11 * rowHeight + 2;
   return (
     <div
       ref={scroller}

@@ -1,0 +1,112 @@
+/* What the Stats, Replication and Sharding sections of the Monitor page draw besides the Server page's pieces: the
+   line of a tile (`monitor.rates`), the colors of the shards and the Distribution bar (`monitor.sharding`). */
+
+.line {
+  display: block;
+  width: 100%;
+  height: calc(var(--space-3) * 2);
+  overflow: visible;
+}
+
+.line polyline {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: var(--border-width);
+  vector-effect: non-scaling-stroke;
+}
+
+/* A section of several tables keeps its height and the panel scrolls; each table scrolls within its own height. */
+.parts {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.parts > * {
+  flex-shrink: 0;
+}
+
+.parts > section {
+  max-height: calc(var(--space-6) * 14);
+}
+
+.heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.distribution {
+  display: flex;
+  width: 100%;
+  height: var(--space-2);
+  border-radius: var(--radius-small);
+  background: var(--color-border);
+  overflow: hidden;
+}
+
+.swatch {
+  display: inline-block;
+  width: var(--space-2);
+  height: var(--space-2);
+  margin-right: var(--space-1);
+  border-radius: var(--radius-small);
+  background: var(--color-border);
+}
+
+[data-color='0'] {
+  background: var(--color-chart-1);
+}
+
+[data-color='1'] {
+  background: var(--color-chart-2);
+}
+
+[data-color='2'] {
+  background: var(--color-chart-3);
+}
+
+[data-color='3'] {
+  background: var(--color-chart-4);
+}
+
+[data-color='4'] {
+  background: var(--color-chart-5);
+}
+
+[data-color='5'] {
+  background: var(--color-chart-6);
+}
+
+[data-color='6'] {
+  background: var(--color-chart-7);
+}
+
+[data-color='7'] {
+  background: var(--color-chart-8);
+}
+
+[data-color='8'] {
+  background: var(--color-chart-9);
+}
+
+[data-color='9'] {
+  background: var(--color-chart-10);
+}
+
+[data-color='10'] {
+  background: var(--color-chart-11);
+}
+
+[data-color='11'] {
+  background: var(--color-chart-12);
+}
+
+.status {
+  margin: 0;
+  padding: var(--space-2);
+  border: var(--border-width) solid var(--color-accent);
+  border-radius: var(--radius-small);
+}

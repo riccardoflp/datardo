@@ -1,23 +1,63 @@
 /**
  * What each Monitor page tab keeps in the window alone (`monitor.show`): the last read of each part of the page, the
  * requests of each part, the choices of its controls, what is selected in each section, the values typed in the
- * controls of the profiler and of the threshold, and what its Operations are doing. A tab's state lives until Datardo
- * quits or the tab is closed; the section and the choices are kept with the tab (`tab.restore`).
+ * controls of the profiler and of the threshold, the history of the lines of the Stats section (`monitor.rates`), and
+ * what its Operations are doing. A tab's state lives until Datardo quits or the tab is closed; the section and the
+ * choices are kept with the tab (`tab.restore`).
  */
 import { useSyncExternalStore } from 'react';
 import type { MonitorChoices } from '../../../features/monitor/parts/choices';
 import type { PartRead } from '../../../features/monitor/parts/failure';
+import type { ShardedCluster } from '../../../features/monitor/parts/sharding-records';
+import type { RatesResult } from '../../../features/monitor/rates';
+import type { CollectionStats } from '../../../features/monitor/read-collection-stats';
+import type { DatabaseStats } from '../../../features/monitor/read-database-stats';
 import type { ServerOperation } from '../../../features/monitor/read-operations';
+import type { OplogEntries } from '../../../features/monitor/read-oplog';
+import type { ReplicaSetRead, ServerKind } from '../../../features/monitor/read-replication';
+import type { ServerStatus } from '../../../features/monitor/read-server-status';
+import type { ShardingEvent } from '../../../features/monitor/read-sharding-events';
+import type { ShardingServer } from '../../../features/monitor/read-sharding';
 import type { SlowQueriesRead } from '../../../features/monitor/read-slow-queries';
 import type { MonitorPart, PartRequests } from '../../../features/monitor/show';
 import type { MonitorSection } from '../../../features/monitor/types';
 import type { Json } from '../../../shared/engine-request';
 import type { ConnectionId } from '../../../shared/ids';
 
-/** What is selected in each section: an operation by its opid, a group by its key or an operation by its place. */
+/**
+ * What is selected in each section: an operation by its opid, a group by its key or an operation by its place, a
+ * collection of the Stats section by its name, a member or an oplog entry, a shard, a sharded collection or an event.
+ */
 export interface MonitorSelection {
   readonly operation?: number | string;
   readonly slow?: { readonly group: string } | { readonly operation: number };
+  readonly statsCollection?: string;
+  readonly replication?: { readonly kind: 'member' | 'entry'; readonly key: string };
+  readonly sharding?: { readonly kind: 'shard' | 'collection' | 'event'; readonly key: string };
+}
+
+/** What the Stats section read: the server, its rates and lines, the databases, the collections of one. */
+export interface StatsReads {
+  readonly server?: PartRead<ServerStatus>;
+  readonly rates?: RatesResult;
+  readonly databases?: PartRead<readonly DatabaseStats[]>;
+  readonly collections?: PartRead<readonly CollectionStats[]>;
+  /** The database whose collections were read. */
+  readonly collectionsOf?: string;
+}
+
+/** What the Replication section read: what `hello` says the server is, the replica set, the oplog's entries. */
+export interface ReplicationReads {
+  readonly server?: PartRead<ServerKind>;
+  readonly replicaSet?: ReplicaSetRead;
+  readonly oplog?: PartRead<OplogEntries>;
+}
+
+/** What the Sharding section read: the kind of server, the cluster merged with the last full read, the events. */
+export interface ShardingReads {
+  readonly server?: PartRead<ShardingServer>;
+  readonly cluster?: ShardedCluster;
+  readonly events?: PartRead<readonly ShardingEvent[]>;
 }
 
 /** The values typed in the controls of the Slow queries section, before **Apply**. */
@@ -52,6 +92,11 @@ export interface MonitorTab {
   readonly drafts: SlowDrafts;
   /** The error line of an Operation of a section, by section. */
   readonly operationErrors: Partial<Readonly<Record<MonitorSection, string>>>;
+  /** What an Operation of a section says once it ran (*The balancer is stopped.*), by section. */
+  readonly notices: Partial<Readonly<Record<MonitorSection, string>>>;
+  readonly stats: StatsReads;
+  readonly replication: ReplicationReads;
+  readonly sharding: ShardingReads;
 }
 
 const tabs = new Map<string, MonitorTab>();
@@ -82,6 +127,10 @@ export function freshMonitorTab(connection: ConnectionId, choices: MonitorChoice
     killing: [],
     drafts: {},
     operationErrors: {},
+    notices: {},
+    stats: {},
+    replication: {},
+    sharding: {},
   };
 }
 

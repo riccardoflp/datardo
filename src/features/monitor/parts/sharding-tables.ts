@@ -18,6 +18,14 @@ export type CollectionColumn = keyof typeof text.sharding.collections.columns;
 /** The columns of **Sharded collections** that do not sort. */
 export const unsortedColumns: readonly CollectionColumn[] = ['chunksPerShard', 'distribution'];
 
+/** The columns of **Sharded collections** that hold numbers, which a first click sorts the largest first. */
+const numberColumns: readonly CollectionColumn[] = ['chunks', 'data', 'documents', 'jumbo'];
+
+/** Whether a column of **Sharded collections** holds words, which a first click sorts from A. */
+export function isWordColumn(column: CollectionColumn): boolean {
+  return !numberColumns.includes(column);
+}
+
 /** A row of **Shards**. */
 export interface ShardRow {
   readonly shard: string;

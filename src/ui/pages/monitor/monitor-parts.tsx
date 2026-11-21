@@ -8,6 +8,7 @@ import type { Json } from '../../../shared/engine-request';
 import type { Place } from '../../../shared/ids';
 import { startFeature } from '../../shell/intent';
 import { killOperation, runSlowOperation } from './monitor-reads';
+import { runSectionOperation } from './monitor-section-operations';
 import { monitorTabOf } from './monitor-store';
 import styles from '../server/server-page.module.css';
 
@@ -47,6 +48,11 @@ export function act(tab: string, control: SectionControl, fallback: Place): void
     case 'monitor.set-log-threshold':
     case 'monitor.create-suggested-index':
       void runSlowOperation(tab, control.feature, control.args, place);
+      return;
+    case 'monitor.step-down':
+    case 'monitor.set-balancer':
+    case 'monitor.set-collection-balancing':
+      void runSectionOperation(tab, control.feature, control.args, place);
       return;
     default: {
       const state = monitorTabOf(tab);

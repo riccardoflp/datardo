@@ -18,13 +18,14 @@ import { isToolTab } from '../../../src/features/mcp/tool/read-only';
 import { mcpActions } from '../../../src/features/mcp/types';
 import { runnableFeatures } from '../../../src/features/registry';
 import { analyzeForTool } from '../../../src/main/advisor';
+import { shardingForTool } from '../../../src/main/sharding';
 import { McpHost, tokenKey } from '../../../src/main/mcp/host';
 import type { RunnerPorts } from '../../../src/runner/ports';
 import { start as startFeature } from '../../../src/runner/start';
 import { readOperationFile } from '../../../src/storage/undo';
 import { noSecretsSaved, type ConnectionView } from '../../../src/shared/connection';
 import { redisCommand, type ConnectionRequest, type Json } from '../../../src/shared/engine-request';
-import { connectionId, type ConnectionId } from '../../../src/shared/ids';
+import { connectionId, featureId, type ConnectionId } from '../../../src/shared/ids';
 import { initialState, reduce, type AppEvent, type AppState } from '../../../src/shared/state';
 import { initialConnectionsState } from '../../../src/shared/state/connections';
 import { testServers } from '../servers';
@@ -288,6 +289,14 @@ export async function liveMcp(options: { readonly settings?: Readonly<Record<str
           startFeature(
             ports,
             { feature: need.read, target: { kind: 'connection', connection }, args: need.args },
+            { startedBy: 'mcp' },
+          ),
+        );
+      case 'monitor.sharding':
+        return shardingForTool(args, (feature, given, connection) =>
+          startFeature(
+            ports,
+            { feature: featureId(feature), target: { kind: 'connection', connection }, args: given },
             { startedBy: 'mcp' },
           ),
         );

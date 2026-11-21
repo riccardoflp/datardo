@@ -2,11 +2,12 @@
  * The MCP server's area in the main process: the one {@link McpHost}, made at start with the engines, the secret
  * storage and the app's state, and started or stopped by `mcp.server` each time `datardo.mcp.enabled` or
  * `datardo.mcp.port` changes, and once at start. It also answers the app actions the tools ask (`mcp.connect`,
- * `mcp.undo-history`, `mcp.undo-write`, `mcp.open-tab`, `saved-query.list`, `advisor.analyze`), none of which writes to
- * a deployment.
+ * `mcp.undo-history`, `mcp.undo-write`, `mcp.open-tab`, `saved-query.list`, `advisor.analyze`, `monitor.sharding`),
+ * none of which writes to a deployment.
  */
 import { app } from 'electron';
 import { randomBytes } from 'node:crypto';
+import { shardingAction } from '../../features/mcp/deployment-tools';
 import { mcpSettings } from '../../features/mcp/read-data';
 import { undoHistoryReply, undoWriteReply } from '../../features/mcp/tool/undo-replies';
 import { isToolTab } from '../../features/mcp/tool/read-only';
@@ -19,6 +20,7 @@ import { start as startFeature } from '../../runner/start';
 import { readOperationFile } from '../../storage/undo';
 import { actions as savedQueryActions } from '../actions/saved-query';
 import { analyzeForTool } from '../advisor';
+import { shardingForTool } from '../sharding';
 import { whenRunnerReady } from '../bridge';
 import { appSecret, connectionEngines, isConnected, keepAppSecret } from '../connections';
 import type { MainServices } from '../services';
@@ -103,6 +105,16 @@ function toolActions(
         startFeature(
           ports,
           { feature: need.read, target: { kind: 'connection', connection }, args: need.args },
+          { startedBy: 'mcp', signal },
+        ),
+      );
+    },
+    [shardingAction]: async (args, signal) => {
+      const ports = await whenRunnerReady();
+      return shardingForTool(args, (feature, given, connection) =>
+        startFeature(
+          ports,
+          { feature: featureId(feature), target: { kind: 'connection', connection }, args: given },
           { startedBy: 'mcp', signal },
         ),
       );

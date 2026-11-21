@@ -1,9 +1,10 @@
 /**
  * The reads of a Monitor page tab, started through the bridge as the Read features the runner carries out: the
  * databases of the **Database** lists once, then the reads of the section shown (`readsOf`), when it is chosen, with
- * **Refresh** and at the automatic refresh. A reply older than the last request of its part is dropped; a read that
- * failed puts its message in the error line of its part. The Operations of the page (**Kill…**, **Apply**,
- * **Clear…**, **Create index…**) read their section again once they ran.
+ * **Refresh** and at the automatic refresh; the parts of the Stats, Replication and Sharding sections read in several
+ * steps (`monitor-section-reads.ts`). A reply older than the last request of its part is dropped; a read that failed
+ * puts its message in the error line of its part. The Operations of the page (**Kill…**, **Apply**, **Clear…**,
+ * **Create index…**, **Step down…**, the balancer's buttons) read their section again once they ran.
  */
 import { firstDatabase } from '../../../features/monitor/slow-queries';
 import { failedPart, type PartRead } from '../../../features/monitor/parts/failure';
@@ -15,23 +16,10 @@ import type { MonitorSection } from '../../../features/monitor/types';
 import type { IntentResult } from '../../../shared/bridge';
 import type { Json } from '../../../shared/engine-request';
 import type { ReadNeed } from '../../../shared/feature';
-import { featureId, type Place } from '../../../shared/ids';
+import type { Place } from '../../../shared/ids';
+import { sectionPartRead, type PartChange } from './monitor-section-reads';
+import { messageOf, startOn } from './monitor-start';
 import { changeMonitorTab, monitorTabOf, type MonitorTab } from './monitor-store';
-
-/** Starts a feature of the page on the tab's connection and waits for what it gives. */
-export function startOn(state: MonitorTab, feature: string, place: Place, args: Json): Promise<IntentResult> {
-  return window.datardo.start({
-    feature: featureId(feature),
-    target: { kind: 'connection', connection: state.connection },
-    place,
-    args,
-  });
-}
-
-/** The message of an intent that did not give a result. */
-export function messageOf(result: IntentResult): string | undefined {
-  return result.kind === 'failed' || result.kind === 'refused' ? result.message : undefined;
-}
 
 function failedRead<T>(result: IntentResult): PartRead<T> {
   return failedPart({ message: messageOf(result) ?? '' });
@@ -62,9 +50,19 @@ function withReply(state: MonitorTab, part: MonitorPart, result: IntentResult): 
     case 'oplog':
     case 'sharding':
     case 'sharding-events':
-      // The parts of the Stats, Replication and Sharding sections, which M31 builds: no section reads them yet.
+      // These parts are read in steps by `sectionPartRead`, which keeps their replies itself.
       return state;
   }
+}
+
+/** Sends the read of a part, in one step or several, and gives what its reply changes in the tab. */
+async function changeOf(state: MonitorTab, part: MonitorPart, need: ReadNeed): Promise<PartChange> {
+  const read = sectionPartRead(part);
+  if (read !== undefined) {
+    return read(state, need);
+  }
+  const result = await startOn(state, need.read, 'toolbar', need.args);
+  return (now) => withReply(now, part, result);
 }
 
 /** Sends the read of one part and keeps its reply, unless a newer request of the same part was sent meanwhile. */
@@ -85,14 +83,14 @@ async function readPart(tab: string, need: ReadNeed): Promise<void> {
   if (state === undefined) {
     return;
   }
-  const result = await startOn(state, need.read, 'toolbar', need.args);
+  const change = await changeOf(state, part, need);
   const readAt = Date.now();
   changeMonitorTab(tab, (now) => {
     if (!isLatestReply(now.requests, part, number)) {
       return now;
     }
     const loading = now.loading.filter((each) => each !== part);
-    return { ...withReply(now, part, result), loading, readAt: { ...now.readAt, [part]: readAt } };
+    return { ...change(now), loading, readAt: { ...now.readAt, [part]: readAt } };
   });
 }
 
@@ -108,17 +106,21 @@ export function slowDatabaseOf(state: MonitorTab): string | undefined {
 
 /** The arguments of the reads of the sections, from the choices of the tab. */
 function readsInput(state: MonitorTab): Parameters<typeof readsOf>[2] {
+  const { choices } = state;
   const database = slowDatabaseOf(state);
   return {
     connection: state.connection,
-    operations: state.choices.idle ? { idle: true } : {},
+    operations: choices.idle ? { idle: true } : {},
     slowQueries: slowQueriesArgs({
       connection: state.connection,
-      source: state.choices.source,
+      source: choices.source,
       ...(database === undefined ? {} : { database }),
-      sinceMinutes: state.choices.since,
+      sinceMinutes: choices.since,
       now: Date.now(),
     }),
+    ...(choices.statsDatabase === undefined ? {} : { statsDatabase: choices.statsDatabase }),
+    oplog: { text: choices.oplogText, operation: choices.oplogOperation, last: choices.oplogLast },
+    events: { text: choices.eventsText, show: choices.eventsScope },
   };
 }
 
@@ -195,4 +197,32 @@ export async function runSlowOperation(tab: string, feature: string, args: Json,
   if (result.kind === 'done' || result.kind === 'failed') {
     await readSection(tab, 'slow-queries', 'refresh');
   }
+}
+
+/**
+ * Reads one part of a section again, as **Refresh** would read it: the collections of the database chosen in the
+ * Stats section, the oplog after a change of its filter, the events after a change of theirs.
+ */
+export async function readPartOf(tab: string, section: MonitorSection, part: MonitorPart): Promise<void> {
+  const state = monitorTabOf(tab);
+  if (state === undefined) {
+    return;
+  }
+  const need = readsOf(section, 'refresh', readsInput(state)).find((each) => each.key === part);
+  if (need !== undefined) {
+    await readPart(tab, need);
+  }
+}
+
+/** The tab with what an Operation of a section said once it ran, and its error line, each in place of the last. */
+export function withOperationOutcome(
+  state: MonitorTab,
+  section: MonitorSection,
+  outcome: { readonly notice?: string; readonly error?: string },
+): MonitorTab {
+  const { [section]: _dropped, ...others } = state.notices;
+  return {
+    ...withOperationError(state, section, outcome.error),
+    notices: outcome.notice === undefined ? others : { ...others, [section]: outcome.notice },
+  };
 }

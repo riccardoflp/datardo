@@ -16,17 +16,10 @@ export const commands: readonly Command[] = [
   command('monitor.show:sharding', text.commands.section(text.sections.sharding)),
 ];
 
-/** The commands of the sections that are built: those of the Stats, Replication and Sharding sections wait for M31. */
-const builtCommands: ReadonlySet<string> = new Set([
-  'monitor.show',
-  'monitor.show:operations',
-  'monitor.show:slow-queries',
-]);
-
 /**
  * Whether a command of the page is offered now: the page of the current connection, which the engine of the area
- * already makes a MongoDB one (`monitor.show`, "Offered when"), for a section that is built.
+ * already makes a MongoDB one (`monitor.show`, "Offered when").
  */
-export function isOffered(state: AppState, id: string): boolean {
-  return builtCommands.has(id) && state.nav.current !== undefined;
+export function isOffered(state: AppState, _id: string): boolean {
+  return state.nav.current !== undefined;
 }

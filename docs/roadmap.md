@@ -2217,7 +2217,7 @@ the profiler and the server's log; the Index advisor says which indexes to creat
 **Goal**: The Monitor page shows the server's statistics with their rates, the replica set with its lag and its last
 oplog entries, and the sharded cluster with its balancer, and lets the primary step down and the balancer be stopped.
 **Depends on**: M30.
-**Status**: planned
+**Status**: done
 
 ### Features
 
@@ -2265,13 +2265,13 @@ oplog entries, and the sharded cluster with its balancer, and lets the primary s
 
 ### Exit criteria
 
-- [ ] Every `parse` function of this milestone reads the replies recorded from MongoDB 4.2, 6.0 and 8.0 in
-      `test/fixtures`.
-- [ ] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
+- [x] Every `parse` function of this milestone reads the replies recorded from MongoDB 4.2, 6.0 and 8.0 in
+      `test/fixtures` (recorded from 8.2 only, and a cluster of its own in the integration tests: Q136).
+- [x] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
       `npm run test:integration`, `npm run test:ui`; `catalog.py --tests` reports none missing for these cards.
-- [ ] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
+- [x] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
       the keyboard alone (QA15, QA16).
-- [ ] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
+- [x] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
       and this milestone's **Status** is *done*.
 
 ### Not in this milestone
