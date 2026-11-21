@@ -15,40 +15,17 @@ import {
   type HashField,
   type ScanPage,
 } from '../../../features/value/read-hash';
-import type { ListPage } from '../../../features/value/read-list';
-import type { SortedSetPage } from '../../../features/value/read-sorted-set';
-import { nextPage as nextStreamPage, type StreamPage } from '../../../features/value/read-stream';
 import { nextPart, withPart, type StringLoad, type StringPart } from '../../../features/value/read-string';
 import { rowName, type ValueRow } from '../../../features/value/show';
 import { fieldExpiryVersion, hexOf, isValueType, type ValueType } from '../../../features/value/types';
-import type { IntentResult } from '../../../shared/bridge';
 import type { Json } from '../../../shared/engine-request';
-import { featureId } from '../../../shared/ids';
-import type { Target } from '../../../shared/target';
 import { currentAppState } from '../../state/store';
+import { loadGroups } from './value-groups-reads';
+import { firstArgs, readOrdered } from './value-pages';
+import { failedRead as failed, isCurrent, readValue as read } from './value-start';
 import { changeValue, valueTabOf, type ValueTab, type ValueWhere } from './value-store';
 
-/** The key of a tab as the target of a feature. */
-export function keyTarget(where: ValueWhere): Target {
-  return { kind: 'key', connection: where.connection, database: where.database, key: where.key };
-}
-
-async function read(where: ValueWhere, feature: string, args: Json): Promise<IntentResult> {
-  return window.datardo.start({ feature: featureId(feature), target: keyTarget(where), place: 'toolbar', args });
-}
-
-/** The message of a read that did not answer. */
-export function messageOf(result: IntentResult): string {
-  return result.kind === 'failed' || result.kind === 'refused' ? result.message : '';
-}
-
-function isCurrent(tab: string, run: number): boolean {
-  return valueTabOf(tab)?.run === run;
-}
-
-function failed(tab: string, run: number, result: IntentResult): void {
-  changeValue(tab, (now) => (now.run === run ? { ...now, status: 'error', error: messageOf(result) } : now));
-}
+export { keyTarget, messageOf } from './value-start';
 
 /** Whether the server has an expiry for each field of a hash (`HPTTL`, Redis 7.4). */
 function fieldsExpire(where: ValueWhere): boolean {
@@ -122,77 +99,6 @@ function setRows(page: ScanPage<Uint8Array>): ScanPage<ValueRow> {
   return { cursor: page.cursor, items: page.items.map((member) => ({ cells: { Member: member } })) };
 }
 
-/** A page of a list, a sorted set or a stream, as rows, with the arguments of the next one. */
-interface OrderedPage {
-  readonly rows: readonly ValueRow[];
-  readonly next?: Json;
-}
-
-const orderedReads: Readonly<Partial<Record<ValueType, { readonly feature: string; readonly first: Json }>>> = {
-  list: { feature: 'value.read-list', first: { form: 'full', from: 'head', index: '0', page: 0 } },
-  zset: {
-    feature: 'value.read-sorted-set',
-    first: { form: 'full', order: 'lowest', min: '', max: '', page: 0, older: false },
-  },
-  stream: { feature: 'value.read-stream', first: { form: 'full', order: 'newest', from: '', to: '' } },
-};
-
-function nextOf(asked: Json, more: boolean): Json | undefined {
-  const fields = asked as Readonly<Record<string, Json>>;
-  return more ? { ...fields, page: (typeof fields['page'] === 'number' ? fields['page'] : 0) + 1 } : undefined;
-}
-
-function orderedPage(type: ValueType, asked: Json, result: unknown): OrderedPage {
-  if (type === 'list') {
-    const page = result as ListPage;
-    const rows = page.elements.map((each) => ({ cells: { Index: String(each.index), Element: each.element } }));
-    const next = nextOf(asked, page.more);
-    return { rows, ...(next === undefined ? {} : { next }) };
-  }
-  if (type === 'zset') {
-    const page = result as SortedSetPage;
-    const rows = page.members.map((each) => ({
-      cells: { Rank: each.rank === undefined ? '' : String(each.rank), Member: each.member, Score: each.score },
-    }));
-    const next = nextOf(asked, page.more);
-    return { rows, ...(next === undefined ? {} : { next }) };
-  }
-  const page = result as StreamPage;
-  const next = nextStreamPage(asked as never, page) as Json | undefined;
-  return { rows: page.entries.map((entry) => ({ cells: {}, entry })), ...(next === undefined ? {} : { next }) };
-}
-
-/** Reads the page of a list, a sorted set or a stream that `asked` names, and adds its rows. */
-async function readOrdered(tab: string, run: number, asked: Json): Promise<void> {
-  const state = valueTabOf(tab);
-  const type = state?.type;
-  const reading = type !== undefined && isValueType(type) ? orderedReads[type] : undefined;
-  if (state === undefined || reading === undefined || type === undefined || !isValueType(type)) {
-    return;
-  }
-  const result = await read(state.where, reading.feature, asked);
-  if (!isCurrent(tab, run)) {
-    return;
-  }
-  if (result.kind !== 'read') {
-    failed(tab, run, result);
-    return;
-  }
-  const page = orderedPage(type, asked, result.result);
-  changeValue(tab, (now) => {
-    if (now.run !== run) {
-      return now;
-    }
-    const { next: _next, ...rest } = now;
-    return {
-      ...rest,
-      rows: [...now.rows, ...page.rows],
-      loadingMore: false,
-      ...(page.next === undefined ? {} : { next: page.next }),
-    };
-  });
-}
-
 /** Reads a part of a string and adds it; a value whose length changed is read again from the start. */
 async function readStringPart(tab: string, run: number, load: StringLoad, asked: Json): Promise<void> {
   const state = valueTabOf(tab);
@@ -239,14 +145,17 @@ async function readFirstPage(tab: string, run: number, type: ValueType, count: n
     await continueScan(tab, run);
     return;
   }
-  const first = orderedReads[type]?.first ?? null;
-  await readOrdered(tab, run, first);
+  const state = valueTabOf(tab);
+  if (state !== undefined) {
+    await readOrdered(tab, run, firstArgs(state));
+  }
 }
 
 /**
  * The tab once `TYPE` and the count are known: what was read before is dropped, the selection is kept (it holds names,
- * and only the rows read again are drawn selected); a type that changed drops the sort and the formats and keeps
- * the old type for the notice; the text typed stays only when the refresh is not the tab's own.
+ * and only the rows read again are drawn selected) except in a list, whose indexes may name other elements now; a type
+ * that changed drops the sort, the formats, the order and range of the pages and the section, and keeps the old type
+ * for the notice; the text typed stays only when the refresh is not the tab's own.
  */
 function readAgain(state: ValueTab, type: string, count: number, keepsDraft: boolean): ValueTab {
   const {
@@ -258,18 +167,23 @@ function readAgain(state: ValueTab, type: string, count: number, keepsDraft: boo
     next: _next,
     was: _was,
     found: _found,
+    problem: _problem,
+    beyond: _beyond,
+    inRange: _inRange,
     sort,
     ...rest
   } = state;
   const changed = state.type !== '' && state.type !== type;
+  const { first: _first, groups: _groups, ...kept } = rest;
   return {
-    ...rest,
+    ...(changed ? { ...kept, typed: {}, section: 'entries' as const } : rest),
     type,
     count,
     status: 'ready',
     rows: [],
     loadingMore: false,
     ownRefresh: false,
+    ...(type === 'list' ? { selection: { keys: new Set<string>() } } : {}),
     ...(changed ? { was: state.type, choices: {} } : sort === undefined ? {} : { sort }),
     ...(keepsDraft && draft !== undefined ? { draft } : {}),
     ...(keepsDraft && line !== undefined ? { line } : {}),
@@ -327,6 +241,9 @@ async function afterCheck(tab: string, run: number, type: string): Promise<void>
   }
   const total = (count.result as ValueCount).count;
   changeValue(tab, (now) => readAgain(now, type, total, keepsDraft));
+  if (type === 'stream' && valueTabOf(tab)?.section === 'groups') {
+    await loadGroups(tab);
+  }
   await readFirstPage(tab, run, type, total);
 }
 

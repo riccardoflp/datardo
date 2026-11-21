@@ -19,6 +19,7 @@ import { actions as tableActions } from './table';
 import { actions as keyActions } from './key';
 import { actions as aggregateActions } from './aggregate';
 import { actions as playgroundActions } from './playground';
+import { actions as saveTabActions } from './save-tab';
 import { actions as consoleActions } from './console';
 import { actions as savedQueryActions } from './saved-query';
 
@@ -41,6 +42,7 @@ const areas: readonly AreaActions[] = [
   keyActions,
   aggregateActions,
   playgroundActions,
+  saveTabActions,
   consoleActions,
   savedQueryActions,
 ];

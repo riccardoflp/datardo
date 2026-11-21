@@ -28,6 +28,7 @@ import {
 /** The commands a check may send: they only read. */
 const readingCommands = new Set([
   'TYPE',
+  'XINFO',
   'GET',
   'STRLEN',
   'HGET',
@@ -183,6 +184,19 @@ export function nothingToWrite(name: string): Outcome {
     publishes: false,
     after: [],
   });
+}
+
+/** The formats a text of a form is typed in, as **Field as**, **Value as**, **Element as** and **Member as** offer them. */
+export const formatChoices = [
+  { value: 'text', label: 'Text' },
+  { value: 'json', label: 'JSON' },
+  { value: 'hex', label: 'Hex' },
+];
+
+/** What was typed in a text of a form, with the format chosen beside it; `{ text, format }` as a window sends it. */
+export function typedIn(answers: Answers, name: string, format: string): unknown {
+  const given = answers[name];
+  return typeof given === 'string' ? { text: given, format: answers[format] ?? 'text' } : given;
 }
 
 /** The bytes typed in an answer (`{ text, format }`), or why they cannot be read. */

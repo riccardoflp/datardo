@@ -3,10 +3,10 @@
  * refresh of its connection (`value.refresh`, the writes of Datardo). It draws the View of the value: the notice of a
  * type that changed, what is shown in the place of the value (the key gone with **Close tab**, a module's type, an
  * error with **Retry**, an empty value), the editor of a string, or the toolbar, the selection bar and the table of
- * the other types with **Load more**. The toolbars of lists, sets, sorted sets and streams come with milestone M15.
+ * the other types with **Load more**; a stream has the section bar of **Entries** and **Groups**
+ * (`value.stream-groups`).
  */
 import { useEffect } from 'react';
-import { foundText } from '../../../features/value/count';
 import type { Control, ValueView } from '../../../features/value/show';
 import { checkText, counted, itemWords, viewText } from '../../../features/value/text';
 import { isValueType, nameText } from '../../../features/value/types';
@@ -16,8 +16,9 @@ import { bytesOfHex } from '../../../features/key/types';
 import { startFeature } from '../../shell/intent';
 import { factsOf } from '../keys/keys-state';
 import { StringEditor } from './string-editor';
-import { addField, copyRows, refreshValue, removeRows, selectedRows } from './value-actions';
-import { applyFilter, loadMore, loadValue } from './value-reads';
+import { copyRows, refreshValue, removeRows, selectedRows } from './value-actions';
+import { GroupsSection, StreamSectionBar } from './value-groups';
+import { loadMore, loadValue } from './value-reads';
 import { fullView, selectedCount } from './value-state';
 import {
   changeValue,
@@ -29,6 +30,7 @@ import {
   type ValueWhere,
 } from './value-store';
 import { ValueTable } from './value-table';
+import { TableToolbar } from './value-toolbar';
 import styles from './value.module.css';
 
 /** The key of a key tab, with its name in hexadecimal: the same text from one drawing to the next. */
@@ -131,50 +133,14 @@ function Notice(props: { readonly tabId: string; readonly tab: ValueTab; readonl
   );
 }
 
-/** The toolbar of a hash: **Filter fields** (`Enter` applies it) and **Add field**; the count. */
-function TableToolbar(props: { readonly tabId: string; readonly tab: ValueTab; readonly shown: ValueView }) {
-  const { tabId, tab, shown } = props;
-  const has = (label: string): boolean => shown.toolbar.some((control) => control.label === label);
-  const found =
-    tab.filter !== '' && isValueType(tab.type) && tab.count !== undefined
-      ? foundText(tab.type, tab.rows.length, tab.count)
-      : undefined;
-  return (
-    <div className={styles['toolbar']} role="toolbar" aria-label="Value">
-      {has('Filter fields') ? (
-        <input
-          type="search"
-          className={styles['input']}
-          placeholder="Filter fields"
-          aria-label="Filter fields"
-          data-feature="value.read-hash@toolbar"
-          value={tab.field}
-          onChange={(event) => {
-            const field = event.target.value;
-            changeValue(tabId, (now) => ({ ...now, field }));
-          }}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter') {
-              event.preventDefault();
-              void applyFilter(tabId);
-            }
-          }}
-        />
-      ) : null}
-      {has('Add field') ? (
-        <button
-          type="button"
-          className={styles['button']}
-          data-feature="value.add-field@toolbar"
-          onClick={() => void addField(tabId)}
-        >
-          Add field
-        </button>
-      ) : null}
-      <span className={styles['count']}>{found ?? shown.count}</span>
-    </div>
-  );
-}
+/** **Remove…** of the selection bar, by the type of the value. */
+const removeElements: Readonly<Partial<Record<string, string>>> = {
+  hash: 'value.remove-fields@selection-bar',
+  list: 'value.remove-elements@selection-bar',
+  set: 'value.remove-members@selection-bar',
+  zset: 'value.remove-scored-members@selection-bar',
+  stream: 'value.delete-entries@selection-bar',
+};
 
 /** The selection bar, while more than one row is selected. */
 function SelectionBar(props: { readonly tabId: string; readonly tab: ValueTab; readonly readOnly: boolean }) {
@@ -205,11 +171,11 @@ function SelectionBar(props: { readonly tabId: string; readonly tab: ValueTab; r
       >
         Copy as command
       </button>
-      {readOnly || tab.type !== 'hash' ? null : (
+      {readOnly || removeElements[tab.type] === undefined ? null : (
         <button
           type="button"
           className={styles['button']}
-          data-feature="value.remove-fields@selection-bar"
+          data-feature={removeElements[tab.type]}
           onClick={() => void removeRows(tabId, rows, 'selection-bar')}
         >
           Remove…
@@ -283,12 +249,19 @@ export function ValueSection(props: {
   const readOnly = factsOf(app, at.connection).readOnly;
   const shown = fullView(app, tab);
   const stringShown = tab.type === 'string' && tab.status === 'ready';
+  const streamShown = tab.type === 'stream' && tab.status === 'ready' && tab.found === undefined;
+  const groupsShown = streamShown && tab.section === 'groups';
   return (
     <section className={styles['section']} aria-label="Value" aria-busy={shown.status === 'loading' ? true : undefined}>
       <Notice tabId={tabId} tab={tab} shown={shown} />
+      {streamShown ? <StreamSectionBar tabId={tabId} tab={tab} /> : null}
       {shown.table === undefined ? <Message tabId={tabId} tab={tab} shown={shown} /> : null}
       {stringShown ? <StringEditor tabId={tabId} tab={tab} shown={shown} /> : null}
-      <TableSection tabId={tabId} tab={tab} shown={shown} readOnly={readOnly} />
+      {groupsShown ? (
+        <GroupsSection tabId={tabId} tab={tab} />
+      ) : (
+        <TableSection tabId={tabId} tab={tab} shown={shown} readOnly={readOnly} />
+      )}
     </section>
   );
 }

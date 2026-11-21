@@ -995,3 +995,28 @@ Raised while the catalog was written; each names the cards that hold the current
   data folder keeps of the connection (the read `connection.remove:counts`, which the main process answers).
   (`saved-query.save`, `saved-query.clear-recent`, `saved-query.choose-folder`, `saved-query.read-folder`,
   `connection.remove`).
+- **Q92** — The values of lists, sets, sorted sets and streams as built in M15, where the cards say otherwise or say
+  nothing; each is the least surprising behavior found, until the author decides: Go to lists **Add scored member…**
+  and **Remove scored members…**, since **Add member…** and **Remove members…** are the set's and Go to keeps one row
+  a title; the forms of **Push…**, **Add member** of a set and of a sorted set have **Element as** or **Member as**
+  (**Text**, **JSON**, **Hex**) beside their field, as **Add field** has (Q75); the form of **Trim…** of a list has no
+  live *Keeps N of M* line under it, since a form of the runner cannot compute one, and its confirmation says what is
+  removed; an ID typed in **Add entry** is compared, before `XADD`, with the `last-generated-id` of `XINFO STREAM` and
+  refused as `/invalid` with *The ID must be greater than the last one, 1700000000000-4.*, and with `*` or `ms-*` the
+  notification says *Added an entry to events.*, not the ID the server gave, which a plan does not see (Q58); for the
+  same reason the notifications of **Remove…** of members, **Delete entries** and **Trim…** of a stream give the counts
+  known before the write, and their texts from the reply exist and are tested but are not reached, as in Q72; after
+  **Push…**, **Add member** and **Add entry** the table is read again from its first page with nothing selected (Q75),
+  except a new entry with **Newest first**, which is selected; the marker of **Remove…** of elements is drawn by the
+  window (32 hexadecimal digits from `crypto.getRandomValues`) and passed as `args.marker`; the commands of values are
+  offered in every key tab and do nothing on a value of another type; a double click on the **Member** of a sorted set
+  says *A member cannot be changed: remove it and add another.*, as for a set; a sorted set whose read fails is read
+  again with the older commands after any failure, not only one that names `REV` or `BYSCORE`; the form of **Add
+  entry** and of **Add a copy…** is drawn by the window from the question's `about`, as the insert dialog is; the rows
+  of the groups, consumers and pending entries are chosen with buttons in their first cell (`aria-pressed`), and the
+  tab **Entries** of the section bar carries no `data-feature`; a pending ID is shown by reading **Entries** from that
+  ID to that ID, the entry selected; the problem line under a toolbar uses `--color-danger`, which M14 drew in
+  `--color-danger-text`, unreadable in the light theme. (`value.push-element`, `value.trim-list`, `value.add-member`,
+  `value.add-scored-member`, `value.remove-scored-members`, `value.remove-members`, `value.remove-elements`,
+  `value.add-entry`, `value.delete-entries`, `value.trim-stream`, `value.read-sorted-set`, `value.change-score`,
+  `value.stream-groups`, `value.show`).

@@ -263,7 +263,7 @@ async function run(args: Json): Promise<void> {
  * `tab.save` `{ tab }`: saves a tab before it closes (`tab.close`, `window.quit`). A save that wrote nothing, its file
  * dialog closed, stops the close.
  */
-async function saveTab(services: MainServices, args: Json, signal: AbortSignal): Promise<void> {
+export async function savePlaygroundTab(services: MainServices, args: Json, signal: AbortSignal): Promise<void> {
   const tab = playgroundTab(services, textField(args, 'tab'));
   const ports = await whenRunnerReady();
   const feature = featureId('playground.save');
@@ -321,5 +321,4 @@ export const actions: AreaActions = (services) => ({
   'playground.remembered': async (args) => (await rememberedTarget(services, textField(args, 'path'))) ?? null,
   'playground.run': (args) => run(args),
   'playground.stop': () => playgroundHost().stop(),
-  'tab.save': (args, signal) => saveTab(services, args, signal),
 });

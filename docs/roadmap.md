@@ -1160,7 +1160,7 @@ removed.
 **Goal**: The other four types are read a page at a time and changed: elements pushed, changed, removed and trimmed;
 members added and removed; scores changed; entries added, deleted and trimmed; the consumer groups of a stream shown.
 **Depends on**: M14.
-**Status**: planned
+**Status**: done
 
 ### Features
 
@@ -1205,13 +1205,13 @@ members added and removed; scores changed; entries added, deleted and trimmed; t
 
 ### Exit criteria
 
-- [ ] Each Operation of this milestone runs on a key of 100,000 items without reading the whole value, is undone, and
+- [x] Each Operation of this milestone runs on a key of 100,000 items without reading the whole value, is undone, and
       is refused on a read-only connection (QA1, QA3).
-- [ ] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
+- [x] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
       `npm run test:integration`, `npm run test:ui`; `catalog.py --tests` reports none missing for these cards.
-- [ ] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
+- [x] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
       the keyboard alone (QA15, QA16).
-- [ ] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
+- [x] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
       and this milestone's **Status** is *done*.
 
 ### Not in this milestone

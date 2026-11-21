@@ -4,17 +4,18 @@
  */
 import type { Answers, Context, Outcome } from '../../shared/feature';
 import { ask, refuse } from '../../shared/feature';
-import { guard, readOnlyRefusal, typedAnswer, writePlan } from './check';
+import { formatChoices, guard, readOnlyRefusal, typedAnswer, typedIn, writePlan } from './check';
 import { listText } from './text';
 import { keyOf, nameText, writeStep } from './types';
 
-/** The form **Push to queue:mail**: **Element**, and **At**: **The tail** or **The head**. */
+/** The form **Push to queue:mail**: **Element** with **Element as**, and **At**: **The tail** or **The head**. */
 function pushForm(key: string): Outcome {
   return ask({
     title: listText.pushForm(key),
     button: 'Push',
     fields: [
       { kind: 'text', key: 'element', label: 'Element' },
+      { kind: 'pick-one', key: 'elementFormat', label: listText.elementAs, choices: formatChoices, default: 'text' },
       {
         kind: 'pick-one',
         key: 'end',
@@ -41,7 +42,7 @@ export function plan(context: Context, answers: Answers): Outcome {
   if (answers['element'] === undefined) {
     return pushForm(nameText(keyOf(context).key));
   }
-  const element = typedAnswer(answers['element']);
+  const element = typedAnswer(typedIn(answers, 'element', 'elementFormat'));
   if ('problem' in element) {
     return refuse('value.push-element/invalid', element.problem);
   }

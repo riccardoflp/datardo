@@ -34,6 +34,16 @@ describe('value.add-member', () => {
     ]);
   });
 
+  it('asks for the member and its format, Text by default, and takes a member typed in Hex', () => {
+    const outcome = addMember.plan(context, {});
+    expect(outcome.kind === 'ask' && outcome.question.fields.map((field) => [field.key, field.default])).toEqual([
+      ['member', undefined],
+      ['memberFormat', 'text'],
+    ]);
+    const answers = { member: '00 ff', memberFormat: 'hex', ...readAnswers('set', [0]) };
+    expect(stepTexts(addMember.plan(context, answers))).toEqual(['SADD tags "\\x00\\xff"']);
+  });
+
   it('refuses a member that is there', () => {
     expect(refusalOf(addMember.plan(context, { member: typed('redis'), ...readAnswers('set', [1]) }))).toEqual({
       code: 'value.add-member/exists',

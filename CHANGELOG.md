@@ -109,9 +109,17 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
   the pipeline of the tab for you or as a file of the connection's queries folder in Mongoster's format, rename,
   move, delete, pin, or reveal one; the folder is watched, a file that is not valid is skipped with a warning, and Go
   to finds saved queries by their name.
+- The key tab reads lists, sets, sorted sets and streams a page at a time: a list from the head, from the tail or
+  from an index; a set filtered by name; a sorted set lowest or highest first, or between two scores; a stream newest
+  or oldest first, or between two IDs or dates. Elements are pushed, changed in their cell, removed one at a time or by
+  selection, and the list trimmed; members are added and removed; scores are changed; entries are added (also as a
+  copy of another), deleted, and the stream trimmed. Every write is confirmed when it loses data, refused on a
+  read-only connection, and undone with its bytes. The **Groups** section of a stream shows its consumer groups, their
+  consumers and the entries they have pending.
 
 ### Fixed
 
+- What a read of a key tab's toolbar refuses, said under the toolbar, can be read in the light theme.
 - The window opens again with exactly the size it was left with when Windows scales the display by a fraction such as
   125%, instead of growing by a few pixels at each start.
 

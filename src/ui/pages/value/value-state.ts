@@ -5,12 +5,14 @@
  */
 import type { Inspection } from '../../../features/nav/types';
 import type { Form } from '../../../features/value/format';
+import { hasRange, sortedSetArgs } from '../../../features/value/read-sorted-set';
 import { rowName, view, type ValueState, type ValueView } from '../../../features/value/show';
 import { viewText } from '../../../features/value/text';
 import { hexOf, isValueType, nameText } from '../../../features/value/types';
 import type { AppState } from '../../../shared/state';
 import { factsOf } from '../keys/keys-state';
 import { rowsInOrder } from './value-actions';
+import { firstArgs } from './value-pages';
 import { valueTabOf, type ValueTab } from './value-store';
 
 /** The index, in the order of the table, of the one row selected; none when no row or several are. */
@@ -48,6 +50,9 @@ export function valueStateOf(tab: ValueTab, readOnly: boolean, form: Form): Valu
     more: hasMore(tab),
     filter: tab.filter,
     fieldExpiry: tab.fieldExpiry,
+    ranged: tab.type === 'zset' && hasRange(sortedSetArgs(firstArgs(tab))),
+    ...(tab.inRange === undefined ? {} : { inRange: tab.inRange }),
+    ...(tab.beyond === undefined ? {} : { beyond: tab.beyond }),
     ...(tab.sort === undefined ? {} : { sortedBy: tab.sort.column }),
     choices: tab.choices,
     ...(selected === undefined ? {} : { selected }),

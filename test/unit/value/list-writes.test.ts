@@ -21,9 +21,20 @@ const hex = (text: string): { readonly hex: string } => ({ hex: hexOf(utf8(text)
 describe('value.push-element', () => {
   const context = keyContext('value.push-element', { key: 'queue:mail' });
 
-  it('asks for the element and the end, the tail by default', () => {
+  it('asks for the element, its format and the end, the tail by default', () => {
     const outcome = pushElement.plan(context, {});
-    expect(outcome.kind === 'ask' && outcome.question.fields.map((field) => field.key)).toEqual(['element', 'end']);
+    expect(outcome.kind === 'ask' && outcome.question.fields.map((field) => field.key)).toEqual([
+      'element',
+      'elementFormat',
+      'end',
+    ]);
+    const end = outcome.kind === 'ask' ? outcome.question.fields.find((field) => field.key === 'end') : undefined;
+    expect(end?.default).toBe('tail');
+  });
+
+  it('takes an element typed as a string with the format chosen', () => {
+    const outcome = pushElement.plan(context, { element: '00 ff', elementFormat: 'hex', ...readAnswers('list') });
+    expect(stepTexts(outcome)).toEqual(['RPUSH queue:mail "\\x00\\xff"']);
   });
 
   it('sends TYPE queue:mail, then RPUSH queue:mail welcome', () => {

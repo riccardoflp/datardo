@@ -9,7 +9,7 @@ import { shown, type Format, type Form, type Shown } from './format';
 import { cellEditing, type EditedCell } from './item-editor';
 import { bytesShown, canLoadWhole, isEditable, nextPart, stringNote, type StringLoad } from './read-string';
 import { entryTime, fieldsLine, type StreamEntry } from './read-stream';
-import { checkText, itemWords, viewText } from './text';
+import { checkText, itemWords, readText, viewText } from './text';
 import { compactItems, filterPattern, isValueType, utf8, type ValueType } from './types';
 
 /** A control of the view: its label, the feature it starts and its identifier, and its key when it has one. */
@@ -48,6 +48,10 @@ export interface ValueState {
   readonly filter?: string;
   /** Sorted sets: a range of scores is set, so there is no **Rank**. */
   readonly ranged?: boolean;
+  /** Sorted sets: how many members the range of scores holds (`ZCOUNT`), for *38 members of 1,204*. */
+  readonly inRange?: number;
+  /** Lists: **Go to index** beyond the ends, *No element at index 5000: the list has 1,204.* */
+  readonly beyond?: string;
   /** Hashes: some field of the page has an expiry of its own (Redis 7.4 or later). */
   readonly fieldExpiry?: boolean;
   /** The column the loaded rows of a hash or a set are sorted by. */
@@ -270,6 +274,12 @@ function tableNote(type: ValueType, state: ValueState): string | undefined {
   const [, many] = itemWords[type];
   if (state.form === 'compact') {
     return firstItemsText(type, Math.min(compactItems, state.rows?.length ?? 0), state.count ?? 0);
+  }
+  if (state.beyond !== undefined) {
+    return state.beyond;
+  }
+  if (state.inRange !== undefined) {
+    return readText.inScores(state.inRange, state.count ?? 0);
   }
   return state.sortedBy !== undefined && state.more === true
     ? viewText.sortedAmong(state.rows?.length ?? 0, many)
