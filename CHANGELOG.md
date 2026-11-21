@@ -84,6 +84,13 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
   or deleted, each write shown before it runs, refused on a read-only connection and on a view, and in the undo
   history. A write that would change the type of a value (a BSON undefined, a date beyond the range of JavaScript)
   is not sent.
+- Documents are exported to JSON, JSON Lines and CSV from the table's toolbar, a selection or the tree, the query or
+  pipeline shown and its page kept; files of JSON, JSON Lines and CSV are imported, shown before they run; a
+  collection is copied to another database or connection with its indexes; test documents are generated from a
+  sample of a collection. Long work shows its progress and stops with **Cancel**, and every type and byte is kept.
+- A connection, a database or a collection is backed up in mongodump's formats (an archive, or a folder compressed
+  or not) and restored from them, with a checksum that stops a damaged archive; a restore, a copy and an import can be
+  undone from the Undo history.
 
 ### Fixed
 

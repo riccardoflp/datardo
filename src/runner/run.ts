@@ -21,7 +21,8 @@ import { Publishing } from './publish';
 import { isStillKept, recordAfter, recordBefore, undoLine, type Recorded } from './record';
 import { endUndoing, revertStopped, startUndoing } from './revert';
 import { runtimeOf } from './runtime';
-import { GuardRefusal, guardStep, runSteps, type StepsOutcome } from './steps';
+import { fedRunOf, fedSummaryOf, recordFedRun } from './fed-record';
+import { GuardRefusal, guardStep, runSteps, type StepObserver, type StepsOutcome } from './steps';
 import { PlanWatch } from './watch';
 import type { OperationId } from '../shared/state/undo';
 
@@ -57,20 +58,32 @@ export async function runPlan(
   // The limits of the undo history come first, so that an operation they drop at once offers no Undo.
   await carryOutAfter(ports, context, ran.recorded.after, options.startFeature);
   const entry = isStillKept(ports, ran.recorded.entry) ? ran.recorded.entry : undefined;
+  // A plan with fed steps ends with the message of its card, done, cancelled or failed, with Undo when it recorded.
+  if (ran.summary !== undefined) {
+    await carryOutAfter(ports, context, withUndo(ran.summary, entry, true), options.startFeature);
+  }
   if (ran.result.kind === 'done') {
-    await carryOutAfter(ports, context, withUndo(plan.after, entry), options.startFeature);
+    await carryOutAfter(
+      ports,
+      context,
+      ran.summary === undefined ? withUndo(plan.after, entry) : plan.after,
+      options.startFeature,
+    );
   }
   return ran.result;
 }
 
 /** What follows, with **Undo** first in the notification of a write that recorded an operation (`undo.notification`). */
-function withUndo(afters: readonly After[], entry: UndoEntry | undefined): readonly After[] {
+function withUndo(afters: readonly After[], entry: UndoEntry | undefined, warnings = false): readonly After[] {
   if (entry === undefined) {
     return afters;
   }
   let added = false;
   return afters.map((after) => {
-    if (added || after.kind !== 'notify' || (after.level !== 'success' && after.level !== 'info')) {
+    const offered =
+      after.kind === 'notify' &&
+      (after.level === 'success' || after.level === 'info' || (warnings && after.level === 'warning'));
+    if (added || after.kind !== 'notify' || !offered) {
       return after;
     }
     added = true;
@@ -112,6 +125,22 @@ export function confirmationOf(plan: Plan, context: Context): Confirmation {
 interface Ran {
   readonly result: IntentResult;
   readonly recorded: Recorded;
+  /** The message that ends a plan with fed steps, which takes the place of the runner's own. */
+  readonly summary?: readonly After[] | undefined;
+}
+
+/** The observer of a plan's steps and the tally of its fed steps, one after the other. */
+function bothObservers(watch: StepObserver, tally: StepObserver): StepObserver {
+  return {
+    before: async (step, index) => {
+      await watch.before(step, index);
+      await tally.before(step, index);
+    },
+    after: async (step, index, ended) => {
+      await watch.after(step, index, ended);
+      await tally.after(step, index, ended);
+    },
+  };
 }
 
 async function runConfirmed(ports: RunnerPorts, plan: Plan, context: Context, options: RunOptions): Promise<Ran> {
@@ -132,9 +161,14 @@ async function runConfirmed(ports: RunnerPorts, plan: Plan, context: Context, op
     }
     const publishing = Publishing.of(ports, plan, context, work.signal);
     const watch = new PlanWatch(publishing);
+    const fed = fedRunOf(ports, plan, context);
+    const observer = fed === undefined ? watch : bothObservers(watch, fed.tally);
     let outcome: StepsOutcome;
     try {
-      outcome = await runSteps({ ports, context, work, observer: watch }, plan);
+      outcome = await runSteps(
+        { ports, context, work, observer, ...(fed === undefined ? {} : { tally: fed.tally }) },
+        plan,
+      );
     } finally {
       for (const connection of connections) {
         ports.state.dispatch({ slice: 'runner', type: 'refresh-asked', connection });
@@ -142,12 +176,19 @@ async function runConfirmed(ports: RunnerPorts, plan: Plan, context: Context, op
     }
     const recorded = await recordAfter(recording, {
       failedIds: watch.failedIds(plan),
-      insertedIds: watch.insertedIds(plan),
+      insertedIds: [...watch.insertedIds(plan), ...(fed?.tally.insertedIds() ?? [])],
     });
+    const fedRecorded = await recordFedRun(ports, context, plan, fed);
     await publishing?.publish();
-    const result = ended(ports, { plan, context, operation }, outcome);
+    const recordedCount = (recorded.entry === undefined ? 0 : 1) + fedRecorded.length;
+    const summary = fedSummaryOf(ports, { context, plan }, fed, { outcome, recorded: recordedCount });
+    const result = ended(ports, { plan, context, operation, summary }, outcome);
     work.end(result.kind === 'failed' ? result.message : undefined);
-    return { result, recorded };
+    // Undo is offered in the message when one operation was recorded; several are undone from the Undo history.
+    const fedEntries = fedRecorded.flatMap((each) => (each.entry === undefined ? [] : [each.entry]));
+    const entry = recorded.entry ?? (fedEntries.length === 1 ? fedEntries[0] : undefined);
+    const after = [...recorded.after, ...fedRecorded.flatMap((each) => each.after)];
+    return { result, recorded: { ...(entry === undefined ? {} : { entry }), after }, summary };
   } catch (error: unknown) {
     work.end(error instanceof Error ? error.message : String(error));
     throw error;
@@ -161,14 +202,19 @@ interface PlanRun {
   readonly plan: Plan;
   readonly context: Context;
   readonly operation: OperationId | undefined;
+  /** The message of the card that ends a plan with fed steps; the runner then says nothing of its own. */
+  readonly summary?: readonly After[] | undefined;
 }
 
 function ended(ports: RunnerPorts, planRun: PlanRun, outcome: StepsOutcome): IntentResult {
   const { plan, context } = planRun;
+  const quiet = planRun.summary !== undefined || ports.endsWithOwnMessage?.(plan) === true;
   if (outcome.cancelledAfter !== undefined) {
     const howFar = runnerText.stoppedAfter(outcome.cancelledAfter, plan.steps.length);
     writeLog(ports, [{ feature: context.feature, kind: 'info', text: `cancelled: ${howFar}` }]);
-    notify(ports, { feature: context.feature, level: 'info', text: howFar });
+    if (!quiet) {
+      notify(ports, { feature: context.feature, level: 'info', text: howFar });
+    }
     return { kind: 'cancelled' };
   }
   if (outcome.failed !== undefined) {
@@ -177,7 +223,7 @@ function ended(ports: RunnerPorts, planRun: PlanRun, outcome: StepsOutcome): Int
     }
     return (
       revertStopped(ports, context, { plan, operation: planRun.operation }, outcome.failed) ??
-      stopped(ports, plan, context, outcome.failed)
+      stopped(ports, { plan, context, quiet }, outcome.failed)
     );
   }
   if (outcome.failedOnTheWay.length > 0) {
@@ -193,10 +239,10 @@ function ended(ports: RunnerPorts, planRun: PlanRun, outcome: StepsOutcome): Int
 /** A step failed and stopped the plan: *Stopped at step 3 of 5.* with the error, as a notification of the kind error. */
 function stopped(
   ports: RunnerPorts,
-  plan: Plan,
-  context: Context,
+  ran: { readonly plan: Plan; readonly context: Context; readonly quiet: boolean },
   failed: NonNullable<StepsOutcome['failed']>,
 ): IntentResult {
+  const { plan, context, quiet } = ran;
   const step = plan.steps[failed.index];
   const connection = step?.kind === 'engine' ? step.connection : undefined;
   const shown = errorMessage(failed.error, {
@@ -204,6 +250,10 @@ function stopped(
     ...(step?.kind === 'file' ? { path: step.path } : {}),
   });
   const message = `${runnerText.stoppedAt(failed.index + 1, plan.steps.length)} ${shown.message}`;
+  if (quiet) {
+    writeLog(ports, [{ feature: context.feature, kind: 'error', text: message }]);
+    return { kind: 'failed', message, details: shown.details };
+  }
   notify(ports, {
     feature: context.feature,
     level: 'error',

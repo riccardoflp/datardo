@@ -12,6 +12,7 @@ import type { Cell } from '../../features/table/rows';
 import type { Document, MenuEntry, TableTarget } from '../../features/table/types';
 import type { Json } from '../../shared/engine-request';
 import { chooseDocumentEntry } from '../pages/document/table-entries';
+import { exportDocuments } from '../pages/transfer/export-start';
 import { dropOnZone } from '../query/bar-actions';
 import { featureOfElement } from '../query/built';
 import type { CollectionRef } from '../query/collection-reads';
@@ -110,6 +111,9 @@ export function chooseEntry(context: EntryContext, entry: ChosenEntry): void {
       return;
     case 'table.selection':
       changeQuery(ref.tab, (query) => ({ ...query, selection: { keys: [] } }));
+      return;
+    case 'transfer.export':
+      exportDocuments(ref, columns, context.documents, entry.element);
       return;
     default:
       if (!chooseDocumentEntry({ ...context, element: entry.element })) {

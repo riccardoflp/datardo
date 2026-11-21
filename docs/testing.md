@@ -33,6 +33,9 @@ read-only connection', …) })`. `catalog.py --tests test` reports a card with n
   servers.
 - **Search indexes** need a server with search and are skipped unless `DATARDO_TEST_SEARCH_URI` gives one; they work
   in a database of their own, which they drop.
+- **mongodump and mongorestore** (the MongoDB Database Tools, installed apart from the server) are needed by the tests
+  that restore Datardo's archives with `mongorestore` and Mongo's with `backup.restore`; they are skipped unless
+  `DATARDO_TEST_MONGO_TOOLS` names the folder that holds both.
 - Each test file uses a database (or a key prefix) named after itself and drops it at the end, so files run in
   parallel.
 

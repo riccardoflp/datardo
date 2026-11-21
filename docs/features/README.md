@@ -94,11 +94,11 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`backup.create`](backup.md#backupcreate--back-up-a-connection-a-database-or-a-collection) | Back up a connection, a database or a collection | Operation | M25 | Specified |
-| [`backup.restore`](backup.md#backuprestore--restore-from-a-backup) | Restore from a backup | Operation | M25 | Specified |
-| [`backup.archive-write`](backup.md#backuparchive-write--writing-a-mongodump-archive) | Writing a mongodump archive | Derivation | M25 | Specified |
-| [`backup.archive-read`](backup.md#backuparchive-read--reading-a-mongodump-archive) | Reading a mongodump archive | Derivation | M25 | Specified |
-| [`backup.folder-layout`](backup.md#backupfolder-layout--backup-folders-and-their-files) | Backup folders and their files | Derivation | M25 | Specified |
+| [`backup.create`](backup.md#backupcreate--back-up-a-connection-a-database-or-a-collection) | Back up a connection, a database or a collection | Operation | M25 | Built |
+| [`backup.restore`](backup.md#backuprestore--restore-from-a-backup) | Restore from a backup | Operation | M25 | Built |
+| [`backup.archive-write`](backup.md#backuparchive-write--writing-a-mongodump-archive) | Writing a mongodump archive | Derivation | M25 | Built |
+| [`backup.archive-read`](backup.md#backuparchive-read--reading-a-mongodump-archive) | Reading a mongodump archive | Derivation | M25 | Built |
+| [`backup.folder-layout`](backup.md#backupfolder-layout--backup-folders-and-their-files) | Backup folders and their files | Derivation | M25 | Built |
 
 ## Charts
 
@@ -752,14 +752,14 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`transfer.export`](transfer.md#transferexport--export-documents-to-a-file) | Export documents to a file | Operation | M25 | Specified |
-| [`transfer.csv-write`](transfer.md#transfercsv-write--documents-as-csv) | Documents as CSV | Derivation | M25 | Specified |
-| [`transfer.import`](transfer.md#transferimport--import-documents-from-a-file) | Import documents from a file | Operation | M25 | Specified |
-| [`transfer.import-files`](transfer.md#transferimport-files--what-an-import-file-holds) | What an import file holds | Derivation | M25 | Specified |
-| [`transfer.csv-read`](transfer.md#transfercsv-read--csv-rows-as-documents) | CSV rows as documents | Derivation | M25 | Specified |
-| [`transfer.copy-collection`](transfer.md#transfercopy-collection--copy-a-collection-to-another-database-or-connection) | Copy a collection to another database or connection | Operation | M25 | Specified |
-| [`transfer.generate`](transfer.md#transfergenerate--generate-test-documents) | Generate test documents | Operation | M25 | Specified |
-| [`transfer.generate-values`](transfer.md#transfergenerate-values--fake-documents-from-a-schema-analysis) | Fake documents from a schema analysis | Derivation | M25 | Specified |
+| [`transfer.export`](transfer.md#transferexport--export-documents-to-a-file) | Export documents to a file | Operation | M25 | Built |
+| [`transfer.csv-write`](transfer.md#transfercsv-write--documents-as-csv) | Documents as CSV | Derivation | M25 | Built |
+| [`transfer.import`](transfer.md#transferimport--import-documents-from-a-file) | Import documents from a file | Operation | M25 | Built |
+| [`transfer.import-files`](transfer.md#transferimport-files--what-an-import-file-holds) | What an import file holds | Derivation | M25 | Built |
+| [`transfer.csv-read`](transfer.md#transfercsv-read--csv-rows-as-documents) | CSV rows as documents | Derivation | M25 | Built |
+| [`transfer.copy-collection`](transfer.md#transfercopy-collection--copy-a-collection-to-another-database-or-connection) | Copy a collection to another database or connection | Operation | M25 | Built |
+| [`transfer.generate`](transfer.md#transfergenerate--generate-test-documents) | Generate test documents | Operation | M25 | Built |
+| [`transfer.generate-values`](transfer.md#transfergenerate-values--fake-documents-from-a-schema-analysis) | Fake documents from a schema analysis | Derivation | M25 | Built |
 
 ## Tree
 

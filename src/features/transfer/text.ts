@@ -30,6 +30,8 @@ export const undoText = {
 
 /** The questions of a destination: a connection, a database (or a new one), a collection. */
 export const destinationText = {
+  notConnected: (connection: string, error: string): string => `Could not connect to ${connection}: ${error}`,
+  notConnectedError: 'not connected',
   sameConnection: 'same connection',
   readOnly: 'read-only',
   newDatabase: 'New database…',

@@ -59,6 +59,8 @@ export const createText = {
   backUpHere: 'Back up here',
   choose: 'Choose',
   noDatabases: (connection: string): string => `${connection} has no databases to back up.`,
+  notConnected: (connection: string, error: string): string => `Could not connect to ${connection}: ${error}`,
+  notConnectedError: 'not connected',
   onlyTimeSeries: "Nothing to back up: time series collections aren't supported (use mongodump).",
   empty: (what: string): string => `Nothing to back up in ${what}.`,
   planTitle: (what: string): string => `Back up ${what}`,

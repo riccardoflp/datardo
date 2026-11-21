@@ -21,6 +21,7 @@ export type {
 export { EngineError } from './engine';
 export { MongoEngineError } from './mongodb/errors';
 export { bsonBytes } from './mongodb/bson-bytes';
+export { documentOfBytes } from './mongodb/document-bytes';
 
 /** Carries out requests on the connections it holds a client for. */
 export interface EngineService {

@@ -133,10 +133,31 @@ function isOfferedByItsCard(state: AppState, id: string): boolean {
   }
 }
 
+/** The commands of export, import, copy and backups; `undefined` for another command. */
+function isTransferOffered(state: AppState, id: string): boolean | undefined {
+  switch (id) {
+    case 'transfer.export':
+    case 'transfer.import':
+    case 'transfer.copy-collection':
+    case 'transfer.generate':
+      // They act on the collection of the active collection tab.
+      return activeTabOf(state.tabs)?.shows.kind === 'collection';
+    case 'backup.create':
+    case 'backup.restore':
+      // They act on the current connection.
+      return state.nav.current !== undefined;
+    default:
+      return undefined;
+  }
+}
+
 /** Whether a command is offered now: for every engine or the current connection's, and offered by its card. */
 export function isOffered(state: AppState, id: string): boolean {
   const engine = engineOf(id);
-  return (engine === 'any' || engine === currentEngine(state)) && isOfferedByItsCard(state, id);
+  return (
+    (engine === 'any' || engine === currentEngine(state)) &&
+    (isTransferOffered(state, id) ?? isOfferedByItsCard(state, id))
+  );
 }
 
 /** The commands Go to lists after `>`, with the title that applies now, in the order they are registered. */
@@ -214,10 +235,10 @@ export function intentOf(state: AppState, id: string): Intent | undefined {
   const args = argsOf(state, feature, variant);
   // The undo history of a connection is the current connection's, whatever tab is active (`undo.per-connection`).
   const current = state.nav.current;
+  // A backup and a restore from Go to are of the current connection, whatever tab is active (`backup.create`).
+  const onConnection = feature === 'undo.per-connection' || feature === 'backup.create' || feature === 'backup.restore';
   const target: Target =
-    feature === 'undo.per-connection' && current !== undefined
-      ? { kind: 'connection', connection: current }
-      : targetNow(state);
+    onConnection && current !== undefined ? { kind: 'connection', connection: current } : targetNow(state);
   return { feature: featureId(feature), target, ...(args === undefined ? {} : { args }) };
 }
 

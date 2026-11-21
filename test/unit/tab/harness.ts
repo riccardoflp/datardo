@@ -11,7 +11,7 @@ import { connectionId, featureId, type ConnectionId } from '../../../src/shared/
 import type { AppState } from '../../../src/shared/state';
 import type { Tab, TabShows } from '../../../src/shared/state/tabs';
 import { AppStateHolder } from '../../../src/main/app-state';
-import { actions } from '../../../src/main/actions/tab';
+import { actions, saveDocumentTab } from '../../../src/main/actions/tab';
 import type { MainServices } from '../../../src/main/services';
 import { titledTabs } from '../../../src/features/tab/title';
 import { feature as openFeature } from '../../../src/features/tab/open';
@@ -114,7 +114,11 @@ export function harness(connections: readonly ConnectionView[] = [local, cacheLo
     dialogs: { ask: () => Promise.resolve(undefined), confirm: () => Promise.resolve(false) },
     platform: 'windows',
   };
-  const area = actions(services);
+  // `tab.save` is its own area, which hands a document tab to `saveDocumentTab` (src/main/actions/save-tab.ts).
+  const area: ReturnType<typeof actions> = {
+    ...actions(services),
+    'tab.save': (args: Json) => saveDocumentTab(services, args),
+  };
   const skipped: string[] = [];
   const titleMap = (): ReadonlyMap<string, string> => titledTabs(holder.get().tabs.tabs);
   const start = async (feature: OperationFeature, args: Json = null, answers: Answers = {}): Promise<Outcome> => {

@@ -6,7 +6,8 @@
  */
 import type { Json } from '../../shared/engine-request';
 import type { Answers, Context, Outcome, ReadFeature, ReadRequest } from '../../shared/feature';
-import { ask, needRead, refuse, run } from '../../shared/feature';
+import { needRead, refuse, run } from '../../shared/feature';
+import { chosenPath, dialogArgs, nothing, pathRead } from './ask/choose-path';
 import { featureId } from '../../shared/ids';
 import { savedConnection } from '../../shared/state/connections';
 import { nothingToDo } from '../task/types';
@@ -14,7 +15,9 @@ import { isObject, textArg } from '../tree/types';
 import { newObjectIds } from './generate-values';
 import { largestImport, parseImport } from './import-files';
 import { counted, importText as text } from './text';
-import { answerText, batchSize, insertUndo, writeStep, type JsonDocument, type Namespace } from './types';
+import { groupThousands } from '../../shared/text-units';
+import type { FedStep } from '../backup/types';
+import { batchSize, fedStep, insertUndo, type JsonDocument, type Namespace } from './types';
 
 /** The name of a file, without its folder. */
 export function fileNameOf(path: string): string {
@@ -34,12 +37,25 @@ export function withIds(documents: readonly JsonDocument[], ids: readonly Json[]
   });
 }
 
-/** The batches of an import: `insertMany([<1,000 documents>], { ordered: false })` each. */
-function batches(on: Namespace, documents: readonly JsonDocument[], context: Context) {
-  const steps = [];
+/**
+ * The batches of an import: `insertMany([<1,000 documents>], { ordered: false })` each, the documents fed to the
+ * runner (`DocumentsFeed` of kind `documents`), so that a document refused, its `_id` already there, is counted and
+ * the next ones are still inserted, and so that the status line says *1,000 of 2,500*.
+ */
+function batches(on: Namespace, documents: readonly JsonDocument[], context: Context, file: string): FedStep[] {
+  const steps: FedStep[] = [];
   for (let first = 0; first < documents.length; first += batchSize) {
     const batch = documents.slice(first, first + batchSize);
-    steps.push(writeStep(on, { method: 'insertMany', arguments: [batch, { ordered: false }] }, context.target));
+    const last = first + batch.length;
+    const from = `documents ${groupThousands(first + 1)}–${groupThousands(last)} of ${file}`;
+    steps.push(
+      fedStep(
+        on,
+        { method: 'insertMany', options: { ordered: false }, from, feed: { kind: 'documents', documents: batch } },
+        context.target,
+        { title: text.progressTitle(file), total: documents.length, unit: '', before: first },
+      ),
+    );
   }
   return steps;
 }
@@ -63,6 +79,33 @@ function isView(contents: unknown, collection: string): boolean {
   );
 }
 
+/** The system's open dialog of an import. */
+function askFile(namespace: string): Outcome {
+  const filters = [
+    { name: text.filter, extensions: ['json', 'jsonl', 'ndjson', 'csv'] },
+    { name: text.allFiles, extensions: ['*'] },
+  ];
+  return needRead(
+    'file',
+    fileDialogId,
+    dialogArgs({ mode: 'open', title: text.title(namespace), button: text.open, filters }),
+  );
+}
+
+/** The documents of the file read, or its refusal: it cannot be read, or holds none. */
+function parsedOf(read: ReadFile, file: string): JsonDocument[] | Outcome {
+  let parsed: JsonDocument[];
+  try {
+    if (read.error !== undefined) {
+      throw new Error(read.error);
+    }
+    parsed = parseImport(read.text ?? '', file);
+  } catch (error) {
+    return refuse('transfer.import/unreadable', text.unreadable(file, error instanceof Error ? error.message : ''));
+  }
+  return parsed.length === 0 ? refuse('transfer.import/empty', text.empty(file)) : parsed;
+}
+
 /** Feature: transfer.import — on a collection: the file, read and parsed; then its documents in batches. */
 export function plan(context: Context, answers: Answers): Outcome {
   const target = context.target;
@@ -81,27 +124,21 @@ export function plan(context: Context, answers: Answers): Outcome {
   if (isView(contents, target.collection)) {
     return refuse('transfer.import/view', text.readOnly(namespace));
   }
-  const path = answerText(answers['file']);
-  if (path === '') {
-    const title = text.title(namespace);
-    return ask({ title, text: text.filter, button: text.open, fields: [{ kind: 'text', key: 'file', label: title }] });
+  const path = chosenPath(answers['file']);
+  if (path === undefined) {
+    return askFile(namespace);
+  }
+  if (path === null) {
+    return run(nothing(text.undoTitle(''), ''));
   }
   const read = answers['read'];
   if (!isReadFile(read)) {
     return needRead('read', 'transfer.import:read', { path });
   }
   const file = fileNameOf(path);
-  let parsed: JsonDocument[];
-  try {
-    if (read.error !== undefined) {
-      throw new Error(read.error);
-    }
-    parsed = parseImport(read.text ?? '', file);
-  } catch (error) {
-    return refuse('transfer.import/unreadable', text.unreadable(file, error instanceof Error ? error.message : ''));
-  }
-  if (parsed.length === 0) {
-    return refuse('transfer.import/empty', text.empty(file));
+  const parsed = parsedOf(read, file);
+  if (!Array.isArray(parsed)) {
+    return parsed;
   }
   const on = { connection: target.connection, database: target.database, collection: target.collection };
   const undo = insertUndo(context, connection, parsed.length, { ...on, title: text.undoTitle(file) });
@@ -112,7 +149,7 @@ export function plan(context: Context, answers: Answers): Outcome {
   const lines = [text.confirm(parsed.length, file, namespace), having > 0 ? text.withIds(having) : text.newIds];
   return run({
     title: text.undoTitle(file),
-    steps: batches(on, documents, context),
+    steps: batches(on, documents, context, file),
     danger: { kind: 'confirm', text: lines.join('\n'), button: text.button },
     touches: counted(parsed.length, 'document'),
     undo,
@@ -120,6 +157,12 @@ export function plan(context: Context, answers: Answers): Outcome {
     after: [{ kind: 'refresh', connection: target.connection }],
   });
 }
+
+/** The read of the open dialog of an import. */
+export const fileDialogId = 'transfer.import:file';
+
+/** `transfer.import:file`: the system's open dialog, which answers the path, or null when it was closed. */
+export const fileDialog = pathRead(fileDialogId, 'transfer.choose-path');
 
 /** `transfer.import:read`: the text of the file at `args.path`, read by the main process up to {@link largestImport}. */
 export const fileRead: ReadFeature = {

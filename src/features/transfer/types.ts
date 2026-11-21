@@ -7,7 +7,7 @@ import type { ConnectionView } from '../../shared/connection';
 import type { Context, EngineStep, OnFailure, Undo } from '../../shared/feature';
 import type { ConnectionId } from '../../shared/ids';
 import type { Target } from '../../shared/target';
-import type { DocumentsFeed, FedStep, JsonDocument } from '../backup/types';
+import type { DocumentsFeed, FedStep, FedWork, JsonDocument } from '../backup/types';
 import { stepText } from '../runner/step-text';
 import { setting } from '../settings/read';
 import { undoText } from './text';
@@ -89,13 +89,18 @@ export function viewOptions(options: JsonDocument | undefined): JsonDocument {
  */
 export function fedStep(
   on: Namespace,
-  fed: { readonly method: 'insertMany' | 'bulkWrite'; readonly options: JsonDocument; readonly from: string },
-  feed: DocumentsFeed,
+  fed: {
+    readonly method: 'insertMany' | 'bulkWrite';
+    readonly options: JsonDocument;
+    readonly from: string;
+    readonly feed: DocumentsFeed;
+  },
   target: Target,
+  work?: FedWork,
 ): FedStep {
   const step = writeStep(on, { method: fed.method, arguments: [[], fed.options] }, target);
   const text = step.text.replace(`.${fed.method}([]`, `.${fed.method}([<${fed.from}>]`);
-  return { ...step, text, feed, batches: { documents: batchSize } };
+  return { ...step, text, feed: fed.feed, batches: { documents: batchSize }, ...(work === undefined ? {} : { work }) };
 }
 
 /**

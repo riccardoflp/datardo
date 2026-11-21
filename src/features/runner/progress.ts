@@ -61,7 +61,10 @@ function item(work: Work, state: ProgressState): WorkView {
     ...(work.connection === undefined
       ? {}
       : { connection: state.connectionName?.(work.connection) ?? work.connection }),
-    ...(known ? { progress: runnerText.progress(work.done ?? 0, work.total ?? 0, work.unit ?? 'items') } : {}),
+    ...(known && work.detail === undefined
+      ? { progress: runnerText.progress(work.done ?? 0, work.total ?? 0, work.unit ?? 'items') }
+      : {}),
+    ...(work.detail === undefined ? {} : { progress: work.detail }),
     ...(known ? { fraction: Math.min(1, (work.done ?? 0) / (work.total ?? 1)) } : {}),
     ...(work.cannotCancel === undefined ? {} : { cannotCancel: work.cannotCancel }),
     ...(work.error === undefined ? {} : { error: work.error }),

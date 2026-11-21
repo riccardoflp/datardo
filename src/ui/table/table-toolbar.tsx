@@ -6,6 +6,7 @@
 import { view as showView, type ToolbarButton } from '../../features/table/show';
 import { text } from '../../features/table/text';
 import { startOnDocuments, startOnFilter } from '../pages/document/document-actions';
+import { exportShown } from '../pages/transfer/export-start';
 import { startFeature } from '../shell/intent';
 import { isBuilt } from '../query/built';
 import { showStateOf } from '../query/collection-view';
@@ -30,6 +31,9 @@ function pressed(props: TablePartProps, button: ToolbarButton): void {
     case 'document.update-many@toolbar':
     case 'document.delete-many@toolbar':
       void startOnFilter(ref, button.element);
+      return;
+    case 'transfer.export@toolbar':
+      exportShown(ref, props.collection, props.columns, button.element);
       return;
     default: {
       const at = button.element.indexOf('@');

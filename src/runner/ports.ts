@@ -3,12 +3,13 @@
  * engines, the actions of the app, the window's dialogs and the state. The runner knows no feature by name
  * (architecture, "Who may use whom").
  */
-import type { Answers, AppStep, FileStep, RunnableFeature, Platform } from '../shared/feature';
+import type { DocumentsFeed, FedTotals, FeedBatches } from '../features/backup/types';
+import type { After, Answers, AppStep, Context, FileStep, Plan, RunnableFeature, Platform } from '../shared/feature';
 import type { ConnectionRequest, Json, RedisRequest } from '../shared/engine-request';
 import type { ConnectionId, FeatureId } from '../shared/ids';
 import type { Question } from '../shared/question';
 import type { AppEvent, AppState } from '../shared/state';
-import type { Confirmation } from '../shared/state/runner';
+import type { Confirmation, Work } from '../shared/state/runner';
 
 /** Carries out requests to the engines: the only way the runner reaches a deployment (R5.1). */
 export interface Engines {
@@ -19,8 +20,36 @@ export interface Engines {
 /** Carries out an app step or answers an app read: `window.set-zoom`, `settings.set`. */
 export type AppAction = (args: Json, signal: AbortSignal) => Promise<unknown>;
 
-/** Carries out a file step. */
-export type FileWriter = (step: FileStep, signal: AbortSignal) => Promise<void>;
+/** What long work says of how far it is: its title, the items done of a total, or a text in their place. */
+export type ProgressReport = (change: Partial<Pick<Work, 'title' | 'done' | 'total' | 'unit' | 'detail'>>) => void;
+
+/** Carries out a file step; a writer of many items says how far it is through `progress`. */
+export type FileWriter = (step: FileStep, signal: AbortSignal, progress?: ProgressReport) => Promise<void>;
+
+/** A batch of documents of one of the feeds read together, by its place among them, as canonical Extended JSON. */
+export interface FedBatch {
+  readonly feed: number;
+  readonly documents: readonly Json[];
+}
+
+/**
+ * Reads the documents of the feeds of fed steps (`DocumentsFeed`): from a query, a file of a backup or generated, in
+ * batches; the feeds given together come from one archive, read once from start to end, their collections in the
+ * order the file has them.
+ */
+export interface Feeds {
+  readonly read: (
+    feeds: readonly DocumentsFeed[],
+    batches: FeedBatches,
+    signal: AbortSignal,
+  ) => AsyncIterable<FedBatch>;
+}
+
+/**
+ * What follows a plan with fed steps once it has run, cancelled or failed, from what the runner counted: the
+ * notification its feature's card writes. None leaves the runner's own.
+ */
+export type FedSummary = (context: Context, plan: Plan, totals: FedTotals) => readonly After[] | undefined;
 
 /** Opens a question or a confirmation in the window and waits for its answer; `undefined` means cancelled. */
 export interface Dialogs {
@@ -67,6 +96,15 @@ export interface RunnerPorts {
   readonly now: () => number;
   /** Where the events of redis-oplog go; nothing is published without it. */
   readonly oplog?: OplogClients;
+  /** Where the documents of fed steps come from; a fed step fails without it. */
+  readonly feeds?: Feeds;
+  /** The message that ends a plan with fed steps. */
+  readonly fedSummary?: FedSummary;
+  /**
+   * Whether the writers of the main process that a plan's file steps name say themselves how it ended, done, cancelled
+   * or failed (an export, a backup): the runner then says nothing of its own.
+   */
+  readonly endsWithOwnMessage?: (plan: Plan) => boolean;
 }
 
 /** An app step, as the runner carries it out. */

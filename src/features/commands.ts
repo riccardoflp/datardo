@@ -18,6 +18,8 @@ import { commands as keyCommands } from './key/commands';
 import { areaCommands as aggregateCommands } from './aggregate/commands';
 import { commands as playgroundCommands } from './playground/commands';
 import { commands as documentCommands } from './document/commands';
+import { commands as transferCommands } from './transfer/commands';
+import { commands as backupCommands } from './backup/commands';
 
 import type { Command } from './command';
 
@@ -41,4 +43,6 @@ export const commands: readonly Command[] = [
   ...aggregateCommands,
   ...playgroundCommands,
   ...documentCommands,
+  ...transferCommands,
+  ...backupCommands,
 ];

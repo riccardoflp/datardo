@@ -33,6 +33,8 @@ export interface DestinationAsk {
   readonly refuseSource?: string;
   /** The refusal of a read-only connection. */
   readonly readOnly: (connection: string) => Outcome;
+  /** The refusal of a connection that is not connected, with its message. */
+  readonly notConnected: (message: string) => Outcome;
 }
 
 /** Where documents go, once every question is answered. */
@@ -181,6 +183,10 @@ export function askDestination(
   }
   if (on.readOnly) {
     return how.readOnly(on.name);
+  }
+  const live = context.state.connections.live[on.id];
+  if (live?.state !== 'connected') {
+    return how.notConnected(text.notConnected(on.name, live?.reason ?? text.notConnectedError));
   }
   const asking = { context, source, how, answers };
   const database = databaseOf(asking, on);

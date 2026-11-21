@@ -74,6 +74,8 @@ export interface Work {
   readonly total?: number;
   /** What `done` and `total` count: `documents`. */
   readonly unit?: string;
+  /** What it says of its progress in place of `done` of `total`: *shop.orders: 3,000 documents*. */
+  readonly detail?: string;
   /** Why it cannot be cancelled, said in place of **Cancel**: *Already sent to the server.* */
   readonly cannotCancel?: string;
   /** It was cancelled and stops at the end of what is in progress. */

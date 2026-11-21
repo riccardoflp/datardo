@@ -134,6 +134,7 @@ function destinationOf(
       sameDatabaseName: `${source.collection}_generated`,
       viewName: text.viewName,
       readOnly: (name) => refuse('transfer.generate/read-only', text.readOnly(name)),
+      notConnected: (message) => refuse('transfer.generate/not-connected', message),
     },
     answers,
   );
@@ -212,9 +213,9 @@ function generatePlan(context: Context, how: Generation): Plan {
     steps: [
       fedStep(
         to,
-        { method: 'insertMany', options: { ordered: false }, from: 'generated documents' },
-        feed,
+        { method: 'insertMany', options: { ordered: false }, from: 'generated documents', feed },
         context.target,
+        { title: text.progressTitle(destination), total: count, unit: 'documents' },
       ),
     ],
     danger: { kind: 'confirm', text: lines.join('\n'), button: text.button },

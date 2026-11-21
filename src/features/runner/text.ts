@@ -48,7 +48,7 @@ export const runnerText = {
   typeToConfirm: (name: string): string => `Type ${name} to confirm`,
   tasksRunning: (count: number): string => `${String(count)} ${count === 1 ? 'task' : 'tasks'} running`,
   progress: (done: number, total: number, unit: string): string =>
-    `${groupThousands(done)} of ${groupThousands(total)} ${unit}`,
+    `${groupThousands(done)} of ${groupThousands(total)}${unit === '' ? '' : ` ${unit}`}`,
   times: (count: number): string => `×${String(count)}`,
   filterChoices: (label: string): string => `Filter ${label.toLowerCase()}`,
 } as const;

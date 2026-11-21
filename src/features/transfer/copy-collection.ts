@@ -131,7 +131,15 @@ function copySteps(
   context: Context,
   source: Namespace,
   to: Destination,
-  how: { mode: CopyMode | undefined; filter: Json; indexes: boolean; options: boolean; info: SourceInfo },
+  how: {
+    mode: CopyMode | undefined;
+    filter: Json;
+    indexes: boolean;
+    options: boolean;
+    info: SourceInfo;
+    count: number;
+    destination: string;
+  },
 ): Step[] {
   const creates = how.mode === undefined || how.mode === 'drop';
   const { connection, database, collection } = source;
@@ -142,9 +150,9 @@ function copySteps(
     ...(creates ? [createCollectionStep(to, how.options ? copiedOptions(how.info.options) : {}, context.target)] : []),
     fedStep(
       to,
-      { method, options: { ordered: false }, from: `documents of ${source.collection}` },
-      feed,
+      { method, options: { ordered: false }, from: `documents of ${source.collection}`, feed },
       context.target,
+      { title: text.progressTitle(`${database}.${collection}`, how.destination), total: how.count, unit: 'documents' },
     ),
     ...(how.indexes ? indexSteps(to, how.info.indexes, context.target) : []),
   ];
@@ -186,7 +194,7 @@ function copyPlan(
           collection: to.collection,
           title,
         });
-  const steps = copySteps(context, source, to, { ...how, filter: how.filter.filter });
+  const steps = copySteps(context, source, to, { ...how, filter: how.filter.filter, destination });
   return {
     title,
     steps,
@@ -221,6 +229,7 @@ export function plan(context: Context, answers: Answers): Outcome {
       viewName: text.viewName,
       refuseSource: text.beingCopied,
       readOnly: (name) => refuse('transfer.copy-collection/read-only', text.readOnly(name)),
+      notConnected: (message) => refuse('transfer.copy-collection/not-connected', message),
     },
     answers,
   );

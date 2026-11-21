@@ -5,7 +5,7 @@
 import { access, mkdir, rename, rm } from 'node:fs/promises';
 import type { FileStep } from '../shared/feature';
 import type { Json } from '../shared/engine-request';
-import type { FileWriter } from '../runner/ports';
+import type { FileWriter, ProgressReport } from '../runner/ports';
 import { connectionsToText, type ExportFormat, type ExportSecrets } from '../features/connection/write-file';
 import { fileOfConnection, isFileProblem, jsonFields } from '../features/connection/types';
 import { transferText } from '../features/connection/text';
@@ -13,9 +13,16 @@ import { saveFailedMessage } from '../features/playground/save';
 import { writeAtomically } from '../storage/store';
 import { notify } from '../runner/notify';
 import { whenRunnerReady } from './bridge';
-import { connectionEngines, fullConnectionString, savedConnections, savedOptionSecrets } from './connections';
+import {
+  connectionEngines,
+  connectionName,
+  fullConnectionString,
+  savedConnections,
+  savedOptionSecrets,
+} from './connections';
 import { nodeFileCrypto } from './file-crypto';
 import { keyExportOf, writeKeyExport } from './key-export';
+import { carryOutTransferStep, type TransferStepServices } from './transfer-steps';
 
 const formats: readonly ExportFormat[] = ['datardo', 'compass', 'list'];
 const modes: readonly ExportSecrets[] = ['remove', 'include', 'encrypt'];
@@ -69,8 +76,27 @@ async function writePlayground(path: string, content: string): Promise<void> {
   }
 }
 
+/** The exports and backups, which send their own notification (`src/main/transfer-steps.ts`). */
+const transferServices: TransferStepServices = {
+  engines: connectionEngines,
+  connectionName,
+  notify: async (feature, after) => {
+    const ports = await whenRunnerReady();
+    notify(ports, {
+      feature,
+      level: after.level,
+      text: after.text,
+      ...(after.actions === undefined ? {} : { actions: after.actions }),
+    });
+  },
+  now: () => Date.now(),
+};
+
 /** Carries out a file step: writes, deletes or creates the folder at its path. */
-export const fileWriter: FileWriter = async (step: FileStep, signal: AbortSignal) => {
+export const fileWriter: FileWriter = async (step: FileStep, signal: AbortSignal, progress?: ProgressReport) => {
+  if (await carryOutTransferStep(transferServices, step, signal, progress)) {
+    return;
+  }
   switch (step.action) {
     case 'delete':
       await rm(step.path, { force: true });

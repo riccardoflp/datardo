@@ -902,3 +902,34 @@ Raised while the catalog was written; each names the cards that hold the current
   `nav.toggle-inspector` there; the title of a new document's tab, *people · New document 1*, is never cut.
   (`runner.run`, `nav.toggle-inspector`, `tab.title`, `document.delete`, `document.delete-many`, `document.update-many`, `document.insert`, `document.insert-from-tab`,
   `document.inline-edit`, `document.open`, `undo.record`, `tab.restore`, `tab.close`).
+- **Q83** — Export, import, copy and backups as built in M25, the runner: Datardo chose the least surprising
+  behavior where the cards are silent, to be confirmed. The steps whose documents come from a file, a query, an import
+  or generated values are engine steps with a feed (`FedStep`): the runner reads the feed through a port of the main
+  process and sends each batch as the step's `insertMany` or `bulkWrite`, looks at **Cancel** between two batches and
+  never in the middle of one, and counts each document refused with code 11000 as a duplicate and any other as failed;
+  the steps fed from one archive run together, so that the file is read once. The message that ends a copy, an import,
+  a generation or a restore is written by its feature from what the runner counted (`fedSummary`), not from replies
+  given to the feature: this is apart from Q58, which stays to be decided. The writers of an export and of a backup
+  send their own notification, done, cancelled or failed, as the writer of `key.export` does (Q65), and the runner then
+  says nothing of its own. A plan of one file step that writes stays cancellable while it runs. An import is cut into
+  steps of 1,000 documents, each fed with its documents, so that the progress reads *1,000 of 2,500*; a copy that
+  replaces documents reads, before each batch, the documents it replaces for the undo history, and asks the question
+  of `undo.record` when they go past its limits; a restore records one operation per collection and leaves out a
+  collection of more than 10,000 documents; **Undo** is offered in the notification when one operation was recorded,
+  also on a warning. The engine reads a query's documents as stored, in bytes (`cursorNextBytes`), so that an export, a
+  copy and a backup keep every type and byte. (`runner.run`, `transfer.copy-collection`, `transfer.import`,
+  `transfer.generate`, `transfer.export`, `backup.create`, `backup.restore`, `undo.record`).
+- **Q84** — Export, import, copy and backups as built in M25, the features: the system's file dialogs are reads of
+  the application, one action for each of the two areas, each starting in the folder last chosen in its area
+  while Datardo runs, then in the home folder; a dialog closed ends the feature with nothing done and nothing said.
+  **Open** and **Reveal** of an export, and **Copy mongorestore command** and **Reveal file** or **Reveal folder** of a
+  backup, start the feature again with the path in its arguments, which gives one step of the application. A backup to
+  a folder is one file step, written by the writer of `backup.create`, where the card lists a step per file: the
+  folder is made first, never one that exists, and **Cancel** or a failure deletes it whole. An export to CSV started
+  with no columns (from the tree) reads the query twice, once for the columns of every document and once to write.
+  From the table, an export carries the query as last run, or the pipeline up to the stage shown, the page and the
+  count shown, and the columns as drawn; **Export 2 documents…** and the entry of a row carry the `_id`s of the
+  rows. A copy, a generation and a backup refuse a connection that is not connected with *Could not connect to
+  \<name\>: not connected*, its reason when the connection gave one, rather than connecting first. In a restore,
+  *Not restored* stays a sentence of its own, after the counts. (`transfer.export`, `transfer.import`,
+  `transfer.copy-collection`, `transfer.generate`, `backup.create`, `backup.restore`, `backup.folder-layout`).

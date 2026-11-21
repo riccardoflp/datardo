@@ -10,6 +10,7 @@
 import type { Json, MongoRequest } from '../../shared/engine-request';
 import type { Answers, Context, Outcome, Plan, ReadFeature, ReadRequest, Step } from '../../shared/feature';
 import { ask, needRead, noDanger, refuse, run } from '../../shared/feature';
+import { chosenPath, dialogArgs, pathRead } from '../transfer/ask/choose-path';
 import { connectionId, featureId, type ConnectionId } from '../../shared/ids';
 import { savedConnection } from '../../shared/state/connections';
 import type { Target } from '../../shared/target';
@@ -18,13 +19,13 @@ import { pathIn } from '../task/run';
 import { nothingToDo } from '../task/types';
 import { listDatabasesArgs } from '../tree/list-databases';
 import { argsOf, failureOf, isObject, numberOf, textArg, type MongoDatabase } from '../tree/types';
-import { backupCollections, collectionMetadata, folderSteps, uniquePath, write } from './folder-layout';
+import { backupWhat, notificationAction } from './creating/message';
+import { backupCollections, collectionMetadata, uniquePath, write } from './folder-layout';
 import { createText as text } from './text';
 import {
   isJsonDocument,
   namespaceOf,
   systemDatabases,
-  textOf,
   textsOf,
   type BackupChoice,
   type BackupDetails,
@@ -49,22 +50,6 @@ export interface BackupWriterArgs {
       readonly total: number;
     }[];
   };
-}
-
-/** What the backup is of, by name: the connection, the database, or `<database>.<collection>`. */
-export function backupWhat(target: Target, connectionName: string): string {
-  switch (target.kind) {
-    case 'database':
-      return target.database;
-    case 'collection':
-      return `${target.database}.${target.collection}`;
-    case 'app':
-    case 'tab':
-    case 'connection':
-    case 'redis-database':
-    case 'key':
-      return connectionName;
-  }
 }
 
 /** The name the dialog proposes: `<what>_<YYYY-MM-DD_HH-MM-SS>`, in local time, `Local_shop_2026-10-08_16-45-12`. */
@@ -176,8 +161,18 @@ function backupChoice(context: Context, what: string, answers: Answers): Outcome
   return found;
 }
 
-/** The format, then the file of an archive or the folder a new folder is made in. */
-function destination(what: string, now: number, answers: Answers): Outcome | { format: BackupFormat; path: string } {
+/** The read of the save dialog of an archive and of the folder dialog of a folder backup. */
+export const pathReadId = 'backup.create:path';
+
+/** `backup.create:path`: the system's dialog, which answers the path, or null when it was closed. */
+export const pathDialog = pathRead(pathReadId, 'backup.choose-path');
+
+/** The format, then the file of an archive or the folder a new folder is made in; `null` when a dialog was closed. */
+function destination(
+  what: string,
+  now: number,
+  answers: Answers,
+): Outcome | { format: BackupFormat; path: string } | null {
   const format = answers['format'];
   if (format !== 'archive' && format !== 'gzip' && format !== 'plain') {
     const choices = (['archive', 'gzip', 'plain'] as const).map((value) => ({ value, ...text.formats[value] }));
@@ -186,18 +181,21 @@ function destination(what: string, now: number, answers: Answers): Outcome | { f
   }
   const archive = format === 'archive';
   const key = archive ? 'file' : 'folder';
-  const path = textOf(answers[key])?.trim() ?? '';
-  if (path === '') {
+  const path = chosenPath(answers[key]);
+  if (path === undefined) {
     const title = text.title(what, archive ? text.archiveStep : text.folderStep);
-    const proposed = archive ? { default: `${proposedName(what, now)}.agz` } : {};
-    return ask({
-      title,
-      ...(archive ? { text: text.archiveFilter } : {}),
-      button: archive ? text.backUp : text.backUpHere,
-      fields: [{ kind: 'text', key, label: title, ...proposed }],
-    });
+    const dialog = archive
+      ? dialogArgs({
+          mode: 'save',
+          title,
+          button: text.backUp,
+          name: `${proposedName(what, now)}.agz`,
+          filters: [{ name: text.archiveFilter, extensions: ['agz'] }],
+        })
+      : dialogArgs({ mode: 'folder', title, button: text.backUpHere });
+    return needRead(key, pathReadId, dialog);
   }
-  return { format, path };
+  return path === null ? null : { format, path };
 }
 
 /** The arguments of the archive's writer: what was chosen, with the metadata and the totals of each collection. */
@@ -246,6 +244,9 @@ function backupPlan(what: string, steps: readonly Step[]): Plan {
 function planOf(context: Context, what: string, choice: BackupChoice, answers: Answers): Outcome {
   const connection = (context.target as { readonly connection: ConnectionId }).connection;
   const asked = destination(what, context.now, answers);
+  if (asked === null) {
+    return run(backupPlan(what, []));
+  }
   if ('kind' in asked) {
     return asked;
   }
@@ -257,17 +258,21 @@ function planOf(context: Context, what: string, choice: BackupChoice, answers: A
     return needRead('details', 'backup.create:details', { connection, collections });
   }
   const list = answers['listed'] as BackupList;
+  const args = {
+    ...archiveArgs(connection, context.target, choice, { serverVersion: list.serverVersion, details }),
+    format: asked.format,
+  };
   if (asked.format === 'archive') {
-    const args = archiveArgs(connection, context.target, choice, { serverVersion: list.serverVersion, details });
-    return run(backupPlan(what, [write(asked.path, 'backup.create', args as unknown as Json)]));
+    return run(backupPlan(what, [write(asked.path, 'backup.create', args)]));
   }
   const taken = textsOf(answers['taken']);
   if (taken === undefined) {
     return needRead('taken', 'backup.create:names', { folder: asked.path });
   }
+  // The new folder and its files are written by one writer, so that Cancel and a failure delete the whole folder; the
+  // files it writes are those of `backup.folder-layout`.
   const root = pathIn(asked.path, uniquePath(proposedName(what, context.now), new Set(taken)), context.platform);
-  const steps = folderSteps(root, choice, details, { platform: context.platform, connection, format: asked.format });
-  return run(backupPlan(what, steps));
+  return run(backupPlan(what, [{ ...write(root, 'backup.create', args), text: `write folder ${root}` }]));
 }
 
 /**
@@ -280,6 +285,17 @@ export function plan(context: Context, answers: Answers): Outcome {
   const what = backupWhat(target, connection?.name ?? '');
   if (connection === undefined) {
     return nothingToDo(text.planTitle(what), text.cannotUndo);
+  }
+  const shown = notificationAction(answers);
+  if (shown !== undefined) {
+    return run({ ...backupPlan(what, shown.steps), after: shown.after });
+  }
+  const live = context.state.connections.live[connection.id];
+  if (live?.state !== 'connected') {
+    return refuse(
+      'backup.create/not-connected',
+      text.notConnected(connection.name, live?.reason ?? text.notConnectedError),
+    );
   }
   const choice = backupChoice(context, what, answers);
   if (!Array.isArray(choice)) {
