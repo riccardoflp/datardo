@@ -385,25 +385,25 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`mcp.server`](mcp.md#mcpserver--run-the-mcp-server-on-127001) | Run the MCP server on 127.0.0.1 | Operation | M29 | Specified |
-| [`mcp.status`](mcp.md#mcpstatus--the-state-of-the-mcp-server-in-the-top-bar) | The state of the MCP server in the top bar | View | M29 | Specified |
-| [`mcp.access-token`](mcp.md#mcpaccess-token--generate-a-new-access-token) | Generate a new access token | Operation | M29 | Specified |
-| [`mcp.setup`](mcp.md#mcpsetup--set-up-the-mcp-server-for-ai-assistants) | Set up the MCP server for AI assistants… | Operation | M29 | Specified |
-| [`mcp.change-port`](mcp.md#mcpchange-port--change-mcp-server-port) | Change MCP server port… | Operation | M29 | Specified |
-| [`mcp.read-data`](mcp.md#mcpread-data--the-tools-offered-without-reading-data) | The tools offered without reading data | Derivation | M29 | Specified |
-| [`mcp.protocol`](mcp.md#mcpprotocol--answer-a-message-of-the-model-context-protocol) | Answer a message of the Model Context Protocol | Derivation | M29 | Specified |
-| [`mcp.arguments`](mcp.md#mcparguments--read-the-arguments-of-a-tool) | Read the arguments of a tool | Derivation | M29 | Specified |
-| [`mcp.output-limits`](mcp.md#mcpoutput-limits--bound-what-a-tool-returns-and-how-long-it-runs) | Bound what a tool returns and how long it runs | Derivation | M29 | Specified |
-| [`mcp.refuse-write-stages`](mcp.md#mcprefuse-write-stages--refuse-pipelines-with-out-or-merge) | Refuse pipelines with $out or $merge | Derivation | M29 | Specified |
-| [`mcp.log`](mcp.md#mcplog--the-mcp-server-in-the-log) | The MCP server in the Log | Derivation | M29 | Specified |
-| [`mcp.data-tools`](mcp.md#mcpdata-tools--explore-the-connections-and-read-documents) | Explore the connections and read documents | Read | M29 | Specified |
-| [`mcp.debugging-tools`](mcp.md#mcpdebugging-tools--follow-what-an-application-writes) | Follow what an application writes | Read | M29 | Specified |
-| [`mcp.performance-tools`](mcp.md#mcpperformance-tools--find-what-makes-a-database-slow) | Find what makes a database slow | Read | M29 | Specified |
-| [`mcp.deployment-tools`](mcp.md#mcpdeployment-tools--read-the-state-of-the-deployment) | Read the state of the deployment | Read | M29 | Specified |
-| [`mcp.data-model-tools`](mcp.md#mcpdata-model-tools--answer-quick-questions-about-the-data-model) | Answer quick questions about the data model | Read | M29 | Specified |
-| [`mcp.redis-key-tools`](mcp.md#mcpredis-key-tools--read-the-keys-of-a-redis-server) | Read the keys of a Redis server | Read | M29 | Specified |
-| [`mcp.redis-server-tools`](mcp.md#mcpredis-server-tools--read-the-state-of-a-redis-server) | Read the state of a Redis server | Read | M29 | Specified |
-| [`mcp.tab-tools`](mcp.md#mcptab-tools--open-datardos-tabs-for-the-user) | Open Datardo's tabs for the user | Read | M29 | Specified |
+| [`mcp.server`](mcp.md#mcpserver--run-the-mcp-server-on-127001) | Run the MCP server on 127.0.0.1 | Operation | M29 | Built |
+| [`mcp.status`](mcp.md#mcpstatus--the-state-of-the-mcp-server-in-the-top-bar) | The state of the MCP server in the top bar | View | M29 | Built |
+| [`mcp.access-token`](mcp.md#mcpaccess-token--generate-a-new-access-token) | Generate a new access token | Operation | M29 | Built |
+| [`mcp.setup`](mcp.md#mcpsetup--set-up-the-mcp-server-for-ai-assistants) | Set up the MCP server for AI assistants… | Operation | M29 | Built |
+| [`mcp.change-port`](mcp.md#mcpchange-port--change-mcp-server-port) | Change MCP server port… | Operation | M29 | Built |
+| [`mcp.read-data`](mcp.md#mcpread-data--the-tools-offered-without-reading-data) | The tools offered without reading data | Derivation | M29 | Built |
+| [`mcp.protocol`](mcp.md#mcpprotocol--answer-a-message-of-the-model-context-protocol) | Answer a message of the Model Context Protocol | Derivation | M29 | Built |
+| [`mcp.arguments`](mcp.md#mcparguments--read-the-arguments-of-a-tool) | Read the arguments of a tool | Derivation | M29 | Built |
+| [`mcp.output-limits`](mcp.md#mcpoutput-limits--bound-what-a-tool-returns-and-how-long-it-runs) | Bound what a tool returns and how long it runs | Derivation | M29 | Built |
+| [`mcp.refuse-write-stages`](mcp.md#mcprefuse-write-stages--refuse-pipelines-with-out-or-merge) | Refuse pipelines with $out or $merge | Derivation | M29 | Built |
+| [`mcp.log`](mcp.md#mcplog--the-mcp-server-in-the-log) | The MCP server in the Log | Derivation | M29 | Built |
+| [`mcp.data-tools`](mcp.md#mcpdata-tools--explore-the-connections-and-read-documents) | Explore the connections and read documents | Read | M29 | Built |
+| [`mcp.debugging-tools`](mcp.md#mcpdebugging-tools--follow-what-an-application-writes) | Follow what an application writes | Read | M29 | Built |
+| [`mcp.performance-tools`](mcp.md#mcpperformance-tools--find-what-makes-a-database-slow) | Find what makes a database slow | Read | M29 | Built |
+| [`mcp.deployment-tools`](mcp.md#mcpdeployment-tools--read-the-state-of-the-deployment) | Read the state of the deployment | Read | M29 | Built |
+| [`mcp.data-model-tools`](mcp.md#mcpdata-model-tools--answer-quick-questions-about-the-data-model) | Answer quick questions about the data model | Read | M29 | Built |
+| [`mcp.redis-key-tools`](mcp.md#mcpredis-key-tools--read-the-keys-of-a-redis-server) | Read the keys of a Redis server | Read | M29 | Built |
+| [`mcp.redis-server-tools`](mcp.md#mcpredis-server-tools--read-the-state-of-a-redis-server) | Read the state of a Redis server | Read | M29 | Built |
+| [`mcp.tab-tools`](mcp.md#mcptab-tools--open-datardos-tabs-for-the-user) | Open Datardo's tabs for the user | Read | M29 | Built |
 
 ## Monitor
 

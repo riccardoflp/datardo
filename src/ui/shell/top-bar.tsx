@@ -1,6 +1,7 @@
 /**
  * `window.top-bar`: the strip at the top of the window, drawn from what `src/features/window/top-bar.ts` returns:
- * Datardo's icon and name, the **Go to** field (`palette.open`), the MCP state and, on Linux, the window's buttons. Its empty part drags
+ * Datardo's icon and name, the **Go to** field (`palette.open`), the MCP state (`mcp.status`: its dot, and its tooltip
+ * as the name) and, on Linux, the window's buttons. Its empty part drags
  * the window. It also names the window for the system (`window.title`), takes the window area's keys, and holds About.
  */
 import '@vscode/codicons/dist/codicon.css';
@@ -56,7 +57,12 @@ export function TopBar(): React.JSX.Element {
           }}
         >
           {bar.mcp.text}
-          <span className={styles['dot']} aria-hidden="true" />
+          <span
+            className={styles['dot']}
+            data-dot={bar.mcp.dot}
+            data-feature={bar.mcp.stateElement}
+            aria-hidden="true"
+          />
         </button>
         <WindowButtons buttons={bar.buttons} />
       </div>

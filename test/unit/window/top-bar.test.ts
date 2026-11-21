@@ -16,7 +16,14 @@ describe('window.top-bar', () => {
       enabled: true,
     });
     expect(bar.goTo.intent.feature).toBe('palette.open');
-    expect(bar.mcp).toMatchObject({ text: 'MCP', label: 'MCP server', element: 'mcp.setup@top-bar' });
+    // The name of the MCP state is its tooltip (mcp.status), which starts with MCP server.
+    expect(bar.mcp).toMatchObject({
+      text: 'MCP',
+      label: 'MCP server: off. Click to set it up.',
+      dot: 'hollow',
+      element: 'mcp.setup@top-bar',
+      stateElement: 'mcp.status@top-bar',
+    });
   });
 
   it("on Windows has no buttons of its own and leaves the system's 138 px at the right", () => {

@@ -12,6 +12,8 @@ export interface Choice {
   readonly description?: string;
   /** A circle of a connection's color before the label (connection.set-color). */
   readonly color?: ConnectionColor;
+  /** The feature the entry starts, with its place, when it is another feature's control: `mcp.change-port@dialog`. */
+  readonly element?: string;
 }
 
 /** A line of text, with what makes it valid. */

@@ -3,16 +3,21 @@
  * notifications, the tooltips of the top bar, the server's instructions to the AI.
  */
 export const text = {
-  instructions: [
-    "Datardo is the database client open on the user's computer. Its tools read the MongoDB and Redis connections the user saved there and never write to a database.",
-    'Start with list_connections: each connection says its engine.',
-    'MongoDB, to explore and read: list_databases, list_collections, describe_collection, find_documents, aggregate; for quick questions: count_documents, distinct_values, describe_relations, collection_options, list_saved_queries.',
-    'To follow what an application writes: watch_changes, write_history, then datardo_writes and datardo_write_details for the writes made from Datardo, and redis_oplog_status.',
-    'To find what makes a database slow: explain_query, slow_queries, current_operations, index_advice, collection_stats. The deployment: server_status, database_stats, replica_set_status, sharding_status.',
-    'Redis: redis_scan_keys, redis_key_details, redis_read_value; the server: redis_server_info, redis_slow_log, redis_clients, redis_memory.',
-    'Filters, sorts, projections and pipelines are in mongosh syntax: ObjectId("…"), ISODate("…"), /re/i.',
-    'The tools whose name starts with open_ or redis_open_ show the results to the user in a tab of Datardo: open_query, open_aggregation, open_explain, open_search, open_watch, open_monitor, open_history, redis_open_keys, redis_open_key, redis_open_server.',
-  ].join('\n'),
+  /**
+   * The instructions of `initialize`, naming only the tools offered: `names` writes those of a list that are offered,
+   * joined by commas.
+   */
+  instructions: (names: (tools: readonly string[]) => string): string =>
+    [
+      "Datardo is the database client open on the user's computer. Its tools read the MongoDB and Redis connections the user saved there and never write to a database.",
+      'Start with list_connections: each connection says its engine.',
+      `MongoDB, to explore and read: ${names(['list_databases', 'list_collections', 'describe_collection', 'find_documents', 'aggregate'])}; for quick questions: ${names(['count_documents', 'distinct_values', 'describe_relations', 'collection_options', 'list_saved_queries'])}.`,
+      `To follow what an application writes: ${names(['watch_changes', 'write_history', 'datardo_writes', 'datardo_write_details', 'redis_oplog_status'])}. datardo_writes and datardo_write_details are the writes made from Datardo.`,
+      `To find what makes a database slow: ${names(['explain_query', 'slow_queries', 'current_operations', 'index_advice', 'collection_stats'])}. The deployment: ${names(['server_status', 'database_stats', 'replica_set_status', 'sharding_status'])}.`,
+      `Redis: ${names(['redis_scan_keys', 'redis_key_details', 'redis_read_value'])}; the server: ${names(['redis_server_info', 'redis_slow_log', 'redis_clients', 'redis_memory'])}.`,
+      'Filters, sorts, projections and pipelines are in mongosh syntax: ObjectId("…"), ISODate("…"), /re/i.',
+      `The tools whose name starts with open_ or redis_open_ show the results to the user in a tab of Datardo: ${names(['open_query', 'open_aggregation', 'open_explain', 'open_search', 'open_watch', 'open_monitor', 'open_history', 'redis_open_keys', 'redis_open_key', 'redis_open_server'])}.`,
+    ].join('\n'),
   server: {
     startTitle: (url: string) => `start the MCP server on ${url}`,
     stopTitle: 'stop the MCP server',

@@ -68,9 +68,19 @@ export function setupChoices(state: AppState): readonly Choice[] {
     ...(settings.enabled ? [] : [{ value: 'on', label: text.setup.turnOn }]),
     { value: 'claude', label: text.setup.claude, description: claudeCommand(url, text.setup.hiddenToken) },
     { value: 'json', label: text.setup.json, description: text.setup.jsonLine },
-    { value: 'log', label: text.setup.log, description: text.setup.logLine },
-    { value: 'port', label: text.setup.port, description: text.setup.portLine(settings.port) },
-    { value: 'token', label: text.setup.token, description: text.setup.tokenLine },
+    { value: 'log', label: text.setup.log, description: text.setup.logLine, element: 'mcp.log@dialog' },
+    {
+      value: 'port',
+      label: text.setup.port,
+      description: text.setup.portLine(settings.port),
+      element: 'mcp.change-port@dialog',
+    },
+    {
+      value: 'token',
+      label: text.setup.token,
+      description: text.setup.tokenLine,
+      element: 'mcp.access-token@dialog',
+    },
     ...(settings.enabled ? [{ value: 'off', label: text.setup.turnOff }] : []),
   ];
 }

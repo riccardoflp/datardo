@@ -223,6 +223,16 @@ export function writeSecrets(id: ConnectionId, draft: ConnectionDraft): void {
   }
 }
 
+/** A secret of Datardo's own that belongs to no connection (`mcp/token`), from the secret storage. */
+export function appSecret(key: string): string | undefined {
+  return need().secrets.get(key);
+}
+
+/** Keeps a secret of Datardo's own in the secret storage; false when it may not be written (a newer file). */
+export function keepAppSecret(key: string, value: string): boolean {
+  return need().secrets.set(key, value);
+}
+
 /** Deletes every secret of a connection. */
 export function deleteSecrets(id: ConnectionId): void {
   const keys = secretKeys(id);

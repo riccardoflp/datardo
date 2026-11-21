@@ -25,6 +25,7 @@ import { features as serverFeatures } from './server';
 import { features as valueFeatures } from './value';
 import { features as consoleFeatures } from './console';
 import { features as savedQueryFeatures } from './saved-query';
+import { features as mcpFeatures } from './mcp';
 
 /** The features of every area, as each area's index lists them. */
 const areas: readonly (readonly RunnableFeature[])[] = [
@@ -49,6 +50,7 @@ const areas: readonly (readonly RunnableFeature[])[] = [
   valueFeatures,
   consoleFeatures,
   savedQueryFeatures,
+  mcpFeatures,
 ];
 
 /** The features the runner can start, by identifier. */

@@ -109,6 +109,12 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
   the pipeline of the tab for you or as a file of the connection's queries folder in Mongoster's format, rename,
   move, delete, pin, or reveal one; the folder is watched, a file that is not valid is skipped with a warning, and Go
   to finds saved queries by their name.
+- An MCP server lets AI assistants on the same machine read your MongoDB and Redis connections through 35 tools that
+  never write: it is turned on from **MCP** in the top bar, whose dot says whether it runs, listens on `127.0.0.1`
+  behind an access token kept in the secret storage, and copies the command for Claude Code or the JSON configuration
+  for other assistants. A new access token, another port and the calls of the assistant in the Log are a click away;
+  a taken port is said once with **Change port**, and `datardo.mcp.readData` off keeps documents and values of keys
+  away from the assistant.
 
 ### Fixed
 

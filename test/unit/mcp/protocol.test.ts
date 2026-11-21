@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { allTools, toolsOffered } from '../../../src/features/mcp';
+import { allTools, serverInstructions, toolsOffered } from '../../../src/features/mcp';
 import { answer, batchBody, callAnswer, parseErrorResponse, rpcErrors } from '../../../src/features/mcp/protocol';
-import { text } from '../../../src/features/mcp/text';
 import type { MessageAnswer } from '../../../src/features/mcp/protocol';
 import { mcpState } from './harness';
 
-const info = { version: '0.1.0', instructions: text.instructions };
+const instructions = serverInstructions();
+const info = { version: '0.1.0', instructions };
 
 function responseOf(message: unknown): unknown {
   const answered: MessageAnswer = answer(message, allTools, info);
@@ -68,8 +68,8 @@ describe('mcp.protocol', () => {
         serverInfo: { name: 'datardo', title: 'Datardo', version: '0.1.0' },
       },
     });
-    expect(text.instructions.startsWith("Datardo is the database client open on the user's computer.")).toBe(true);
-    expect(text.instructions).toContain('Start with list_connections: each connection says its engine.');
+    expect(instructions.startsWith("Datardo is the database client open on the user's computer.")).toBe(true);
+    expect(instructions).toContain('Start with list_connections: each connection says its engine.');
   });
 
   it('keeps a version it knows', () => {
@@ -139,7 +139,7 @@ describe('mcp.protocol', () => {
 
   it('names in its instructions only tools offered with readData on', () => {
     const offered = new Set(toolsOffered(mcpState().settings).map((tool) => tool.name));
-    const named = text.instructions.match(/\b[a-z]+(?:_[a-z]+)+\b/gu) ?? [];
+    const named = instructions.match(/\b[a-z]+(?:_[a-z]+)+\b/gu) ?? [];
     expect(named.length).toBeGreaterThan(30);
     for (const name of named) {
       expect(offered.has(name), name).toBe(true);
