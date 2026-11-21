@@ -2,7 +2,17 @@ import { describe, expect, it } from 'vitest';
 import * as addEntry from '../../../src/features/value/add-entry';
 import * as deleteEntries from '../../../src/features/value/delete-entries';
 import * as trimStream from '../../../src/features/value/trim-stream';
-import { keyContext, neededCommands, planOf, readAnswers, refusalOf, stepTexts, typed } from './context';
+import {
+  detailOf,
+  keyContext,
+  neededCommands,
+  planOf,
+  questionOf,
+  readAnswers,
+  refusalOf,
+  stepTexts,
+  typed,
+} from './context';
 
 describe('value.add-entry', () => {
   const context = keyContext('value.add-entry', { key: 'events' });
@@ -63,12 +73,9 @@ describe('value.delete-entries', () => {
   it('asks Delete the entry 1700000000000-0 from events? and sends XDEL events 1700000000000-0', () => {
     const outcome = deleteEntries.plan(context, { ids: ['1700000000000-0'], ...readAnswers('stream') });
     const plan = planOf(outcome);
-    expect(plan.title).toBe('Delete the entry 1700000000000-0 from events?');
-    expect(plan.danger).toEqual({
-      kind: 'confirm',
-      text: 'Consumer groups keep an entry they have pending in their lists, without its fields.',
-      button: 'Delete',
-    });
+    expect(questionOf(plan)).toBe('Delete the entry 1700000000000-0 from events?');
+    expect(detailOf(plan)).toBe('Consumer groups keep an entry they have pending in their lists, without its fields.');
+    expect(plan.danger.kind === 'confirm' && plan.danger.button).toBe('Delete');
     expect(stepTexts(outcome)).toEqual(['XDEL events 1700000000000-0']);
   });
 
@@ -93,8 +100,9 @@ describe('value.trim-stream', () => {
     ]);
     const outcome = trimStream.plan(context, { ...answers, ...readAnswers('stream', [5200]) });
     const plan = planOf(outcome);
-    expect(plan.title).toBe('Trim events to its newest 1,000 entries?');
-    expect(plan.danger).toEqual({ kind: 'confirm', text: '4,200 of 5,200 entries are deleted.', button: 'Trim' });
+    expect(questionOf(plan)).toBe('Trim events to its newest 1,000 entries?');
+    expect(detailOf(plan)).toBe('4,200 of 5,200 entries are deleted.');
+    expect(plan.danger.kind === 'confirm' && plan.danger.button).toBe('Trim');
     expect(stepTexts(outcome)).toEqual(['XTRIM events MAXLEN 1000']);
   });
 

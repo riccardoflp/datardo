@@ -577,6 +577,10 @@ Raised while the catalog was written; each names the cards that hold the current
   (`undo.record`, `undo.revert-plan`, `undo.details`, `value.edit-field`).
 - **Q15** — Writes to one element of a list compare and then write in two commands; should they be one script that
   does both at once? (`value.edit-element`, `value.remove-elements`, `value.add-field`, `key.new`).
+  *Built in M14 without a script, until the author decides*: the writes of strings and hashes read what they compare
+  (`TYPE`, then `GET`, `HGET`, `HEXISTS`, `HPTTL` through `value.check`) and write in a second request, the steps of
+  one write in `MULTI` … `EXEC` when there are several; a client that changes the value between the two is not seen.
+  No `EVAL` is sent, so nothing depends on scripts being allowed on the server.
 - **Q16** — With no keychain, secrets live in memory and connecting at the next start asks again. Or should saving a
   connection be refused there? (`connection.secrets`, `connection.connect`).
 - **Q17** — The connection form replaces Mongoster's quick add; **Save** does not try the connection, **Save and
@@ -835,3 +839,21 @@ Raised while the catalog was written; each names the cards that hold the current
   their identifiers in one attribute; an import reads files of at most 512 MB, a number of Datardo's own (Q11).
   (`key.switch-database`, `key.details`, `key.rename`, `key.export`, `key.delete-by-pattern`, `key.show`, `key.open`,
   `key.import`).
+- **Q67** — The values of strings and hashes as built in M14, where the cards say otherwise or say nothing: Go to
+  lists `value.copy` as **Copy Redis value**, since `table.copy-value` is already **Copy value** and Go to keeps one
+  row a title; the commands of values have no keys of their own: `F5` is the key of **Refresh keys**, which a key tab
+  carries out as `value.refresh`, and `Ctrl+S` is the string editor's; the form of **Add field** has **Field as** and
+  **Value as** (**Text**, **JSON**, **Hex**) beside its two fields; a refusal closes the form, so *already has a field
+  named* is shown as the refusal of the write and not under **Field** with the form open, and the field added is not
+  put first and selected: the table is read again in the server's order; a confirmation of a write is titled by the
+  name the undo history gives it (**Edit orders:42**), its question in its text, as in M13; closing the question
+  **Overwrite** or **Create again** answers the window `cancelled`, so the window, not the feature, says *Not saved:
+  the value changed in the database.*; the steps of one write in `MULTI` … `EXEC` are sent on the client the tabs of
+  the connection share (Q65), where a request of another tab sent at the same moment could be queued inside the
+  transaction; text typed and not saved does not mark the key tab as unsaved, since the window has no way to say so,
+  so closing the tab does not ask (D33), while **Refresh** asks through its arguments; an empty string shows *Empty
+  string.* with no editor, so it cannot be typed into; the format chosen in the inspector island is the one of the
+  column, shared with the table; the compact form does not repeat **Open in a tab**, which is among the key's buttons
+  above it; lists, sets, sorted sets and streams show their table read-only with **Load more**, their toolbars coming
+  with M15. (`value.copy`, `value.refresh`, `value.save-string`, `value.add-field`, `value.edit-field`,
+  `value.rename-field`, `value.remove-fields`, `value.show`).

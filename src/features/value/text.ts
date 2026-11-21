@@ -72,6 +72,8 @@ export const hashText = {
   fieldExists: (key: string, field: string): string =>
     `${key} already has a field named ${field}: edit its value instead.`,
   addFieldForm: (key: string): string => `Add a field to ${key}`,
+  fieldAs: 'Field as',
+  valueAs: 'Value as',
   editFieldTitle: (field: string, key: string): string => `Edit field ${field} of ${key}`,
   savedField: (field: string, key: string): string => `Saved the field ${field} of ${key}.`,
   fieldChanged: (field: string, key: string, now: string): string =>

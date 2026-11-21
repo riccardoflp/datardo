@@ -4,7 +4,17 @@ import * as pushElement from '../../../src/features/value/push-element';
 import * as removeElements from '../../../src/features/value/remove-elements';
 import * as trimList from '../../../src/features/value/trim-list';
 import { hexOf } from '../../../src/features/value/types';
-import { keyContext, neededCommands, planOf, readAnswers, refusalOf, stepTexts, typed, utf8 } from './context';
+import {
+  keyContext,
+  neededCommands,
+  planOf,
+  questionOf,
+  readAnswers,
+  refusalOf,
+  stepTexts,
+  typed,
+  utf8,
+} from './context';
 
 const hex = (text: string): { readonly hex: string } => ({ hex: hexOf(utf8(text)) });
 
@@ -82,7 +92,7 @@ describe('value.remove-elements', () => {
       `LREM queue:mail 1 __datardo_removed__:${marker}`,
       'EXEC',
     ]);
-    expect(planOf(outcome).title).toBe('Remove the element at index 2 from queue:mail?');
+    expect(questionOf(planOf(outcome))).toBe('Remove the element at index 2 from queue:mail?');
   });
 
   it('removes the rows at indexes 0 and 2 with the same marker', () => {
@@ -145,10 +155,10 @@ describe('value.trim-list', () => {
   it('asks Trim queue:mail to 100 elements? for 0 to 99 of 1,204', () => {
     const outcome = trimList.plan(context, { from: '0', to: '99', ...readAnswers('list', [1204]) });
     const plan = planOf(outcome);
-    expect(plan.title).toBe('Trim queue:mail to 100 elements?');
+    expect(questionOf(plan)).toBe('Trim queue:mail to 100 elements?');
     expect(plan.danger).toEqual({
       kind: 'confirm',
-      text: '1,104 of 1,204 elements are removed: those before index 0 and after index 99.',
+      text: 'Trim queue:mail to 100 elements?\n1,104 of 1,204 elements are removed: those before index 0 and after index 99.',
       button: 'Trim',
     });
     expect(stepTexts(outcome)).toEqual(['LTRIM queue:mail 0 99']);

@@ -1,0 +1,291 @@
+/* value.show in a key tab and in the inspector island: the value's toolbar, the string's editor, the table of the
+   other types drawn a screen at a time, the item editor over a cell, and the compact form. */
+.section {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  border-top: var(--border-width) solid var(--color-border);
+}
+
+.toolbar,
+.selection-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.selection-bar {
+  background: var(--color-selected);
+}
+
+.button {
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-small);
+  background: var(--color-island);
+  color: var(--color-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.button[aria-pressed='true'] {
+  background: var(--color-selected);
+}
+
+.button:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.button:hover:enabled {
+  background: var(--color-hover);
+}
+
+.formats {
+  display: inline-flex;
+}
+
+.formats > * {
+  border-radius: 0;
+}
+
+.formats > :first-child {
+  border-radius: var(--radius-small) 0 0 var(--radius-small);
+}
+
+.formats > :last-child {
+  border-radius: 0 var(--radius-small) var(--radius-small) 0;
+}
+
+.input {
+  min-width: 200px;
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-small);
+  background: var(--color-canvas);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.count,
+.muted {
+  color: var(--color-text-muted);
+}
+
+.notice {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: var(--border-width) solid var(--color-border);
+  background: var(--color-raised);
+}
+
+.message {
+  margin: 0;
+  padding: var(--space-4);
+}
+
+.message p {
+  margin: 0 0 var(--space-2);
+}
+
+.editor {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-height: 0;
+  padding: var(--space-2) var(--space-3);
+}
+
+.text {
+  flex: 1;
+  min-height: 120px;
+  padding: var(--space-2);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-small);
+  background: var(--color-canvas);
+  color: var(--color-text);
+  font-family: var(--font-family-code);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height);
+  resize: none;
+  white-space: pre;
+}
+
+.line {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.problem {
+  margin: 0;
+  color: var(--color-danger-text);
+}
+
+.grid {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  outline-offset: calc(var(--focus-width) * -1);
+}
+
+.head {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky-heading);
+  background: var(--color-island);
+}
+
+.head-row,
+.row {
+  display: grid;
+  grid-template-columns: var(--value-columns);
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.heading-button {
+  flex: 1;
+  padding: var(--space-1) var(--space-2);
+  border: 0;
+  background: transparent;
+  color: var(--color-text-muted);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.body {
+  position: relative;
+}
+
+.row {
+  position: absolute;
+  right: 0;
+  left: 0;
+  align-items: center;
+  border-bottom: var(--border-width) solid var(--color-border);
+  cursor: default;
+}
+
+.row:hover {
+  background: var(--color-hover);
+}
+
+.row[aria-selected='true'] {
+  background: var(--color-selected);
+}
+
+.cell {
+  overflow: hidden;
+  padding: 0 var(--space-2);
+  font-family: var(--font-family-code);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cell-editor {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: var(--z-suggestions);
+  white-space: normal;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-width) solid var(--color-focus);
+  background: var(--color-raised);
+}
+
+.cell-input {
+  padding: var(--space-1);
+  border: var(--border-width) solid var(--color-border);
+  background: var(--color-canvas);
+  color: var(--color-text);
+  font-family: var(--font-family-code);
+  font-size: var(--font-size-body);
+  resize: none;
+}
+
+.dialog-input {
+  width: 100%;
+  min-height: 240px;
+  padding: var(--space-2);
+  border: var(--border-width) solid var(--color-border);
+  background: var(--color-canvas);
+  color: var(--color-text);
+  font-family: var(--font-family-code);
+  font-size: var(--font-size-body);
+  resize: vertical;
+}
+
+.more {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+}
+
+.compact {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: 0 var(--space-3) var(--space-3);
+}
+
+.compact-text,
+.full-text {
+  margin: 0;
+  overflow: auto;
+  font-family: var(--font-family-code);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.compact-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.compact-table th,
+.compact-table td {
+  overflow: hidden;
+  padding: var(--space-0) var(--space-1);
+  border-bottom: var(--border-width) solid var(--color-border);
+  font-family: var(--font-family-code);
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.compact-table th {
+  color: var(--color-text-muted);
+  font-family: var(--font-family-ui);
+  font-weight: var(--font-weight-normal);
+}
+
+.inspected {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  overflow: auto;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}

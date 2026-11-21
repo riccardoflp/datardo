@@ -10,7 +10,7 @@ import { cellEditing, type EditedCell } from './item-editor';
 import { bytesShown, canLoadWhole, isEditable, nextPart, stringNote, type StringLoad } from './read-string';
 import { entryTime, fieldsLine, type StreamEntry } from './read-stream';
 import { checkText, itemWords, viewText } from './text';
-import { compactItems, filterPattern, isValueType, type ValueType } from './types';
+import { compactItems, filterPattern, isValueType, utf8, type ValueType } from './types';
 
 /** A control of the view: its label, the feature it starts and its identifier, and its key when it has one. */
 export interface Control {
@@ -142,6 +142,44 @@ const loadMores: Readonly<Record<ValueType, Control>> = {
   zset: { label: viewText.loadMore, feature: 'value.read-sorted-set', element: 'value.read-sorted-set@table' },
   stream: { label: viewText.loadMore, feature: 'value.read-stream', element: 'value.read-stream@table' },
 };
+
+/** The bytes a row is known by, which the selection keeps: a field's name, a member, an index, an entry's ID. */
+export function rowName(row: ValueRow): Uint8Array {
+  if (row.entry !== undefined) {
+    return utf8(row.entry.id);
+  }
+  const first = row.cells['Field'] ?? row.cells['Member'] ?? row.cells['Index'] ?? '';
+  return typeof first === 'string' ? utf8(first) : first;
+}
+
+function compared(one: Uint8Array | string | undefined, other: Uint8Array | string | undefined): number {
+  const left = typeof one === 'string' ? utf8(one) : (one ?? new Uint8Array());
+  const right = typeof other === 'string' ? utf8(other) : (other ?? new Uint8Array());
+  for (let index = 0; index < Math.min(left.length, right.length); index += 1) {
+    const difference = (left[index] ?? 0) - (right[index] ?? 0);
+    if (difference !== 0) {
+      return difference;
+    }
+  }
+  return left.length - right.length;
+}
+
+/**
+ * The loaded rows of a hash or a set sorted by a click on a column header: by the bytes of the column, compared one
+ * by one (the order of the characters for UTF-8 text), lowest first or highest first. The other types keep their own
+ * order.
+ */
+export function sortedRows(
+  type: ValueType,
+  rows: readonly ValueRow[],
+  sort: { readonly column: string; readonly order: 'ascending' | 'descending' } | undefined,
+): readonly ValueRow[] {
+  if (sort === undefined || (type !== 'hash' && type !== 'set')) {
+    return rows;
+  }
+  const sign = sort.order === 'ascending' ? 1 : -1;
+  return [...rows].sort((one, other) => sign * compared(one.cells[sort.column], other.cells[sort.column]));
+}
 
 /** The columns of each type's table. */
 export function columnsOf(type: ValueType, state: Pick<ValueState, 'ranged' | 'fieldExpiry'>): readonly string[] {

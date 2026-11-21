@@ -1,7 +1,8 @@
 /**
  * `key.inspect`: the selected key in the inspector island, drawn from its View: the name with **Copy name**, its type,
  * expiry (counted again every second), size and encoding, the line of a module's type, and the buttons of what can be
- * done to it. It is read 150 ms after the selection settles, and again after every refresh of its tab.
+ * done to it, then its value in the compact form (`value.show`). It is read 150 ms after the selection settles, and
+ * again after every refresh of its tab.
  */
 import { useEffect, useState } from 'react';
 import { settleMs } from '../../../features/key/details';
@@ -16,6 +17,7 @@ import { readInspected } from './keys-reads';
 import { factsOf, selectionOf } from './keys-state';
 import { useKeysTab } from './keys-store';
 import styles from './keys-page.module.css';
+import { ValueCompact } from '../value/value-inspector';
 
 /** The time the expiry is counted from, read again every second. */
 export function useClock(): number {
@@ -115,5 +117,13 @@ export function KeyInspector({ tabId }: { readonly tabId: string }): React.JSX.E
   const read: InspectRead = inspected !== undefined && inspected.key === keyHex ? inspected.read : { kind: 'loading' };
   const shown = view({ name, readOnly: factsOf(app, tab.where.connection).readOnly, read, now });
   const target: Target = { kind: 'key', connection: tab.where.connection, database: tab.where.database, key: name };
-  return <KeyDetails shown={shown} target={target} place="inspector" />;
+  const type = read.kind === 'loaded' && shown.value?.kind === 'value' ? read.key.type : undefined;
+  return (
+    <>
+      <KeyDetails shown={shown} target={target} place="inspector" />
+      {type === undefined ? null : (
+        <ValueCompact where={{ connection: tab.where.connection, database: tab.where.database, key: name, type }} />
+      )}
+    </>
+  );
 }

@@ -92,6 +92,16 @@ export function planOf(outcome: Outcome): Plan {
   return outcome.plan;
 }
 
+/** The question of a plan's confirmation: the first line of its text; none for a plan that is not confirmed. */
+export function questionOf(plan: Plan): string | undefined {
+  return plan.danger.kind === 'none' ? undefined : plan.danger.text.split('\n')[0];
+}
+
+/** What a plan's confirmation says under its question; empty when nothing. */
+export function detailOf(plan: Plan): string | undefined {
+  return plan.danger.kind === 'none' ? undefined : plan.danger.text.split('\n').slice(1).join('\n');
+}
+
 /** The texts of the steps of a plan, as the confirmation and the Log show them. */
 export function stepTexts(outcome: Outcome): readonly string[] {
   return planOf(outcome).steps.map((step) => (step as EngineStep).text);

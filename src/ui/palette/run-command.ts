@@ -7,6 +7,7 @@ import { intentOf } from '../../features/palette/run-command';
 import type { Intent } from '../../shared/bridge';
 import type { AppState } from '../../shared/state';
 import { databasesArgs } from '../pages/keys/keys-path';
+import { isValueCommand, runValueCommand } from '../pages/value/value-commands';
 import { focusNextIsland } from '../shell/focus';
 import { startIntent } from '../shell/top-bar/start';
 import { queryCommandIds, runQueryCommand } from '../query/query-commands';
@@ -70,6 +71,10 @@ export function runCommand(id: string, state: AppState): void {
   }
   if (isTableCommand(id)) {
     runTableCommand(id, state);
+    return;
+  }
+  if (isValueCommand(id, state)) {
+    runValueCommand(id, state);
     return;
   }
   const local = windowOnly[id];

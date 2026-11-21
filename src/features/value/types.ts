@@ -6,11 +6,12 @@
 import type { ConnectionView } from '../../shared/connection';
 import type { ConnectionRequest, Json, RedisRequest } from '../../shared/engine-request';
 import { redisCommand } from '../../shared/engine-request';
-import type { After, Context, EngineStep, ReadRequest, Undo } from '../../shared/feature';
+import type { After, Answers, Context, EngineStep, ReadRequest, Undo } from '../../shared/feature';
 import type { ConnectionId } from '../../shared/ids';
 import { savedConnection } from '../../shared/state/connections';
 import type { Target } from '../../shared/target';
 import { isVersionAtLeast } from '../connection/server-info';
+import { keepsJson, keyNameOf } from '../undo/types';
 import { quoted } from './quote';
 import { byteUnits, characterLength, type ByteUnit } from '../../shared/utf8';
 
@@ -240,9 +241,22 @@ export function filterPattern(typed: string): string | undefined {
   return /[*?[\\]/u.test(typed) ? typed : `*${typed}*`;
 }
 
-/** What the undo history keeps before a write of this area: the whole key, by `DUMP` and `PTTL` (`undo.record`). */
-export function keyKept(at: KeyAt, title: string): Undo {
-  return { keeps: { kind: 'redis-keys', title, database: at.database, keys: [hexOf(at.key)] } };
+/**
+ * What the undo history keeps before a write of this area: the whole key, by `DUMP` and `PTTL` (`undo.record`; D58),
+ * as the writes of keys keep theirs (`keysKept`). The operation is named by the plan's title.
+ */
+export function keyKept(at: KeyAt): Undo {
+  return { keeps: keepsJson({ kind: 'keys', database: at.database, keys: [keyNameOf(at.key)] }) };
+}
+
+/**
+ * The answers of a feature with the arguments it was started with (`Intent.args`): a control of the window gives
+ * what was typed, the bytes loaded and the items selected as arguments, which the runner keeps under `answers.args`.
+ * What the reads learned (`check`, `current`) is never taken from the arguments.
+ */
+export function withArgs(answers: Answers): Answers {
+  const { check: _check, current: _current, ...given } = fieldsOf(answers['args']);
+  return { ...given, ...answers };
 }
 
 /** What follows every write of this area: the view reads the count and the page again. */

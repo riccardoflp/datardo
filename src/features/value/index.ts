@@ -2,7 +2,7 @@
  * The Operations and the Reads of the value area, as the runner starts them. Derivations and views are not listed,
  * except `value.stream-groups`, a View whose section has reads of its own.
  */
-import type { RunnableFeature } from '../../shared/feature';
+import type { OperationFeature, RunnableFeature } from '../../shared/feature';
 import { featureId } from '../../shared/ids';
 import * as addEntry from './add-entry';
 import * as addField from './add-field';
@@ -32,6 +32,12 @@ import * as saveString from './save-string';
 import * as streamGroups from './stream-groups';
 import * as trimList from './trim-list';
 import * as trimStream from './trim-stream';
+import { withArgs } from './types';
+
+/** An Operation of this area, given the arguments it was started with as answers (`withArgs`). */
+function operation(id: string, plan: OperationFeature['plan']): OperationFeature {
+  return { kind: 'operation', id: featureId(id), plan: (context, answers) => plan(context, withArgs(answers)) };
+}
 
 /** The features of this area the runner can start. */
 export const features: readonly RunnableFeature[] = [
@@ -44,23 +50,23 @@ export const features: readonly RunnableFeature[] = [
   { kind: 'read', id: featureId('value.read-sorted-set'), request: readSortedSet.request, parse: readSortedSet.parse },
   { kind: 'read', id: featureId('value.read-stream'), request: readStream.request, parse: readStream.parse },
   { kind: 'read', id: featureId('value.stream-groups'), request: streamGroups.request, parse: streamGroups.parse },
-  { kind: 'operation', id: featureId('value.refresh'), plan: refresh.plan },
-  { kind: 'operation', id: featureId('value.copy'), plan: copy.plan },
-  { kind: 'operation', id: featureId('value.save-string'), plan: saveString.plan },
-  { kind: 'operation', id: featureId('value.add-field'), plan: addField.plan },
-  { kind: 'operation', id: featureId('value.edit-field'), plan: editField.plan },
-  { kind: 'operation', id: featureId('value.rename-field'), plan: renameField.plan },
-  { kind: 'operation', id: featureId('value.remove-fields'), plan: removeFields.plan },
-  { kind: 'operation', id: featureId('value.push-element'), plan: pushElement.plan },
-  { kind: 'operation', id: featureId('value.edit-element'), plan: editElement.plan },
-  { kind: 'operation', id: featureId('value.remove-elements'), plan: removeElements.plan },
-  { kind: 'operation', id: featureId('value.trim-list'), plan: trimList.plan },
-  { kind: 'operation', id: featureId('value.add-member'), plan: addMember.plan },
-  { kind: 'operation', id: featureId('value.remove-members'), plan: removeMembers.plan },
-  { kind: 'operation', id: featureId('value.add-scored-member'), plan: addScoredMember.plan },
-  { kind: 'operation', id: featureId('value.change-score'), plan: changeScore.plan },
-  { kind: 'operation', id: featureId('value.remove-scored-members'), plan: removeScoredMembers.plan },
-  { kind: 'operation', id: featureId('value.add-entry'), plan: addEntry.plan },
-  { kind: 'operation', id: featureId('value.delete-entries'), plan: deleteEntries.plan },
-  { kind: 'operation', id: featureId('value.trim-stream'), plan: trimStream.plan },
+  operation('value.refresh', refresh.plan),
+  operation('value.copy', copy.plan),
+  operation('value.save-string', saveString.plan),
+  operation('value.add-field', addField.plan),
+  operation('value.edit-field', editField.plan),
+  operation('value.rename-field', renameField.plan),
+  operation('value.remove-fields', removeFields.plan),
+  operation('value.push-element', pushElement.plan),
+  operation('value.edit-element', editElement.plan),
+  operation('value.remove-elements', removeElements.plan),
+  operation('value.trim-list', trimList.plan),
+  operation('value.add-member', addMember.plan),
+  operation('value.remove-members', removeMembers.plan),
+  operation('value.add-scored-member', addScoredMember.plan),
+  operation('value.change-score', changeScore.plan),
+  operation('value.remove-scored-members', removeScoredMembers.plan),
+  operation('value.add-entry', addEntry.plan),
+  operation('value.delete-entries', deleteEntries.plan),
+  operation('value.trim-stream', trimStream.plan),
 ];

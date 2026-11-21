@@ -11,7 +11,7 @@ import { layout, railWidth, rightMargin, type Layout } from '../../features/nav/
 import { dragged, widthLimits, type ResizedIsland } from '../../features/nav/resize';
 import { navInput, type NavInput } from '../../features/nav/types';
 import { useCollectionStatus } from '../query/collection-status';
-import { tabExtras } from '../pages';
+import { tabExtras, usePageStores } from '../pages';
 import { useAppState } from '../state/store';
 import { ConnectionSwitcher } from './connection-switcher';
 import { Explorer } from './explorer';
@@ -84,6 +84,7 @@ function withPageExtras(input: NavInput, state: ReturnType<typeof useAppState>):
 /** The islands. */
 export function Islands(): React.JSX.Element {
   const state = useAppState();
+  usePageStores();
   const input = withPageExtras(useCollectionStatus(state, navInput(state)), state);
   const windowWidth = useWindowWidth();
   const [drag, setDrag] = useState<Drag | undefined>(undefined);

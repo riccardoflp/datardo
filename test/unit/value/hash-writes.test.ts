@@ -4,6 +4,7 @@ import * as editField from '../../../src/features/value/edit-field';
 import * as removeFields from '../../../src/features/value/remove-fields';
 import * as renameField from '../../../src/features/value/rename-field';
 import * as saveString from '../../../src/features/value/save-string';
+import { keyNameOf } from '../../../src/features/undo/types';
 import { hexOf } from '../../../src/features/value/types';
 import {
   bytes,
@@ -59,7 +60,7 @@ describe('value.save-string', () => {
     expect(stepTexts(outcome)).toEqual(['SET orders:42 "hello world" KEEPTTL']);
     expect(planOf(outcome).danger).toEqual({ kind: 'none' });
     expect(planOf(outcome).undo).toEqual({
-      keeps: { kind: 'redis-keys', title: 'Edit orders:42', database: 0, keys: [hexOf(utf8('orders:42'))] },
+      keeps: { kind: 'keys', database: 0, keys: [keyNameOf(utf8('orders:42'))] },
     });
   });
 
@@ -76,8 +77,12 @@ describe('value.save-string', () => {
   it('asks Overwrite when the value changed, and closing it writes nothing', () => {
     const changed = { ...answers, ...readAnswers('string', [utf8('hullo')]) };
     const plan = planOf(saveString.plan(context, changed));
-    expect(plan.title).toBe('orders:42 was changed in the database after it was loaded. Overwrite it?');
-    expect(plan.danger).toEqual({ kind: 'confirm', text: '', button: 'Overwrite' });
+    expect(plan.title).toBe('Edit orders:42');
+    expect(plan.danger).toEqual({
+      kind: 'confirm',
+      text: 'orders:42 was changed in the database after it was loaded. Overwrite it?',
+      button: 'Overwrite',
+    });
     expect(refusalOf(saveString.plan(context, { ...changed, overwrite: false }))).toEqual({
       code: 'value.save-string/changed',
       message: 'Not saved: the value changed in the database.',
@@ -89,7 +94,7 @@ describe('value.save-string', () => {
     expect(stepTexts(outcome)).toEqual(['SET orders:42 "hello world"']);
     expect(planOf(outcome).danger).toEqual({
       kind: 'confirm',
-      text: 'It is created without an expiry.',
+      text: 'The key orders:42 no longer exists. Create it again?\nIt is created without an expiry.',
       button: 'Create again',
     });
   });
@@ -182,7 +187,10 @@ describe('value.edit-field', () => {
   it('asks Overwrite when another client set visits to 13 meanwhile', () => {
     const context = keyContext('value.edit-field');
     const plan = planOf(editField.plan(context, { ...answers, ...readAnswers('hash', [utf8('13'), [-1]]) }));
-    expect(plan.title).toBe('visits of user:7 was changed to 13 in the database after it was loaded. Overwrite it?');
+    expect(plan.title).toBe('Edit field visits of user:7');
+    expect(plan.danger.kind === 'confirm' && plan.danger.text).toBe(
+      'visits of user:7 was changed to 13 in the database after it was loaded. Overwrite it?',
+    );
   });
 
   it('writes nothing for a value saved without a change', () => {
@@ -249,8 +257,8 @@ describe('value.remove-fields', () => {
   it('asks Remove the field nickname from user:7? and sends HDEL user:7 nickname', () => {
     const outcome = removeFields.plan(context, { fields: [hex('nickname')], ...readAnswers('hash', [2]) });
     const plan = planOf(outcome);
-    expect(plan.title).toBe('Remove the field nickname from user:7?');
-    expect(plan.danger).toEqual({ kind: 'confirm', text: '', button: 'Remove' });
+    expect(plan.title).toBe('Remove field nickname from user:7');
+    expect(plan.danger).toEqual({ kind: 'confirm', text: 'Remove the field nickname from user:7?', button: 'Remove' });
     expect(stepTexts(outcome)).toEqual(['HDEL user:7 nickname']);
   });
 
@@ -265,7 +273,7 @@ describe('value.remove-fields', () => {
     const plan = planOf(removeFields.plan(context, { fields: [hex('a'), hex('b')], ...readAnswers('hash', [2]) }));
     expect(plan.danger).toEqual({
       kind: 'confirm',
-      text: 'They are all the fields of user:7: the key is deleted with them.',
+      text: 'Remove 2 fields from user:7?\nThey are all the fields of user:7: the key is deleted with them.',
       button: 'Remove',
     });
   });

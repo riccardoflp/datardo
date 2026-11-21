@@ -8,16 +8,34 @@ import { currentReplies, guard, readCurrent, readOnlyRefusal, typedAnswer, write
 import { hashText } from './text';
 import { keyOf, nameText, replyNumber, writeStep } from './types';
 
-/** The form **Add a field to user:7**: **Field** and **Value**, each typed as text, JSON or hexadecimal. */
+/** The formats a text of the form is typed in, as **Field as** and **Value as** offer them. */
+const formatChoices = [
+  { value: 'text', label: 'Text' },
+  { value: 'json', label: 'JSON' },
+  { value: 'hex', label: 'Hex' },
+];
+
+/**
+ * The form **Add a field to user:7**: **Field** and **Value**, each typed as text, JSON or hexadecimal, as chosen in
+ * **Field as** and **Value as** (**Text** at first).
+ */
 function addForm(key: string): Outcome {
   return ask({
     title: hashText.addFieldForm(key),
     button: 'Add',
     fields: [
       { kind: 'text', key: 'field', label: 'Field' },
+      { kind: 'pick-one', key: 'fieldFormat', label: hashText.fieldAs, choices: formatChoices, default: 'text' },
       { kind: 'text', key: 'value', label: 'Value' },
+      { kind: 'pick-one', key: 'valueFormat', label: hashText.valueAs, choices: formatChoices, default: 'text' },
     ],
   });
+}
+
+/** What was typed in a text of the form, with the format chosen beside it; `{ text, format }` as a window sends it. */
+function typedIn(answers: Answers, name: string, format: string): unknown {
+  const given = answers[name];
+  return typeof given === 'string' ? { text: given, format: answers[format] ?? 'text' } : given;
 }
 
 /**
@@ -32,11 +50,11 @@ export function plan(context: Context, answers: Answers): Outcome {
   if (answers['field'] === undefined || answers['value'] === undefined) {
     return addForm(nameText(keyOf(context).key));
   }
-  const field = typedAnswer(answers['field']);
+  const field = typedAnswer(typedIn(answers, 'field', 'fieldFormat'));
   if ('problem' in field) {
     return refuse('value.add-field/invalid', field.problem);
   }
-  const value = typedAnswer(answers['value']);
+  const value = typedAnswer(typedIn(answers, 'value', 'valueFormat'));
   if ('problem' in value) {
     return refuse('value.add-field/invalid', value.problem);
   }
