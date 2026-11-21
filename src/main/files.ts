@@ -29,6 +29,8 @@ import { savedQueriesData } from './saved-queries';
 import { writeDownload } from './gridfs';
 import { carryOutTransferStep, type TransferStepServices } from './transfer-steps';
 import { messagesFile } from './pubsub-commands';
+import { carryOutTaskStep } from './task-writer';
+import { taskHost } from './tasks';
 
 const formats: readonly ExportFormat[] = ['datardo', 'compass', 'list'];
 const modes: readonly ExportSecrets[] = ['remove', 'include', 'encrypt'];
@@ -152,6 +154,10 @@ const transferServices: TransferStepServices = {
 export const fileWriter: FileWriter = async (step: FileStep, signal: AbortSignal, progress?: ProgressReport) => {
   if (step.content?.writer === queryFileWriter) {
     await queryFile(step, step.content.args);
+    return;
+  }
+  const tasks = taskHost();
+  if (tasks !== undefined && (await carryOutTaskStep(tasks, step, signal, progress))) {
     return;
   }
   if (await carryOutTransferStep(transferServices, step, signal, progress)) {

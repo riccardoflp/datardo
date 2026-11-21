@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "tasks": [
+    {
+      "id": "t-nightly",
+      "name": "Back up shop",
+      "engine": "mongodb",
+      "kind": "backup",
+      "enabled": true,
+      "connection": "c-local",
+      "database": "shop",
+      "format": "archive",
+      "folder": "D:\\backups",
+      "pattern": "{name}_{date}_{time}",
+      "schedule": { "kind": "daily", "time": "02:00" },
+      "keep": 7,
+      "runMissed": false,
+      "notifySuccess": false,
+      "since": 1761951600000
+    },
+    {
+      "id": "t-orders",
+      "name": "Export shop.orders",
+      "engine": "mongodb",
+      "kind": "export",
+      "enabled": false,
+      "connection": "c-local",
+      "database": "shop",
+      "collection": "orders",
+      "format": "jsonl",
+      "filter": "{ status: \"open\" }",
+      "projection": "{ total: 1 }",
+      "folder": "D:\\exports",
+      "pattern": "{collection}_{date}",
+      "schedule": { "kind": "weekly", "days": [1, 4], "time": "06:30" },
+      "keep": 0,
+      "runMissed": true,
+      "notifySuccess": true,
+      "since": 1761951600000
+    }
+  ]
+}

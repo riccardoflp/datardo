@@ -87,6 +87,23 @@ export const formText = {
   notifySuccess: 'Notify after successful runs too',
   notifySuccessTooltip: 'Failed and skipped runs always notify',
   enabled: 'Enabled',
+  labels: {
+    name: 'Name',
+    kind: 'Kind',
+    connection: 'Connection',
+    database: 'Database',
+    collection: 'Collection',
+    format: 'Format',
+    filter: 'Filter',
+    projection: 'Projection',
+    folder: 'Folder',
+    pattern: 'File name',
+    when: 'When',
+    every: 'Every … hours',
+    time: 'At (HH:MM)',
+    keep: 'Keep',
+    options: 'Options',
+  },
 } as const;
 
 /** What is wrong with a field of the form (`task.edit`). */
@@ -112,10 +129,19 @@ export const problemText = {
 /** The steps, titles and messages of the plans of the area. */
 export const planText = {
   save: (name: string): string => `save the scheduled task "${name}"`,
+  openForm: 'Open the form of a scheduled task',
   saved: (name: string, schedule: string, next: string): string => `Saved "${name}" (${schedule}). Next run: ${next}.`,
   savedDisabled: (name: string, schedule: string): string => `Saved "${name}" (${schedule}). It is disabled.`,
   cannotUndoEdit: 'A scheduled task is not in the undo history: edit it again.',
   saveFailed: (error: string): string => `Could not save the task: ${error}`,
+  newerFile: 'the tasks were written by a newer version of Datardo',
+  notSaved: (error: string): string => `The scheduled tasks could not be saved: ${error}`,
+  damagedTasks: (file: string): string =>
+    `The scheduled tasks could not be read and were set aside as ${file.split(/[\\/]/u).at(-1) ?? file}.`,
+  openDataFolder: 'Open data folder',
+  notConnected: 'the connection did not open',
+  newerTasks:
+    'These tasks were written by a newer version of Datardo. Changes to the tasks are not saved until Datardo is updated.',
   runTitle: (name: string): string => `Run the scheduled task "${name}"`,
   startRun: (name: string): string => `start the run of "${name}"`,
   write: (path: string): string => `write ${path}`,
@@ -161,6 +187,7 @@ export const planText = {
 /** The Scheduled tasks page (`task.show`). */
 export const pageText = {
   title: 'Scheduled tasks',
+  opensNothing: 'Opening a page changes nothing.',
   summary: (tasks: number, enabled: number): string => `${counted(tasks, 'task')}, ${groupThousands(enabled)} enabled`,
   newTask: 'New task…',
   empty:
@@ -209,4 +236,9 @@ export const notifyText = {
     `Scheduled task "${name}" done (${what}) in ${seconds} s: ${file}`,
   show: 'Show scheduled tasks',
   reveal: 'Reveal',
+} as const;
+
+/** The entries other areas show for this one. */
+export const menuText = {
+  schedule: 'Schedule…',
 } as const;

@@ -41,6 +41,18 @@ A pin of a saved query in `pins.json` names its database, collection and name, a
 `folder`), `file` (the path of its file inside the queries folder) and `query` (the query of one for me): optional
 fields of version 1, which an older Datardo leaves out when it reads the file ([Q80](decisions.md#open-questions)).
 
+`tasks/tasks.json` holds `tasks`, a list in the order of the page, each with `id`, `name`, `engine` (`mongodb`),
+`kind` (`backup` or `export`), `enabled`, `connection` (its id), the optional `database` and `collection`, `format`
+(`archive`, `gzip` or `plain` for a backup; `json`, `jsonl` or `csv` for an export), an export's optional `filter`
+and `projection` in mongosh syntax, `folder`, `pattern`, `schedule` (`{ kind: "hours", every, time }`,
+`{ kind: "daily", time }` or `{ kind: "weekly", days, time }`, with `time` as `HH:MM` in local time and `days` from 0,
+Sunday), `keep` (0 keeps every output), `runMissed`, `notifySuccess` and `since` (milliseconds since 1970).
+`tasks/<id>.json` holds the optional `lastSlot`, `runs` (newest first, at most 20, each with `start`, `end`,
+`trigger`, `status` and the optional `output`, `size`, `documents`, `collections`, `error`, `note` and `deleted`),
+`outputs` (oldest first, each with `path`, `at`, `size` and `folder`) and, while a run is in progress, `running`
+(`start`, `trigger` and the optional `slot`), so that a run cut short by a quit is known at the next start. Both are
+recorded at version 1 in `test/fixtures/stored/tasks/v1/` ([Q119](decisions.md#open-questions)).
+
 The Log is kept in memory and is never written to disk ([security](security.md#what-can-go-wrong), T1). Datardo writes
 no crash report and no usage data.
 

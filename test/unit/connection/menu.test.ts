@@ -36,6 +36,7 @@ describe('connection.menu', () => {
       '—',
       'Back up…',
       'Restore from backup…',
+      'Schedule…',
       '—',
       'Remove connection',
     ]);

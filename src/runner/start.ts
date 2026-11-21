@@ -82,7 +82,8 @@ function failed(session: Session, error: unknown): IntentResult {
   }
   const shown = errorMessage(error);
   writeLog(ports, [{ feature: context.feature, kind: 'error', text: shown.details }]);
-  if (context.startedBy !== 'mcp') {
+  // The MCP server answers its tool with the error; a scheduled task's run notifies by `task.notify`.
+  if (context.startedBy === 'user') {
     notify(ports, { feature: context.feature, level: 'error', text: shown.message, details: shown.details });
   }
   return { kind: 'failed', message: shown.message, details: shown.details };

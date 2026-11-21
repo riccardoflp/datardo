@@ -17,7 +17,7 @@ import { previousRun, timeText } from './next-runs';
 import { retentionChoice, retentionSteps } from './retention';
 import { planText } from './text';
 import type { DiskFacts, RunInProgress, RunTrigger, ScheduledTask, TaskOutput, TaskRun, TaskState } from './types';
-import { appStep, argumentTask, argumentsOf, diskFactsOf, isRunning, nothingToDo, stateOf, tasksOf } from './types';
+import { appStep, argumentTask, argumentsOf, diskOf, isRunning, nothingToDo, stateOf, tasksOf } from './types';
 
 const triggers: readonly RunTrigger[] = ['schedule', 'manual', 'missed'];
 
@@ -138,7 +138,7 @@ export function plan(context: Context, answers: Answers): Outcome {
   }
   const asked = argumentsOf(answers)['trigger'];
   const trigger = triggers.find((each) => each === asked) ?? 'manual';
-  return runPlan(context, task, trigger, diskFactsOf(answers['disk']));
+  return runPlan(context, task, trigger, diskOf(answers));
 }
 
 /**

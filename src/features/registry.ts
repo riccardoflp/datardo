@@ -40,6 +40,7 @@ import { features as searchFeatures } from './search';
 import { features as relationFeatures } from './relation';
 import { features as compareFeatures } from './compare';
 import { features as structureFeatures } from './structure';
+import { features as taskFeatures } from './task';
 
 /** The features of every area, as each area's index lists them. */
 const areas: readonly (readonly RunnableFeature[])[] = [
@@ -79,6 +80,7 @@ const areas: readonly (readonly RunnableFeature[])[] = [
   relationFeatures,
   compareFeatures,
   structureFeatures,
+  taskFeatures,
 ];
 
 /** The features the runner can start, by identifier. */

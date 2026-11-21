@@ -1,0 +1,341 @@
+/* task.show and task.edit: the toolbar, the note and the message, the form of a task, then the list of the tasks. */
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.summary,
+.muted,
+.hint {
+  color: var(--color-text-muted);
+}
+
+.button,
+.primary,
+.more {
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-small);
+  background: var(--color-island);
+  color: var(--color-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.primary {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-accent-text);
+}
+
+.button:hover,
+.more:hover {
+  background: var(--color-hover);
+}
+
+.link {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-accent);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.note,
+.message {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.message[data-failed='true'],
+.problem {
+  color: var(--color-danger);
+}
+
+.scroller {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  color: var(--color-text-muted);
+}
+
+.empty p {
+  margin: 0;
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  border-bottom: var(--border-width) solid var(--color-border);
+  cursor: pointer;
+}
+
+.item:hover {
+  background: var(--color-hover);
+}
+
+.item[data-selected='true'] {
+  background: var(--color-selected);
+}
+
+.item:focus-visible {
+  outline: var(--focus-width) solid var(--color-focus);
+  outline-offset: calc(0px - var(--focus-width));
+}
+
+.row {
+  display: grid;
+  grid-template-columns:
+    auto minmax(10rem, 2fr) minmax(8rem, 2fr) minmax(8rem, 1.5fr) minmax(6rem, 1fr) minmax(8rem, 2fr)
+    auto auto;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+}
+
+.item[data-greyed='true'] .row {
+  opacity: 0.6;
+}
+
+.name,
+.cell {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.disclosure {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  font-weight: var(--font-weight-strong, 600);
+  text-align: left;
+  cursor: pointer;
+}
+
+.source {
+  overflow: hidden;
+  padding-left: var(--space-2);
+  border-left: var(--space-1) solid var(--connection-color, var(--color-border));
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.source[data-removed='true'],
+[data-status='failed'] {
+  color: var(--color-danger);
+}
+
+[data-status='skipped'] {
+  color: var(--color-warning);
+}
+
+[data-status='done'] {
+  color: var(--color-success);
+}
+
+/* The colors of the statuses and of the links do not keep 4.5:1 on the selected background: the text's does. */
+.item[data-selected='true'] [data-status],
+.item[data-selected='true'] .link {
+  color: var(--color-text);
+}
+
+[data-color='red'] {
+  --connection-color: var(--color-connection-red, var(--color-danger));
+}
+
+[data-color='orange'] {
+  --connection-color: var(--color-connection-orange, var(--color-warning));
+}
+
+[data-color='yellow'] {
+  --connection-color: var(--color-connection-yellow, var(--color-warning));
+}
+
+[data-color='green'] {
+  --connection-color: var(--color-connection-green, var(--color-success));
+}
+
+[data-color='blue'] {
+  --connection-color: var(--color-connection-blue, var(--color-accent));
+}
+
+[data-color='purple'] {
+  --connection-color: var(--color-connection-purple, var(--color-accent));
+}
+
+.switch {
+  cursor: pointer;
+}
+
+.details {
+  padding: var(--space-2) var(--space-3) var(--space-3) var(--space-6, var(--space-4));
+  cursor: default;
+}
+
+.facts {
+  margin: 0 0 var(--space-2);
+  padding: 0;
+  list-style: none;
+}
+
+.runs {
+  border-collapse: collapse;
+}
+
+.runs td {
+  padding: var(--space-1) var(--space-3) var(--space-1) 0;
+  vertical-align: top;
+}
+
+.deleted {
+  color: var(--color-text-muted);
+  text-decoration: line-through;
+}
+
+.menu {
+  z-index: var(--z-dialog);
+  min-width: calc(var(--dialog-width) / 3);
+  padding: var(--space-1);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-medium);
+  background: var(--color-raised);
+  color: var(--color-text);
+}
+
+.menuItem {
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-small);
+  outline: none;
+  cursor: default;
+}
+
+.menuItem[data-highlighted] {
+  background: var(--color-selected);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-width: calc(var(--dialog-width) * 1.5);
+  margin: var(--space-3);
+  padding: var(--space-3);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-medium);
+  background: var(--color-raised);
+}
+
+.formTitle {
+  margin: 0;
+  font-size: inherit;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.kinds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.kinds .hint {
+  flex-basis: 100%;
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.input,
+.time,
+.number {
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-small);
+  background: var(--color-canvas);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.inline .input {
+  flex: 1;
+  min-width: 12rem;
+}
+
+.withAside {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-2);
+}
+
+.withAside .label {
+  flex: 1;
+}
+
+.time {
+  width: 6rem;
+}
+
+.number {
+  width: 5rem;
+}
+
+.buttons {
+  display: flex;
+  gap: var(--space-2);
+}

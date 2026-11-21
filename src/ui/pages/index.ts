@@ -50,6 +50,7 @@ import { useCompareChanges } from './compare/compare-store';
 import { StructureInspector, structureExtras } from './structure/structure-inspector';
 import { StructurePage } from './structure/structure-page';
 import { useStructureChanges } from './structure/structure-store';
+import { TasksPage } from './tasks/tasks-page';
 
 /** A page as the main island draws it. */
 export type PageView = () => React.JSX.Element | null;
@@ -72,6 +73,7 @@ export const pages: Readonly<Record<string, PageView>> = {
   diagram: DiagramPage,
   compare: ComparePage,
   structure: StructurePage,
+  tasks: TasksPage,
 };
 
 /** The pages of the tabs that show a target of a connection, by the kind of what they show (`keys`, `key`). */

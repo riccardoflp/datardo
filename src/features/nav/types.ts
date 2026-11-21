@@ -92,6 +92,8 @@ export interface NavInput {
   readonly work: readonly Work[];
   /** The zoom of the window, in percent (`window.zoom`). */
   readonly zoom: number;
+  /** How many scheduled tasks are running now (`task.show`). */
+  readonly tasksRunning?: number;
 }
 
 /** What the server is, as the nav area shows it: the first two numbers of the version and the topology. */
@@ -159,6 +161,7 @@ export function navInput(state: AppState): NavInput {
         : { ...active.shows, tab: active.id, ...(active.section === undefined ? {} : { section: active.section }) },
     work: state.runner.work,
     zoom: setting(state.settings, 'datardo.window.zoom'),
+    tasksRunning: Object.keys(state.tasks.running).length,
   };
 }
 

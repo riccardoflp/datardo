@@ -3,6 +3,10 @@
  * and, for a task, its last 20 runs with what they wrote.
  */
 import type { ConnectionColor, ConnectionView } from '../../shared/connection';
+import type { OperationFeature } from '../../shared/feature';
+import { noDanger, run } from '../../shared/feature';
+import { featureId } from '../../shared/ids';
+import { pathStep } from '../transfer/ask/choose-path';
 import type { SettingsState } from '../../shared/state/settings';
 import { groupThousands } from '../../shared/text-units';
 import { nextTaskRun } from './due';
@@ -11,7 +15,7 @@ import { describeSchedule, whenText } from './next-runs';
 import { formatLabels, pageText } from './text';
 import { keepsRunning } from './tray';
 import type { PageMessage, RunStatus, ScheduledTask, TaskId, TaskRun, TaskState, TasksState } from './types';
-import { stateOf } from './types';
+import { argumentsOf, stateOf } from './types';
 
 /** What the page is drawn from. */
 export interface ShowState {
@@ -321,3 +325,25 @@ export function view(state: ShowState): ShowView {
     items: tasks.map((task) => item(task, state)),
   };
 }
+
+/**
+ * Feature: task.show — opening the page: no step; what follows shows the one **Scheduled tasks** tab of the app. With
+ * `args.reveal`, the output of a run (a link of the page, **Reveal** of a notification) is shown in the system's file
+ * manager instead (`transfer.reveal-path`).
+ */
+export const open: OperationFeature = {
+  kind: 'operation',
+  id: featureId('task.show'),
+  plan: (_context, answers) => {
+    const reveal = argumentsOf(answers)['reveal'];
+    const revealed = typeof reveal === 'string' && reveal !== '';
+    return run({
+      title: pageText.title,
+      steps: revealed ? [pathStep('reveal', reveal)] : [],
+      danger: noDanger,
+      undo: { cannot: pageText.opensNothing },
+      publishes: false,
+      after: revealed ? [] : [{ kind: 'open', page: 'tasks' }],
+    });
+  },
+};

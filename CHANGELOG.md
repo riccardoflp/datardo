@@ -194,6 +194,11 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
 - **Compare structure with…** compares the collections, views, options, indexes, search indexes and shard keys of two
   databases, and makes the right one like the left one: with the script copied or opened in a playground, or applied
   after a confirmation that asks to type the name of what it drops.
+- Scheduled tasks back up a connection, a database or a collection, or export a collection with a filter and a
+  projection, every few hours, daily or weekly while Datardo runs, also from the tray: **Schedule…** on a connection,
+  a database or a collection, or **New task…** on the Scheduled tasks page, which shows each task's next run and last
+  runs. A run missed while Datardo was closed is logged or run once at the next start, older outputs past **Keep**
+  are deleted (never a file the task did not write), a run can be run now or cancelled, and failed runs notify.
 
 ### Fixed
 

@@ -23,6 +23,7 @@ import { start as startWatch } from './watch';
 import { start as startPubSub } from './pubsub';
 import { start as startSearch } from './search';
 import { start as startRelations } from './relations';
+import { start as startTasks } from './tasks';
 
 /** What one area does at start. */
 export type AreaStart = (services: MainServices) => Promise<void>;
@@ -49,6 +50,7 @@ const starts: readonly AreaStart[] = [
   startMcp,
   startSearch,
   startRelations,
+  startTasks,
   startPing,
   startCheckUpdate,
 ];

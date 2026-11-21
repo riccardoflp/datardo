@@ -521,7 +521,7 @@ the secret storage, connects and disconnects, makes it read-only, and sees its O
 - Named by cards above and built in M22: `index.create`.
 - Named by cards above and built in M25: `backup.create`, `backup.restore`, `transfer.import`,
   `transfer.copy-collection`, `transfer.generate`.
-- Named by cards above and built in M26: `task.run`.
+- Named by cards above and built in M26: `task.edit`, `task.run`.
 - Named by cards above and built in M29: `mcp.server`.
 - Named by cards above and built in M30: `monitor.show`.
 - Named by cards above and built in M35: `structure.apply`.
@@ -1880,7 +1880,7 @@ restored in mongodump's formats.
 **Goal**: Backups and exports run by themselves at set times while Datardo runs, also from the tray; missed runs are
 handled, old outputs are removed, and the page shows each task's last runs.
 **Depends on**: M25.
-**Status**: planned
+**Status**: done
 
 ### Features
 
@@ -1913,13 +1913,13 @@ handled, old outputs are removed, and the page shows each task's last runs.
 
 ### Exit criteria
 
-- [ ] A task set for every minute runs three times with the window closed and Datardo in the tray, and retention keeps
+- [x] A task set for every minute runs three times with the window closed and Datardo in the tray, and retention keeps
       its last two outputs and deletes only files it wrote.
-- [ ] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
+- [x] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
       `npm run test:integration`, `npm run test:ui`; `catalog.py --tests` reports none missing for these cards.
-- [ ] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
+- [x] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
       the keyboard alone (QA15, QA16).
-- [ ] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
+- [x] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
       and this milestone's **Status** is *done*.
 
 ### Not in this milestone

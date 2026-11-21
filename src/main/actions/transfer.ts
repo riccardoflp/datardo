@@ -15,6 +15,11 @@ import { listFolder, listNames, readArchiveList, readImportFile, readMetadata, t
 /** The folder last chosen in each area, until Datardo quits. */
 const lastFolders = new Map<string, string>();
 
+/** The folder last chosen in an area (`backup`, `transfer`), else the home folder: where a dialog starts. */
+export function lastFolderOf(area: string): string {
+  return lastFolders.get(area) ?? app.getPath('home');
+}
+
 interface Filter {
   readonly name: string;
   readonly extensions: string[];
@@ -41,7 +46,7 @@ function choosePath(services: MainServices, area: string): AppAction {
     const mode = textArgOf(args, 'mode');
     const title = textArgOf(args, 'title');
     const buttonLabel = textArgOf(args, 'button');
-    const folder = lastFolders.get(area) ?? app.getPath('home');
+    const folder = lastFolderOf(area);
     const window = services.window();
     let chosen: string | undefined;
     if (mode === 'save') {

@@ -36,6 +36,7 @@ import { initialWatchState, reduceWatch, type WatchPages, type WatchStateEvent }
 import { initialPubSubPages, reducePubSub, type PubSubEvent, type PubSubPages } from './pubsub';
 import { initialSearchState, reduceSearch, type SearchState, type SearchStateEvent } from './search';
 import { initialRelationState, reduceRelation, type RelationState, type RelationStateEvent } from './relation';
+import { initialTasksState, reduceTasks, type TasksEvent, type TasksState } from './tasks';
 
 /** Everything the window shows and the features decide from, apart from the results of reads. */
 export interface AppState {
@@ -58,6 +59,7 @@ export interface AppState {
   readonly pubsubPages: PubSubPages;
   readonly search: SearchState;
   readonly relation: RelationState;
+  readonly tasks: TasksState;
 }
 
 /** Every change to the app's state. */
@@ -80,7 +82,8 @@ export type AppEvent =
   | WatchStateEvent
   | PubSubEvent
   | SearchStateEvent
-  | RelationStateEvent;
+  | RelationStateEvent
+  | TasksEvent;
 
 /** The state at start, before anything is loaded. */
 export const initialState: AppState = {
@@ -103,6 +106,7 @@ export const initialState: AppState = {
   pubsubPages: initialPubSubPages,
   search: initialSearchState,
   relation: initialRelationState,
+  tasks: initialTasksState,
 };
 
 /** The one function that changes the app's state. */
@@ -146,5 +150,7 @@ export function reduce(state: AppState, event: AppEvent): AppState {
       return { ...state, search: reduceSearch(state.search, event) };
     case 'relation':
       return { ...state, relation: reduceRelation(state.relation, event) };
+    case 'tasks':
+      return { ...state, tasks: reduceTasks(state.tasks, event) };
   }
 }

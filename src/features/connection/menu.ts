@@ -4,7 +4,7 @@
  * connection island (`@connection-island`).
  *
  * The entries of the undo history (**Stop keeping undo history**, **Keep undo history**; `undo.per-connection`) are
- * in the third group; those of the backup area (**Back up…**, **Restore from backup…**) in the fourth. **Create database…**
+ * in the third group; those of the backup area (**Back up…**, **Restore from backup…**) in the fourth, with **Schedule…** (`task.edit`) on the connection island. **Create database…**
  * (`manage.create-database`) follows **Open overview** on the connection island.
  */
 import type { ConnectionStateName, ConnectionView } from '../../shared/connection';
@@ -14,6 +14,7 @@ import { connectionState, savedConnection, type ConnectionsState } from '../../s
 import { isVariantOffered, variantTitle, type KeepVariant } from '../undo/per-connection';
 import { text as manageText } from '../manage/text';
 import { createText, restoreText } from '../backup/text';
+import { menuText as taskMenuText } from '../task/text';
 import { menuText } from './text';
 
 /** The places the menu is drawn in. */
@@ -213,7 +214,10 @@ function organizeEntries(
   ];
 }
 
-/** The fourth group, of a MongoDB connection: **Back up…** and, unless read-only, **Restore from backup…**. */
+/**
+ * The fourth group, of a MongoDB connection: **Back up…** and, unless read-only, **Restore from backup…**; on the
+ * connection island, **Schedule…** too, read-only or not (`task.edit`).
+ */
 function backupEntries(connection: ConnectionView, place: MenuPlace): readonly MenuEntry[] {
   if (connection.engine !== 'mongodb') {
     return [];
@@ -222,6 +226,7 @@ function backupEntries(connection: ConnectionView, place: MenuPlace): readonly M
     separator,
     item(createText.command, 'backup.create', elements.backUp[place]),
     ...(connection.readOnly ? [] : [item(restoreText.command, 'backup.restore', elements.restore[place])]),
+    ...(place === 'connection-island' ? [item(taskMenuText.schedule, 'task.edit', 'task.edit@connection-island')] : []),
   ];
 }
 
