@@ -12,6 +12,7 @@ import { startIntent } from '../shell/top-bar/start';
 import { isAggregateCommand, runAggregateCommand } from '../pages/aggregate/aggregate-commands';
 import { queryCommandIds, runQueryCommand } from '../query/query-commands';
 import { isDocumentCommand, runDocumentCommand } from '../pages/document/document-commands';
+import { isGridFsCommand, runGridFsCommand } from '../pages/gridfs/gridfs-commands';
 import { isTableCommand, runTableCommand } from '../table/table-commands';
 import { runTreeCommand } from '../tree/tree-commands';
 import { openAbout } from '../window/about';
@@ -83,6 +84,10 @@ export function runCommand(id: string, state: AppState): void {
   }
   if (isDocumentCommand(id)) {
     runDocumentCommand(id, state);
+    return;
+  }
+  if (isGridFsCommand(id)) {
+    runGridFsCommand(id, state);
     return;
   }
   const local = windowOnly[id];

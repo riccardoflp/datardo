@@ -40,6 +40,15 @@ describe('nav.status-line', () => {
     });
   });
 
+  it('while a download runs shows what its step says of it in place of a percentage', () => {
+    const download: Work = { ...work('w1', 'Download logo.png'), detail: '1.2 MB of 4.0 MB' };
+    expect(view(input({ work: [download] })).work).toMatchObject({
+      kind: 'one',
+      title: 'Download logo.png',
+      progress: '1.2 MB of 4.0 MB',
+    });
+  });
+
   it('while three things run shows 3 running, whatever tab is active', () => {
     const three = [work('a', 'A'), work('b', 'B'), work('c', 'C')];
     expect(view(input({ work: three, connections: [cacheLocal], nav: { current: cacheLocal.id } })).work).toMatchObject(

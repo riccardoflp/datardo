@@ -12,6 +12,9 @@ import { KeyPage } from './key/key-page';
 import { KeyInspector } from './keys/key-inspector';
 import { KeysPage } from './keys/keys-page';
 import { keysExtras } from './keys/keys-state';
+import { GridFsInspector } from './gridfs/gridfs-inspector';
+import { GridFsPage } from './gridfs/gridfs-page';
+import { gridFsExtras } from './gridfs/gridfs-state';
 
 /** A page as the main island draws it. */
 export type PageView = () => React.JSX.Element | null;
@@ -24,6 +27,7 @@ export const pages: Readonly<Record<string, PageView>> = {
   'connection-form': ConnectionFormPage,
   overview: OverviewPage,
   undo: UndoHistoryPage,
+  gridfs: GridFsPage,
 };
 
 /** The pages of the tabs that show a target of a connection, by the kind of what they show (`keys`, `key`). */
@@ -32,10 +36,19 @@ export const tabPages: Readonly<Partial<Record<string, PageView>>> = {
   key: KeyPage,
 };
 
-/** What the inspector island draws for one thing selected in a page, by the kind of what the active tab shows. */
+/**
+ * What the inspector island draws for one thing selected in a page, by the kind of what the active tab shows, or by
+ * the name of its page for a tab that shows a page (`gridfs`).
+ */
 export const inspectors: Readonly<
   Partial<Record<string, (props: { readonly tabId: string }) => React.JSX.Element | null>>
-> = { keys: KeyInspector };
+> = { keys: KeyInspector, gridfs: GridFsInspector };
 
-/** What a page adds to the active tab, by its kind: what the status line counts, what the inspector island shows. */
-export const tabExtras: Readonly<Partial<Record<string, typeof keysExtras>>> = { keys: keysExtras };
+/**
+ * What a page adds to the active tab, by its kind, or the name of its page (`gridfs`): what the status line counts,
+ * what the inspector island shows.
+ */
+export const tabExtras: Readonly<Partial<Record<string, typeof keysExtras>>> = {
+  keys: keysExtras,
+  gridfs: gridFsExtras,
+};

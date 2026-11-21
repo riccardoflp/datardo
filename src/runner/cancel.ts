@@ -19,8 +19,11 @@ export function cancelLatest(ports: RunnerPorts): boolean {
 
 /** The error a cancelled wait ends with, which the runner tells from a failure. */
 export class Cancelled extends Error {
-  /** Made when the signal of the work is raised. */
-  constructor() {
+  /**
+   * Made when the signal of the work is raised. A step whose card says what a cancel of it says (*Download
+   * cancelled.*) gives it as `said`, which the notification shows in place of how far the plan went.
+   */
+  constructor(readonly said?: string) {
     super('Cancelled.');
     this.name = 'Cancelled';
   }

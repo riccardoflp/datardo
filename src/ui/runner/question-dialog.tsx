@@ -107,6 +107,7 @@ function FieldControl({ shown, first, filter, onFilter, onChange, onAnswer }: Fi
   const id = `question-${field.key}`;
   if (field.kind === 'text') {
     const problemId = `${id}-problem`;
+    const selection = field.selection;
     return (
       <div className={styles['field']}>
         <label htmlFor={id}>{field.label}</label>
@@ -121,6 +122,9 @@ function FieldControl({ shown, first, filter, onFilter, onChange, onAnswer }: Fi
           onChange={(event) => {
             onChange(event.target.value);
           }}
+          {...(selection === undefined
+            ? {}
+            : { 'data-select-start': selection.start, 'data-select-end': selection.end })}
           {...(first ? { [autoFocusAttribute]: '' } : {})}
         />
         {shown.problem === undefined ? null : (

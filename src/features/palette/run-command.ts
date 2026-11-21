@@ -23,6 +23,7 @@ import { activeTabOf, type TabShows } from '../../shared/state/tabs';
 import type { Target } from '../../shared/target';
 import type { Command } from '../command';
 import { commands as registeredCommands } from '../commands';
+import { isGridFsCommandOffered } from '../gridfs/commands';
 import { canGo } from '../nav/back';
 import { isOffered as isCopyPathOffered } from '../nav/copy-path';
 import { pinOfTab } from '../nav/pin';
@@ -65,6 +66,11 @@ function isKeepUndoOffered(state: AppState, variant: 'stop' | 'keep'): boolean {
   const current = state.nav.current;
   const connection = current === undefined ? undefined : savedConnection(state.connections, current);
   return connection !== undefined && (connection.readOnly || isVariantOffered(connection, variant));
+}
+
+/** Whether a command of an area that decides it alone is offered now: those of GridFS, and of the window. */
+function isOfferedOtherwise(state: AppState, id: string): boolean {
+  return id.startsWith('gridfs.') ? isGridFsCommandOffered(state, id) : isWindowCommandOffered(state, id);
 }
 
 /** What a command's own card says of whether it is offered now. */
@@ -129,7 +135,7 @@ function isOfferedByItsCard(state: AppState, id: string): boolean {
       return state.nav.current !== undefined;
     default:
       // The commands of the table act on the active collection tab: with none, there is no table.
-      return id.startsWith('table.') ? active?.shows.kind === 'collection' : isWindowCommandOffered(state, id);
+      return id.startsWith('table.') ? active?.shows.kind === 'collection' : isOfferedOtherwise(state, id);
   }
 }
 

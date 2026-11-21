@@ -33,7 +33,7 @@ function SelectedThing({ input }: { readonly input: NavInput }): React.JSX.Eleme
   if (tab.kind === 'collection' && tab.tab !== undefined) {
     return <DocumentInspector tab={tab.tab} />;
   }
-  const Drawn = inspectors[tab.kind];
+  const Drawn = inspectors[tab.kind === 'page' ? tab.page : tab.kind];
   return Drawn === undefined || tab.tab === undefined ? null : <Drawn tabId={tab.tab} />;
 }
 

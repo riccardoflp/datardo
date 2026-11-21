@@ -149,7 +149,7 @@ export function plan(context: Context, answers: Answers): Outcome {
     writePlan({
       title: text.open.plan(file.filename),
       steps: [
-        downloadStep(place, file.id, path),
+        downloadStep(place, file.id, path, { title: text.open.progress(file.filename), length: file.length }),
         { kind: 'app', action: 'gridfs.open-copy', args: { path }, text: text.open.step },
       ],
       danger: { kind: 'none' },

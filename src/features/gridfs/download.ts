@@ -51,7 +51,15 @@ export function plan(context: Context, answers: Answers): Outcome {
   return run(
     writePlan({
       title: text.download.plan(name),
-      steps: chosen ? [downloadStep(place, file.id, path)] : [],
+      steps: chosen
+        ? [
+            downloadStep(place, file.id, path, {
+              title: text.download.progress(name),
+              length: file.length,
+              cancelled: text.download.cancelled,
+            }),
+          ]
+        : [],
       danger: { kind: 'none' },
       cannotUndo: text.download.undo,
       after: chosen ? [notifySuccess(text.download.done(name, sizeText(file.length), path))] : [],

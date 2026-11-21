@@ -8,7 +8,7 @@ import type { Context, EngineStep, Plan, Step } from '../shared/feature';
 import type { RefusalCode } from '../shared/ids';
 import { Cancelled } from './cancel';
 import { writeLog } from './log';
-import type { RunnerPorts } from './ports';
+import type { RunnerPorts, StepProgress } from './ports';
 import type { RunningWork } from './work';
 
 /** A step refused by the guard while the plan runs: the connection changed since the plan was confirmed. */
@@ -29,6 +29,8 @@ export interface StepsOutcome {
   readonly failed?: { readonly index: number; readonly error: unknown };
   /** The plan was cancelled after this many steps. */
   readonly cancelledAfter?: number;
+  /** What the step that was cancelled says of it, in place of how far the plan went (`Cancelled.said`). */
+  readonly cancelledSaid?: string;
   /** The steps that failed while the plan went on: their texts. */
   readonly failedOnTheWay: readonly string[];
 }
@@ -99,7 +101,11 @@ export async function runSteps(running: Running, plan: Plan): Promise<StepsOutco
     } catch (error: unknown) {
       if (error instanceof GuardRefusal || error instanceof Cancelled) {
         return error instanceof Cancelled
-          ? { cancelledAfter: index, failedOnTheWay }
+          ? {
+              cancelledAfter: index,
+              failedOnTheWay,
+              ...(error.said === undefined ? {} : { cancelledSaid: error.said }),
+            }
           : { failed: { index, error }, failedOnTheWay };
       }
       const handled = await afterFailure(running, step, error);
@@ -160,13 +166,14 @@ async function runStep(running: Running, step: Step, onlyStep: boolean): Promise
   const feature = context.feature;
   const where = connection === undefined ? {} : { connection };
   writeLog(ports, [{ feature, kind: 'step', text: stepText(step, context.target), ...where }]);
-  if (onlyStep) {
+  // A file or an app step that takes long (a download, an upload) reads the signal itself, and stays cancellable.
+  if (onlyStep && step.kind === 'engine') {
     work.change({ cannotCancel: runnerText.alreadySent });
   }
   const started = ports.now();
   let reply: unknown;
   try {
-    reply = await carryOut(ports, step, work.signal);
+    reply = await carryOut(ports, step, work);
   } catch (error: unknown) {
     const text = error instanceof Error ? error.message : String(error);
     writeLog(ports, [{ feature, kind: 'error', text: `failed: ${text}`, ...where }]);
@@ -198,19 +205,23 @@ export function changedCount(reply: unknown): number | undefined {
   return counts.length === 0 ? undefined : counts.reduce((sum, value) => sum + value, 0);
 }
 
-async function carryOut(ports: RunnerPorts, step: Step, signal: AbortSignal): Promise<unknown> {
+async function carryOut(ports: RunnerPorts, step: Step, work: RunningWork): Promise<unknown> {
+  const signal = work.signal;
+  const progress: StepProgress = (said) => {
+    work.change(said);
+  };
   switch (step.kind) {
     case 'engine':
       return ports.engines.send({ connection: step.connection, request: step.request }, signal);
     case 'file':
-      await ports.files(step, signal);
+      await ports.files(step, signal, progress);
       return undefined;
     case 'app': {
       const action = ports.appActions.get(step.action);
       if (action === undefined) {
         throw new Error(`Datardo has no action named ${step.action}.`);
       }
-      return action(step.args, signal);
+      return action(step.args, signal, progress);
     }
   }
 }

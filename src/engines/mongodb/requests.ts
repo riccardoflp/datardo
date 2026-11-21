@@ -9,6 +9,7 @@ import { callOptions, type Call } from './call';
 import { changeStreamMethod } from './change-streams';
 import { collectionMethod } from './collection-methods';
 import { databaseMethod } from './database-methods';
+import { gridFsMethod } from './gridfs';
 import type { Handles } from './handles';
 import { indexMethod } from './index-methods';
 import { keptCursorMethod } from './kept-cursors';
@@ -25,6 +26,7 @@ const methods: readonly ((call: Call) => Promise<unknown> | undefined)[] = [
   sessionMethod,
   keptCursorMethod,
   changeStreamMethod,
+  gridFsMethod,
   collectionMethod,
   indexMethod,
   databaseMethod,

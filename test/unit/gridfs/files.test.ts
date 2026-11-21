@@ -32,7 +32,11 @@ describe('gridfs.rename', () => {
     });
     const question = questionOf(rename.plan(contextOn('gridfs.rename'), { ...started, file: logo }));
     expect(question.title).toBe('Rename logo.png');
-    expect(question.fields[0]).toMatchObject({ key: 'name', default: 'logo.png' });
+    expect(question.fields[0]).toMatchObject({
+      key: 'name',
+      default: 'logo.png',
+      selection: { start: 0, end: 4 },
+    });
     expect(rename.selectedPart('logo.png')).toEqual({ start: 0, end: 4 });
   });
 
@@ -133,7 +137,15 @@ describe('gridfs.download', () => {
         path: 'C:\\Users\\ada\\logo.png',
         content: {
           writer: 'gridfs.download',
-          args: { connection: local.id, database: 'shop', bucket: 'fs', id: logoId },
+          args: {
+            connection: local.id,
+            database: 'shop',
+            bucket: 'fs',
+            id: logoId,
+            title: 'Downloading logo.png',
+            length: 734_003,
+            cancelled: 'Download cancelled.',
+          },
         },
         text: 'write C:\\Users\\ada\\logo.png',
       },

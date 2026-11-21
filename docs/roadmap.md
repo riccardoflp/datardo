@@ -2340,7 +2340,7 @@ grants and revokes roles, and creates, edits and deletes custom roles.
 **Goal**: A bucket's files are listed, filtered, previewed, uploaded, downloaded, opened, renamed and deleted, and a
 bucket is created and dropped.
 **Depends on**: M12.
-**Status**: planned
+**Status**: done
 
 ### Features
 
@@ -2381,14 +2381,14 @@ bucket is created and dropped.
 
 ### Exit criteria
 
-- [ ] A file of 200 MB is uploaded and downloaded with equal bytes while the window stays usable, and the upload is
+- [x] A file of 200 MB is uploaded and downloaded with equal bytes while the window stays usable, and the upload is
       cancelled within one chunk.
-- [ ] A file named `run.exe` is not handed to the system; an SVG with a script is previewed and runs nothing.
-- [ ] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
+- [x] A file named `run.exe` is not handed to the system; an SVG with a script is previewed and runs nothing.
+- [x] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
       `npm run test:integration`, `npm run test:ui`; `catalog.py --tests` reports none missing for these cards.
-- [ ] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
+- [x] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
       the keyboard alone (QA15, QA16).
-- [ ] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
+- [x] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
       and this milestone's **Status** is *done*.
 
 ### Not in this milestone

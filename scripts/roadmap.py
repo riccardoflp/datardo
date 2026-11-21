@@ -43,7 +43,7 @@ STANDARD_EXIT = [
 # its cards, or a pair of an area and the names of some of them, or of an area and "rest"), what it builds beyond
 # the cards, its own exit criteria, and what is left out on purpose.
 # The status of each milestone that is not planned: in progress, or done (its exit criteria are then ticked).
-STATUS: dict[int, str] = {0: "done", 1: "done", 2: "done", 3: "done", 4: "done", 5: "done", 6: "done", 7: "done", 8: "done", 9: "done", 10: "done", 11: "done", 12: "done", 13: "done", 19: "done", 28: "done"}
+STATUS: dict[int, str] = {0: "done", 1: "done", 2: "done", 3: "done", 4: "done", 5: "done", 6: "done", 7: "done", 8: "done", 9: "done", 10: "done", 11: "done", 12: "done", 13: "done", 19: "done", 28: "done", 33: "done"}
 
 MILESTONES = [
     dict(n=1, title="A window of its own",

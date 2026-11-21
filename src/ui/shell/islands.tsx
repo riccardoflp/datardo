@@ -77,7 +77,8 @@ function useFocusKeptWhenHidden(shown: boolean): void {
 /** The active tab with what its page adds: the count of the status line, what the inspector island shows. */
 function withPageExtras(input: NavInput, state: ReturnType<typeof useAppState>): NavInput {
   const tab = input.activeTab;
-  const extras = tab.tab === undefined ? undefined : tabExtras[tab.kind]?.(state, tab.tab);
+  const kind = tab.kind === 'page' ? tab.page : tab.kind;
+  const extras = tab.tab === undefined ? undefined : tabExtras[kind]?.(state, tab.tab);
   return extras === undefined ? input : { ...input, activeTab: { ...tab, ...extras } };
 }
 

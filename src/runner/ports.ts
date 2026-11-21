@@ -16,11 +16,17 @@ export interface Engines {
   readonly send: (request: ConnectionRequest, signal: AbortSignal) => Promise<unknown>;
 }
 
+/**
+ * What a step that takes long says of how far it is, in its item of work in progress (`runner.progress`): its title,
+ * and the words of its progress in place of the steps done (`logo.png (1 of 3) · 1.2 MB of 4.5 MB`).
+ */
+export type StepProgress = (said: { readonly title?: string; readonly detail?: string }) => void;
+
 /** Carries out an app step or answers an app read: `window.set-zoom`, `settings.set`. */
-export type AppAction = (args: Json, signal: AbortSignal) => Promise<unknown>;
+export type AppAction = (args: Json, signal: AbortSignal, progress?: StepProgress) => Promise<unknown>;
 
 /** Carries out a file step. */
-export type FileWriter = (step: FileStep, signal: AbortSignal) => Promise<void>;
+export type FileWriter = (step: FileStep, signal: AbortSignal, progress?: StepProgress) => Promise<void>;
 
 /** Opens a question or a confirmation in the window and waits for its answer; `undefined` means cancelled. */
 export interface Dialogs {

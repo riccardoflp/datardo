@@ -3,7 +3,14 @@
  * a batch at a time, the change streams of Watch changes, and the sessions of a playground (`playground.sessions`).
  * The main process closes what it opened; whatever is left is closed with the client.
  */
-import type { AbstractCursor, AggregationCursor, ChangeStream, ClientSession, FindCursor } from 'mongodb';
+import type {
+  AbstractCursor,
+  AggregationCursor,
+  ChangeStream,
+  ClientSession,
+  FindCursor,
+  GridFSBucketReadStream,
+} from 'mongodb';
 import { EngineError } from '../engine';
 
 /** How many cursors, change streams and sessions one client keeps open at most (R9.2). */
@@ -13,7 +20,13 @@ export const mostKept = 100;
 export type Kept =
   | { readonly kind: 'cursor'; readonly cursor: FindCursor | AggregationCursor }
   | { readonly kind: 'change-stream'; readonly stream: ChangeStream }
-  | { readonly kind: 'session'; readonly session: ClientSession };
+  | { readonly kind: 'session'; readonly session: ClientSession }
+  | {
+      readonly kind: 'download';
+      readonly stream: GridFSBucketReadStream;
+      /** The chunks of the stream, read one at a time. */
+      readonly chunks: AsyncIterator<Uint8Array>;
+    };
 
 /** The things one client keeps, by identifier. */
 export interface Handles {
@@ -25,6 +38,8 @@ export interface Handles {
   readonly changeStream: (id: unknown) => ChangeStream;
   /** The session kept as `id`; an error when there is none. */
   readonly session: (id: unknown) => ClientSession;
+  /** The download of a GridFS file kept as `id`; an error when there is none. */
+  readonly download: (id: unknown) => Extract<Kept, { kind: 'download' }>;
   /** Forgets what is kept as `id`, and gives it back so that it can be closed; `undefined` when nothing was. */
   readonly release: (id: unknown) => Kept | undefined;
   /** Closes everything kept: when the client closes. */
@@ -35,6 +50,7 @@ const kindWords: Readonly<Record<Kept['kind'], string>> = {
   cursor: 'cursor',
   'change-stream': 'change stream',
   session: 'session',
+  download: 'download',
 };
 
 /** Closes one thing kept: a cursor or a change stream is closed on the server, a session ended. */
@@ -48,6 +64,9 @@ export async function closeKept(kept: Kept): Promise<void> {
       return;
     case 'session':
       await kept.session.endSession();
+      return;
+    case 'download':
+      await kept.stream.abort();
       return;
   }
 }
@@ -78,6 +97,7 @@ export function createHandles(): Handles {
     cursor: (id) => found(id, 'cursor').cursor,
     changeStream: (id) => found(id, 'change-stream').stream,
     session: (id) => found(id, 'session').session,
+    download: (id) => found(id, 'download'),
     release: (id) => {
       const each = typeof id === 'string' ? kept.get(id) : undefined;
       if (typeof id === 'string') {

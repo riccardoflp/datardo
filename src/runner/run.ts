@@ -168,7 +168,7 @@ function ended(ports: RunnerPorts, planRun: PlanRun, outcome: StepsOutcome): Int
   if (outcome.cancelledAfter !== undefined) {
     const howFar = runnerText.stoppedAfter(outcome.cancelledAfter, plan.steps.length);
     writeLog(ports, [{ feature: context.feature, kind: 'info', text: `cancelled: ${howFar}` }]);
-    notify(ports, { feature: context.feature, level: 'info', text: howFar });
+    notify(ports, { feature: context.feature, level: 'info', text: outcome.cancelledSaid ?? howFar });
     return { kind: 'cancelled' };
   }
   if (outcome.failed !== undefined) {

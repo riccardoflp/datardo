@@ -16,6 +16,7 @@ import { whenRunnerReady } from './bridge';
 import { connectionEngines, fullConnectionString, savedConnections, savedOptionSecrets } from './connections';
 import { nodeFileCrypto } from './file-crypto';
 import { keyExportOf, writeKeyExport } from './key-export';
+import { writeDownload } from './gridfs';
 
 const formats: readonly ExportFormat[] = ['datardo', 'compass', 'list'];
 const modes: readonly ExportSecrets[] = ['remove', 'include', 'encrypt'];
@@ -70,7 +71,7 @@ async function writePlayground(path: string, content: string): Promise<void> {
 }
 
 /** Carries out a file step: writes, deletes or creates the folder at its path. */
-export const fileWriter: FileWriter = async (step: FileStep, signal: AbortSignal) => {
+export const fileWriter: FileWriter = async (step: FileStep, signal: AbortSignal, progress) => {
   switch (step.action) {
     case 'delete':
       await rm(step.path, { force: true });
@@ -98,6 +99,13 @@ export const fileWriter: FileWriter = async (step: FileStep, signal: AbortSignal
       const content = step.content;
       if (content?.writer === 'key.export') {
         await writeKeys(step, content.args, signal);
+        return;
+      }
+      if (content?.writer === 'gridfs.download') {
+        await writeDownload({ engines: connectionEngines }, step.path, content.args, {
+          signal,
+          ...(progress === undefined ? {} : { progress }),
+        });
         return;
       }
       const writer = content === undefined ? undefined : writers[content.writer];

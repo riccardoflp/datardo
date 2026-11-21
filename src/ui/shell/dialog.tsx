@@ -23,6 +23,20 @@ export interface DialogProps {
 /** The selector of the control that takes the focus when the dialog opens, which each kind marks. */
 export const autoFocusAttribute = 'data-autofocus';
 
+/**
+ * Selects the text of the field that takes the focus: all of it, or the part its question names (`logo` of
+ * `logo.png`), given as `data-select-start` and `data-select-end`.
+ */
+function selectStart(input: HTMLInputElement): void {
+  const start = Number(input.dataset['selectStart']);
+  const end = Number(input.dataset['selectEnd']);
+  if (input.dataset['selectStart'] !== undefined && Number.isInteger(start) && Number.isInteger(end)) {
+    input.setSelectionRange(start, end);
+  } else {
+    input.select();
+  }
+}
+
 /** A dialog over the window, with the rest of the window dimmed. */
 export function Dialog({ title, kind, onCancel, children, buttons }: DialogProps): React.JSX.Element {
   const behavior = dialogBehavior(kind);
@@ -49,7 +63,7 @@ export function Dialog({ title, kind, onCancel, children, buttons }: DialogProps
               event.preventDefault();
               target.focus();
               if (target instanceof HTMLInputElement) {
-                target.select();
+                selectStart(target);
               }
             }
           }}
