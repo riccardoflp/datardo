@@ -60,6 +60,13 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
   before it runs, refused on a read-only connection, and recorded in the undo history when it fits.
 - Keys are exported to a file of Redis commands, with their values, expiries and bytes kept, and imported from it,
   skipping, replacing or stopping at the keys that exist.
+- A Redis connection opens a console tab, on a connection of its own named `datardo-console`: commands are typed with
+  their colors, the suggestions of the server's commands and the hint of their arguments, run with `Enter` one line
+  after the other, and their replies shown by their type, a string of a reply in the inspector island. The console
+  follows its database and its transaction, keeps the commands in a history reached with `Up` and `Down`, refuses on
+  a read-only connection every command that writes, confirms the commands that lose data or change the server, writes
+  passwords as `***`, and **Stop** stops a command that waits. The output is cleared with `Ctrl+L`, a reply, one of
+  its values or the command is copied, a command is run again from its menu, and the history can be cleared.
 
 ### Fixed
 

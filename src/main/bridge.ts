@@ -15,11 +15,12 @@ import type { WorkId } from '../shared/ids';
 import { notifiesTheSystem } from '../features/runner/notify';
 import { setting } from '../features/settings/read';
 import { cancel } from '../runner/cancel';
-import { start } from '../runner/start';
 import type { RunnerPorts } from '../runner/ports';
 import { writeAtomically } from '../storage/store';
 import type { AppStateHolder } from './app-state';
 import type { WindowDialogs } from './dialogs';
+import { startWithConsoles } from './console-commands';
+import { consolesReady } from './consoles';
 import { keepTabQuery } from './query';
 import { withTestFeatures } from './test-features';
 
@@ -37,11 +38,12 @@ export function whenRunnerReady(): Promise<RunnerPorts> {
 export function answerTheBridge(given: RunnerPorts, state: AppStateHolder, dialogs: WindowDialogs): void {
   const ports = process.env['DATARDO_TEST'] === '1' ? withTestFeatures(given) : given;
   readyPorts(ports);
+  consolesReady(ports);
   ipcMain.handle(bridgeChannel.ping, (): PingReply => ({ name: 'Datardo', version: app.getVersion() }));
   ipcMain.handle(bridgeChannel.state, () => state.get());
   ipcMain.handle(bridgeChannel.start, async (_event, intent: Intent) => {
     const started = Date.now();
-    const result = await start(ports, intent);
+    const result = await startWithConsoles(ports, intent);
     keepTabQuery(state, intent, result);
     tellTheSystem(state, Date.now() - started, result.kind === 'failed' ? result.message : undefined);
     return result;

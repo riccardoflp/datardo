@@ -12,6 +12,10 @@ import { KeyPage } from './key/key-page';
 import { KeyInspector } from './keys/key-inspector';
 import { KeysPage } from './keys/keys-page';
 import { keysExtras } from './keys/keys-state';
+import { ConsoleInspector } from './console/console-inspector';
+import { ConsolePage } from './console/console-page';
+import { consoleExtras } from './console/console-state';
+import { useConsoleTab } from './console/console-store';
 
 /** A page as the main island draws it. */
 export type PageView = () => React.JSX.Element | null;
@@ -30,12 +34,24 @@ export const pages: Readonly<Record<string, PageView>> = {
 export const tabPages: Readonly<Partial<Record<string, PageView>>> = {
   keys: KeysPage,
   key: KeyPage,
+  console: ConsolePage,
 };
 
 /** What the inspector island draws for one thing selected in a page, by the kind of what the active tab shows. */
 export const inspectors: Readonly<
   Partial<Record<string, (props: { readonly tabId: string }) => React.JSX.Element | null>>
-> = { keys: KeyInspector };
+> = { keys: KeyInspector, console: ConsoleInspector };
 
 /** What a page adds to the active tab, by its kind: what the status line counts, what the inspector island shows. */
-export const tabExtras: Readonly<Partial<Record<string, typeof keysExtras>>> = { keys: keysExtras };
+export const tabExtras: Readonly<Partial<Record<string, typeof keysExtras>>> = {
+  keys: keysExtras,
+  console: consoleExtras,
+};
+
+/**
+ * Draws again whatever reads `tabExtras` when the state a page keeps in the window changes: the string selected in a
+ * console's output is not in the state of the main process.
+ */
+export function useTabExtrasChanges(): void {
+  useConsoleTab(undefined);
+}

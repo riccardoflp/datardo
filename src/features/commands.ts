@@ -15,6 +15,7 @@ import { commands as undoCommands } from './undo/commands';
 import { commands as queryCommands } from './query/commands';
 import { commands as tableCommands } from './table/commands';
 import { commands as keyCommands } from './key/commands';
+import { commands as consoleCommands } from './console/commands';
 
 import type { Command } from './command';
 
@@ -35,4 +36,5 @@ export const commands: readonly Command[] = [
   ...queryCommands,
   ...tableCommands,
   ...keyCommands,
+  ...consoleCommands,
 ];

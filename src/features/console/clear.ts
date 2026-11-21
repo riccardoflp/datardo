@@ -8,15 +8,9 @@ import type { AppStep, Answers, Context, Outcome } from '../../shared/feature';
 import { noDanger, run } from '../../shared/feature';
 import { savedConnection } from '../../shared/state/connections';
 import { text } from './text';
-import type { OutputEntry } from './types';
 import { consoleConnection } from './types';
 
-/** The output once cleared: only the command still waiting for its reply, when one is. */
-export function clearedEntries(entries: readonly OutputEntry[]): readonly OutputEntry[] {
-  return entries.filter(
-    (entry) => entry.reply === undefined && entry.refusal === undefined && entry.tookMs === undefined,
-  );
-}
+export { clearedEntries } from '../../shared/state/consoles';
 
 /** Feature: console.clear — the app step `clear the output of the console of Cache local`. */
 export function plan(context: Context, _answers: Answers): Outcome {

@@ -67,7 +67,7 @@ export function consoleState(
     connections: { ...base.connections, live },
     runner: { ...base.runner, remembered },
     consoles: Object.fromEntries(consoles.map((each) => [each.connection, each])),
-  } as AppState;
+  };
 }
 
 /** A context of a console feature started on a connection. */

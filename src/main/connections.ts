@@ -32,6 +32,7 @@ import { redisConnectMs } from '../features/connection/connect';
 import { writeLog } from '../runner/log';
 import { notify } from '../runner/notify';
 import { connectText } from '../features/connection/text';
+import { consoleOwner } from '../features/console/types';
 import { text as navText } from '../features/nav/text';
 import type { AreaStart } from './areas';
 import type { MainServices } from './services';
@@ -124,14 +125,19 @@ export function findConnection(id: ConnectionId): SavedConnection | undefined {
   return savedConnections().find((each) => each.id === id);
 }
 
-/** The name of a connection for the messages; its id when it is not saved. */
-export function connectionName(id: ConnectionId): string {
-  return registry === undefined ? id : (findConnection(id)?.name ?? id);
+/** The saved connection a client belongs to: the connection itself, or the one whose console it is. */
+function ownerOf(id: ConnectionId): ConnectionId {
+  return consoleOwner(id) ?? id;
 }
 
-/** Whether a connection is read-only now (D14). */
+/** The name of a connection for the messages, the console's client named as its connection; its id when not saved. */
+export function connectionName(id: ConnectionId): string {
+  return registry === undefined ? id : (findConnection(ownerOf(id))?.name ?? id);
+}
+
+/** Whether a connection is read-only now (D14); the console's client is as read-only as its connection. */
 export function isReadOnly(id: ConnectionId): boolean {
-  return registry === undefined ? false : findConnection(id)?.readOnly === true;
+  return registry === undefined ? false : findConnection(ownerOf(id))?.readOnly === true;
 }
 
 /** Whether a connection has an open client. */

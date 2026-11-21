@@ -1223,7 +1223,7 @@ members added and removed; scores changed; entries added, deleted and trimmed; t
 hints their arguments, remembers the commands, refuses what a read-only connection must not send and confirms what
 loses data.
 **Depends on**: M13.
-**Status**: planned
+**Status**: done
 
 ### Features
 
@@ -1272,15 +1272,15 @@ loses data.
 
 ### Exit criteria
 
-- [ ] On a read-only connection `SET`, `PUBLISH`, `CONFIG SET` and a script are refused and the server receives none
+- [x] On a read-only connection `SET`, `PUBLISH`, `CONFIG SET` and a script are refused and the server receives none
       of them; `GET` runs (QA1).
-- [ ] `FLUSHALL` asks to type the connection's name; `AUTH` and `CONFIG SET requirepass` are written with `***` in the
+- [x] `FLUSHALL` asks to type the connection's name; `AUTH` and `CONFIG SET requirepass` are written with `***` in the
       output, the history and the Log.
-- [ ] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
+- [x] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
       `npm run test:integration`, `npm run test:ui`; `catalog.py --tests` reports none missing for these cards.
-- [ ] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
+- [x] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
       the keyboard alone (QA15, QA16).
-- [ ] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
+- [x] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
       and this milestone's **Status** is *done*.
 
 ### Not in this milestone

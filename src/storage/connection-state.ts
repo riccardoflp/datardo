@@ -3,8 +3,9 @@
  *
  * This module reads and writes the recent queries of each collection (`saved-query.recent`), under
  * `collections.<database>.<collection>.recentQueries`, and the columns' layout and the expanded field paths
- * (`table.columns`), under `.layout` and `.expanded` beside them, and keeps every other field of the file as it found it, so that
- * the other parts data.md lists for this file (the columns' layout, the console's last commands, …) can be added
+ * (`table.columns`), under `.layout` and `.expanded` beside them, the commands of the console (`console.history`) under
+ * `consoleHistory`, and keeps every other field of the file as it found it, so that
+ * the other parts data.md lists for this file (the targets of playgrounds, the last folders, …) can be added
  * beside them without a new version. The content is the file's object without `version`.
  */
 import type { Json } from '../shared/engine-request';
@@ -131,6 +132,19 @@ export function withCollectionRenamed(
   }
   const after = withField(withField(before, names.from, undefined), names.to, kept);
   return withField(state, 'collections', withField(collections, database, after));
+}
+
+/** The field of the file that keeps the commands of the console (`console.history`). */
+const consoleHistoryField = 'consoleHistory';
+
+/** The commands of the console the file keeps, the oldest first; what is not a line of text is left out. */
+export function consoleHistoryIn(state: ConnectionStateFile): readonly string[] {
+  return strings(state[consoleHistoryField]);
+}
+
+/** The state with the commands of the console replaced, every other field kept; an empty list removes the field. */
+export function withConsoleHistory(state: ConnectionStateFile, history: readonly string[]): ConnectionStateFile {
+  return withField(state, consoleHistoryField, history.length === 0 ? undefined : [...history]);
 }
 
 /** What the file keeps of the columns of a collection (`table.columns`): its layout and its expanded field paths. */

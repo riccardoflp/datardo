@@ -6,6 +6,7 @@ import { stepText } from '../features/runner/step-text';
 import { runnerText } from '../features/runner/text';
 import type { Context, EngineStep, Plan, Step } from '../shared/feature';
 import type { RefusalCode } from '../shared/ids';
+import { isConsoleAnswer } from '../shared/typed-reply';
 import { Cancelled } from './cancel';
 import { writeLog } from './log';
 import type { RunnerPorts } from './ports';
@@ -176,10 +177,17 @@ async function runStep(running: Running, step: Step, onlyStep: boolean): Promise
   return reply;
 }
 
-/** `done in 12 ms`, or `3 changed in 12 ms` when the reply says how many. */
+/**
+ * `done in 12 ms`, or `3 changed in 12 ms` when the reply says how many; for a command of the console answered with
+ * an error, which is its reply and not a failure, `error in 12 ms: WRONGTYPE`, its code alone (`console.run`): a reply
+ * of the console is never written in the Log (D51).
+ */
 function outcomeText(reply: unknown, milliseconds: number): string {
   const count = changedCount(reply);
   const time = `in ${String(milliseconds)} ms`;
+  if (isConsoleAnswer(reply) && reply.reply.kind === 'error') {
+    return `error ${time}: ${reply.reply.message.split(' ', 1)[0] ?? ''}`;
+  }
   return count === undefined ? `done ${time}` : `${String(count)} changed ${time}`;
 }
 
