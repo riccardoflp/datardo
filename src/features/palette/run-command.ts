@@ -28,6 +28,8 @@ import { isOffered as isFieldOffered } from '../field/commands';
 import { isOffered as isIndexOffered } from '../index/commands';
 import { isOffered as isSchemaOffered } from '../schema/commands';
 import { isOffered as isExplainOffered } from '../explain/commands';
+import { isOffered as isChartOffered } from '../chart/commands';
+import { isOffered as isCodegenOffered } from '../codegen/commands';
 import { isOffered as isManageOffered } from '../manage/commands';
 import { isGridFsCommandOffered } from '../gridfs/commands';
 import { isOffered as isUserOffered } from '../user/commands';
@@ -142,6 +144,9 @@ function isOfferedByItsArea(state: AppState, id: string): boolean | undefined {
   }
   if (id.startsWith('schema.') || id.startsWith('explain.')) {
     return id.startsWith('schema.') ? isSchemaOffered(state, id) : isExplainOffered(state);
+  }
+  if (id.startsWith('chart.') || id.startsWith('codegen.')) {
+    return id.startsWith('chart.') ? isChartOffered(state, id) : isCodegenOffered(state, id);
   }
   return id.startsWith('field.') ? isFieldOffered(state) : undefined;
 }

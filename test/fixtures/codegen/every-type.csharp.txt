@@ -1,0 +1,34 @@
+using MongoDB.Bson;
+using MongoDB.Driver;
+
+var uri = Environment.GetEnvironmentVariable("MONGODB_URI") ?? "mongodb://localhost:27017";
+var client = new MongoClient(uri);
+var collection = client.GetDatabase("shop").GetCollection<BsonDocument>("orders");
+
+var filter = new BsonDocument
+{
+    { "id", new ObjectId("65f1c0de9a1b2c3d4e5f6a7b") },
+    { "at", new DateTime(2024, 3, 1, 10, 20, 30, DateTimeKind.Utc).AddMilliseconds(123) },
+    { "long", 9007199254740993L },
+    { "decimal", Decimal128.Parse("0.10") },
+    { "int", 42 },
+    { "double", 2.5 },
+    { "big", 3000000000L },
+    { "regex", new BsonRegularExpression("^ma", "i") },
+    { "uuid", new BsonBinaryData(Guid.Parse("3b241101-e2bb-4255-8caf-4136c566a962"), GuidRepresentation.Standard) },
+    { "binary", new BsonBinaryData(Convert.FromBase64String("AQID"), (BsonBinarySubType)0x00) },
+    { "timestamp", new BsonTimestamp(1700000000, 1) },
+    { "min", BsonMinKey.Value },
+    { "max", BsonMaxKey.Value },
+    { "none", BsonNull.Value },
+    { "yes", true },
+    { "nan", double.NaN },
+    { "list", new BsonArray { 1, "a" } },
+    { "empty", new BsonDocument() }
+};
+var sort = new BsonDocument("at", -1);
+
+foreach (var doc in collection.Find(filter).Sort(sort).ToList())
+{
+    Console.WriteLine(doc);
+}

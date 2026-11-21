@@ -29,6 +29,8 @@ import { isPubSubCommand, runPubSubCommand } from '../pages/pubsub/pubsub-comman
 import { followSelectedCell } from '../pages/relation/table-links';
 import { isSchemaCommand, runSchemaCommand } from '../pages/schema/schema-commands';
 import { isExplainCommand, runExplainCommand } from '../pages/explain/explain-commands';
+import { isChartCommand, runChartCommand } from '../pages/chart/chart-commands';
+import { isCodeCommand, runCodeCommand } from '../pages/code/code-commands';
 
 let switcherOpener: (() => void) | undefined;
 
@@ -147,6 +149,15 @@ export function runCommand(id: string, state: AppState): void {
       runSchemaCommand(state);
     } else {
       runExplainCommand(state);
+    }
+    return;
+  }
+  // **Draw**, the picture of the chart, **Code** and **Copy code** take what the Chart and Code sections hold.
+  if (isChartCommand(id) || isCodeCommand(id)) {
+    if (isChartCommand(id)) {
+      runChartCommand(id, state);
+    } else {
+      runCodeCommand(id, state);
     }
     return;
   }

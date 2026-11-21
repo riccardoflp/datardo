@@ -5,7 +5,7 @@ import type { RunnableFeature } from '../../shared/feature';
 import { featureId } from '../../shared/ids';
 import * as draw from './draw';
 import { feature as filterFromMark } from './filter-from-mark';
-import { feature as savePicture } from './save-picture';
+import { feature as savePicture, fileRead as savePictureFile } from './save-picture';
 import { feature as show } from './show';
 
 /** The features of this area the runner can start. */
@@ -14,4 +14,5 @@ export const features: readonly RunnableFeature[] = [
   { kind: 'read', id: featureId('chart.draw'), request: draw.request, parse: draw.parse },
   filterFromMark,
   savePicture,
+  savePictureFile,
 ];

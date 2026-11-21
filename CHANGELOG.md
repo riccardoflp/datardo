@@ -207,6 +207,13 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
   used an index, the documents returned and examined, the winning plan as a tree, shard by shard on a sharded
   cluster, and the stages after the query; it suggests an index by the equality, sort and range rule, which
   **Create…** opens in the index dialog, and **Raw** shows the server's output as it came.
+- The Chart section of a collection draws the documents of the filter or the output of the pipeline as bars, lines, a
+  pie, a scatter of two fields or a histogram, counted or measured by category, by date unit and by series, in the
+  colors of the theme; a click on a bar or a slice shows its documents, **Save picture…** writes the chart as a PNG,
+  and the type, the fields and the options are kept with the tab.
+- The Code section writes the query of the bar, the pipeline or the aggregation of a chart as code for mongosh,
+  Node.js, Python, Java, C# and Go, as a few lines or as a full program that reads `MONGODB_URI`, with every BSON
+  type kept; **Copy** puts it on the clipboard, and the language chosen is kept with the tab.
 
 ### Fixed
 

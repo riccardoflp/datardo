@@ -1,0 +1,22 @@
+use("shop");
+
+db.getCollection("orders").find({
+  id: ObjectId("65f1c0de9a1b2c3d4e5f6a7b"),
+  at: ISODate("2024-03-01T10:20:30.123Z"),
+  long: NumberLong("9007199254740993"),
+  decimal: NumberDecimal("0.10"),
+  int: 42,
+  double: 2.5,
+  big: 3000000000,
+  regex: /^ma/i,
+  uuid: UUID("3b241101-e2bb-4255-8caf-4136c566a962"),
+  binary: BinData(0, "AQID"),
+  timestamp: Timestamp({ t: 1700000000, i: 1 }),
+  min: MinKey(),
+  max: MaxKey(),
+  none: null,
+  yes: true,
+  nan: NaN,
+  list: [1, "a"],
+  empty: {}
+}).sort({ at: -1 });

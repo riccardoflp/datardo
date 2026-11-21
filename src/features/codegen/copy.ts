@@ -2,7 +2,8 @@
  * Feature: codegen.copy
  *
  * Copies the code the Code section shows, exactly as shown: in the language chosen, with its line breaks, its tabs
- * in Go and one line break at the end. It changes only the clipboard.
+ * in Go and one line break at the end. It changes only the clipboard; the status line then says *Copied to the
+ * clipboard*, as for the other copies of a collection tab.
  */
 import { noDanger, run, type Answers, type Context, type OperationFeature, type Outcome } from '../../shared/feature';
 import { featureId } from '../../shared/ids';
@@ -45,7 +46,8 @@ export function plan(_context: Context, answers: Answers): Outcome {
         args: { text: args.code },
       },
     ],
-    after: [{ kind: 'notify', level: 'success', text: text.copied }],
+    // The status line says *Copied to the clipboard* once the window learns that the copy is done.
+    after: [],
   });
 }
 

@@ -584,6 +584,16 @@ pipeline, which can be of any shape and which Schema's card does not describe.
 *Built in M23 on 2026-11-21 as Q26 describes; answers the Schema and Explain part of Q26 unless the author decides
 otherwise.*
 
+## D150 — The Chart section draws again each time it is shown, once its first field is chosen
+
+The Chart section is built as its card says (M24). When it is shown and connected, **Data** follows the mode of the
+query bar and, once the category, the x axis or the field of a histogram is chosen, the chart is drawn again
+(`chart.draw`), as Schema samples again and Explain explains again (D62): a chart of a filter or a pipeline changed
+since is never shown as if it were still true. While it runs, the chart drawn before stays, dimmed. Histograms and
+dates by a unit need MongoDB 5.0, as the card says, and are refused before anything is sent on an older server.
+Rejected: keeping the last chart until **Draw** is pressed, which shows numbers that may no longer be true.
+*Built in M24 on 2026-11-21 as Q26 describes; answers the Chart part of Q26 unless the author decides otherwise.*
+
 ## Open questions
 
 - **Q1** — *Answered on 2026-11-18 by [D7](#d7--home-is-the-first-page)*: the last active tab when tabs are restored,
@@ -661,7 +671,9 @@ Raised while the catalog was written; each names the cards that hold the current
   (`table.sort`, `aggregate.sort-column`).
 - **Q26** — *Schema and Explain answered on 2026-11-21 by
   [D62](#d62--schema-and-explain-read-again-each-time-they-are-shown-and-schema-analyzes-the-find-filter-in-aggregate)*,
-  unless the author decides otherwise; Chart is open. Schema, Chart and Explain read from the server each time their
+  unless the author decides otherwise; Chart answered on 2026-11-21 by
+  [D150](#d150--the-chart-section-draws-again-each-time-it-is-shown-once-its-first-field-is-chosen), unless the
+  author decides otherwise. Schema, Chart and Explain read from the server each time their
   section is shown; Schema analyzes the filter's documents also in Aggregate; a chart needs MongoDB 5.0 for histograms
   and dates by unit. (`schema.sample`, `chart.draw`, `explain.run`).
 - **Q27** — Saved query files keep Mongoster's format with no version; the queries folder is the folder itself;
@@ -709,7 +721,9 @@ Raised while the catalog was written; each names the cards that hold the current
   file manager. The place of **Keep running in the tray** on the Settings page is on no card. The field names of
   `tasks/tasks.json` and `tasks/<id>.json` are not yet in [data.md](data.md). (`task.run`, `task.retention`,
   `task.notify`, `task.tray`).
-- **Q40** — Chart and Code: the **Code** button of the Chart section has no place on the card, so it carries no
+- **Q40** — *In part built in M24 as Q181 describes*: the picture is saved through the system's dialog, and
+  **Copied to the clipboard** is a line of the status line; the **Code** button still carries no element. Chart and
+  Code: the **Code** button of the Chart section has no place on the card, so it carries no
   element; the message of a stage that cannot be read in the Chart section is not on the card; saving the picture
   needs a question that chooses a file, which the questions do not have yet (a text field stands in for it); is
   **Copied to the clipboard** a notification or a line of the status line? (`codegen.show`, `chart.draw`,
@@ -1390,3 +1404,28 @@ Raised while the catalog was written; each names the cards that hold the current
   the raw output change only the window; **Create…** of a suggested index opens `index.create` on the suggested
   keys, which that dialog now opens as plain numbers (`{ status: 1 }`, named `status_1`) whatever way they are given
   (`schema.show`, `explain.show`, `explain.raw`, `index.create`).
+- **Q180** — The Chart and Code sections as built in M24 keep their choices in the tab's memory, in
+  `TabMemory.choices` of `session.json`, which already holds *the choices of a page's controls*, so no migration:
+  `chartType`, `chartFirst`, `chartSecond`, `chartValue`, `chartSeries`, `chartUnit` and `chartLimit`, written by the
+  main process each time `chart.draw` reads a chart of the tab; `codeLanguage` and `codeProgram` (`on`, `off`),
+  written when `codegen.show` is started with `{ choices }`, which the section does when the language or **Full
+  program** changes. **Data**, the last chart and the code shown last only as long as the window. Should the chart's
+  choices be kept as soon as they change, before a chart is drawn? (`chart.show`, `codegen.show`, `tab.restore`).
+- **Q181** — `chart.save-picture` asks for the file with the system's save dialog, opened in the Pictures folder on
+  the proposed name, through an app read of the action chart.choose-file, as `relation.export-svg` does, where the card has a
+  question; the window draws the PNG from its canvas and passes it as base64 to the file step, whose writer in the
+  main process writes it beside the file and renames it over it. **Copied to the clipboard** of `codegen.copy` is the
+  line of the status line for two seconds, as for the copies of the table; the plan has no After
+  (`chart.save-picture`, `codegen.copy`).
+- **Q182** — `chart.filter-from-mark` reuses the app action query.set-filter of the schema area (Q121) and has no
+  After: the window waits for the filter to reach its state, shows the Documents section, and runs the query there,
+  switching the tab to **Find** when it was in **Aggregate**, where the card says the After runs `query.run`. Its
+  arguments add the tab, and take the filter as typed in the bar, read in the feature (`chart.filter-from-mark`).
+- **Q183** — `chart.draw` takes the filter of the bar as typed and the pipeline of the editor, and reads them in the
+  feature with the time of the context, as `explain.run` does; a `source` already read is still taken. The time on
+  the line of the chart is measured by the window, from the start to the reply. Go to offers **Save chart as
+  picture…** and **Copy code** only when the window has a chart drawn or code shown, which the commands' **Offered
+  when** cannot know: the window leaves them out of Go to. **Chart** follows **Schema** in the section bar; **Code** is
+  under **More**, after **Explain**, and **More** reads as pressed while either is shown. Cancelling `chart.draw` is
+  as Q124: the aggregation goes on on the server until its time limit (`chart.draw`, `chart.show`,
+  `codegen.show`, `palette.run-command`).

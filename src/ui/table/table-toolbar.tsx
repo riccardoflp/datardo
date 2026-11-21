@@ -7,6 +7,7 @@ import { view as showView, type ToolbarButton } from '../../features/table/show'
 import { text } from '../../features/table/text';
 import { startOnDocuments, startOnFilter } from '../pages/document/document-actions';
 import { exportShown } from '../pages/transfer/export-start';
+import { showCode } from '../pages/code/code-actions';
 import { startFeature } from '../shell/intent';
 import { isBuilt } from '../query/built';
 import { showStateOf } from '../query/collection-view';
@@ -34,6 +35,9 @@ function pressed(props: TablePartProps, button: ToolbarButton): void {
       return;
     case 'transfer.export@toolbar':
       exportShown(ref, props.collection, props.columns, button.element);
+      return;
+    case 'codegen.show@query-bar':
+      showCode(ref, { kind: 'query' }, 'query-bar');
       return;
     default: {
       const at = button.element.indexOf('@');

@@ -1,0 +1,34 @@
+import { MongoClient, Binary, Decimal128, Long, MaxKey, MinKey, ObjectId, Timestamp, UUID } from "mongodb";
+
+const client = new MongoClient(process.env.MONGODB_URI ?? "mongodb://localhost:27017");
+
+const filter = {
+  id: new ObjectId("65f1c0de9a1b2c3d4e5f6a7b"),
+  at: new Date("2024-03-01T10:20:30.123Z"),
+  long: Long.fromString("9007199254740993"),
+  decimal: Decimal128.fromString("0.10"),
+  int: 42,
+  double: 2.5,
+  big: 3000000000,
+  regex: /^ma/i,
+  uuid: new UUID("3b241101-e2bb-4255-8caf-4136c566a962"),
+  binary: new Binary(Buffer.from("AQID", "base64"), 0x00),
+  timestamp: new Timestamp({ t: 1700000000, i: 1 }),
+  min: new MinKey(),
+  max: new MaxKey(),
+  none: null,
+  yes: true,
+  nan: NaN,
+  list: [1, "a"],
+  empty: {}
+};
+const sort = { at: -1 };
+
+try {
+  const cursor = client.db("shop").collection("orders").find(filter, { sort });
+  for await (const doc of cursor) {
+    console.log(doc);
+  }
+} finally {
+  await client.close();
+}

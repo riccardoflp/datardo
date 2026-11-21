@@ -12,6 +12,8 @@ import { inspectedOf } from '../pages/index/index-inspector';
 import { forgetClosedIndexes, useIndexMemory, type IndexMemory } from '../pages/index/index-store';
 import { forgetClosedSchemas } from '../pages/schema/schema-store';
 import { forgetClosedExplains } from '../pages/explain/explain-store';
+import { forgetClosedCharts } from '../pages/chart/chart-store';
+import { forgetClosedCodes } from '../pages/code/code-store';
 import { inspectionOf } from '../pages/document/inspect-state';
 import { collectionRefOf } from './collection-reads';
 import { forgetClosed, useCollection } from './collection-store';
@@ -30,6 +32,8 @@ export function useCollectionStatus(state: AppState, input: NavInput): NavInput 
     forgetClosedIndexes(new Set(open.map((each) => each.id)));
     forgetClosedSchemas(new Set(open.map((each) => each.id)));
     forgetClosedExplains(new Set(open.map((each) => each.id)));
+    forgetClosedCharts(new Set(open.map((each) => each.id)));
+    forgetClosedCodes(new Set(open.map((each) => each.id)));
   }, [open]);
   if (tab === undefined) {
     return input;

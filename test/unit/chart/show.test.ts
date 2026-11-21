@@ -2,10 +2,14 @@ import { describe, expect, it } from 'vitest';
 import { chartData } from '../../../src/features/chart/data';
 import { firstInput } from '../../../src/features/chart/options';
 import {
+  chartChoices,
   controlsOf,
+  inputOfChoices,
   isComplete,
+  keptChartMemory,
   modeOfQueryBar,
   plan,
+  suggestedFields,
   view,
   type ChartSectionState,
 } from '../../../src/features/chart/show';
@@ -146,5 +150,40 @@ describe('chart.show', () => {
     ]);
     const none = plan(context(false), {});
     expect(none.kind === 'run' && none.plan.steps).toEqual([]);
+  });
+
+  it('shows the error of a first draw in place of the text of the empty state', () => {
+    expect(view({ ...first, error: 'not connected' }).state).toBe('not connected');
+  });
+
+  it('keeps the type, the fields and the options with the tab, and reads them back the same', () => {
+    const input: ChartInput = {
+      type: 'line',
+      first: 'createdAt',
+      second: 'total',
+      value: 'sum',
+      series: 'status',
+      unit: 'month',
+      limit: 50,
+    };
+    const memory = keptChartMemory({ query: '{}', choices: { codeLanguage: 'go' } }, input);
+    expect(memory.choices).toMatchObject({ codeLanguage: 'go', chartType: 'line', chartUnit: 'month' });
+    expect(memory.query).toBe('{}');
+    expect(inputOfChoices(memory.choices)).toEqual({ ...input, limit: '50' });
+    expect(inputOfChoices(chartChoices(statusInput))).toEqual({ ...statusInput, limit: '20' });
+    expect(inputOfChoices(undefined)).toEqual(firstInput);
+    expect(inputOfChoices({ chartType: 'donut' }).type).toBe('bar');
+  });
+
+  it('suggests the fields of the collection with Filter and those of the stage shown with Pipeline, never objects', () => {
+    const hints = [
+      { path: 'status', types: ['string'] },
+      { path: 'address', types: ['object'] },
+      { path: 'address.city', types: ['string'] },
+      { path: 'mixed', types: ['object', 'null'] },
+    ];
+    expect(suggestedFields('filter', hints, [])).toEqual(['status', 'address.city', 'mixed']);
+    const documents = [{ _id: 'paid', count: int(3), by: { city: 'Rome' }, items: [{ sku: 'a' }] }];
+    expect(suggestedFields('pipeline', hints, documents)).toEqual(['_id', 'count', 'by.city', 'items', 'items.sku']);
   });
 });

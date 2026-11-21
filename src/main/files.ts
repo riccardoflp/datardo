@@ -10,6 +10,7 @@ import { connectionsToText, type ExportFormat, type ExportSecrets } from '../fea
 import { fileOfConnection, isFileProblem, jsonFields } from '../features/connection/types';
 import { transferText } from '../features/connection/text';
 import { saveFailedMessage } from '../features/playground/save';
+import { pictureWriter } from '../features/chart/save-picture';
 import { svgWriter } from '../features/relation/export-svg';
 import { text as relationText } from '../features/relation/text';
 import { queryFileWriter } from '../features/saved-query/types';
@@ -31,6 +32,7 @@ import { carryOutTransferStep, type TransferStepServices } from './transfer-step
 import { messagesFile } from './pubsub-commands';
 import { carryOutTaskStep } from './task-writer';
 import { taskHost } from './tasks';
+import { writePicture } from './chart';
 
 const formats: readonly ExportFormat[] = ['datardo', 'compass', 'list'];
 const modes: readonly ExportSecrets[] = ['remove', 'include', 'encrypt'];
@@ -190,6 +192,10 @@ export const fileWriter: FileWriter = async (step: FileStep, signal: AbortSignal
       const content = step.content;
       if (content?.writer === 'key.export') {
         await writeKeys(step, content.args, signal);
+        return;
+      }
+      if (content?.writer === pictureWriter) {
+        await writePicture(step.path, content.args);
         return;
       }
       if (content?.writer === 'gridfs.download') {

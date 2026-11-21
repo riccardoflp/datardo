@@ -66,8 +66,8 @@ describe('chart.filter-from-mark', () => {
     ).toBe('{ tags: "a" }');
   });
 
-  it('plans one app step that puts the filter in the query bar, then runs the query', () => {
-    expect(planned(markArgs({ mark: { category: 'paid' } }))).toEqual({
+  it('plans one app step that puts the filter in the query bar of the tab; the window then runs the query', () => {
+    expect(planned(markArgs({ tab: 't-3', mark: { category: 'paid' } }))).toEqual({
       kind: 'run',
       plan: {
         title: 'Show the documents',
@@ -77,10 +77,10 @@ describe('chart.filter-from-mark', () => {
             text: 'add status: "paid" to the filter of orders',
             action: 'query.set-filter',
             args: {
-              kind: 'collection',
               connection: 'c-local',
               database: 'shop',
               collection: 'orders',
+              tab: 't-3',
               filter: '{ status: "paid" }',
               filterJson: { status: 'paid' },
             },
@@ -89,13 +89,7 @@ describe('chart.filter-from-mark', () => {
         danger: { kind: 'none' },
         undo: { cannot: 'Nothing is written to a deployment, so nothing is recorded.' },
         publishes: false,
-        after: [
-          {
-            kind: 'start',
-            feature: 'query.run',
-            target: { kind: 'collection', connection: 'c-local', database: 'shop', collection: 'orders' },
-          },
-        ],
+        after: [],
       },
     });
   });
@@ -111,6 +105,19 @@ describe('chart.filter-from-mark', () => {
         filter: '{ total: { $gte: 100 }, status: "paid" }',
       },
     );
+  });
+
+  it('reads the filter of the bar as typed, and refuses one that does not parse', () => {
+    const typed = { ...markArgs({ mark: { category: 'paid' } }), filter: '{ total: { $gte: 100 } }' };
+    const outcome = plan(context, { args: typed });
+    expect(outcome.kind === 'run' && outcome.plan.steps[0]?.kind === 'app' && outcome.plan.steps[0].args).toMatchObject(
+      { filter: '{ total: { $gte: 100 }, status: "paid" }' },
+    );
+    const broken = { ...typed, filter: '{ status: ' };
+    expect(plan(context, { args: broken })).toMatchObject({
+      kind: 'refuse',
+      code: 'chart.filter-from-mark/invalid-filter',
+    });
   });
 
   it('joins operators on a field and replaces a value', () => {

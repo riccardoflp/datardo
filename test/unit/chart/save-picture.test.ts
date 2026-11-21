@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { pictureName, pictureWriter, plan } from '../../../src/features/chart/save-picture';
+import { fileRead, pictureName, pictureWriter, plan } from '../../../src/features/chart/save-picture';
 import type { Context } from '../../../src/shared/feature';
 import { featureId } from '../../../src/shared/ids';
 import { initialState } from '../../../src/shared/state';
@@ -22,15 +22,27 @@ describe('chart.save-picture', () => {
     expect(pictureName('a/\\b', 'pie')).toBe('a_b-pie.png');
   });
 
-  it('asks for the file first, in the dialog titled Save chart', () => {
+  it("asks for the file first, in the system's save dialog titled Save chart, for PNG images", () => {
     expect(plan(context, { args })).toEqual({
-      kind: 'ask',
-      question: {
-        title: 'Save chart',
-        button: 'Save',
-        fields: [{ kind: 'text', key: 'file', label: 'PNG image', default: 'orders-bar.png' }],
+      kind: 'read',
+      need: {
+        key: 'file',
+        read: 'chart.save-picture:file',
+        args: { title: 'Save chart', name: 'orders-bar.png', kind: 'PNG image', extensions: ['png'] },
       },
     });
+    expect(fileRead.request(context, { title: 'Save chart' })).toEqual({
+      kind: 'app',
+      action: 'chart.choose-file',
+      args: { title: 'Save chart' },
+    });
+    expect(fileRead.parse(['orders-bar.png'], null)).toBe('orders-bar.png');
+  });
+
+  it('writes nothing and says nothing when the dialog is cancelled', () => {
+    expect(fileRead.parse([null], null)).toBeNull();
+    const outcome = plan(context, { args, file: null });
+    expect(outcome.kind === 'run' && [outcome.plan.steps, outcome.plan.after]).toEqual([[], []]);
   });
 
   it('writes the picture to the file chosen and says so', () => {

@@ -1,0 +1,50 @@
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.Date;
+import java.util.UUID;
+import org.bson.BsonBinary;
+import org.bson.BsonRegularExpression;
+import org.bson.BsonTimestamp;
+import org.bson.Document;
+import org.bson.types.Binary;
+import org.bson.types.Decimal128;
+import org.bson.types.MaxKey;
+import org.bson.types.MinKey;
+import org.bson.types.ObjectId;
+
+public class Main {
+    public static void main(String[] args) {
+        String uri = System.getenv().getOrDefault("MONGODB_URI", "mongodb://localhost:27017");
+        try (MongoClient client = MongoClients.create(uri)) {
+            MongoCollection<Document> collection = client.getDatabase("shop").getCollection("orders");
+
+            Document filter = new Document("id", new ObjectId("65f1c0de9a1b2c3d4e5f6a7b"))
+                .append("at", Date.from(Instant.parse("2024-03-01T10:20:30.123Z")))
+                .append("long", 9007199254740993L)
+                .append("decimal", Decimal128.parse("0.10"))
+                .append("int", 42)
+                .append("double", 2.5)
+                .append("big", 3000000000L)
+                .append("regex", new BsonRegularExpression("^ma", "i"))
+                .append("uuid", new BsonBinary(UUID.fromString("3b241101-e2bb-4255-8caf-4136c566a962")))
+                .append("binary", new Binary((byte) 0x00, Base64.getDecoder().decode("AQID")))
+                .append("timestamp", new BsonTimestamp(1700000000, 1))
+                .append("min", new MinKey())
+                .append("max", new MaxKey())
+                .append("none", null)
+                .append("yes", true)
+                .append("nan", Double.NaN)
+                .append("list", Arrays.asList(1, "a"))
+                .append("empty", new Document());
+            Document sort = new Document("at", -1);
+
+            for (Document doc : collection.find(filter).sort(sort)) {
+                System.out.println(doc.toJson());
+            }
+        }
+    }
+}

@@ -14,6 +14,7 @@ import type { Place } from '../../../shared/ids';
 import type { CollectionRef } from '../../query/collection-reads';
 import { currentAppState } from '../../state/store';
 import { flashCopied } from '../../table/copied-flash';
+import { showCode } from '../code/code-actions';
 import { changeDraft, changePipeline, pipelineOf, readKept } from './pipeline-store';
 import { runPipeline, showError, startOnTab } from './pipeline-reads';
 
@@ -124,6 +125,11 @@ export async function startOnPipeline(ref: CollectionRef, control: EditorControl
 export function pressControl(ref: CollectionRef, control: EditorControl): void {
   if (control.feature === 'aggregate.run') {
     runWhole(ref);
+    return;
+  }
+  // **Code**: the code of the pipeline as the editor holds it now, in the Code section.
+  if (control.feature === 'codegen.show') {
+    showCode(ref, { kind: 'query' }, 'query-bar');
     return;
   }
   void startOnPipeline(ref, control);
