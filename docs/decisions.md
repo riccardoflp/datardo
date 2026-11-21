@@ -1020,3 +1020,28 @@ Raised while the catalog was written; each names the cards that hold the current
 - **Q86** — Go to keeps one row a title, and M14's `value.rename-field` and M21's `field.rename` were both **Rename
   field…**: Go to lists the first as **Rename hash field…**, as Q75 did for **Copy Redis value**; the row menu of the
   hash keeps **Rename field…** (`value.rename-field`, `field.rename`).
+- **Q87** — GridFS as built in M33, the transfers: Datardo chose the least surprising behavior where the cards are
+  silent, and the author may decide otherwise. An upload starts with an app step that checks the files on the disk,
+  which stops it before anything is deleted or written when a file chosen is gone or has another size; the chunks of a
+  file are written by an app step of their own, which refuses itself on a read-only connection (the runner's guard asks
+  only of engine steps) and does not stop the insert of the chunk being sent, so that **Cancel** is read before the next
+  chunk and no insert lands after the chunks are deleted; an insert of a chunk, and that deletion, may take 30 s. A
+  download is read through the driver's `GridFSBucket` with the engine's methods `openDownload`, `readDownload` and
+  `closeDownload`, a download kept like a cursor; the folder of a copy of `gridfs.open` is made when it is missing, and
+  the copies a quit could not delete are deleted at the next start. A file or an app step that takes long says how far
+  it is (`progress` of the runner's ports, the `detail` of a work in progress, at most every 200 ms) and stays
+  cancellable when it is a plan's only step; when it is cancelled it may say its own text in place of how far the plan
+  went (`Cancelled` carries `said`: *Download cancelled.*, *Uploaded 1 file (717 KB) to Local › shop › fs, cancelled.*).
+  An upload of several files whose one group fails on the server goes on with the others, and its notification is the
+  one known before it ran, with the runner's warning naming the steps that failed. (`gridfs.upload`, `gridfs.download`,
+  `gridfs.open`, `runner.progress`, `runner.cancel`, `runner.notify`).
+- **Q88** — GridFS as built in M33, the page: a text field of a question may carry the part of its default that is
+  selected when it opens (`selection`), which `gridfs.rename` uses for the name up to its extension; the save dialog of
+  a download opens in the home folder; the page reads only while its connection is connected, and every refresh of
+  the connection (any write made through Datardo) reads it again and forgets the previews; `↑` and `↓` select the row
+  above and below, `Shift+F10` opens the menu of the selected row, and the `…` buttons are reached with the mouse only;
+  the status line keeps its own **Read-only** with its own tooltip (`nav.status-line`). In Go to, **Upload files to
+  GridFS bucket…** is `gridfs.upload` (two commands never share a title), and the commands of the area are offered
+  when the active tab is the page of a bucket (`gridfs.create-bucket` when it is of another place of a database): those
+  of a file act on the selected row and do nothing with none, and **Open GridFS bucket** shows the bucket's tab again.
+  (`gridfs.show`, `gridfs.rename`, `gridfs.download`, `palette.run-command`, `nav.status-line`).

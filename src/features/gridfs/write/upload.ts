@@ -141,6 +141,15 @@ export function replacedOf(value: unknown): readonly Replaced[] {
     : [];
 }
 
+/** The files a **Replace** deletes, as a feature has them from the read (`{ id, filename }`). */
+export function replacedAnswered(value: unknown): readonly Replaced[] {
+  return Array.isArray(value)
+    ? (value as readonly unknown[])
+        .filter(isRecord)
+        .map((each) => ({ id: each['id'] ?? null, filename: textOf(each, 'filename') ?? '' }))
+    : [];
+}
+
 /** `db.fs.files.createIndex({ filename: 1, uploadDate: 1 })` and `db.fs.chunks.createIndex({ files_id: 1, n: 1 }, { unique: true })`. */
 export function indexSteps(place: BucketRef): readonly EngineStep[] {
   const one = { $numberInt: '1' };
@@ -172,8 +181,21 @@ export function chunksText(place: BucketRef, id: Json, count: number): string {
   return `${written} ${text.upload.chunks(count)}`;
 }
 
+/**
+ * Where a file is in its upload, for what the writer of its chunks says: the title of the work in progress
+ * (*Uploading to Local › shop › fs*), the files sent in order with their sizes, which one this is, and how many were
+ * skipped, so that the status line says `logo.png (1 of 3) · 1.2 MB of 4.5 MB` and a cancel says *Uploaded 1 file
+ * (717 KB) to Local › shop › fs, cancelled.*
+ */
+export interface UploadAt {
+  readonly where: string;
+  readonly files: readonly ChosenFile[];
+  readonly index: number;
+  readonly skipped: number;
+}
+
 /** The app step that writes the chunks of a file from the disk. */
-export function chunksStep(place: BucketRef, file: ChosenFile, group: string): Step {
+export function chunksStep(place: BucketRef, file: ChosenFile, at: UploadAt & { readonly group: string }): Step {
   return {
     kind: 'app',
     action: 'gridfs.write-chunks',
@@ -185,9 +207,26 @@ export function chunksStep(place: BucketRef, file: ChosenFile, group: string): S
       path: file.path,
       size: file.size,
       chunkSize: uploadChunkSize,
+      where: at.where,
+      files: at.files.map((each) => ({ name: each.name, size: each.size })),
+      index: at.index,
+      skipped: at.skipped,
     },
     text: chunksText(place, file.id, chunkCount(file.size)),
-    group,
+    group: at.group,
+  };
+}
+
+/**
+ * The first step of an upload, `check the files on the disk: logo.png, b.png`: each file must still be read with the
+ * size it had when it was chosen, or the upload stops before anything is deleted or written.
+ */
+export function checkStep(files: readonly ChosenFile[]): Step {
+  return {
+    kind: 'app',
+    action: 'gridfs.check-files',
+    args: { files: files.map((file) => ({ path: file.path, size: file.size })) },
+    text: text.upload.checkStep(files.map((file) => file.name)),
   };
 }
 
@@ -207,17 +246,21 @@ export function filesDocument(file: ChosenFile, now: number): Json {
 /** The steps of one file: its chunks, its files document, then the deletes of the files it replaces. */
 export function fileSteps(
   place: BucketRef,
-  file: ChosenFile,
-  replaced: readonly Replaced[],
+  at: UploadAt & { readonly replaced: readonly Replaced[] },
   now: number,
 ): readonly Step[] {
+  const file = at.files[at.index];
+  if (file === undefined) {
+    return [];
+  }
+  const replaced = at.replaced;
   const group = `${file.name} (${oneLine(file.id)})`;
   const insert = bucketStep(
     place,
     bucketRequest(place, 'files', { method: 'insertOne', arguments: [filesDocument(file, now)] }),
   );
   return [
-    ...(chunkCount(file.size) > 0 ? [chunksStep(place, file, group)] : []),
+    ...(chunkCount(file.size) > 0 ? [chunksStep(place, file, { ...at, group })] : []),
     { ...insert, group },
     ...replaced.flatMap((old) => deleteFileSteps(place, old.id).map((step) => ({ ...step, group }))),
   ];

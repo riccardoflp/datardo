@@ -23,6 +23,9 @@ import { ConsoleInspector } from './console/console-inspector';
 import { ConsolePage } from './console/console-page';
 import { consoleExtras } from './console/console-state';
 import { useConsoleTab } from './console/console-store';
+import { GridFsInspector } from './gridfs/gridfs-inspector';
+import { GridFsPage } from './gridfs/gridfs-page';
+import { gridFsExtras } from './gridfs/gridfs-state';
 
 /** A page as the main island draws it. */
 export type PageView = () => React.JSX.Element | null;
@@ -36,6 +39,7 @@ export const pages: Readonly<Record<string, PageView>> = {
   overview: OverviewPage,
   undo: UndoHistoryPage,
   server: ServerPage,
+  gridfs: GridFsPage,
 };
 
 /** The pages of the tabs that show a target of a connection, by the kind of what they show (`keys`, `key`). */
@@ -47,11 +51,17 @@ export const tabPages: Readonly<Partial<Record<string, PageView>>> = {
 
 /**
  * What the inspector island draws for one thing selected in a page, by the kind of what the active tab shows, or by
- * the name of its page for a page tab (`server`).
+ * the name of its page for a page tab (`server`, `gridfs`).
  */
 export const inspectors: Readonly<
   Partial<Record<string, (props: { readonly tabId: string }) => React.JSX.Element | null>>
-> = { keys: KeyInspector, key: ValueItemInspector, server: ServerInspector, console: ConsoleInspector };
+> = {
+  keys: KeyInspector,
+  key: ValueItemInspector,
+  server: ServerInspector,
+  console: ConsoleInspector,
+  gridfs: GridFsInspector,
+};
 
 /** What a page adds to the active tab, by its kind or its page: what the status line counts, what the inspector shows. */
 export const tabExtras: Readonly<Partial<Record<string, typeof keysExtras>>> = {
@@ -59,6 +69,7 @@ export const tabExtras: Readonly<Partial<Record<string, typeof keysExtras>>> = {
   key: valueExtras,
   server: serverExtras,
   console: consoleExtras,
+  gridfs: gridFsExtras,
 };
 
 /** The name `inspectors` and `tabExtras` know a tab by: its page for a page tab, else the kind of what it shows. */

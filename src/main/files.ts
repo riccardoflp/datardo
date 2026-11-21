@@ -18,6 +18,7 @@ import { connectionEngines, fullConnectionString, savedConnections, savedOptionS
 import { nodeFileCrypto } from './file-crypto';
 import { keyExportOf, writeKeyExport } from './key-export';
 import { savedQueriesData } from './saved-queries';
+import { writeDownload } from './gridfs';
 
 const formats: readonly ExportFormat[] = ['datardo', 'compass', 'list'];
 const modes: readonly ExportSecrets[] = ['remove', 'include', 'encrypt'];
@@ -94,7 +95,7 @@ async function queryFile(step: FileStep, args: Json): Promise<void> {
 }
 
 /** Carries out a file step: writes, deletes or creates the folder at its path. */
-export const fileWriter: FileWriter = async (step: FileStep, signal: AbortSignal) => {
+export const fileWriter: FileWriter = async (step: FileStep, signal: AbortSignal, progress) => {
   if (step.content?.writer === queryFileWriter) {
     await queryFile(step, step.content.args);
     return;
@@ -126,6 +127,13 @@ export const fileWriter: FileWriter = async (step: FileStep, signal: AbortSignal
       const content = step.content;
       if (content?.writer === 'key.export') {
         await writeKeys(step, content.args, signal);
+        return;
+      }
+      if (content?.writer === 'gridfs.download') {
+        await writeDownload({ engines: connectionEngines }, step.path, content.args, {
+          signal,
+          ...(progress === undefined ? {} : { progress }),
+        });
         return;
       }
       const writer = content === undefined ? undefined : writers[content.writer];

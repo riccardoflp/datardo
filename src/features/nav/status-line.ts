@@ -75,6 +75,9 @@ function connectionPart(input: NavInput, current: SavedConnection | undefined): 
 }
 
 function progressOf(work: Work): string | undefined {
+  if (work.detail !== undefined) {
+    return work.detail;
+  }
   if (work.total !== undefined && work.total > 0) {
     return `${String(Math.floor(((work.done ?? 0) / work.total) * 100))}%`;
   }

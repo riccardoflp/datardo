@@ -24,6 +24,7 @@ export { MongoEngineError } from './mongodb/errors';
 export { bsonBytes } from './mongodb/bson-bytes';
 export { redisAddress } from './redis';
 export { closedBeforeReply } from './redis/console-client';
+export { newObjectId } from './mongodb/gridfs';
 
 /** Carries out requests on the connections it holds a client for. */
 export interface EngineService {

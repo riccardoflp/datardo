@@ -262,23 +262,23 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`gridfs.show`](gridfs.md#gridfsshow--the-page-of-a-bucket) | The page of a bucket | View | M33 | Specified |
-| [`gridfs.buckets`](gridfs.md#gridfsbuckets--the-buckets-of-a-database) | The buckets of a database | Derivation | M33 | Specified |
-| [`gridfs.list`](gridfs.md#gridfslist--a-page-of-the-files-of-a-bucket) | A page of the files of a bucket | Read | M33 | Specified |
-| [`gridfs.filter`](gridfs.md#gridfsfilter--the-filter-of-the-files) | The filter of the files | Derivation | M33 | Specified |
-| [`gridfs.size-text`](gridfs.md#gridfssize-text--a-size-in-words) | A size in words | Derivation | M33 | Specified |
-| [`gridfs.inspect`](gridfs.md#gridfsinspect--a-file-in-the-inspector) | A file in the inspector | View | M33 | Specified |
-| [`gridfs.preview`](gridfs.md#gridfspreview--the-preview-of-a-file) | The preview of a file | Read | M33 | Specified |
-| [`gridfs.hex-dump`](gridfs.md#gridfshex-dump--the-hex-dump-of-the-first-bytes) | The hex dump of the first bytes | Derivation | M33 | Specified |
-| [`gridfs.content-type`](gridfs.md#gridfscontent-type--the-content-type-of-a-file-name) | The content type of a file name | Derivation | M33 | Specified |
-| [`gridfs.upload`](gridfs.md#gridfsupload--upload-files-to-a-bucket) | Upload files to a bucket | Operation | M33 | Specified |
-| [`gridfs.create-bucket`](gridfs.md#gridfscreate-bucket--create-a-bucket-by-uploading-to-it) | Create a bucket by uploading to it | Operation | M33 | Specified |
-| [`gridfs.download`](gridfs.md#gridfsdownload--download-a-file) | Download a file | Operation | M33 | Specified |
-| [`gridfs.open`](gridfs.md#gridfsopen--open-a-file-with-the-systems-application) | Open a file with the system's application | Operation | M33 | Specified |
-| [`gridfs.rename`](gridfs.md#gridfsrename--rename-a-file) | Rename a file | Operation | M33 | Specified |
-| [`gridfs.edit-metadata`](gridfs.md#gridfsedit-metadata--edit-the-files-document-of-a-file) | Edit the files document of a file | Operation | M33 | Specified |
-| [`gridfs.delete`](gridfs.md#gridfsdelete--delete-a-file) | Delete a file | Operation | M33 | Specified |
-| [`gridfs.drop-bucket`](gridfs.md#gridfsdrop-bucket--delete-a-bucket) | Delete a bucket | Operation | M33 | Specified |
+| [`gridfs.show`](gridfs.md#gridfsshow--the-page-of-a-bucket) | The page of a bucket | View | M33 | Built |
+| [`gridfs.buckets`](gridfs.md#gridfsbuckets--the-buckets-of-a-database) | The buckets of a database | Derivation | M33 | Built |
+| [`gridfs.list`](gridfs.md#gridfslist--a-page-of-the-files-of-a-bucket) | A page of the files of a bucket | Read | M33 | Built |
+| [`gridfs.filter`](gridfs.md#gridfsfilter--the-filter-of-the-files) | The filter of the files | Derivation | M33 | Built |
+| [`gridfs.size-text`](gridfs.md#gridfssize-text--a-size-in-words) | A size in words | Derivation | M33 | Built |
+| [`gridfs.inspect`](gridfs.md#gridfsinspect--a-file-in-the-inspector) | A file in the inspector | View | M33 | Built |
+| [`gridfs.preview`](gridfs.md#gridfspreview--the-preview-of-a-file) | The preview of a file | Read | M33 | Built |
+| [`gridfs.hex-dump`](gridfs.md#gridfshex-dump--the-hex-dump-of-the-first-bytes) | The hex dump of the first bytes | Derivation | M33 | Built |
+| [`gridfs.content-type`](gridfs.md#gridfscontent-type--the-content-type-of-a-file-name) | The content type of a file name | Derivation | M33 | Built |
+| [`gridfs.upload`](gridfs.md#gridfsupload--upload-files-to-a-bucket) | Upload files to a bucket | Operation | M33 | Built |
+| [`gridfs.create-bucket`](gridfs.md#gridfscreate-bucket--create-a-bucket-by-uploading-to-it) | Create a bucket by uploading to it | Operation | M33 | Built |
+| [`gridfs.download`](gridfs.md#gridfsdownload--download-a-file) | Download a file | Operation | M33 | Built |
+| [`gridfs.open`](gridfs.md#gridfsopen--open-a-file-with-the-systems-application) | Open a file with the system's application | Operation | M33 | Built |
+| [`gridfs.rename`](gridfs.md#gridfsrename--rename-a-file) | Rename a file | Operation | M33 | Built |
+| [`gridfs.edit-metadata`](gridfs.md#gridfsedit-metadata--edit-the-files-document-of-a-file) | Edit the files document of a file | Operation | M33 | Built |
+| [`gridfs.delete`](gridfs.md#gridfsdelete--delete-a-file) | Delete a file | Operation | M33 | Built |
+| [`gridfs.drop-bucket`](gridfs.md#gridfsdrop-bucket--delete-a-bucket) | Delete a bucket | Operation | M33 | Built |
 
 ## Document history
 

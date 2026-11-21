@@ -39,15 +39,34 @@ export const temporaryRead: ReadFeature = {
 /** The name of the writer of a file's bytes. */
 export const downloadWriter = 'gridfs.download';
 
+/**
+ * What the writer of a download says while it runs and when it is cancelled: the title of its work in progress
+ * (*Downloading logo.png*), the size of the file for its `1.2 MB of 4.5 MB`, and the notification of a cancel
+ * (*Download cancelled.*), when the card names one.
+ */
+export interface DownloadSaid {
+  readonly title: string;
+  readonly length: number;
+  readonly cancelled?: string;
+}
+
 /** `write C:\Users\ada\logo.png`: the file step whose writer reads the chunks of the file in order. */
-export function downloadStep(place: BucketRef, id: Json, path: string): FileStep {
+export function downloadStep(place: BucketRef, id: Json, path: string, said: DownloadSaid): FileStep {
   const step = {
     kind: 'file' as const,
     action: 'write' as const,
     path,
     content: {
       writer: downloadWriter,
-      args: { connection: place.connection, database: place.database, bucket: place.bucket, id },
+      args: {
+        connection: place.connection,
+        database: place.database,
+        bucket: place.bucket,
+        id,
+        title: said.title,
+        length: said.length,
+        ...(said.cancelled === undefined ? {} : { cancelled: said.cancelled }),
+      },
     },
   };
   return { ...step, text: stepText(step) };

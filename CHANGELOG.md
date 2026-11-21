@@ -118,6 +118,15 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
   documents matching the filter of the query bar: each write is shown before it runs with the documents it touches,
   leaves out those where a parent is an array, is refused on a read-only connection and on a view, and is recorded in
   the undo history; the column follows a renamed or removed field.
+- A GridFS bucket opens in a page of its own from the tree or Go to: its files are listed a hundred at a time, filtered
+  by name or by a MongoDB filter, sorted by name, size or date, and the selected file is previewed in the inspector
+  island (a picture, an SVG among them with nothing in it run, a text, or the hex of its first bytes) with its files
+  document. Files are uploaded from the disk, adding a revision, replacing or skipping the names that exist, and
+  downloaded, both a chunk at a time with their progress on the status line and **Cancel**, which leaves nothing half
+  written; a file is opened with the system's application from a temporary copy, only for the types of documents,
+  pictures, sound and archives; files are renamed, their metadata edited in a document tab, and deleted, and a bucket
+  is created by its first upload and deleted from the tree. A read-only connection lists, previews, downloads and
+  opens, and changes nothing.
 
 ### Fixed
 

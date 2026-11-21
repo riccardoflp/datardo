@@ -74,6 +74,8 @@ export interface Work {
   readonly total?: number;
   /** What `done` and `total` count: `documents`. */
   readonly unit?: string;
+  /** How far it is in words, said in place of `done` and `total` by a step that says it: `1.2 MB of 4.5 MB`. */
+  readonly detail?: string;
   /** Why it cannot be cancelled, said in place of **Cancel**: *Already sent to the server.* */
   readonly cannotCancel?: string;
   /** It was cancelled and stops at the end of what is in progress. */

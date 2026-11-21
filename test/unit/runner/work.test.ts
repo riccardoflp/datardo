@@ -1,7 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { linesText, logPlace, open as openLog, timeText, view as logView } from '../../../src/features/runner/log';
 import { elapsedText, view as progressView } from '../../../src/features/runner/progress';
-import { cancel, cancelLatest } from '../../../src/runner/cancel';
+import { cancel, cancelLatest, Cancelled } from '../../../src/runner/cancel';
+import type { AppAction } from '../../../src/runner/ports';
 import { runtimeOf } from '../../../src/runner/runtime';
 import { start } from '../../../src/runner/start';
 import { showAfterMs } from '../../../src/runner/work';
@@ -79,6 +80,11 @@ describe('runner.progress', () => {
     expect(elapsedText(3_780_000)).toBe('1 h 3 min');
   });
 
+  it('shows what a long app step says of itself, in place of the count of its steps', () => {
+    const shown = progressView({ work: [work({ detail: '1.2 MB of 4.0 MB', done: 0, total: 1 })], now: 0 });
+    expect(shown.items[0]).toMatchObject({ progress: '1.2 MB of 4.0 MB' });
+  });
+
   it('says why an item cannot be cancelled in place of Cancel', () => {
     const [item] = progressView({ work: [work({ cannotCancel: 'Already sent to the server.' })], now: 0 }).items;
     expect(item).toMatchObject({ cancellable: false, cannotCancel: 'Already sent to the server.' });
@@ -125,6 +131,32 @@ describe('runner.cancel', () => {
     expect(result).toEqual({ kind: 'cancelled' });
     expect(test.sent.map(keyOf)).toEqual(['a']);
     expect(test.log()).toContain('[test.delete] cancelled: Stopped after step 1 of 3.');
+  });
+
+  it('cancels a plan of one app step while it runs; the step says what it left, and the item what it said', async () => {
+    vi.useFakeTimers();
+    const said: { progress?: (text: string) => void } = {};
+    const copy: AppAction = (_args, signal, progress) => {
+      said.progress = (text) => progress?.({ detail: text });
+      return new Promise((_resolve, reject) => {
+        signal.addEventListener('abort', () => {
+          reject(new Cancelled('Download cancelled: nothing was written.'));
+        });
+      });
+    };
+    const plan = planOf('Copy a file', [{ kind: 'app', action: 'test.copy', args: null, text: 'copy the file' }]);
+    const feature: OperationFeature = { kind: 'operation', id: featureId('test.copy'), plan: () => run(plan) };
+    const test = harness({ features: [feature], appActions: { 'test.copy': copy } });
+    const running = start(test.ports, { feature: feature.id, target: appTarget });
+    await vi.advanceTimersByTimeAsync(showAfterMs);
+    said.progress?.('1.2 MB of 4.0 MB');
+    expect(test.state().runner.work[0]).toMatchObject({ title: 'Copy a file', detail: '1.2 MB of 4.0 MB' });
+    expect(test.state().runner.work[0]?.cannotCancel).toBeUndefined();
+    expect(cancelLatest(test.ports)).toBe(true);
+    expect(await running).toEqual({ kind: 'cancelled' });
+    expect(test.state().runner.notifications.map((each) => each.text)).toContain(
+      'Download cancelled: nothing was written.',
+    );
   });
 
   it('cannot cancel a plan of one step that has been sent, and says why', async () => {

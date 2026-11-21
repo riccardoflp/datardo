@@ -23,6 +23,8 @@ export interface TextField {
   readonly placeholder?: string;
   /** Hidden while typed: a password. */
   readonly secret?: boolean;
+  /** The part of the default selected when the field opens, from `start` to `end`; all of it when absent. */
+  readonly selection?: { readonly start: number; readonly end: number };
   /** The message shown under the field while the text is not valid, by rule (feature's own validation). */
   readonly rules?: readonly TextRule[];
 }

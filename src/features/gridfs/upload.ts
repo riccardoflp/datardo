@@ -41,11 +41,12 @@ import {
 import { chooseReadId, chosenFiles, type ChosenFile } from './write/file';
 import { notifySuccess, refreshAfter, writePlan } from './write/plan';
 import {
+  checkStep,
   existingOf,
   existingReadId,
   fileSteps,
   indexSteps,
-  replacedOf,
+  replacedAnswered,
   replacedReadId,
   type Replaced,
 } from './write/upload';
@@ -145,7 +146,7 @@ function gathered(place: BucketPlace, answers: Answers, files: readonly ChosenFi
       outcome: needRead('replaced', replacedReadId, { ...bucketArgs(place), names: existing }),
     };
   }
-  const replaced = choice === 'replace' ? replacedOf(answers['replaced']) : [];
+  const replaced = choice === 'replace' ? replacedAnswered(answers['replaced']) : [];
   return { kind: 'gathered', files, existing, empty: read.empty, choice, replaced };
 }
 
@@ -191,13 +192,20 @@ function uploadPlan(
   const sent =
     before.choice === 'skip' ? before.files.filter((file) => !before.existing.includes(file.name)) : before.files;
   const replacing = before.choice === 'replace' ? sent.filter((file) => before.existing.includes(file.name)) : [];
+  const skipped = before.files.length - sent.length;
   const steps = [
+    ...(sent.length > 0 ? [checkStep(sent)] : []),
     ...(before.empty && sent.length > 0 ? indexSteps(place) : []),
-    ...sent.flatMap((file) =>
+    ...sent.flatMap((file, index) =>
       fileSteps(
         place,
-        file,
-        before.replaced.filter((old) => replacing.includes(file) && old.filename === file.name),
+        {
+          where,
+          files: sent,
+          index,
+          skipped,
+          replaced: before.replaced.filter((old) => replacing.includes(file) && old.filename === file.name),
+        },
         context.now,
       ),
     ),
@@ -210,10 +218,7 @@ function uploadPlan(
           text: `${text.upload.replaceQuestion(replacing.length, where)}\n${text.upload.replaceDetail}`,
           button: text.upload.replace,
         };
-  const done: After = notifySuccess(
-    uploadedText(sent, where, { skipped: before.files.length - sent.length, cancelled: false }),
-    openAction(place, args),
-  );
+  const done: After = notifySuccess(uploadedText(sent, where, { skipped, cancelled: false }), openAction(place, args));
   return run(
     writePlan({
       title: text.upload.plan(where),

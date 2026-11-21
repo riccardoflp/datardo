@@ -61,8 +61,9 @@ What it shows, top to bottom:
 3. The pager, only when more than 100 files match: **‹ Previous**, `101–200 of 1,234`, **Next ›**. A page has 100
    files. When a page beyond the end is asked for (files were deleted meanwhile), the last page is shown.
 
-Selecting a row shows the file in the inspector island (`gridfs.inspect`). The context menu of a row and its `…`
-button (`@row-menu`) have **Open** (*Open the file with the system's application (a temporary copy)*),
+Selecting a row shows the file in the inspector island (`gridfs.inspect`); `↑` and `↓` select the row above and
+below. The context menu of a row, `Shift+F10` and its `…` button (named *More for logo.png*; the column has the name
+**More**) (`@row-menu`) have **Open** (*Open the file with the system's application (a temporary copy)*),
 **Download…** (*Save the file to disk*) and, on a connection that is not read-only, **Rename…** and **Delete**
 (*Delete the file and its chunks*). `Delete` on a selected row starts the delete.
 
@@ -261,6 +262,8 @@ What it shows, top to bottom:
    - an error, as it is: *The file no longer exists.*, or the server's.
 5. **Files document**: the files document in mongosh syntax, on several lines (`query.format`).
 
+With no file selected the island reads **Nothing selected** and *Select a file to see it here.* (`nav.inspector`).
+
 Acceptance:
 
 - [ ] Selecting `logo.png` of 12 KB shows the image; selecting it again later does not read it again; **Refresh**
@@ -415,7 +418,9 @@ Stores files from the disk in the bucket, asking first what to do with the names
 - **Engine**: MongoDB
 - **Function**: `src/features/gridfs/upload.ts › plan(context, answers)`
 - **Entry points**: **Upload…** in the toolbar of the page of a bucket (`@toolbar`); **Upload files to GridFS…** in
-  the context menu of a bucket (`@tree-menu`). Started for a database, it is `gridfs.create-bucket`.
+  the context menu of a bucket (`@tree-menu`). Started for a database, it is `gridfs.create-bucket`. Go to: **Upload
+  files to GridFS bucket…**, for the bucket of the active tab *(Datardo's choice: the title of
+  `gridfs.create-bucket` is taken, and two commands never share a title)*.
 - **Offered when**: a bucket, on a connection that is not read-only.
 - **Asks**:
   1. the files, in the system's file dialog titled *Upload files to Local › shop › fs*, which takes several and
@@ -427,8 +432,10 @@ Stores files from the disk in the bucket, asking first what to do with the names
      - **Skip** — *upload only the new names*.
 - **Reads**: `db.fs.files.distinct("filename", { filename: { $in: ["a.png", "b.png"] } })`, with the names of the
   files chosen, and the size of each file on the disk.
-- **Plan**: the files one after the other, in the order they were chosen; with **Skip**, without those whose name
-  exists. For each file:
+- **Plan**: first `check the files on the disk: logo.png, b.png`: each file sent must still be there and have the
+  size it had when it was chosen, or the upload stops before anything is deleted or written, with *C:\Users\ada\logo.png
+  changed since it was chosen: nothing was uploaded.* or the error of the disk *(Datardo's choice)*. Then the files one
+  after the other, in the order they were chosen; with **Skip**, without those whose name exists. For each file:
   1. with **Replace**, when its name exists: `db.fs.files.find({ filename: "logo.png" }, { _id: 1 })`, to know the
      files to delete once the new one is in place ([D50](../decisions.md#d50--a-gridfs-file-is-replaced-after-the-new-one-is-uploaded));
   2. its chunks, read from the disk as they are sent, never the whole file in memory: one
@@ -594,7 +601,8 @@ of files that are safe to hand to the system.
 - **Danger**: None.
 - **Read-only**: Allowed, because it writes nothing to a deployment.
 - **Undo**: Cannot be undone from the undo history: it writes a temporary copy. The copies are deleted when Datardo
-  quits *(Datardo's choice)*.
+  quits, and those a quit could not delete (a copy still open in its application) when it next starts *(Datardo's
+  choice)*. The app step checks the type of the copy once more before handing it to the system.
 - **After**: while it runs, the status line shows *Opening logo.png* with the bytes and **Cancel**, as a download.
   Changes made to the copy are not written back to the bucket.
 - **Refuses**: a file deleted meanwhile (`/gone`): *The file no longer exists.*; a type Datardo does not hand to

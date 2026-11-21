@@ -26,6 +26,7 @@ import type { Command } from '../command';
 import { commands as registeredCommands } from '../commands';
 import { isOffered as isFieldOffered } from '../field/commands';
 import { isOffered as isManageOffered } from '../manage/commands';
+import { isGridFsCommandOffered } from '../gridfs/commands';
 import { canGo } from '../nav/back';
 import { isOffered as isCopyPathOffered } from '../nav/copy-path';
 import { pinOfTab } from '../nav/pin';
@@ -118,6 +119,11 @@ function isOfferedByItsArea(state: AppState, id: string): boolean | undefined {
   return id.startsWith('field.') ? isFieldOffered(state) : undefined;
 }
 
+/** Whether a command of an area that decides it alone is offered now: those of GridFS, and of the window. */
+function isOfferedOtherwise(state: AppState, id: string): boolean {
+  return id.startsWith('gridfs.') ? isGridFsCommandOffered(state, id) : isWindowCommandOffered(state, id);
+}
+
 /** What a command's own card says of whether it is offered now. */
 function isOfferedByItsCard(state: AppState, id: string): boolean {
   const active = activeTabOf(state.tabs);
@@ -164,7 +170,7 @@ function isOfferedByItsCard(state: AppState, id: string): boolean {
       if (id.startsWith('value.')) {
         return active?.shows.kind === 'key';
       }
-      return id.startsWith('table.') ? active?.shows.kind === 'collection' : isWindowCommandOffered(state, id);
+      return id.startsWith('table.') ? active?.shows.kind === 'collection' : isOfferedOtherwise(state, id);
   }
 }
 

@@ -56,6 +56,7 @@ export function plan(context: Context, answers: Answers): Outcome {
           key: 'name',
           label: text.rename.name,
           default: file.filename,
+          selection: selectedPart(file.filename),
           rules: [{ kind: 'not-empty', message: text.rename.empty }],
         },
       ],

@@ -67,6 +67,7 @@ describe('gridfs.upload', () => {
     const plan = planOf(uploadWith({ files: [logo], existing: { names: [], empty: true } }));
     expect(plan.danger).toEqual({ kind: 'none' });
     expect(stepTexts(plan)).toEqual([
+      'check the files on the disk: logo.png',
       'db.getCollection("fs.files").createIndex({ filename: 1, uploadDate: 1 })',
       'db.getCollection("fs.chunks").createIndex({ files_id: 1, n: 1 }, { unique: true })',
       'db.getCollection("fs.chunks").insertOne({ files_id: ObjectId("65f1c0ffee0000000000b001"), n: 0, data: BinData(0, "…") }) ×3',
@@ -82,10 +83,23 @@ describe('gridfs.upload', () => {
       filename: 'logo.png',
       metadata: { contentType: 'image/png' },
     });
-    expect(plan.steps[2]).toMatchObject({
+    expect(plan.steps[0]).toMatchObject({
+      kind: 'app',
+      action: 'gridfs.check-files',
+      args: { files: [{ path: 'C:\\Users\\ada\\logo.png', size: 734_003 }] },
+    });
+    expect(plan.steps[3]).toMatchObject({
       kind: 'app',
       action: 'gridfs.write-chunks',
-      args: { path: 'C:\\Users\\ada\\logo.png', size: 734_003, chunkSize: 261_120 },
+      args: {
+        path: 'C:\\Users\\ada\\logo.png',
+        size: 734_003,
+        chunkSize: 261_120,
+        where: 'Local › shop › fs',
+        files: [{ name: 'logo.png', size: 734_003 }],
+        index: 0,
+        skipped: 0,
+      },
     });
     expect([chunkCount(734_003), chunkLength(734_003, 2)]).toEqual([3, 211_763]);
     expect(plan.publishes).toBe(false);
@@ -94,7 +108,7 @@ describe('gridfs.upload', () => {
   it('uploads Makefile with metadata {}, and a file of 0 bytes with no chunk', () => {
     const files = [chosen('Makefile', 10, '65f1c0ffee0000000000b002'), chosen('empty', 0, '65f1c0ffee0000000000b003')];
     const plan = planOf(uploadWith({ files, existing: { names: [], empty: false } }));
-    expect(plan.steps.map((step) => step.kind)).toEqual(['app', 'engine', 'engine']);
+    expect(plan.steps.map((step) => step.kind)).toEqual(['app', 'app', 'engine', 'engine']);
     const [makefile, empty] = sentRequests(plan).map((request) => request.arguments[0] as Record<string, Json>);
     expect(makefile?.['metadata']).toEqual({});
     expect(empty?.['length']).toEqual({ $numberLong: '0' });
@@ -156,8 +170,12 @@ describe('gridfs.upload', () => {
       plan.steps.map((step) =>
         step.kind === 'app' ? 'app' : (sentRequests({ ...plan, steps: [step] })[0]?.method ?? ''),
       ),
-    ).toEqual(['app', 'insertOne', 'deleteOne', 'deleteMany', 'deleteOne', 'deleteMany']);
-    expect(new Set(plan.steps.map((step) => step.group)).size).toBe(1);
+    ).toEqual(['app', 'app', 'insertOne', 'deleteOne', 'deleteMany', 'deleteOne', 'deleteMany']);
+    expect(new Set(plan.steps.slice(1).map((step) => step.group)).size).toBe(1);
+    expect(sentRequests(plan).filter((request) => request.method === 'deleteOne')).toMatchObject([
+      { arguments: [{ _id: { $oid: '65f1c0ffee0000000000a2c1' } }] },
+      { arguments: [{ _id: { $oid: '65f1c0ffee0000000000a2c2' } }] },
+    ]);
   });
 
   it('has Open in the notification when started from the tree, and not from the page', () => {
