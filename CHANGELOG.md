@@ -84,6 +84,13 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
   or deleted, each write shown before it runs, refused on a read-only connection and on a view, and in the undo
   history. A write that would change the type of a value (a BSON undefined, a date beyond the range of JavaScript)
   is not sent.
+- **History** of a document, from its inspector, its row menu or its tab, lists the writes the oplog still holds,
+  newest first, with what each changed and the versions they made, marking those written from Datardo; a version is
+  copied, or restored after a confirmation and recorded for undo, refused on a read-only connection.
+- **Watch changes** follows a collection, a database or the whole deployment live through a change stream: the change
+  events arrive newest first, are filtered by the server and by type and text in the page, show what each changed in
+  the inspector, can be paused, stopped, resumed from the last one, cleared, copied and exported as JSON Lines, and a
+  collection can be made to record pre-images.
 
 ### Fixed
 

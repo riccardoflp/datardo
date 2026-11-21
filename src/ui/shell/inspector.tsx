@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import { view } from '../../features/nav/inspector';
 import { text } from '../../features/nav/text';
 import type { NavInput } from '../../features/nav/types';
-import { inspectors } from '../pages';
+import { inspectors, pageKindOf } from '../pages';
 import { DocumentInspector } from '../pages/document/document-inspector';
 import { startFeature } from './intent';
 import styles from './bars.module.css';
@@ -33,7 +33,7 @@ function SelectedThing({ input }: { readonly input: NavInput }): React.JSX.Eleme
   if (tab.kind === 'collection' && tab.tab !== undefined) {
     return <DocumentInspector tab={tab.tab} />;
   }
-  const Drawn = inspectors[tab.kind];
+  const Drawn = inspectors[pageKindOf(tab)];
   return Drawn === undefined || tab.tab === undefined ? null : <Drawn tabId={tab.tab} />;
 }
 

@@ -21,6 +21,8 @@ export const showText = {
     pausedNew: (count: number): string => `Paused · ${groupThousands(count)} new`,
   },
   types: { insert: 'insert', update: 'update', replace: 'replace', delete: 'delete', other: 'other' },
+  typesLabel: 'Types of change events',
+  lineMenu: 'Change event',
   typeTips: {
     insert: 'Show the insert events',
     update: 'Show the update events',
@@ -153,6 +155,12 @@ export const detailText = {
   current: 'Current document',
   currentNotRead: 'Current document (not read: enable "Current document on update", or the document was deleted)',
   event: 'Change event',
+} as const;
+
+/** What the page remembers, as the Log writes it (`watch.visible-events`). */
+export const rememberText = {
+  title: 'Change what the list of change events shows',
+  step: 'remember the toggles, the search and the filter of the page',
 } as const;
 
 /** What `watch.event-diff` notes on a truncated array. */

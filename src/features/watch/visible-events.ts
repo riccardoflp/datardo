@@ -5,23 +5,18 @@
  * list shows, newest first, after the type toggles and the search ({@link visibleEvents}). Nothing is asked of the
  * server: what it sends is narrowed by **Filter** (`watch.pipeline`).
  */
+import { newestKept, type KeptEvents } from '../../shared/state/watch';
 import { showText } from './text';
 import { categoryOf, eventCategories, type EventCategory, type WatchEvent } from './types';
 
-/** The change events a page keeps. */
-export const mostEvents = 1000;
+export { mostEvents, type KeptEvents } from '../../shared/state/watch';
 
-/** The change events kept, in order of arrival, and how many of the oldest were dropped. */
-export interface KeptEvents {
-  readonly events: readonly WatchEvent[];
-  readonly dropped: number;
-}
-
-/** Feature: watch.visible-events — the change events with those added, the newest 1,000, in order of arrival. */
+/**
+ * Feature: watch.visible-events — the change events with those added, the newest 1,000, in order of arrival. The
+ * pages of the app's state keep their lists with the same rule (`src/shared/state/watch.ts`).
+ */
 export function keepNewest(events: readonly WatchEvent[], added: readonly WatchEvent[]): KeptEvents {
-  const all = [...events, ...added];
-  const dropped = Math.max(0, all.length - mostEvents);
-  return { events: all.slice(dropped), dropped };
+  return newestKept(events, added);
 }
 
 /** What the list shows. */

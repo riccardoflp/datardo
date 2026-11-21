@@ -902,3 +902,26 @@ Raised while the catalog was written; each names the cards that hold the current
   `nav.toggle-inspector` there; the title of a new document's tab, *people · New document 1*, is never cut.
   (`runner.run`, `nav.toggle-inspector`, `tab.title`, `document.delete`, `document.delete-many`, `document.update-many`, `document.insert`, `document.insert-from-tab`,
   `document.inline-edit`, `document.open`, `undo.record`, `tab.restore`, `tab.close`).
+- **Q86** — The document history as built in M27, while the runner gives no Operation its replies (Q58): after
+  **Restore** the page says *Restored `<_id>` as of `<time>`.* (or *Inserted `<_id>` again…*) from the plan that ran,
+  and reads the oplog again; *The document was deleted meanwhile* is not reached, its `afterReplies` waiting for Q58.
+  Apart from Q58: the read of the oplog, window after window, runs in the main process as one app action,
+  which answers with the oplog's ends, the writes, where it stopped, the document as it is now and
+  Datardo's own writes; `history.read-writes` started with a window is still the query of that window. The page reads
+  again when `history.show` makes its tab active again for the same document, and when the tree is refreshed for the
+  connection. The document of a version in the inspector is shown as text (mongosh syntax), not as a tree.
+  (`history.show`, `history.read-writes`, `history.version-detail`, `document.restore-version`).
+- **Q87** — Watch changes as built in M27: the stream is kept by the main process, the window draws the page from
+  the app's state; a closed tab, **Stop** and quitting close the server's cursor,
+  waiting up to 1 s for the `getMore` in flight (its `maxAwaitTimeMS`) rather than leaving the cursor open on the
+  server. The page draws at most one batch of change events every 150 ms. What the toolbar remembers (the types
+  hidden, the search, and the text of **Filter** and **Current document on update** while the stream is stopped) is
+  an Operation with an app step, `watch.visible-events:remember`, as D57 says of what Datardo remembers, so it is in
+  the log; the tab keeps it in an optional field of its memory, `watch`, which needs no new version of the saved tabs.
+  An error of `watch.enable-pre-images` reaches the page as the runner's message of a failed step, which the page
+  writes as *Pre-images not enabled: `<message>`*. The notification of `watch.export` has no **Show in folder**, since
+  no feature shows a file in the file manager (Q39). **Watch changes** under **Pages of** in the tree starts
+  `watch.show` on the connection, so that the tab is named after the connection; the same page opened from Go to,
+  from a pin, from **Open** in the menu of the page in the tree or from the MCP tool is a page tab titled *Watch
+  changes*, as `connectionPageShows` makes it, and is not the same tab. (`watch.show`, `watch.stream`, `watch.stop`,
+  `watch.visible-events`, `watch.enable-pre-images`, `watch.export`, `tree.pages`).

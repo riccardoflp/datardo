@@ -122,10 +122,12 @@ describe('the MongoDB engine: watch', () => {
 
   it('on a database, and on the whole deployment', async () => {
     const onDatabase = await now();
+    // Only this database's change events: another test file may write elsewhere at the same time, and a token of one
+    // of its change events is not found again by the stream filtered below.
     const token = (await client.send({
       database: 'admin',
       method: 'watch',
-      arguments: [[], {}],
+      arguments: [[{ $match: { 'ns.db': database } }], {}],
       timeLimitMs: 0,
     })) as Changes;
     await client.send({ collection: 'other', method: 'insertOne', arguments: [{ _id: int(9) }] });

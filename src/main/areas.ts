@@ -15,6 +15,7 @@ import { start as startUndo } from './undo';
 import { start as startOplog } from './oplog';
 import { start as startTable } from './table';
 import { start as startPlaygrounds } from './playgrounds';
+import { start as startWatch } from './watch';
 
 /** What one area does at start. */
 export type AreaStart = (services: MainServices) => Promise<void>;
@@ -29,6 +30,8 @@ const starts: readonly AreaStart[] = [
   startNav,
   // Before the tabs are restored, so that the playground of each restored tab is loaded.
   startPlaygrounds,
+  // Before the tabs are restored, so that each restored Watch changes tab gets its page.
+  startWatch,
   startTabs,
   startPalette,
   startTable,
