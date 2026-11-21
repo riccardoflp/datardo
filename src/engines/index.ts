@@ -25,6 +25,7 @@ export { bsonBytes } from './mongodb/bson-bytes';
 export { redisAddress } from './redis';
 export { closedBeforeReply } from './redis/console-client';
 export { newObjectId } from './mongodb/gridfs';
+export { documentOfBytes } from './mongodb/document-bytes';
 
 /** Carries out requests on the connections it holds a client for. */
 export interface EngineService {

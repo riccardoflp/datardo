@@ -34,7 +34,22 @@ describe('connection.menu', () => {
       'Stop keeping undo history',
       'Link a Redis connection…',
       '—',
+      'Back up…',
+      'Restore from backup…',
+      '—',
       'Remove connection',
+    ]);
+  });
+
+  it('offers Back up and Restore from backup on a MongoDB connection, Back up only on a read-only one', () => {
+    expect(labels(menuIn('connected', true).entries)).toContain('Back up…');
+    expect(labels(menuIn('connected', true).entries)).not.toContain('Restore from backup…');
+    const island = menuIn('connected').entries.filter(
+      (entry) => entry.kind === 'item' && entry.feature.startsWith('backup.'),
+    );
+    expect(island.map((entry) => entry.kind === 'item' && entry.element)).toEqual([
+      'backup.create@connection-island',
+      'backup.restore@connection-island',
     ]);
   });
 

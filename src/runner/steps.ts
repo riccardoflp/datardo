@@ -7,9 +7,11 @@ import { runnerText } from '../features/runner/text';
 import type { Context, EngineStep, Plan, Step } from '../shared/feature';
 import type { RefusalCode } from '../shared/ids';
 import { isConsoleAnswer } from '../shared/typed-reply';
+import { isFedStep } from '../features/backup/types';
 import { Cancelled } from './cancel';
+import { FedTally, fedGroup, runFed } from './fed';
 import { writeLog } from './log';
-import type { RunnerPorts, StepProgress } from './ports';
+import type { ProgressReport, RunnerPorts } from './ports';
 import type { RunningWork } from './work';
 
 /** A step refused by the guard while the plan runs: the connection changed since the plan was confirmed. */
@@ -54,6 +56,8 @@ export interface Running {
   readonly context: Context;
   readonly work: RunningWork;
   readonly observer?: StepObserver;
+  /** What counts the documents of fed steps; a plan without fed steps has none. */
+  readonly tally?: FedTally;
 }
 
 /** The refusal the guard gives a step, or none: read-only, a view, not connected (R5.2). */
@@ -85,20 +89,67 @@ function viewOf(ports: RunnerPorts, step: EngineStep): string | undefined {
     : undefined;
 }
 
+/** Runs fed steps together, each between what its observer does before and after it. */
+async function runFedSteps(running: Running, plan: Plan, indexes: readonly number[]): Promise<void> {
+  const tally = running.tally ?? new FedTally(running.ports.now());
+  for (const index of indexes) {
+    const step = plan.steps[index];
+    if (step !== undefined) {
+      await running.observer?.before(step, index);
+    }
+  }
+  let failure: { error: unknown } | undefined;
+  try {
+    await runFed(running, plan.steps, indexes, tally);
+  } catch (error: unknown) {
+    failure = { error };
+  }
+  for (const index of indexes) {
+    const step = plan.steps[index];
+    if (step !== undefined) {
+      const ended =
+        failure === undefined
+          ? { kind: 'done' as const, reply: undefined }
+          : { kind: 'failed' as const, error: failure.error };
+      await running.observer?.after(step, index, ended);
+    }
+  }
+  if (failure !== undefined) {
+    throw failure.error;
+  }
+}
+
+/** Runs one step, or the fed steps that are read with it; gives the indexes it ran. */
+async function runAt(running: Running, plan: Plan, index: number): Promise<readonly number[]> {
+  const step = plan.steps[index];
+  if (step !== undefined && isFedStep(step)) {
+    const group = fedGroup(plan.steps, index);
+    await runFedSteps(running, plan, group);
+    return group;
+  }
+  if (step !== undefined) {
+    running.work.change({ done: index, total: plan.steps.length, unit: 'steps' });
+    await observed(running, step, index, () => runStep(running, step, plan.steps.length === 1));
+  }
+  return [index];
+}
+
 /** Runs the steps in order, as each says when it fails; a group that fails stops only itself. */
 export async function runSteps(running: Running, plan: Plan): Promise<StepsOutcome> {
   const failedOnTheWay: string[] = [];
   const failedGroups = new Set<string>();
+  const ran = new Set<number>();
   for (const [index, step] of plan.steps.entries()) {
     if (running.work.signal.aborted) {
       return { cancelledAfter: index, failedOnTheWay };
     }
-    if (step.group !== undefined && failedGroups.has(step.group)) {
+    if (ran.has(index) || (step.group !== undefined && failedGroups.has(step.group))) {
       continue;
     }
-    running.work.change({ done: index, total: plan.steps.length, unit: 'steps' });
     try {
-      await observed(running, step, index, () => runStep(running, step, plan.steps.length === 1));
+      for (const done of await runAt(running, plan, index)) {
+        ran.add(done);
+      }
     } catch (error: unknown) {
       if (error instanceof GuardRefusal || error instanceof Cancelled) {
         return error instanceof Cancelled
@@ -174,7 +225,9 @@ async function runStep(running: Running, step: Step, onlyStep: boolean): Promise
   const started = ports.now();
   let reply: unknown;
   try {
-    reply = await carryOut(ports, step, work);
+    reply = await carryOut(ports, step, work.signal, (change) => {
+      work.change(change);
+    });
   } catch (error: unknown) {
     const text = error instanceof Error ? error.message : String(error);
     writeLog(ports, [{ feature, kind: 'error', text: `failed: ${text}`, ...where }]);
@@ -213,11 +266,12 @@ export function changedCount(reply: unknown): number | undefined {
   return counts.length === 0 ? undefined : counts.reduce((sum, value) => sum + value, 0);
 }
 
-async function carryOut(ports: RunnerPorts, step: Step, work: RunningWork): Promise<unknown> {
-  const signal = work.signal;
-  const progress: StepProgress = (said) => {
-    work.change(said);
-  };
+async function carryOut(
+  ports: RunnerPorts,
+  step: Step,
+  signal: AbortSignal,
+  progress: ProgressReport,
+): Promise<unknown> {
   switch (step.kind) {
     case 'engine':
       return ports.engines.send({ connection: step.connection, request: step.request }, signal);

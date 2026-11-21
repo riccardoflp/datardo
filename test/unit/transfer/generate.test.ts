@@ -4,7 +4,7 @@ import { largestIdRead, parseCount, plan, sampleRead } from '../../../src/featur
 import { analyzeSample } from '../../../src/features/transfer/generate/sample';
 import type { Answers, ReadRequest } from '../../../src/shared/feature';
 import { connectionId } from '../../../src/shared/ids';
-import { connection, contextOn, local, next, ordersOn, planOf, production, stateWith } from './harness';
+import { connection, contextOn, local, next, ordersOn, planOf, production, staging, stateWith } from './harness';
 
 const int = (value: number) => ({ $numberInt: String(value) });
 const sample = analyzeSample(
@@ -72,6 +72,16 @@ describe('transfer.generate', () => {
       kind: 'refuse',
       code: 'transfer.generate/read-only',
       message: 'The connection Production is read-only.',
+    });
+  });
+
+  it('refuses a destination that is not connected, with its error', () => {
+    const offline = stateWith(undefined, undefined, [staging]);
+    const answers = { sample, 'how-many': '100', 'destination-connection': staging.id };
+    expect(generating(answers, production, offline)).toEqual({
+      kind: 'refuse',
+      code: 'transfer.generate/not-connected',
+      message: 'Could not connect to Staging: not connected',
     });
   });
 

@@ -59,7 +59,23 @@ describe('backup.restore', () => {
   it('asks for the backup, then its file, titled Restore into <where>', () => {
     const first = restore(shop, {});
     expect(first.kind === 'ask' && first.question.title).toBe('Restore into Local › shop: backup');
-    expect(next(restore(shop, { kind: 'archive' }))).toBe('path');
+    const dialog = restore(shop, { kind: 'archive' });
+    expect(dialog.kind === 'read' && dialog.need).toMatchObject({
+      key: 'path',
+      read: 'backup.restore:path',
+      args: {
+        mode: 'open',
+        title: 'Restore into Local › shop: archive',
+        button: 'Restore',
+        filters: [
+          { name: 'mongodump archive', extensions: ['agz', 'archive', 'gz'] },
+          { name: 'All files', extensions: ['*'] },
+        ],
+      },
+    });
+    const folder = restore(shop, { kind: 'folder' });
+    expect(folder.kind === 'read' && folder.need.args).toMatchObject({ mode: 'folder', button: 'Restore' });
+    expect(next(restore(shop, { kind: 'archive', path: null }))).toBe('run');
     expect(restore(shop, { kind: 'archive', path: 'D:\\b\\shop.agz' })).toEqual({
       kind: 'read',
       need: { key: 'listing', read: 'backup.restore:archive', args: { path: 'D:\\b\\shop.agz' } },

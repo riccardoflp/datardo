@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { fileNameOf, fileRead, plan } from '../../../src/features/transfer/import';
-import type { Answers } from '../../../src/shared/feature';
+import { isFedStep, type FedStep } from '../../../src/features/backup/types';
+import type { Answers, Step } from '../../../src/shared/feature';
 import { connection, contextOn, local, mongoOf, next, ordersOn, planOf, production, stateWith } from './harness';
 
 const contents = { buckets: [], entries: [{ name: 'orders', kind: 'collection', system: false }] };
@@ -16,20 +17,40 @@ function importing(answers: Answers, state = stateWith()) {
   return plan(contextOn(ordersOn(answers['on'] === 'prod' ? production : local), 'transfer.import', state), answers);
 }
 
+/** The documents a fed step of an import holds. */
+function documentsOf(step: Step | undefined): readonly unknown[] {
+  return step !== undefined && isFedStep(step) && step.feed.kind === 'documents' ? step.feed.documents : [];
+}
+
 describe('transfer.import', () => {
   it('inserts 2,500 documents in 3 batches of insertMany, ordered false', () => {
     const imported = planOf(importing({ contents, file: path, read: { text: lines(2500) } }));
     expect(imported.steps).toHaveLength(3);
-    const sizes = imported.steps.map((step) => (mongoOf(step).arguments[0] as unknown[]).length);
+    const steps = imported.steps as FedStep[];
+    const sizes = steps.map((step) => (step.feed.kind === 'documents' ? step.feed.documents.length : 0));
     expect(sizes).toEqual([1000, 1000, 500]);
     expect(mongoOf(imported.steps[0])).toMatchObject({ method: 'insertMany', collection: 'orders' });
     expect(mongoOf(imported.steps[0]).arguments[1]).toEqual({ ordered: false });
+    expect(steps.map((step) => step.text)).toEqual([
+      'db.orders.insertMany([<documents 1–1,000 of orders.jsonl>], { ordered: false })',
+      'db.orders.insertMany([<documents 1,001–2,000 of orders.jsonl>], { ordered: false })',
+      'db.orders.insertMany([<documents 2,001–2,500 of orders.jsonl>], { ordered: false })',
+    ]);
+    // The status line says 1,000 of 2,500, 2,000 of 2,500, 2,500 of 2,500 (runner.progress).
+    expect(steps.map((step) => step.work)).toEqual(
+      [0, 1000, 2000].map((before) => ({
+        title: 'Importing orders.jsonl',
+        total: 2500,
+        unit: '',
+        before,
+      })),
+    );
     expect(imported.publishes).toBe(false);
   });
 
   it('gives each document without _id a new ObjectId while the undo history records, all different', () => {
     const imported = planOf(importing({ contents, file: path, read: { text: lines(3) } }));
-    const documents = mongoOf(imported.steps[0]).arguments[0] as { _id: { $oid: string } }[];
+    const documents = documentsOf(imported.steps[0]) as { _id: { $oid: string } }[];
     expect(documents.map((document) => Object.keys(document)[0])).toEqual(['_id', '_id', '_id']);
     expect(new Set(documents.map((document) => document._id.$oid)).size).toBe(3);
     expect(imported.undo).toEqual({
@@ -77,7 +98,7 @@ describe('transfer.import', () => {
   it('keeps the documents as they are when the undo history is off', () => {
     const quiet = stateWith([connection('c-local', 'Local', { keepsUndo: false })]);
     const imported = planOf(importing({ contents, file: path, read: { text: lines(1) } }, quiet));
-    expect(mongoOf(imported.steps[0]).arguments[0]).toEqual([{ n: { $numberInt: '0' } }]);
+    expect(documentsOf(imported.steps[0])).toEqual([{ n: { $numberInt: '0' } }]);
     expect(imported.undo).toEqual({ cannot: "The undo history is off for this connection: this can't be undone." });
   });
 
@@ -101,11 +122,20 @@ describe('transfer.import', () => {
 
   it('asks the file in a dialog titled Import into <database>.<collection>, then reads it', () => {
     const asked = importing({ contents });
-    expect(asked.kind === 'ask' && asked.question).toMatchObject({
-      title: 'Import into shop.orders',
-      text: 'JSON, JSON Lines, CSV',
-      button: 'Import',
+    expect(asked.kind === 'read' && asked.need).toMatchObject({
+      key: 'file',
+      read: 'transfer.import:file',
+      args: {
+        mode: 'open',
+        title: 'Import into shop.orders',
+        button: 'Import',
+        filters: [
+          { name: 'JSON, JSON Lines, CSV', extensions: ['json', 'jsonl', 'ndjson', 'csv'] },
+          { name: 'All files', extensions: ['*'] },
+        ],
+      },
     });
+    expect(planOf(importing({ contents, file: null })).steps).toEqual([]);
     expect(next(importing({ contents, file: path }))).toBe('read:read');
     expect(fileRead.request(contextOn(ordersOn(), 'x'), { path })).toEqual({
       kind: 'app',

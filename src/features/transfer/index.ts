@@ -12,7 +12,9 @@ import * as importDocuments from './import';
 /** The features of this area the runner can start. */
 export const features: readonly RunnableFeature[] = [
   { kind: 'operation', id: featureId('transfer.export'), plan: exportDocuments.plan },
+  exportDocuments.fileRead,
   { kind: 'operation', id: featureId('transfer.import'), plan: importDocuments.plan },
+  importDocuments.fileDialog,
   importDocuments.fileRead,
   { kind: 'operation', id: featureId('transfer.copy-collection'), plan: copyCollection.plan },
   copyCollection.sourceRead,

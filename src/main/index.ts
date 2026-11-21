@@ -10,6 +10,7 @@ import type { Platform } from '../shared/feature';
 import { featureId } from '../shared/ids';
 import { appTarget } from '../shared/target';
 import { runnableFeatures } from '../features/registry';
+import { fedSummary } from '../features/transfer/ends/summary';
 import type { RunnerPorts } from '../runner/ports';
 import { writeLog } from '../runner/log';
 import { start } from '../runner/start';
@@ -24,6 +25,8 @@ import { withConsoles } from './console-commands';
 import { WindowDialogs } from './dialogs';
 import { fileWriter } from './files';
 import { oplogClients } from './oplog';
+import { transferFeeds } from './transfer-feeds';
+import { endsWithOwnMessage } from './transfer-steps';
 import type { MainServices } from './services';
 import { guardTheSession } from './window-guard';
 import { windowHost } from './window-host';
@@ -82,6 +85,9 @@ function runnerPorts(): RunnerPorts {
     connectionName,
     now: () => Date.now(),
     oplog: oplogClients,
+    feeds: transferFeeds(connectionEngines),
+    fedSummary,
+    endsWithOwnMessage,
   };
 }
 

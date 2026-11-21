@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { countRead, plan, sourceRead, type SourceInfo } from '../../../src/features/transfer/copy-collection';
 import type { FedStep } from '../../../src/features/backup/types';
 import type { Answers } from '../../../src/shared/feature';
-import { contextOn, local, mongoOf, next, ordersOn, planOf, production, staging } from './harness';
+import { contextOn, local, mongoOf, next, ordersOn, planOf, production, staging, stateWith } from './harness';
 
 const source: SourceInfo = {
   type: 'collection',
@@ -47,6 +47,15 @@ describe('transfer.copy-collection', () => {
           ],
         },
       ],
+    });
+  });
+
+  it('refuses a destination that is not connected, with its error', () => {
+    const offline = contextOn(ordersOn(), 'transfer.copy-collection', stateWith(undefined, undefined, [staging]));
+    expect(plan(offline, { 'destination-connection': staging.id })).toEqual({
+      kind: 'refuse',
+      code: 'transfer.copy-collection/not-connected',
+      message: 'Could not connect to Staging: not connected',
     });
   });
 

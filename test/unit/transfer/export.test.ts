@@ -3,6 +3,7 @@ import {
   csvExport,
   exportEnd,
   exportPieces,
+  exportMessage,
   exportRequest,
   plan,
   relaxed,
@@ -85,10 +86,12 @@ describe('transfer.export', () => {
 
   it('exports a view from the tree without asking which results', () => {
     const outcome = exporting({ format: 'jsonl' });
-    expect(outcome.kind === 'ask' && outcome.question.fields[0]).toMatchObject({
+    expect(outcome.kind === 'read' && outcome.need).toMatchObject({
       key: 'file',
-      default: 'orders.jsonl',
+      read: 'transfer.export:file',
+      args: { mode: 'save', title: 'Export orders', button: 'Export', name: 'orders.jsonl' },
     });
+    expect(planOf(exporting({ format: 'jsonl', file: null })).steps).toEqual([]);
     const step = planOf(exporting({ format: 'jsonl', file: 'D:\\orders.jsonl' })).steps[0] as FileStep;
     expect(step).toMatchObject({
       kind: 'file',
@@ -174,5 +177,26 @@ describe('transfer.export', () => {
       ],
       { allowDiskUse: true },
     ]);
+  });
+
+  it('ends with Exported <n> documents to <file name>, with Open and Reveal, which start the export on that file', () => {
+    const done = exportMessage(writerArgs, { kind: 'done', documents: 1200, path: 'D:\\out\\orders.jsonl' });
+    expect(done).toMatchObject({ level: 'success', text: 'Exported 1,200 documents to orders.jsonl.' });
+    expect(done.actions?.map((action) => [action.label, action.feature, action.args])).toEqual([
+      ['Open', 'transfer.export', { open: 'D:\\out\\orders.jsonl' }],
+      ['Reveal', 'transfer.export', { reveal: 'D:\\out\\orders.jsonl' }],
+    ]);
+    const opened = planOf(exporting({ args: { reveal: 'D:\\out\\orders.jsonl' } }));
+    expect(opened.steps).toEqual([
+      expect.objectContaining({ kind: 'app', action: 'transfer.reveal-path', args: { path: 'D:\\out\\orders.jsonl' } }),
+    ]);
+    expect(exportMessage(writerArgs, { kind: 'cancelled' })).toMatchObject({
+      level: 'info',
+      text: 'Export cancelled.',
+    });
+    expect(exportMessage(writerArgs, { kind: 'failed', error: 'disk full' })).toMatchObject({
+      level: 'error',
+      text: 'Export failed: disk full',
+    });
   });
 });

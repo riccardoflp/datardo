@@ -29,6 +29,8 @@ import { features as manageFeatures } from './manage';
 import { features as fieldFeatures } from './field';
 import { features as gridfsFeatures } from './gridfs';
 import { features as mcpFeatures } from './mcp';
+import { features as transferFeatures } from './transfer';
+import { features as backupFeatures } from './backup';
 
 /** The features of every area, as each area's index lists them. */
 const areas: readonly (readonly RunnableFeature[])[] = [
@@ -57,6 +59,8 @@ const areas: readonly (readonly RunnableFeature[])[] = [
   fieldFeatures,
   gridfsFeatures,
   mcpFeatures,
+  transferFeatures,
+  backupFeatures,
 ];
 
 /** The features the runner can start, by identifier. */

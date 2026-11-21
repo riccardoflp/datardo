@@ -12,6 +12,7 @@ import { emptySelection } from '../../features/table/types';
 import { isBuilt } from '../query/built';
 import { changeQuery } from '../query/collection-store';
 import { idsOf, startOnDocuments } from '../pages/document/document-actions';
+import { exportDocuments } from '../pages/transfer/export-start';
 import { copyDocuments } from './table-start';
 import type { TablePartProps } from './table-parts';
 import styles from './table-panels.module.css';
@@ -89,7 +90,12 @@ export function SelectionBar(props: TablePartProps): React.JSX.Element {
       {bar === undefined ? null : (
         <>
           <CopyAs bar={bar} props={props} />
-          <Other button={bar.export} />
+          <Other
+            button={bar.export}
+            onPress={() => {
+              exportDocuments(collectionRef, props.columns, selected, bar.export?.element ?? '');
+            }}
+          />
           <Other
             button={bar.update}
             onPress={() => {

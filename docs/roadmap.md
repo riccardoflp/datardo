@@ -519,8 +519,8 @@ the secret storage, connects and disconnects, makes it read-only, and sees its O
 - Named by cards above and built in M21: `manage.create-collection`, `manage.drop-collection`, `manage.drop-database`,
   `manage.edit-view`, `manage.edit-validation`.
 - Named by cards above and built in M22: `index.create`.
-- Named by cards above and built in M25: `backup.restore`, `transfer.import`, `transfer.copy-collection`,
-  `transfer.generate`.
+- Named by cards above and built in M25: `backup.create`, `backup.restore`, `transfer.import`,
+  `transfer.copy-collection`, `transfer.generate`.
 - Named by cards above and built in M26: `task.run`.
 - Named by cards above and built in M29: `mcp.server`.
 - Named by cards above and built in M30: `monitor.show`.
@@ -1820,7 +1820,7 @@ picture; the Code section writes the query or the pipeline as code for mongosh, 
 database or connection; test documents are generated; a connection, a database or a collection is backed up and
 restored in mongodump's formats.
 **Depends on**: M12.
-**Status**: planned
+**Status**: done
 
 ### Features
 
@@ -1860,14 +1860,14 @@ restored in mongodump's formats.
 
 ### Exit criteria
 
-- [ ] An archive written by Datardo is restored by `mongorestore`, and one written by `mongodump` is restored by
+- [x] An archive written by Datardo is restored by `mongorestore`, and one written by `mongodump` is restored by
       Datardo, with every type: an integration test with both tools.
-- [ ] A damaged archive stops the restore at its checksum and writes nothing more.
-- [ ] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
+- [x] A damaged archive stops the restore at its checksum and writes nothing more.
+- [x] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
       `npm run test:integration`, `npm run test:ui`; `catalog.py --tests` reports none missing for these cards.
-- [ ] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
+- [x] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
       the keyboard alone (QA15, QA16).
-- [ ] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
+- [x] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
       and this milestone's **Status** is *done*.
 
 ### Not in this milestone

@@ -4,8 +4,8 @@
  * connection island (`@connection-island`).
  *
  * The entries of the undo history (**Stop keeping undo history**, **Keep undo history**; `undo.per-connection`) are
- * in the third group. **Create database…** (`manage.create-database`) follows **Open overview** on the connection
- * island.
+ * in the third group; those of the backup area (**Back up…**, **Restore from backup…**) in the fourth. **Create database…**
+ * (`manage.create-database`) follows **Open overview** on the connection island.
  */
 import type { ConnectionStateName, ConnectionView } from '../../shared/connection';
 import type { Json } from '../../shared/engine-request';
@@ -13,6 +13,7 @@ import type { ConnectionId } from '../../shared/ids';
 import { connectionState, savedConnection, type ConnectionsState } from '../../shared/state/connections';
 import { isVariantOffered, variantTitle, type KeepVariant } from '../undo/per-connection';
 import { text as manageText } from '../manage/text';
+import { createText, restoreText } from '../backup/text';
 import { menuText } from './text';
 
 /** The places the menu is drawn in. */
@@ -119,6 +120,16 @@ const elements = {
     'connection-switcher': 'connection.unlink-redis@connection-switcher',
     'connection-island': 'connection.unlink-redis@connection-island',
   },
+  backUp: {
+    home: 'backup.create@home',
+    'connection-switcher': 'backup.create@connection-switcher',
+    'connection-island': 'backup.create@connection-island',
+  },
+  restore: {
+    home: 'backup.restore@home',
+    'connection-switcher': 'backup.restore@connection-switcher',
+    'connection-island': 'backup.restore@connection-island',
+  },
   keepUndo: {
     home: 'undo.per-connection@home',
     'connection-switcher': 'undo.per-connection@connection-switcher',
@@ -202,6 +213,18 @@ function organizeEntries(
   ];
 }
 
+/** The fourth group, of a MongoDB connection: **Back up…** and, unless read-only, **Restore from backup…**. */
+function backupEntries(connection: ConnectionView, place: MenuPlace): readonly MenuEntry[] {
+  if (connection.engine !== 'mongodb') {
+    return [];
+  }
+  return [
+    separator,
+    item(createText.command, 'backup.create', elements.backUp[place]),
+    ...(connection.readOnly ? [] : [item(restoreText.command, 'backup.restore', elements.restore[place])]),
+  ];
+}
+
 /**
  * Feature: connection.menu — the entries of the menu of a connection in a place, in the order of the card, with a
  * line between the groups.
@@ -225,6 +248,7 @@ export function view(state: {
       item(menuText.copyString, 'connection.copy-string', elements.copyString[place]),
       separator,
       ...organizeEntries(state.connections, connection, place),
+      ...backupEntries(connection, place),
       separator,
       item(menuText.remove, 'connection.remove', elements.remove[place]),
     ],

@@ -4,7 +4,8 @@
  * each; whether existing collections are added to or dropped. Each answer has its own key.
  */
 import type { Answers, Context, Outcome } from '../../../shared/feature';
-import { ask, needRead } from '../../../shared/feature';
+import { ask, needRead, run } from '../../../shared/feature';
+import { chosenPath, dialogArgs, nothing, pathRead } from '../../transfer/ask/choose-path';
 import type { Choice } from '../../../shared/question';
 import { savedConnection } from '../../../shared/state/connections';
 import { counted, sizeText, restoreText as text } from '../text';
@@ -65,6 +66,12 @@ export interface BackupListing {
   readonly error?: string;
 }
 
+/** The read of the dialog of a restore's archive, file or folder. */
+export const pathReadId = 'backup.restore:path';
+
+/** `backup.restore:path`: the system's dialog, which answers the path, or null when it was closed. */
+export const pathDialog = pathRead(pathReadId, 'backup.choose-path');
+
 /** The backup: its kind, its path, then its list of databases and collections, read. */
 export function chooseBackup(
   context: Context,
@@ -78,16 +85,25 @@ export function chooseBackup(
     const choices = (['archive', 'folder'] as const).map((value) => ({ value, ...text.kinds[value] }));
     return pickOne(title(text.backupStep), 'kind', choices);
   }
-  const path = textOf(answers['path'])?.trim() ?? '';
-  if (path === '') {
+  const path = chosenPath(answers['path']);
+  if (path === undefined) {
     const step = title(onCollection ? text.bsonStep : kind === 'archive' ? text.archiveStep : text.folderStep);
-    const filter = onCollection ? text.bsonFilter : kind === 'archive' ? text.archiveFilter : undefined;
-    return ask({
-      title: step,
-      ...(filter === undefined ? {} : { text: filter }),
-      button: text.restore,
-      fields: [{ kind: 'text', key: 'path', label: step }],
-    });
+    const filter = onCollection
+      ? { name: text.bsonFilter, extensions: ['bson', 'gz', 'agz', 'archive'] }
+      : { name: text.archiveFilter, extensions: ['agz', 'archive', 'gz'] };
+    const dialog =
+      kind === 'folder' && !onCollection
+        ? dialogArgs({ mode: 'folder', title: step, button: text.restore })
+        : dialogArgs({
+            mode: 'open',
+            title: step,
+            button: text.restore,
+            filters: [filter, { name: text.allFiles, extensions: ['*'] }],
+          });
+    return needRead('path', pathReadId, dialog);
+  }
+  if (path === null) {
+    return run(nothing(title(text.backupStep), text.cannotUndo));
   }
   if (target.kind === 'collection' && bsonFile.test(path)) {
     return bsonBackup(path, target.database, target.collection);

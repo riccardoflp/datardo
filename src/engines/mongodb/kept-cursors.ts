@@ -8,6 +8,8 @@
  *   `project`, `hint`, …). Replies `{ cursor }`, its identifier; nothing is read yet.
  * - `cursorNext` `[cursor, count]`: the next documents, at most `count` and the request's limit, as `{ documents,
  *   exhausted }`.
+ * - `cursorNextBytes` `[cursor, count]`: the same, of a cursor opened with `{ raw: true }` in its options, each
+ *   document as a BSON binary of its bytes as stored, for a backup that writes them as they are.
  * - `cursorHasNext` `[cursor]`: `{ hasNext }`. `cursorExplain` `[cursor, verbosity]`: the explain of its query.
  * - `closeCursor` `[cursor]`: closes a cursor or a change stream and forgets it; `{ closed }` says whether it was open.
  *
@@ -15,6 +17,7 @@
  * give `maxTimeMS`. A read cancelled closes the cursor.
  */
 import {
+  BSON,
   FindCursor,
   type AggregationCursor,
   type CollationOptions,
@@ -138,6 +141,15 @@ async function nextDocuments(call: Call): Promise<Document> {
     },
   );
   const exhausted = read.length < most || (cursor.bufferedCount() === 0 && cursor.id?.isZero() === true);
+  if (call.request.method === 'cursorNextBytes') {
+    const bytes = read.map((each) => {
+      if (!(each instanceof Uint8Array)) {
+        throw new EngineError('cursorNextBytes reads a cursor opened with { raw: true }.');
+      }
+      return new BSON.Binary(each);
+    });
+    return { documents: bytes, exhausted };
+  }
   return { documents: read, exhausted };
 }
 
@@ -156,6 +168,7 @@ export function keptCursorMethod(call: Call): Promise<unknown> | undefined {
     case 'openCursor':
       return Promise.resolve({ cursor: call.handles.keep({ kind: 'cursor', cursor: opened(call) }) });
     case 'cursorNext':
+    case 'cursorNextBytes':
       return nextDocuments(call);
     case 'cursorHasNext':
       return call.handles

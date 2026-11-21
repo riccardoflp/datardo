@@ -898,7 +898,7 @@ The entries offered on a saved connection, the same wherever the connection is s
 - **Uses**: `connection.connect`, `connection.disconnect`, `connection.reconnect`, `connection.overview`,
   `connection.edit`, `connection.duplicate`, `connection.copy-string`, `connection.move-to-folder`,
   `connection.set-color`, `connection.read-only`, `connection.allow-changes`, `connection.link-redis`,
-  `connection.unlink-redis`, `connection.remove`.
+  `connection.unlink-redis`, `backup.create`, `backup.restore`, `connection.remove`.
 - **Ported from**: the context menu of a connection in Mongoster (`package.json`, `view/item/context` with `viewItem
   =~ /^connection/`). Its entries that open a page are in **Pages of** the connection, in the tree island; those
   that create, back up and restore are in the tree island's own menu.
@@ -911,7 +911,9 @@ What it shows, in this order, with a line between the groups:
 3. **Move to folder…**, **Set color…**, **Make read-only** or, on a read-only connection, **Allow changes**; **Stop
    keeping undo history** or **Keep undo history**, which belong to the undo area; for a MongoDB connection, **Link
    a Redis connection…** and, when one is linked, **Unlink <name of the Redis connection>**.
-4. **Remove connection**.
+4. For a MongoDB connection, **Back up…** and, unless it is read-only, **Restore from backup…**, which belong to the
+   backup area.
+5. **Remove connection**.
 
 Acceptance:
 
@@ -921,6 +923,8 @@ Acceptance:
 - [ ] A read-only connection shows **Allow changes** and no **Make read-only**.
 - [ ] A Redis connection shows no entry about linking; a MongoDB connection linked to Cache local shows **Link a
       Redis connection…** and **Unlink Cache local**.
+- [ ] A MongoDB connection shows **Back up…** and **Restore from backup…**; a read-only one **Back up…** only; a Redis
+      connection neither.
 - [ ] Every entry can be reached with the keyboard: `Shift+F10` on a card or a line opens the menu, the arrows move,
       `Enter` chooses, `Escape` closes.
 

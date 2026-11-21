@@ -7,14 +7,17 @@
  * {@link exportPieces}; a scheduled task writes its exports with the same writer (`task.run`).
  */
 import type { Json, MongoRequest } from '../../shared/engine-request';
-import { ask, noDanger, refuse, run, type Answers, type Context, type Outcome } from '../../shared/feature';
+import { ask, needRead, noDanger, refuse, run } from '../../shared/feature';
+import type { After, Answers, Context, Outcome } from '../../shared/feature';
+import { featureId } from '../../shared/ids';
+import { chosenPath, dialogArgs, nothing, pathRead, pathStep } from './ask/choose-path';
 import { nothingToDo } from '../task/types';
 import type { ConnectionId } from '../../shared/ids';
 import { write } from '../backup/folder-layout';
 import type { ExportFormat } from '../task/types';
 import { csvTable, plainColumns, toCsv, type CsvColumn } from './csv-write';
 import { exportText as text } from './text';
-import { answerText, batchSize, isPlainObject, isWrapper } from './types';
+import { batchSize, isPlainObject, isWrapper } from './types';
 import { canonical } from './values/canonical';
 import { readMongosh } from './values/mongosh';
 
@@ -59,6 +62,48 @@ export interface ExportWriterArgs {
 
 const extensions: Readonly<Record<ExportFormat, string>> = { json: 'json', jsonl: 'jsonl', csv: 'csv' };
 
+/** The read of the save dialog of an export. */
+export const fileReadId = 'transfer.export:file';
+
+/** `transfer.export:file`: the system's save dialog, which answers the path, or null when it was closed. */
+export const fileRead = pathRead(fileReadId, 'transfer.choose-path');
+
+/** How the writer of an export ended: what it wrote, or that it was cancelled, or its error. */
+export type ExportEnded =
+  | { readonly kind: 'done'; readonly documents: number; readonly path: string }
+  | { readonly kind: 'cancelled' }
+  | { readonly kind: 'failed'; readonly error: string };
+
+/**
+ * The notification that ends an export, which its writer sends: *Exported \<n\> documents to \<file name\>.* with
+ * **Open** and **Reveal**, *Export cancelled.*, or *Export failed: \<error\>*.
+ */
+export function exportMessage(args: ExportWriterArgs, ended: ExportEnded): Extract<After, { kind: 'notify' }> {
+  if (ended.kind === 'cancelled') {
+    return { kind: 'notify', level: 'info', text: text.cancelled };
+  }
+  if (ended.kind === 'failed') {
+    return { kind: 'notify', level: 'error', text: text.failed(ended.error) };
+  }
+  const name = ended.path.split(/[\\/]/u).pop() ?? ended.path;
+  const target = {
+    kind: 'collection',
+    connection: args.connection,
+    database: args.database ?? '',
+    collection: args.collection ?? '',
+  } as const;
+  const feature = featureId('transfer.export');
+  return {
+    kind: 'notify',
+    level: 'success',
+    text: text.done(ended.documents, name),
+    actions: [
+      { label: text.open, feature, target, args: { open: ended.path } },
+      { label: text.reveal, feature, target, args: { reveal: ended.path } },
+    ],
+  };
+}
+
 /** The texts of the source that are not empty, read: the first that does not parse gives its error. */
 function parseProblem(source: ExportSource, parse: (text: string) => Json): string | undefined {
   const texts = [source.filter, source.projection, source.sort, ...(source.pipeline ?? [])];
@@ -86,6 +131,20 @@ export function writingStage(pipeline: readonly string[] | undefined): string | 
   return stage === undefined ? undefined : `$${stage}`;
 }
 
+/** **Open** or **Reveal** of the notification of an export: the file it wrote, `args.open` or `args.reveal`. */
+function shownFile(answers: Answers): { readonly what: 'open' | 'reveal'; readonly path: string } | undefined {
+  const args = answers['args'];
+  if (!isPlainObject(args)) {
+    return undefined;
+  }
+  const open = args['open'];
+  const reveal = args['reveal'];
+  if (typeof open === 'string' && open !== '') {
+    return { what: 'open', path: open };
+  }
+  return typeof reveal === 'string' && reveal !== '' ? { what: 'reveal', path: reveal } : undefined;
+}
+
 function sourceOf(answers: Answers): ExportSource {
   const args = answers['args'];
   return isPlainObject(args) ? args : {};
@@ -107,6 +166,32 @@ function pickScope(collection: string, format: ExportFormat, source: ExportSourc
   return ask({ title, button: text.choose, fields: [{ kind: 'pick-one', key: 'scope', label: title, choices }] });
 }
 
+/** What the writer of an export is given: the collection, the format, the read, and the page when only it is wanted. */
+function writerArgs(
+  target: Extract<Context['target'], { kind: 'collection' }>,
+  format: ExportFormat,
+  source: ExportSource,
+  pageOnly: boolean,
+): ExportWriterArgs {
+  return {
+    task: null,
+    connection: target.connection,
+    database: target.database,
+    collection: target.collection,
+    format,
+    filter: source.filter ?? '',
+    projection: source.projection ?? '',
+    batchSize,
+    ...(source.sort === undefined ? {} : { sort: source.sort }),
+    ...(source.pipeline === undefined ? {} : { pipeline: source.pipeline }),
+    ...(pageOnly && source.page !== undefined
+      ? { skip: source.page.first - 1, limit: source.page.last - source.page.first + 1 }
+      : {}),
+    ...(source.ids === undefined ? {} : { ids: source.ids }),
+    ...(source.columns === undefined ? {} : { columns: source.columns }),
+  };
+}
+
 /**
  * Feature: transfer.export — on a collection or view, with what the table shows in `answers.args`: the format, which
  * results from the toolbar, the file; then one `write` of the file.
@@ -115,6 +200,13 @@ export function plan(context: Context, answers: Answers): Outcome {
   const target = context.target;
   if (target.kind !== 'collection') {
     return nothingToDo(text.planTitle(''), text.cannotUndo);
+  }
+  const shown = shownFile(answers);
+  if (shown !== undefined) {
+    return run({
+      ...nothing(text.planTitle(target.collection), text.cannotUndo),
+      steps: [pathStep(shown.what, shown.path)],
+    });
   }
   const source = sourceOf(answers);
   const stage = writingStage(source.pipeline);
@@ -133,29 +225,17 @@ export function plan(context: Context, answers: Answers): Outcome {
   if (source.page !== undefined && scope !== 'all' && scope !== 'page') {
     return pickScope(target.collection, format, source);
   }
-  const file = answerText(answers['file']);
-  if (file === '') {
+  const file = chosenPath(answers['file']);
+  if (file === undefined) {
     const title = text.title(target.collection);
-    const proposed = `${target.collection}.${extensions[format]}`;
-    return ask({ title, button: text.save, fields: [{ kind: 'text', key: 'file', label: title, default: proposed }] });
+    const name = `${target.collection}.${extensions[format]}`;
+    const filters = [{ name: text.formats[format].label, extensions: [extensions[format]] }];
+    return needRead('file', fileReadId, dialogArgs({ mode: 'save', title, button: text.save, name, filters }));
   }
-  const args: ExportWriterArgs = {
-    task: null,
-    connection: target.connection,
-    database: target.database,
-    collection: target.collection,
-    format,
-    filter: source.filter ?? '',
-    projection: source.projection ?? '',
-    batchSize,
-    ...(source.sort === undefined ? {} : { sort: source.sort }),
-    ...(source.pipeline === undefined ? {} : { pipeline: source.pipeline }),
-    ...(scope === 'page' && source.page !== undefined
-      ? { skip: source.page.first - 1, limit: source.page.last - source.page.first + 1 }
-      : {}),
-    ...(source.ids === undefined ? {} : { ids: source.ids }),
-    ...(source.columns === undefined ? {} : { columns: source.columns }),
-  };
+  if (file === null) {
+    return run(nothing(text.planTitle(target.collection), text.cannotUndo));
+  }
+  const args = writerArgs(target, format, source, scope === 'page');
   return run({
     title: text.planTitle(target.collection),
     steps: [write(file, 'transfer.export', args as unknown as Json)],

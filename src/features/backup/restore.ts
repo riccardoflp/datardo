@@ -66,7 +66,7 @@ interface Restore {
 }
 
 /** Where a restore goes, as its titles say it: `<connection>`, `<connection> › <database>`, or with the collection. */
-function whereOf(context: Context, connection: string): string {
+export function whereOf(context: Context, connection: string): string {
   const target = context.target;
   switch (target.kind) {
     case 'database':
@@ -166,11 +166,12 @@ function documentsStep(
       method: 'insertMany',
       options: { ordered: false, bypassDocumentValidation: true },
       from: `documents of ${of.from}`,
+      feed,
     },
-    feed,
     context.target,
   );
-  return { ...step, batches: { documents: batchDocuments, bytes: batchBytes } } as Step;
+  const work = { title: text.progressTitle(how.where) };
+  return { ...step, batches: { documents: batchDocuments, bytes: batchBytes }, work } as Step;
 }
 
 /** One operation of the undo history per collection, with **Add documents**; none with **Drop and restore**. */

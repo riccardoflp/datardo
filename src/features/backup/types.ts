@@ -3,7 +3,7 @@
  * folder, the limits that files from outside are read with (R14.4), and the reading of arguments and replies.
  */
 import type { Json } from '../../shared/engine-request';
-import type { EngineStep } from '../../shared/feature';
+import type { EngineStep, Step } from '../../shared/feature';
 import type { ConnectionId } from '../../shared/ids';
 import { isJsonDocument, type JsonDocument } from '../chart/types';
 import type { BackupFormat } from '../task/types';
@@ -137,7 +137,9 @@ export type DocumentsFeed =
       readonly filter: Json;
     }
   /** Generated documents (`transfer.generate-values`), from the analysis and the options, in order. */
-  | { readonly kind: 'generated'; readonly analysis: Json; readonly options: Json; readonly count: number };
+  | { readonly kind: 'generated'; readonly analysis: Json; readonly options: Json; readonly count: number }
+  /** Documents the plan holds already, as canonical Extended JSON: those of an import file, read and parsed. */
+  | { readonly kind: 'documents'; readonly documents: readonly Json[] };
 
 /** How a feed is cut into batches: at most so many documents, and at most so many bytes when it says so. */
 export interface FeedBatches {
@@ -145,5 +147,61 @@ export interface FeedBatches {
   readonly bytes?: number;
 }
 
+/**
+ * What the work in progress says while a feed is inserted (`runner.progress`): its title, and the documents done of
+ * `total` in `unit`, or without a total, *\<database\>.\<collection\>: \<n\> documents*.
+ */
+export interface FedWork {
+  readonly title: string;
+  readonly total?: number;
+  readonly unit?: string;
+  /** The documents of `total` that the plan's earlier steps insert: an import cut into steps of 1,000. */
+  readonly before?: number;
+}
+
 /** An insert step whose documents come from a feed. */
-export type FedStep = EngineStep & { readonly feed: DocumentsFeed; readonly batches: FeedBatches };
+export type FedStep = EngineStep & {
+  readonly feed: DocumentsFeed;
+  readonly batches: FeedBatches;
+  readonly work?: FedWork;
+};
+
+/** What the documents of one fed step did, as the runner counted them batch by batch. */
+export interface FedStepTotals {
+  readonly database: string;
+  readonly collection: string;
+  /** The documents the feed gave. */
+  readonly read: number;
+  readonly inserted: number;
+  /** Refused because their `_id` already existed (E11000 on `_id`). */
+  readonly duplicates: number;
+  /** Refused for any other reason. */
+  readonly failed: number;
+  /** The message of the first document refused, duplicates included. */
+  readonly firstError?: string;
+  /** The message of the first document refused for another reason than its `_id`. */
+  readonly firstOtherError?: string;
+}
+
+/**
+ * What the runner counted of a plan with fed steps, for the message that ends it: the steps' documents, the indexes
+ * created and those that failed (`<name>: <error>`), how it ended, the operations recorded in the undo history and why
+ * it could not be recorded when it could not.
+ */
+export interface FedTotals {
+  readonly milliseconds: number;
+  readonly steps: readonly FedStepTotals[];
+  readonly indexes: {
+    readonly created: number;
+    readonly failed: readonly { readonly index: string; readonly on: string; readonly error: string }[];
+  };
+  readonly ended: 'done' | 'cancelled' | 'failed';
+  readonly error?: string;
+  readonly recorded: number;
+  readonly notRecorded?: string;
+}
+
+/** Whether a step's documents come from a feed. */
+export function isFedStep(step: Step): step is FedStep {
+  return step.kind === 'engine' && 'feed' in step;
+}

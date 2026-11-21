@@ -140,6 +140,13 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
   for other assistants. A new access token, another port and the calls of the assistant in the Log are a click away;
   a taken port is said once with **Change port**, and `datardo.mcp.readData` off keeps documents and values of keys
   away from the assistant.
+- Documents are exported to JSON, JSON Lines and CSV from the table's toolbar, a selection or the tree, the query or
+  pipeline shown and its page kept; files of JSON, JSON Lines and CSV are imported, shown before they run; a
+  collection is copied to another database or connection with its indexes; test documents are generated from a
+  sample of a collection. Long work shows its progress and stops with **Cancel**, and every type and byte is kept.
+- A connection, a database or a collection is backed up in mongodump's formats (an archive, or a folder compressed
+  or not) and restored from them, with a checksum that stops a damaged archive; a restore, a copy and an import can be
+  undone from the Undo history.
 
 ### Fixed
 

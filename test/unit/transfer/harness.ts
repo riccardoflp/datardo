@@ -33,14 +33,18 @@ export const local = connection('c-local', 'Local');
 export const production = connection('c-prod', 'Production', { readOnly: true });
 export const staging = connection('c-staging', 'Staging');
 
-/** The app's state with the connections saved, and the settings stored. */
+/** The app's state with the connections saved, each connected but those in `offline`, and the settings stored. */
 export function stateWith(
   saved: readonly ConnectionView[] = [local, production, staging],
   settings: Readonly<Record<string, Json>> = {},
+  offline: readonly ConnectionView[] = [],
 ): AppState {
+  const live = Object.fromEntries(
+    saved.filter((each) => !offline.includes(each)).map((each) => [each.id, { state: 'connected' as const }]),
+  );
   return {
     ...initialState,
-    connections: { ...initialConnectionsState, loaded: true, saved },
+    connections: { ...initialConnectionsState, loaded: true, saved, live },
     settings: { ...initialState.settings, stored: settings },
   };
 }

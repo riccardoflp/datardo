@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { detailsRead, listRead, plan, proposedName, type BackupList } from '../../../src/features/backup/create';
+import { backupMessage } from '../../../src/features/backup/creating/message';
+import { collectionFileNames } from '../../../src/features/backup/folder-layout';
 import type { FileStep, ReadRequest } from '../../../src/shared/feature';
 import type { Target } from '../../../src/shared/target';
-import { contextOn, local, next, planOf, production } from '../transfer/harness';
+import { contextOn, local, next, planOf, production, stateWith } from '../transfer/harness';
 
 const shopOrders: Target = { kind: 'collection', connection: local.id, database: 'shop', collection: 'orders' };
 const shop: Target = { kind: 'database', connection: local.id, database: 'shop' };
@@ -73,8 +75,25 @@ describe('backup.create', () => {
   it('proposes <what>_<date>_<time>.agz in local time', () => {
     const when = new Date(2026, 9, 8, 16, 45, 12).getTime();
     expect(`${proposedName('Local shop', when)}.agz`).toBe('Local_shop_2026-10-08_16-45-12.agz');
-    const outcome = plan(contextOn(shopOrders, 'backup.create'), { listed, format: 'archive' });
-    expect(outcome.kind === 'ask' && outcome.question.fields[0]).toMatchObject({ key: 'file' });
+    const context = contextOn(shopOrders, 'backup.create');
+    const outcome = plan(context, { listed, format: 'archive' });
+    expect(outcome.kind === 'read' && outcome.need).toMatchObject({
+      key: 'file',
+      read: 'backup.create:path',
+      args: {
+        mode: 'save',
+        title: 'Back up shop.orders: archive',
+        button: 'Back up',
+        name: `${proposedName('shop.orders', context.now)}.agz`,
+        filters: [{ name: 'mongodump archive (gzip)', extensions: ['agz'] }],
+      },
+    });
+    const folder = plan(context, { listed, format: 'gzip' });
+    expect(folder.kind === 'read' && folder.need).toMatchObject({
+      key: 'folder',
+      args: { mode: 'folder', title: 'Back up shop.orders: folder', button: 'Back up here' },
+    });
+    expect(planOf(plan(context, { listed, format: 'archive', file: null })).steps).toEqual([]);
   });
 
   it('writes an archive with one step and the writer backup.create, the metadata of each collection given', () => {
@@ -109,30 +128,60 @@ describe('backup.create', () => {
 
   it('writes a compressed folder <what>_<date>_<time>/shop/orders.bson.gz, an uncompressed one orders.bson', () => {
     const answers = { listed, format: 'gzip', folder: 'D:\\b', details, taken: [] };
-    const steps = planOf(plan(contextOn(shopOrders, 'backup.create'), answers)).steps.map((step) => step.text);
+    const steps = planOf(plan(contextOn(shopOrders, 'backup.create'), answers)).steps as FileStep[];
     const root = `D:\\b\\${proposedName('shop.orders', contextOn(shopOrders, 'x').now)}`;
-    expect(steps).toEqual([
-      `create folder ${root}`,
-      `create folder ${root}\\shop`,
-      `write ${root}\\shop\\orders.metadata.json.gz`,
-      `write ${root}\\shop\\orders.bson.gz`,
-    ]);
+    expect(steps.map((step) => step.text)).toEqual([`write folder ${root}`]);
+    expect(steps[0]).toMatchObject({ path: root, content: { writer: 'backup.create', args: { format: 'gzip' } } });
+    expect(collectionFileNames('orders', 'gzip')).toEqual({
+      metadata: 'orders.metadata.json.gz',
+      documents: 'orders.bson.gz',
+    });
     const plain = planOf(plan(contextOn(shopOrders, 'backup.create'), { ...answers, format: 'plain' })).steps;
-    expect(plain.map((step) => step.text.split('\\').pop())).toContain('orders.bson');
+    expect((plain[0] as FileStep).content).toMatchObject({ args: { format: 'plain' } });
+    expect(collectionFileNames('orders', 'plain')).toEqual({
+      metadata: 'orders.metadata.json',
+      documents: 'orders.bson',
+    });
   });
 
   it('never replaces a folder: _2 when the name is taken', () => {
     const name = proposedName('shop.orders', contextOn(shopOrders, 'x').now);
     const answers = { listed, format: 'plain', folder: 'D:\\b', details, taken: [name] };
     const [first] = planOf(plan(contextOn(shopOrders, 'backup.create'), answers)).steps;
-    expect(first?.text).toBe(`create folder D:\\b\\${name}_2`);
+    expect(first?.text).toBe(`write folder D:\\b\\${name}_2`);
   });
 
   it('gives a view only its metadata file in a folder', () => {
     const answers = { listed, collections: ['recent'], format: 'plain', folder: 'D:\\b', details, taken: [] };
-    const texts = planOf(plan(contextOn(shop, 'backup.create'), answers)).steps.map((step) => step.text);
-    expect(texts.filter((text) => text.startsWith('write'))).toHaveLength(1);
-    expect(texts.at(-1)).toMatch(/recent\.metadata\.json$/u);
+    const [step] = planOf(plan(contextOn(shop, 'backup.create'), answers)).steps as FileStep[];
+    expect(step?.content).toMatchObject({
+      args: { plan: { collections: [{ collection: 'recent', type: 'view', total: 0 }] } },
+    });
+  });
+
+  it('offers Copy mongorestore command and Reveal folder, which copy the command and reveal the folder', () => {
+    const message = backupMessage(
+      'shop',
+      { connection: local.id, format: 'gzip' },
+      {
+        kind: 'done',
+        totals: { collections: 1, documents: 3, bytes: 2048 },
+        path: 'D:\\b\\shop_1',
+        milliseconds: 1200,
+      },
+    );
+    expect(message.text).toBe('Backed up shop (1 collection, 3 documents, 2.0 KB) to D:\\b\\shop_1 in 1.2 s.');
+    expect(message.actions?.map((action) => action.label)).toEqual(['Copy mongorestore command', 'Reveal folder']);
+    const [copy, reveal] = message.actions ?? [];
+    const copied = planOf(plan(contextOn(onLocal, 'backup.create'), { args: copy?.args }));
+    expect(copied.after).toEqual([{ kind: 'copy', text: 'mongorestore --gzip --dir "D:\\b\\shop_1"' }]);
+    const revealed = planOf(plan(contextOn(onLocal, 'backup.create'), { args: reveal?.args }));
+    expect(revealed.steps).toMatchObject([
+      { kind: 'app', action: 'transfer.reveal-path', args: { path: 'D:\\b\\shop_1' } },
+    ]);
+    expect(backupMessage('shop', { connection: local.id, format: 'archive' }, { kind: 'cancelled' }).text).toBe(
+      'Backup of shop cancelled: the incomplete backup was deleted.',
+    );
   });
 
   it('leaves out a time series collection, with a warning naming it', () => {
@@ -146,6 +195,14 @@ describe('backup.create', () => {
     ]);
     const only = plan(contextOn(shop, 'backup.create'), { listed, collections: ['events'] });
     expect(next(only)).toBe('refuse:backup.create/unsupported');
+  });
+
+  it('refuses a connection that is not connected, with its error', () => {
+    expect(plan(contextOn(onLocal, 'backup.create', stateWith(undefined, undefined, [local])), {})).toEqual({
+      kind: 'refuse',
+      code: 'backup.create/not-connected',
+      message: 'Could not connect to Local: not connected',
+    });
   });
 
   it('works on a read-only connection: it writes files only', () => {
