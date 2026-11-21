@@ -8,7 +8,7 @@ import { addRun, dueRun } from './due';
 import { runPlan } from './run';
 import { planText } from './text';
 import type { TaskState } from './types';
-import { appStep, argumentTask, diskFactsOf, nothingToDo, stateOf, tasksOf } from './types';
+import { appStep, argumentTask, diskOf, nothingToDo, stateOf, tasksOf } from './types';
 
 /** The state once the missed run of `slot` is recorded: the time handled, and the run `missed` in the log. */
 export function recordMissed(state: TaskState, slot: number): TaskState {
@@ -33,7 +33,7 @@ export function plan(context: Context, answers: Answers): Outcome {
     return nothingToDo(planText.missedTitle(task.name), planText.cannotUndoMissed);
   }
   if (task.runMissed) {
-    return runPlan(context, task, 'missed', diskFactsOf(answers['disk']));
+    return runPlan(context, task, 'missed', diskOf(answers));
   }
   return run({
     title: planText.missedTitle(task.name),

@@ -27,6 +27,7 @@ import type {
   TaskState,
 } from './types';
 import { appStep, argumentsOf, stateOf, taskById, taskId, tasksOf } from './types';
+import { openForm } from './editing/form-request';
 
 /** The formats of a backup, in the order the form lists them. */
 export const backupFormats: readonly TaskFormat[] = ['archive', 'gzip', 'plain'] satisfies readonly BackupFormat[];
@@ -337,12 +338,13 @@ export function formFromJson(value: unknown): TaskForm | undefined {
 /**
  * Feature: task.edit — `args` is `{ form, task }`: the fields of the form, and the task it edits (none for a new one).
  * The plan is `save the scheduled task "<name>"`, after which the page says what was saved and when it runs next.
+ * Started without a form (**New task…**, **Schedule…**, **Edit**), it opens the page with the form instead.
  */
 export function plan(context: Context, answers: Answers): Outcome {
   const args = argumentsOf(answers);
   const form = formFromJson(args['form']);
   if (form === undefined) {
-    throw new Error('task.edit needs the fields of the form.');
+    return openForm(context, answers);
   }
   const first = Object.values(formProblems(form))[0];
   if (first !== undefined) {

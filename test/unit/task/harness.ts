@@ -96,7 +96,7 @@ export function appStateWith(
     ...initialState,
     connections: { ...initialConnectionsState, loaded: true, saved: connections },
     tasks,
-  } as AppState;
+  };
 }
 
 /** A context of the feature at `now`. */

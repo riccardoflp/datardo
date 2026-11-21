@@ -29,7 +29,9 @@ wrote.
 - **Function**: `src/features/task/show.ts › view(state)`
 - **Entry points**: **Scheduled tasks** on the rail (`@rail`); **Scheduled tasks** among the pages of a MongoDB
   connection in the tree island (`@tree`); the count of running tasks on the status line (`@status-line`); **Show
-  scheduled tasks** on the notifications of `task.notify` (`@notification`); Go to (**Scheduled tasks**).
+  scheduled tasks** on the notifications of `task.notify` (`@notification`); Go to (**Scheduled tasks**). The output
+  of a run in the details of a task is a link that shows it in the system's file manager (`@list`), as **Reveal** of
+  a notification does.
 - **Offered when**: always. The page is an app tab: it belongs to no connection, and there is one of it.
 - **Reads**: the tasks and their states from Datardo's data folder; the saved connections, for their names and
   colors; `task.next-runs` for the next run of each task; the runs in progress, from the scheduler. It is shown again
@@ -98,7 +100,8 @@ The form of a task: what it saves, where, under which name, when, and how many o
 - **Entry points**: **New task…** in the toolbar of the page (`@toolbar`) and in its empty state (`@empty-state`);
   **Edit** on a task (`@item-menu`), and a double click on it (`@list`); **Schedule…** in the context menu of a
   database, a collection or a view of the tree (`@tree-menu`) and in the menu of the connection island
-  (`@connection-island`), which open the page with a new task of that source; Go to (**New scheduled task…**).
+  (`@connection-island`), which open the page with a new task of that source; Go to (**New scheduled task…**). In the
+  form, **Create task** (or **Save**) and **Browse…** (`@form`).
 - **Offered when**: always for **New task…**; **Schedule…** only on a MongoDB connection, read-only connections
   included.
 - **Asks**, in a form titled **New scheduled task**, or **Edit <name>**, with **Create task** (or **Save**) and

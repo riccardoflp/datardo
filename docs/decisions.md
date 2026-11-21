@@ -1149,3 +1149,44 @@ Raised while the catalog was written; each names the cards that hold the current
   from a pin, from **Open** in the menu of the page in the tree or from the MCP tool is a page tab titled *Watch
   changes*, as `connectionPageShows` makes it, and is not the same tab. (`watch.show`, `watch.stream`, `watch.stop`,
   `watch.visible-events`, `watch.enable-pre-images`, `watch.export`, `tree.pages`).
+- **Q150** — *Open, for the author.* **Schedule…** in the menu of a connection as built in M26: the card of
+  `task.edit` names the menu of the connection island (`@connection-island`) and the context menu of a database, a
+  collection or a view (`@tree-menu`), not the menu of a connection in the tree; the menu of `connection.menu`, the
+  same everywhere, shows **Schedule…** after **Restore from backup…** on the connection island only, and its card says
+  so. Should the connection's menu in the tree offer it too, under a new place of the card? (`task.edit`,
+  `connection.menu`).
+- **Q151** — Scheduled tasks as built in M26, the runs: Datardo chose the least surprising behavior where the cards
+  are silent, to be confirmed. Every run, **Run now** included, is started by the main process (the start of
+  `task.run` from the window is taken over through the bridge), connects the task's connection first when it is not
+  connected, and logs a run that cannot connect as *skipped* with the reason (`task.run/not-connected`) rather than
+  asking. The facts of the disk that `task.run` and `task.missed` need (the folder exists, the names taken) are given
+  in the intent's arguments (`disk`), which is the main process answering as Q39 says, with no Read card. A backup of
+  no database reads the databases first and leaves out `admin`, `local` and `config`; a backup reads its collections
+  and leaves out the time series, which the run's note names. A plan started by a task notifies nothing of its own,
+  refused or failed: the runner only logs it, and `task.notify` says it once (`runner.notify`, `runner.run`). The
+  runner's queue: a plan with file steps and no engine step waits behind the other plans of the same files rather
+  than behind every plan of the application, so that a scheduled export never waits for an unrelated dialog; this
+  also concerns the exports and backups of M25. A CSV export of a task writes every top-level field, as an export
+  from the tree does (Q94), since a task has no table to take its columns from. **Reveal** in the notification of a run and
+  the output link in a task's details start `task.show` with the output's path, which shows it in the file manager
+  through the application's action that **Reveal** of an export uses (Q94), where Q39 noted that no feature did
+  (`task.show@list`). Retention deletes the outputs past **Keep** without a
+  confirmation, as the card says; Q37 stays open. (`task.run`, `task.missed`, `task.retention`, `task.notify`,
+  `task.show`).
+- **Q152** — Scheduled tasks as built in M26, the page and the form: **Browse…** of the form is the element
+  `task.edit@form`, though it starts the read of a folder (`task.edit:folder`) and not the plan; the databases and
+  collections suggested in the form are read only while the connection is connected, and are typed otherwise. Which
+  tasks have their details open is kept in the window, not in the app's state, so that two clicks never wait on the
+  main process. A save the tasks file refuses (one written by a newer Datardo) leaves the form open with *Could not
+  save the task: the tasks were written by a newer version of Datardo* (`task.edit/save-failed`). The link of the tray in the notes of the page opens the Settings page at its group
+  **Scheduled tasks** (the place of **Keep running in the tray**, which Q39 found on no card). The statuses and
+  links of a selected task are drawn in the text's color, since the colors of success and of links do not keep 4.5:1
+  on the selected background. (`task.show`, `task.edit`, `task.tray`).
+- **Q153** — Scheduled tasks as built in M26, the tests and the data: the exit criterion of a task *set for every
+  minute* names a schedule the cards do not offer (every 1 to 12 hours, daily, weekly); it is tested with an hourly
+  task whose scheduler is driven by a test clock, three runs that keep the last two outputs and leave a file of the
+  user alone, against the test replica set, with the main process's part and no window. The tray and the closed
+  window are covered by `task.tray`'s unit tests (Datardo keeps running when a task is enabled) and the manual
+  checklist, not by a UI test. The scheduler runs in every UI test, checking first 3 s after the start, then every
+  15 s. The field names of `tasks/tasks.json` and `tasks/<id>.json` are now in [data.md](data.md#the-data-folder);
+  the rest of Q39 stays. (`task.run`, `task.due`, `task.tray`).

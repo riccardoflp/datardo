@@ -2,7 +2,7 @@
  * Feature: nav.status-line
  *
  * The row at the bottom of the window: the current connection and its state, what the active page counts, the work in
- * progress, the zoom and whether the current connection is read-only. Each part is there only when it has something
+ * progress, the scheduled tasks running, the zoom and whether the current connection is read-only. Each part is there only when it has something
  * to say.
  */
 import type { WorkId } from '../../shared/ids';
@@ -45,6 +45,8 @@ export interface StatusLineView {
   readonly reconnect?: { readonly label: string; readonly element: 'connection.reconnect@status-line' };
   readonly count?: { readonly text: string; readonly element?: 'query.count@status-line' };
   readonly work?: WorkPart;
+  /** `1 task running`, which opens the Scheduled tasks page. */
+  readonly tasks?: { readonly text: string; readonly element: 'task.show@status-line' };
   readonly zoom?: { readonly text: string; readonly label: string; readonly element: 'window.zoom@status-line' };
   readonly readOnly?: {
     readonly text: string;
@@ -123,6 +125,9 @@ export function view(input: NavInput): StatusLineView {
             tab.kind === 'collection' ? { text: tab.count, element: 'query.count@status-line' } : { text: tab.count },
         }),
     ...(work === undefined ? {} : { work }),
+    ...((input.tasksRunning ?? 0) === 0
+      ? {}
+      : { tasks: { text: text.statusLine.tasksRunning(input.tasksRunning ?? 0), element: 'task.show@status-line' } }),
     ...(input.zoom === 100
       ? {}
       : {

@@ -40,7 +40,10 @@ export function notify(ports: NotifyPorts, notice: Notice): void {
   showNotification(ports, notice);
 }
 
-/** Who started what was refused: a refusal to a tool of the MCP server is its error, not a notification. */
+/**
+ * Who started what was refused: a refusal to a tool of the MCP server is its error, and that of a scheduled task's run
+ * is logged in its run log and notified by `task.notify`, not by a notification of its own.
+ */
 export type RefusalAudience = 'user' | 'mcp' | 'task';
 
 /**
@@ -53,7 +56,7 @@ export function reportRefusal(
   audience: RefusalAudience,
 ): void {
   writeLog(ports, [{ feature: refusal.feature, kind: 'refusal', text: `refused: ${refusal.code} ${refusal.message}` }]);
-  if (audience !== 'mcp') {
+  if (audience === 'user') {
     showNotification(ports, {
       feature: refusal.feature,
       level: 'warning',

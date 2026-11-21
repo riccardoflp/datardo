@@ -74,9 +74,13 @@ export function pinOfPage(page: ConnectionPage): Pin {
 
 /**
  * The control of a page: it opens the page's tab; **Watch changes** starts `watch.show` on the whole connection, which
- * connects it first and names its tab after the connection.
+ * connects it first and names its tab after the connection; **Scheduled tasks** starts `task.show`, whose page is the
+ * one tab of the app that belongs to no connection.
  */
 function pageControl(name: string, connection: ConnectionId, page: ConnectionPage): Control {
+  if (page === 'tasks') {
+    return { kind: 'start', label: name, element: elements.tasks, feature: 'task.show', target: { kind: 'app' } };
+  }
   if (page === 'watch') {
     return {
       kind: 'start',

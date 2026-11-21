@@ -9,6 +9,7 @@ import {
   type Dismissal,
   type ExportResult,
   type Intent,
+  type IntentResult,
   type PingReply,
 } from '../shared/bridge';
 import type { WorkId } from '../shared/ids';
@@ -35,6 +36,26 @@ export function whenRunnerReady(): Promise<RunnerPorts> {
   return ready;
 }
 
+/** What an area starts itself of what the window sends, or undefined when it leaves it to the runner. */
+export type OwnStart = (intent: Intent) => Promise<IntentResult> | undefined;
+
+const ownStarts: OwnStart[] = [];
+
+/** An area that carries out some starts of the window itself: **Run now** of a scheduled task (`task.run`). */
+export function startsItself(own: OwnStart): void {
+  ownStarts.push(own);
+}
+
+function ownStart(intent: Intent): Promise<IntentResult> | undefined {
+  for (const own of ownStarts) {
+    const started = own(intent);
+    if (started !== undefined) {
+      return started;
+    }
+  }
+  return undefined;
+}
+
 /** Answers every channel of the bridge. */
 export function answerTheBridge(given: RunnerPorts, state: AppStateHolder, dialogs: WindowDialogs): void {
   const ports = process.env['DATARDO_TEST'] === '1' ? withTestFeatures(given) : given;
@@ -44,7 +65,7 @@ export function answerTheBridge(given: RunnerPorts, state: AppStateHolder, dialo
   ipcMain.handle(bridgeChannel.state, () => state.get());
   ipcMain.handle(bridgeChannel.start, async (_event, intent: Intent) => {
     const started = Date.now();
-    const result = await startWithConsoles(ports, intent);
+    const result = await (ownStart(intent) ?? startWithConsoles(ports, intent));
     keepTabQuery(state, intent, result);
     keepTabPipeline(state, intent, result);
     tellTheSystem(state, Date.now() - started, result.kind === 'failed' ? result.message : undefined);

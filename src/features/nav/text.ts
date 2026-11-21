@@ -119,6 +119,7 @@ export const text = {
   statusLine: {
     noConnection: 'No connection',
     running: (count: number) => `${String(count)} running`,
+    tasksRunning: (count: number) => `${String(count)} ${count === 1 ? 'task' : 'tasks'} running`,
     cancel: 'Cancel',
     readOnlyTip: (connection: string) => `Datardo sends no writes through ${connection}.`,
     zoomReset: 'Reset zoom',

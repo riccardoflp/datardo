@@ -6,6 +6,8 @@
  * the two the same. A field Datardo does not know is kept and written back, on each task and at the top of each file.
  * A task this version cannot read is kept as it is, written back and never run: a damaged task loses no other (RS4).
  */
+import { rm } from 'node:fs/promises';
+import { join } from 'node:path';
 import type { EngineName, Json } from '../shared/engine-request';
 import type { ConnectionId } from '../shared/ids';
 import type { JsonObject, StoredFile } from './store';
@@ -329,4 +331,13 @@ export function taskStateFile(id: string): StoredFile<StoredTaskState> {
     },
     write: (value) => value as unknown as JsonObject,
   };
+}
+
+/**
+ * Deletes the state of the task `id`, `tasks/<id>.json`, with the task (`task.delete`): its run log and its list of
+ * outputs go with it, so that no later task deletes the files it wrote. A file already gone is no error.
+ */
+export async function deleteTaskState(folder: string, id: string): Promise<void> {
+  const file = taskStateFile(id);
+  await rm(join(folder, ...file.path.split('/')), { force: true });
 }

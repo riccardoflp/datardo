@@ -32,6 +32,7 @@ import { useHistoryChanges } from './history/history-store';
 import { WatchInspector, watchExtras } from './watch/watch-inspector';
 import { WatchPage } from './watch/watch-page';
 import { useWatchChanges } from './watch/watch-store';
+import { TasksPage } from './tasks/tasks-page';
 
 /** A page as the main island draws it. */
 export type PageView = () => React.JSX.Element | null;
@@ -48,6 +49,7 @@ export const pages: Readonly<Record<string, PageView>> = {
   gridfs: GridFsPage,
   history: HistoryPage,
   watch: WatchPage,
+  tasks: TasksPage,
 };
 
 /** The pages of the tabs that show a target of a connection, by the kind of what they show (`keys`, `key`). */

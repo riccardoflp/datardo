@@ -9,7 +9,7 @@ import type { Answers, Context, Outcome, Step } from '../../shared/feature';
 import { noDanger, run } from '../../shared/feature';
 import { planText } from './text';
 import type { DiskFacts, ScheduledTask, TaskOutput, TaskState } from './types';
-import { appStep, argumentTask, diskFactsOf, nothingToDo, stateOf, tasksOf } from './types';
+import { appStep, argumentTask, diskOf, nothingToDo, stateOf, tasksOf } from './types';
 
 /**
  * The outputs retention deletes: all but the `keep` newest by the time of their run, of two at the same time the one
@@ -24,6 +24,9 @@ export function outputsToDelete(outputs: readonly TaskOutput[], keep: number): r
     .sort((first, second) => second.output.at - first.output.at || second.order - first.order);
   return newestFirst.slice(Math.floor(keep)).map(({ output }) => output);
 }
+
+/** The writer of the main process that carries out a `delete` of retention (`FileStep.content`). */
+export const retentionWriter = 'task.retention';
 
 /** What retention does with the outputs it chose: those it deletes, and those it only drops from the list. */
 export interface RetentionChoice {
@@ -56,6 +59,9 @@ export function retentionSteps(task: ScheduledTask, choice: RetentionChoice): re
       kind: 'file',
       action: 'delete',
       path: output.path,
+      // The main process deletes a recorded output only while it is still of the kind recorded: a folder with
+      // everything in it, or a file.
+      content: { writer: retentionWriter, args: { task: task.id, folder: output.folder } },
       text: planText.delete(output.path),
       onFailure: { kind: 'go-on' },
     })),
@@ -119,7 +125,7 @@ export function plan(context: Context, answers: Answers): Outcome {
     return nothingToDo(planText.retentionTitle(''), planText.cannotUndoRetention);
   }
   const state = stateOf(tasksOf(context.state), task.id);
-  const steps = retentionSteps(task, retentionChoice(state.outputs, task.keep, diskFactsOf(answers['disk'])));
+  const steps = retentionSteps(task, retentionChoice(state.outputs, task.keep, diskOf(answers)));
   return run({
     title: planText.retentionTitle(task.name),
     steps,

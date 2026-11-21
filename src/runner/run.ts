@@ -50,10 +50,7 @@ export async function runPlan(
       return { kind: 'cancelled' };
     }
   }
-  const connections = engineConnections(plan);
-  const ran = await runtimeOf(ports).queue.run(connections.length === 0 ? ['app'] : connections, () =>
-    runConfirmed(ports, plan, context, options),
-  );
+  const ran = await runtimeOf(ports).queue.run(queueKeys(plan), () => runConfirmed(ports, plan, context, options));
   // What follows is carried out once the plan has left its queue: a feature it starts queues behind it otherwise.
   // The limits of the undo history come first, so that an operation they drop at once offers no Undo.
   await carryOutAfter(ports, context, ran.recorded.after, options.startFeature);
@@ -276,6 +273,20 @@ export function reconnect(connection: ConnectionId): NotificationAction {
 function refusedBy(ports: RunnerPorts, context: Context, refusal: GuardRefusal): IntentResult {
   reportRefusal(ports, { feature: context.feature, code: refusal.code, message: refusal.message }, context.startedBy);
   return { kind: 'refused', code: refusal.code, message: refusal.message };
+}
+
+/**
+ * What a plan waits behind: the plans on the same connections; a plan that writes files and reaches no deployment, the
+ * plans on the same files, so that a long export or a scheduled run does not hold back the app's other plans (a cancel,
+ * a setting); the other plans of the app, for the rest.
+ */
+export function queueKeys(plan: Plan): readonly string[] {
+  const connections = engineConnections(plan);
+  if (connections.length > 0) {
+    return connections;
+  }
+  const files = plan.steps.flatMap((step) => (step.kind === 'file' ? [`file:${step.path}`] : []));
+  return files.length > 0 ? files : ['app'];
 }
 
 function engineConnections(plan: Plan): readonly ConnectionId[] {

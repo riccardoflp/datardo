@@ -11,6 +11,22 @@ import { useCopiedFlash } from '../table/copied-flash';
 import { startFeature } from './intent';
 import styles from './bars.module.css';
 
+/** `1 task running`, which opens the Scheduled tasks page (`task.show@status-line`). */
+function TasksPart({ tasks }: { readonly tasks: ReturnType<typeof view>['tasks'] }): React.JSX.Element | null {
+  return tasks === undefined ? null : (
+    <button
+      type="button"
+      className={styles['part']}
+      data-feature={tasks.element}
+      onClick={() => {
+        startFeature('task.show', { place: 'status-line' });
+      }}
+    >
+      {tasks.text}
+    </button>
+  );
+}
+
 /** The status line. */
 export function StatusLine(props: { readonly input: NavInput; readonly openSwitcher: () => void }): React.JSX.Element {
   const line = view(props.input);
@@ -95,6 +111,7 @@ export function StatusLine(props: { readonly input: NavInput; readonly openSwitc
           </>
         )}
       </span>
+      <TasksPart tasks={line.tasks} />
       {line.zoom === undefined ? null : (
         <button
           type="button"

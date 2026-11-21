@@ -734,19 +734,19 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`task.show`](task.md#taskshow--the-scheduled-tasks-page) | The Scheduled tasks page | View | M26 | Specified |
-| [`task.edit`](task.md#taskedit--create-or-edit-a-task) | Create or edit a task | Operation | M26 | Specified |
-| [`task.next-runs`](task.md#tasknext-runs--when-a-task-runs) | When a task runs | Derivation | M26 | Specified |
-| [`task.due`](task.md#taskdue--due-and-missed-runs) | Due and missed runs | Derivation | M26 | Specified |
-| [`task.file-names`](task.md#taskfile-names--the-names-of-what-a-run-writes) | The names of what a run writes | Derivation | M26 | Specified |
-| [`task.run`](task.md#taskrun--run-a-task) | Run a task | Operation | M26 | Specified |
-| [`task.cancel`](task.md#taskcancel--cancel-a-run) | Cancel a run | Operation | M26 | Specified |
-| [`task.retention`](task.md#taskretention--keep-the-last-n-outputs) | Keep the last N outputs | Operation | M26 | Specified |
-| [`task.missed`](task.md#taskmissed--runs-missed-while-datardo-was-closed) | Runs missed while Datardo was closed | Operation | M26 | Specified |
-| [`task.enable`](task.md#taskenable--enable-or-disable-a-task) | Enable or disable a task | Operation | M26 | Specified |
-| [`task.delete`](task.md#taskdelete--delete-a-task) | Delete a task | Operation | M26 | Specified |
-| [`task.notify`](task.md#tasknotify--notifications-of-runs) | Notifications of runs | View | M26 | Specified |
-| [`task.tray`](task.md#tasktray--keep-datardo-running-in-the-tray-for-the-tasks) | Keep Datardo running in the tray for the tasks | Derivation | M26 | Specified |
+| [`task.show`](task.md#taskshow--the-scheduled-tasks-page) | The Scheduled tasks page | View | M26 | Built |
+| [`task.edit`](task.md#taskedit--create-or-edit-a-task) | Create or edit a task | Operation | M26 | Built |
+| [`task.next-runs`](task.md#tasknext-runs--when-a-task-runs) | When a task runs | Derivation | M26 | Built |
+| [`task.due`](task.md#taskdue--due-and-missed-runs) | Due and missed runs | Derivation | M26 | Built |
+| [`task.file-names`](task.md#taskfile-names--the-names-of-what-a-run-writes) | The names of what a run writes | Derivation | M26 | Built |
+| [`task.run`](task.md#taskrun--run-a-task) | Run a task | Operation | M26 | Built |
+| [`task.cancel`](task.md#taskcancel--cancel-a-run) | Cancel a run | Operation | M26 | Built |
+| [`task.retention`](task.md#taskretention--keep-the-last-n-outputs) | Keep the last N outputs | Operation | M26 | Built |
+| [`task.missed`](task.md#taskmissed--runs-missed-while-datardo-was-closed) | Runs missed while Datardo was closed | Operation | M26 | Built |
+| [`task.enable`](task.md#taskenable--enable-or-disable-a-task) | Enable or disable a task | Operation | M26 | Built |
+| [`task.delete`](task.md#taskdelete--delete-a-task) | Delete a task | Operation | M26 | Built |
+| [`task.notify`](task.md#tasknotify--notifications-of-runs) | Notifications of runs | View | M26 | Built |
+| [`task.tray`](task.md#tasktray--keep-datardo-running-in-the-tray-for-the-tasks) | Keep Datardo running in the tray for the tasks | Derivation | M26 | Built |
 
 ## Transfer
 

@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "lastSlot": 1762045200000,
+  "runs": [
+    {
+      "start": 1762045200000,
+      "end": 1762045212400,
+      "trigger": "schedule",
+      "status": "done",
+      "output": "D:\\backups\\shop_2025-11-02_02-00-00.agz",
+      "size": 1048576,
+      "documents": 1200,
+      "collections": 2,
+      "deleted": 1
+    },
+    {
+      "start": 1761958800000,
+      "end": 1761958800000,
+      "trigger": "schedule",
+      "status": "missed",
+      "error": "Datardo wasn't running (or the computer was asleep) at that time"
+    }
+  ],
+  "outputs": [
+    { "path": "D:\\backups\\shop_2025-11-02_02-00-00.agz", "at": 1762045200000, "size": 1048576, "folder": false }
+  ]
+}
