@@ -57,8 +57,11 @@ async function snapshot(): Promise<string> {
   const documents = await onShop('find', [{}], 'orders');
   const keys = await ourKeys();
   const dumped = await Promise.all(keys.map(async (key) => [key, await live.redis('DUMP', key)]));
-  return JSON.stringify({ collections, documents, dumped }, (_key, value: unknown) =>
-    value instanceof Uint8Array ? Buffer.from(value).toString('hex') : value,
+  // The cluster's time moves whenever another test file writes to the replica set: it says nothing of this data.
+  const unclocked = (key: string, value: unknown): unknown =>
+    key === '$clusterTime' || key === 'operationTime' ? undefined : value;
+  return JSON.stringify({ collections, documents, dumped }, (key, value: unknown) =>
+    value instanceof Uint8Array ? Buffer.from(value).toString('hex') : unclocked(key, value),
   );
 }
 
