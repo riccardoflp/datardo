@@ -1,0 +1,246 @@
+/* compare.show and compare.field-diff: the sides, the options, the counts, the bulk writes and the list of the
+   differences, and the difference of the selected row in the inspector island. */
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.sides,
+.options,
+.counts,
+.bulk {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.label {
+  font-weight: var(--font-weight-strong);
+}
+
+.side {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.namespace,
+.code {
+  font-family: var(--font-family-code);
+}
+
+.muted {
+  color: var(--color-text-muted);
+}
+
+.badge {
+  padding: 0 var(--space-1);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-small);
+  color: var(--color-text-muted);
+}
+
+.field,
+.grow,
+.check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.grow {
+  flex: 1;
+}
+
+.select,
+.input {
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-small);
+  background: var(--color-canvas);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.input {
+  min-width: 160px;
+  font-family: var(--font-family-code);
+}
+
+.grow .input {
+  flex: 1;
+}
+
+.button,
+.primary,
+.chip {
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-small);
+  background: var(--color-island);
+  color: var(--color-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.primary {
+  background: var(--color-selected);
+}
+
+.button:hover,
+.primary:hover,
+.chip:hover {
+  background: var(--color-hover);
+}
+
+.button[aria-disabled='true'],
+.primary[aria-disabled='true'],
+.chip[aria-disabled='true'] {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.chip[aria-pressed='true'] {
+  background: var(--color-selected);
+}
+
+span.chip {
+  cursor: default;
+}
+
+.line,
+.message,
+.error {
+  margin: 0;
+  padding: var(--space-1) var(--space-3);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.message {
+  flex-basis: 100%;
+  padding: 0;
+  border: 0;
+  color: var(--color-text-muted);
+}
+
+.error {
+  color: var(--color-danger);
+}
+
+.scroller {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.note {
+  margin: 0;
+  padding: var(--space-3);
+  color: var(--color-text-muted);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.heading {
+  position: sticky;
+  top: 0;
+  padding: var(--space-1) var(--space-3);
+  background: var(--color-island);
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-normal);
+  text-align: left;
+}
+
+.row > td {
+  padding: var(--space-1) var(--space-3);
+  border-top: var(--border-width) solid var(--color-border);
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.row {
+  cursor: pointer;
+}
+
+.row:hover {
+  background: var(--color-hover);
+}
+
+.row[aria-selected='true'] {
+  background: var(--color-selected);
+}
+
+.row > td.what {
+  max-width: 0;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: var(--font-family-code);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+/* The inspector island. */
+.detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  overflow: auto;
+}
+
+.detail .note {
+  padding: 0;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.diff {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.diff th,
+.diff td {
+  padding: var(--space-1) var(--space-2);
+  border-top: var(--border-width) solid var(--color-border);
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+.diff thead th {
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-normal);
+}
+
+.document {
+  margin: 0;
+  font-family: var(--font-family-code);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

@@ -108,5 +108,28 @@ export function parse(replies: readonly unknown[], args: Json): CompareResult | 
   return right.kind === 'refuse' ? right : finishPairing(pairing);
 }
 
+/** The action of the main process that streams both sides into the pairing (`src/main/compare-reads.ts`). */
+export const compareAction = 'compare.compare';
+
+/**
+ * Feature: compare.read — as the page starts it: the refusal of the filter, or the app action that reads each side a
+ * batch at a time into the pairing of a worker thread, so that only the `_id`s and the hashes stay in memory (QA11).
+ * It answers with what `parse` gives: the result, or the refusal of a side with too many documents.
+ */
+export function pageRequest(context: Context, args: Json): ReadRequest | Outcome {
+  const sent = request(context, args);
+  return sent.kind === 'engine' ? { kind: 'app', action: compareAction, args } : sent;
+}
+
+/** Feature: compare.read — what the main process paired: the result, or the refusal of a side with too many documents. */
+export function pageParse(replies: readonly unknown[]): unknown {
+  return replies[0] ?? null;
+}
+
 /** The feature, as the runner starts it. */
-export const feature: ReadFeature = { kind: 'read', id: featureId('compare.read'), request, parse };
+export const feature: ReadFeature = {
+  kind: 'read',
+  id: featureId('compare.read'),
+  request: pageRequest,
+  parse: pageParse,
+};

@@ -217,5 +217,7 @@ export const text = {
     noOtherDatabase: (connection: string): string => `${connection} has no other database to compare with.`,
     couldNotConnect: (connection: string, message: string): string => `Could not connect to ${connection}: ${message}`,
     openPlan: 'Open the structure comparison',
+    keepPlan: 'Keep the sides and choices of the structure comparison',
+    keepStep: (title: string): string => `keep the sides and choices of ${title} with its tab`,
   },
 };

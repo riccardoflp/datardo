@@ -6,16 +6,24 @@ import { withoutSecrets } from '../features/runner/error';
 import type { ReadRequest } from '../shared/feature';
 import type { ConnectionRequest } from '../shared/engine-request';
 import { Cancelled } from './cancel';
-import type { RunnerPorts } from './ports';
+import type { ProgressReport, RunnerPorts } from './ports';
 
-/** The replies of a read's requests, in order. */
-export async function sendRead(ports: RunnerPorts, request: ReadRequest, signal: AbortSignal): Promise<unknown[]> {
+/**
+ * The replies of a read's requests, in order. An app read that takes long says how far it is through `progress`, in
+ * its item of work in progress (`runner.progress`): a comparison, the structure of a database.
+ */
+export async function sendRead(
+  ports: RunnerPorts,
+  request: ReadRequest,
+  signal: AbortSignal,
+  progress?: ProgressReport,
+): Promise<unknown[]> {
   if (request.kind === 'app') {
     const action = ports.appActions.get(request.action);
     if (action === undefined) {
       throw new Error(`Datardo has no action named ${request.action}.`);
     }
-    return [await action(request.args, signal)];
+    return [await action(request.args, signal, progress)];
   }
   const replies: unknown[] = [];
   for (const each of request.requests) {

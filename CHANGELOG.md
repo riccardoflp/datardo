@@ -154,6 +154,13 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
   events arrive newest first, are filtered by the server and by type and text in the page, show what each changed in
   the inspector, can be paused, stopped, resumed from the last one, cleared, copied and exported as JSON Lines, and a
   collection can be made to record pre-images.
+- **Compare with…** compares two collections of any MongoDB connections document by document, with a filter, fields
+  to ignore and numbers compared by value or by type: the counts, the first 300 differences of each kind, the
+  difference of a document field by field in the inspector, and one document or a whole side made like the other
+  after a confirmation, every BSON type kept and recorded for undo, refused on a read-only side or a view.
+- **Compare structure with…** compares the collections, views, options, indexes, search indexes and shard keys of two
+  databases, and makes the right one like the left one: with the script copied or opened in a playground, or applied
+  after a confirmation that asks to type the name of what it drops.
 
 ### Fixed
 

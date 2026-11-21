@@ -276,10 +276,37 @@ export function parse(replies: readonly unknown[], args: Json): StructureRead {
   return { kind: 'structure', structure: { ...withSearch(collections, layout, replies), sharded: keys !== undefined } };
 }
 
+/** The action of the main process that reads both sides, phase after phase (`src/main/structure-reads.ts`). */
+export const readBothAction = 'structure.read-both';
+
+/** What the page is given: the structure of each side, or the message of the read that failed it. */
+export interface BothStructures {
+  readonly left: StructureRead;
+  readonly right: StructureRead;
+}
+
+function isBoth(args: Json): boolean {
+  return typeof args === 'object' && args !== null && !Array.isArray(args) && 'left' in args && 'right' in args;
+}
+
+/**
+ * Feature: structure.read — as the page starts it, with `{ left, right }`: the app action that reads both sides at the
+ * same time, each as a loop over `request`, `nextRequests` and `parse`, saying how far each is. Started with one side
+ * `{ connection, database }`, its first requests.
+ */
+export function pageRequest(context: Context, args: Json): ReadRequest {
+  return isBoth(args) ? { kind: 'app', action: readBothAction, args } : request(context, args);
+}
+
+/** Feature: structure.read — what the main process read of both sides, or the structure of one side. */
+export function pageParse(replies: readonly unknown[], args: Json): unknown {
+  return isBoth(args) ? (replies[0] ?? null) : parse(replies, args);
+}
+
 /** The feature, as the runner starts it. */
 export const feature: ReadFeature = {
   kind: 'read',
   id: featureId('structure.read'),
-  request,
-  parse: (replies, args) => parse(replies, args),
+  request: pageRequest,
+  parse: pageParse,
 };

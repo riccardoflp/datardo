@@ -111,10 +111,24 @@ const collectionTabCommands: ReadonlySet<string> = new Set([
   'saved-query.save:folder',
   'saved-query.clear-recent',
 ]);
+/**
+ * **Compare with…** acts on the collection of the active tab; **Compare structure with…** on its database, that of a
+ * collection tab or of a page of a database.
+ */
+function isCompareOffered(state: AppState, id: string): boolean {
+  const shows = activeTabOf(state.tabs)?.shows;
+  return id === 'compare.show'
+    ? shows?.kind === 'collection'
+    : shows?.kind === 'collection' || (shows?.kind === 'page' && shows.database !== undefined);
+}
+
 /** What the cards of an area that decides for its commands say of whether one is offered now; `undefined` for others. */
 function isOfferedByItsArea(state: AppState, id: string): boolean | undefined {
   if (id.startsWith('manage.')) {
     return isManageOffered(state, id);
+  }
+  if (id === 'compare.show' || id === 'structure.show') {
+    return isCompareOffered(state, id);
   }
   return id.startsWith('field.') ? isFieldOffered(state) : undefined;
 }

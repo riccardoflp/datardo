@@ -18,6 +18,8 @@ export const text = {
     right === undefined || right === left ? `Compare: ${left}` : `Compare: ${left} ↔ ${right}`,
   openPlan: 'Open the comparison of two collections',
   openStep: (namespace: string) => `open the comparison of ${namespace}`,
+  keepPlan: 'Keep the sides and options of the comparison',
+  keepStep: (title: string) => `keep the sides and options of ${title} with its tab`,
   sides: {
     left: 'Left',
     right: 'Right',
@@ -73,6 +75,7 @@ export const text = {
       `Showing the first ${groupThousands(shown)} of ${groupThousands(total)}; the buttons above apply to all of them.`,
   },
   kinds: { different: 'Different', 'only-left': 'Only left', 'only-right': 'Only right' },
+  list: { kind: 'Kind', id: '_id', what: 'What differs', write: 'Make alike' },
   rows: {
     toRight: '→ Right',
     toLeft: '← Left',

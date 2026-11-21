@@ -30,6 +30,8 @@ import { commands as transferCommands } from './transfer/commands';
 import { commands as backupCommands } from './backup/commands';
 import { commands as historyCommands } from './history/commands';
 import { commands as watchCommands } from './watch/commands';
+import { areaCommands as compareCommands } from './compare/commands';
+import { areaCommands as structureCommands } from './structure/commands';
 
 import type { Command } from './command';
 
@@ -65,4 +67,6 @@ export const commands: readonly Command[] = [
   ...backupCommands,
   ...historyCommands,
   ...watchCommands,
+  ...compareCommands,
+  ...structureCommands,
 ];

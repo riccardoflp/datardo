@@ -8,12 +8,13 @@
  */
 import type { Answers, Context, OperationFeature, Outcome } from '../../shared/feature';
 import { run } from '../../shared/feature';
-import { featureId, type ConnectionId } from '../../shared/ids';
+import { connectionId, featureId, type ConnectionId } from '../../shared/ids';
 import { activeTabOf } from '../../shared/state/tabs';
-import { appPlan } from '../nav/types';
+import { appPlan, startArgs } from '../nav/types';
 import { planOf } from '../tab/open';
 import { text } from './text';
 import { differenceKinds, type DifferenceKind, type StructureComparison, type StructureSide } from './types';
+import { keepPlan } from './model/memory';
 import { detailOf, groupsOf, isApplicable, type CollectionGroup, type DifferenceDetail } from './model/page';
 
 /** The page's name in its tab. */
@@ -45,6 +46,8 @@ export interface StructurePageState {
   readonly databases?: readonly string[];
   readonly comparing: boolean;
   readonly progress?: { readonly left?: SideProgress; readonly right?: SideProgress };
+  /** The detail of the work in progress, when the page has it: *Reading the structures… left 3 of 12…*. */
+  readonly progressText?: string;
   readonly result?: { readonly comparison: StructureComparison; readonly milliseconds: number };
   readonly error?: string;
   /** **All** is on: what is the same is listed too. */
@@ -267,7 +270,8 @@ export function view(state: StructurePageState): StructurePageView {
   const progress = state.comparing
     ? state.swapping
       ? text.show.swapping
-      : text.show.reading(sideProgress(state.progress?.left), sideProgress(state.progress?.right))
+      : (state.progressText ??
+        text.show.reading(sideProgress(state.progress?.left), sideProgress(state.progress?.right)))
     : undefined;
   const chosen = state.right.connection !== undefined && state.right.database !== undefined;
   return {
@@ -285,11 +289,18 @@ export function view(state: StructurePageState): StructurePageView {
   };
 }
 
-/** The database the page is opened on: the target's, or the active tab's. */
-function databaseOf(context: Context): { readonly connection: ConnectionId; readonly database: string } | undefined {
+/** The database the page is opened on: the target's, the tree node's (`{ connection, database }`), or the active tab's. */
+function databaseOf(
+  context: Context,
+  args: Readonly<Record<string, unknown>>,
+): { readonly connection: ConnectionId; readonly database: string } | undefined {
   const target = context.target;
   if (target.kind === 'database' || target.kind === 'collection') {
     return { connection: target.connection, database: target.database };
+  }
+  const [connection, database] = [args['connection'], args['database']];
+  if (typeof connection === 'string' && typeof database === 'string' && database !== '') {
+    return { connection: connectionId(connection), database };
   }
   const shows = activeTabOf(context.state.tabs)?.shows;
   if (shows?.kind === 'collection' || (shows?.kind === 'page' && shows.database !== undefined)) {
@@ -298,9 +309,16 @@ function databaseOf(context: Context): { readonly connection: ConnectionId; read
   return undefined;
 }
 
-/** Feature: structure.show — **Compare structure with…**: the page tab of the database, on the left. */
-export function plan(context: Context, _answers: Answers): Outcome {
-  const where = databaseOf(context);
+/**
+ * Feature: structure.show — **Compare structure with…**: the page tab of the database, on the left. The page starts
+ * it with `{ keep }` to keep its sides and choices with its tab (`./model/memory.ts`).
+ */
+export function plan(context: Context, answers: Answers): Outcome {
+  const args = startArgs(answers);
+  if ('keep' in args) {
+    return keepPlan(context, args['keep']);
+  }
+  const where = databaseOf(context, args);
   const saved = context.state.connections.saved.find((each) => each.id === where?.connection);
   if (where === undefined || saved?.engine !== 'mongodb') {
     return run(appPlan(text.show.openPlan, []));

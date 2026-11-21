@@ -10,9 +10,9 @@
 import type { ConnectionView } from '../../shared/connection';
 import type { Json } from '../../shared/engine-request';
 import { run, type Answers, type Context, type OperationFeature, type Outcome } from '../../shared/feature';
-import { featureId, type ConnectionId } from '../../shared/ids';
+import { connectionId, featureId, type ConnectionId } from '../../shared/ids';
 import { activeTabOf, type TabShows } from '../../shared/state/tabs';
-import { appPlan } from '../nav/types';
+import { appPlan, startArgs } from '../nav/types';
 import { planOf } from '../tab/open';
 import {
   collectionChoices,
@@ -23,6 +23,7 @@ import {
   type ConnectionChoice,
 } from './page/choices';
 import { inspectorView, type InspectorView } from './page/inspector';
+import { keepPlan } from './page/keep';
 import {
   bulkButtons,
   chips,
@@ -258,11 +259,27 @@ export function pageShows(left: SideRef): TabShows {
   };
 }
 
+function textOf(value: unknown): string | undefined {
+  return typeof value === 'string' && value !== '' ? value : undefined;
+}
+
+/** The collection of the node of the tree **Compare with…** was chosen on: `{ connection, database, collection }`. */
+function leftOfArgs(args: Readonly<Record<string, unknown>>): SideRef | undefined {
+  const [connection, database, collection] = [args['connection'], args['database'], args['collection']].map(textOf);
+  return connection === undefined || database === undefined || collection === undefined
+    ? undefined
+    : { connection: connectionId(connection), database, collection, view: args['view'] === true };
+}
+
 /** The collection the page compares: the node of the tree it was started on, or the collection of the active tab. */
-function leftOf(context: Context): SideRef | undefined {
+function leftOf(context: Context, answers: Answers): SideRef | undefined {
   const { target } = context;
   if (target.kind === 'collection') {
     return { connection: target.connection, database: target.database, collection: target.collection, view: false };
+  }
+  const fromTree = leftOfArgs(startArgs(answers));
+  if (fromTree !== undefined) {
+    return fromTree;
   }
   const shows = activeTabOf(context.state.tabs)?.shows;
   return shows?.kind === 'collection'
@@ -275,9 +292,16 @@ function leftOf(context: Context): SideRef | undefined {
     : undefined;
 }
 
-/** Feature: compare.show — **Compare with…**: the page tab with the collection on the left; nothing without one. */
-export function plan(context: Context, _answers: Answers): Outcome {
-  const left = leftOf(context);
+/**
+ * Feature: compare.show — **Compare with…**: the page tab with the collection on the left; nothing without one. The
+ * page starts it with `{ keep }` to keep its sides and options with its tab (`./page/keep.ts`).
+ */
+export function plan(context: Context, answers: Answers): Outcome {
+  const args = startArgs(answers);
+  if ('keep' in args) {
+    return keepPlan(context, args['keep']);
+  }
+  const left = leftOf(context, answers);
   const saved =
     left === undefined ? undefined : context.state.connections.saved.find((each) => each.id === left.connection);
   if (left === undefined || saved?.engine !== 'mongodb') {

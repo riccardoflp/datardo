@@ -132,13 +132,13 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`compare.show`](compare.md#compareshow--the-comparison-page-of-two-collections) | The comparison page of two collections | View | M35 | Specified |
-| [`compare.read`](compare.md#compareread--read-both-sides-and-pair-the-documents) | Read both sides and pair the documents | Read | M35 | Specified |
-| [`compare.read-details`](compare.md#compareread-details--read-the-documents-of-the-differences-shown) | Read the documents of the differences shown | Read | M35 | Specified |
-| [`compare.equality`](compare.md#compareequality--when-two-documents-are-equal) | When two documents are equal | Derivation | M35 | Specified |
-| [`compare.field-diff`](compare.md#comparefield-diff--the-difference-of-one-document-field-by-field) | The difference of one document, field by field | Derivation | M35 | Specified |
-| [`compare.copy-document`](compare.md#comparecopy-document--copy-one-document-to-the-other-side) | Copy one document to the other side | Operation | M35 | Specified |
-| [`compare.make-like`](compare.md#comparemake-like--make-one-side-like-the-other) | Make one side like the other | Operation | M35 | Specified |
+| [`compare.show`](compare.md#compareshow--the-comparison-page-of-two-collections) | The comparison page of two collections | View | M35 | Built |
+| [`compare.read`](compare.md#compareread--read-both-sides-and-pair-the-documents) | Read both sides and pair the documents | Read | M35 | Built |
+| [`compare.read-details`](compare.md#compareread-details--read-the-documents-of-the-differences-shown) | Read the documents of the differences shown | Read | M35 | Built |
+| [`compare.equality`](compare.md#compareequality--when-two-documents-are-equal) | When two documents are equal | Derivation | M35 | Built |
+| [`compare.field-diff`](compare.md#comparefield-diff--the-difference-of-one-document-field-by-field) | The difference of one document, field by field | Derivation | M35 | Built |
+| [`compare.copy-document`](compare.md#comparecopy-document--copy-one-document-to-the-other-side) | Copy one document to the other side | Operation | M35 | Built |
+| [`compare.make-like`](compare.md#comparemake-like--make-one-side-like-the-other) | Make one side like the other | Operation | M35 | Built |
 
 ## Connections
 
@@ -674,13 +674,13 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`structure.show`](structure.md#structureshow--the-structure-comparison-page-of-two-databases) | The structure comparison page of two databases | View | M35 | Specified |
-| [`structure.read`](structure.md#structureread--read-the-structure-of-a-database) | Read the structure of a database | Read | M35 | Specified |
-| [`structure.steps`](structure.md#structuresteps--what-each-difference-takes) | What each difference takes | Derivation | M35 | Specified |
-| [`structure.script`](structure.md#structurescript--the-script-that-makes-the-right-database-like-the-left-one) | The script that makes the right database like the left one | Derivation | M35 | Specified |
-| [`structure.copy-script`](structure.md#structurecopy-script--copy-the-script) | Copy the script | Operation | M35 | Specified |
-| [`structure.open-in-playground`](structure.md#structureopen-in-playground--open-the-script-in-a-playground) | Open the script in a playground | Operation | M35 | Specified |
-| [`structure.apply`](structure.md#structureapply--apply-differences-to-the-right-database) | Apply differences to the right database | Operation | M35 | Specified |
+| [`structure.show`](structure.md#structureshow--the-structure-comparison-page-of-two-databases) | The structure comparison page of two databases | View | M35 | Built |
+| [`structure.read`](structure.md#structureread--read-the-structure-of-a-database) | Read the structure of a database | Read | M35 | Built |
+| [`structure.steps`](structure.md#structuresteps--what-each-difference-takes) | What each difference takes | Derivation | M35 | Built |
+| [`structure.script`](structure.md#structurescript--the-script-that-makes-the-right-database-like-the-left-one) | The script that makes the right database like the left one | Derivation | M35 | Built |
+| [`structure.copy-script`](structure.md#structurecopy-script--copy-the-script) | Copy the script | Operation | M35 | Built |
+| [`structure.open-in-playground`](structure.md#structureopen-in-playground--open-the-script-in-a-playground) | Open the script in a playground | Operation | M35 | Built |
+| [`structure.apply`](structure.md#structureapply--apply-differences-to-the-right-database) | Apply differences to the right database | Operation | M35 | Built |
 
 ## The tab strip
 

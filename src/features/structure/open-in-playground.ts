@@ -6,12 +6,13 @@
  * the user runs the playground (`playground.run`), which has its own rules for writes, so it works on a read-only
  * right connection. Pressing it twice opens two playgrounds.
  *
- * The request of `playground.open` is this area's own type until the playground area (M28), written beside it, gives
- * its own: `{ connection, database, text }`, a new playground every time.
+ * The request is the one of `playground.open` (M28): `{ connection, database, title, text, caret }`, a new playground
+ * every time, titled as **New playground** titles it, with the caret at the first line of the script.
  */
 import { run, type Answers, type Context, type OperationFeature, type Outcome } from '../../shared/feature';
 import { featureId } from '../../shared/ids';
 import { appPlan, appStep } from '../nav/types';
+import { newTitle } from '../playground/open';
 import { structureScript } from './script';
 import { text } from './text';
 import { pageArgs, whereText } from './model/arguments';
@@ -19,11 +20,13 @@ import { pageArgs, whereText } from './model/arguments';
 /** The app action that opens a new playground tab with a text. */
 export const openPlaygroundAction = 'playground.open';
 
-/** What a new playground is opened with: its connection, its default database and its text. */
+/** What a new playground is opened with: its connection, its default database, its title, its text and its caret. */
 export type PlaygroundOpening = {
   readonly connection: string;
   readonly database: string;
+  readonly title: string;
   readonly text: string;
+  readonly caret: 'start';
 };
 
 /** Feature: structure.open-in-playground — a new playground on the right side with the script. */
@@ -44,7 +47,9 @@ export function plan(context: Context, answers: Answers): Outcome {
   const opening: PlaygroundOpening = {
     connection: comparison.right.connection,
     database: comparison.right.database,
+    title: newTitle(context.state, comparison.right.connection),
     text: script,
+    caret: 'start',
   };
   const step = appStep(text.playground.step(right, left), openPlaygroundAction, opening);
   return run(appPlan(text.playground.title, [step]));
