@@ -1020,3 +1020,25 @@ Raised while the catalog was written; each names the cards that hold the current
 - **Q86** — Go to keeps one row a title, and M14's `value.rename-field` and M21's `field.rename` were both **Rename
   field…**: Go to lists the first as **Rename hash field…**, as Q75 did for **Copy Redis value**; the row menu of the
   hash keeps **Rename field…** (`value.rename-field`, `field.rename`).
+- **Q130** — Users and roles as built in M32, what the window adds that no card says: the names of the regions and
+  of the controls without a text of their own (*Sections of Users and roles*, the toolbar *Users and roles*, *Actions
+  of*, *Select a user or a role to see it here.*, *Role*, *Database of the role*, *Database of the role to grant*);
+  the controls of the page start their features on the connection, the database in their arguments, so that the Log
+  writes `db.getSiblingDB("shop")` as the cards say (the runner writes `db` for the database of its target); the
+  **Database** chosen is kept as the tab's section, so it comes back with the tab, while the section shown, the filter
+  and **Built-in roles** are kept in the window only (`user.show`, `user.inspect`).
+- **Q131** — A name the server already has (`user.create`): the window follows the outcome of **Create user** and,
+  when its step failed, starts the feature again with the dialog's answers as they were (`args.retry`) and the
+  server's error (`args.failure`), which the dialog shows above its fields; the failed step's error notification is
+  shown too. The password is not sent back through the main process: the window keeps the one it sent, for that
+  dialog only, until it is answered or closed (T21, D41). A **Create user** started by a notification or by anything
+  but the page and Go to is not followed (`user.create`).
+- **Q132** — The dialogs of the user area check what the plans refuse (no name, no password, custom data, privileges
+  that cannot be read or are not a list) with the same functions before they answer, so that they stay open with what
+  was typed; the plans still refuse with their codes when they are answered otherwise. **Grant** empties its field
+  once the role is granted. From Go to, **Grant role** grants what the field holds, or puts the focus in it when it is
+  empty, and **Revoke role…** puts the focus on the first `✕` of the selected user, since no card names the role it
+  revokes; the other commands act on the selection of the active page (`user.grant-role`, `user.revoke-role`).
+- **Q133** — A read of the Users and roles page that the server refuses shows its message in place of the table, as
+  the card says, and the runner also notifies it as an error, as it does for every failed read; the second may be
+  noise on a server where the user lacks `usersInfo` or `listDatabases` (`user.show`, `runner.notify`).

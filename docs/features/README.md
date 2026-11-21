@@ -810,22 +810,22 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`user.show`](user.md#usershow--the-users-and-roles-page) | The Users and roles page | View | M32 | Specified |
-| [`user.list`](user.md#userlist--the-users-of-a-database-or-of-all-databases) | The users of a database or of all databases | Read | M32 | Specified |
-| [`user.list-roles`](user.md#userlist-roles--the-roles-of-a-database-or-of-all-databases) | The roles of a database or of all databases | Read | M32 | Specified |
-| [`user.signed-in`](user.md#usersigned-in--who-the-connection-is-signed-in-as) | Who the connection is signed in as | Read | M32 | Specified |
-| [`user.inspect`](user.md#userinspect--a-user-or-a-role-in-the-inspector) | A user or a role in the inspector | View | M32 | Specified |
-| [`user.create`](user.md#usercreate--create-a-user) | Create a user | Operation | M32 | Specified |
-| [`user.change-password`](user.md#userchange-password--change-the-password-of-a-user) | Change the password of a user | Operation | M32 | Specified |
-| [`user.grant-role`](user.md#usergrant-role--grant-a-role-to-a-user) | Grant a role to a user | Operation | M32 | Specified |
-| [`user.revoke-role`](user.md#userrevoke-role--revoke-a-role-from-a-user) | Revoke a role from a user | Operation | M32 | Specified |
-| [`user.delete`](user.md#userdelete--delete-a-user) | Delete a user | Operation | M32 | Specified |
-| [`user.create-role`](user.md#usercreate-role--create-a-custom-role) | Create a custom role | Operation | M32 | Specified |
-| [`user.edit-role`](user.md#useredit-role--edit-a-custom-role) | Edit a custom role | Operation | M32 | Specified |
-| [`user.delete-role`](user.md#userdelete-role--delete-a-custom-role) | Delete a custom role | Operation | M32 | Specified |
-| [`user.role-reference`](user.md#userrole-reference--how-a-role-is-written-suggested-and-sent) | How a role is written, suggested and sent | Derivation | M32 | Specified |
-| [`user.privilege-summary`](user.md#userprivilege-summary--the-privileges-of-a-role-in-short) | The privileges of a role in short | Derivation | M32 | Specified |
-| [`user.generate-password`](user.md#usergenerate-password--a-random-password) | A random password | Derivation | M32 | Specified |
+| [`user.show`](user.md#usershow--the-users-and-roles-page) | The Users and roles page | View | M32 | Built |
+| [`user.list`](user.md#userlist--the-users-of-a-database-or-of-all-databases) | The users of a database or of all databases | Read | M32 | Built |
+| [`user.list-roles`](user.md#userlist-roles--the-roles-of-a-database-or-of-all-databases) | The roles of a database or of all databases | Read | M32 | Built |
+| [`user.signed-in`](user.md#usersigned-in--who-the-connection-is-signed-in-as) | Who the connection is signed in as | Read | M32 | Built |
+| [`user.inspect`](user.md#userinspect--a-user-or-a-role-in-the-inspector) | A user or a role in the inspector | View | M32 | Built |
+| [`user.create`](user.md#usercreate--create-a-user) | Create a user | Operation | M32 | Built |
+| [`user.change-password`](user.md#userchange-password--change-the-password-of-a-user) | Change the password of a user | Operation | M32 | Built |
+| [`user.grant-role`](user.md#usergrant-role--grant-a-role-to-a-user) | Grant a role to a user | Operation | M32 | Built |
+| [`user.revoke-role`](user.md#userrevoke-role--revoke-a-role-from-a-user) | Revoke a role from a user | Operation | M32 | Built |
+| [`user.delete`](user.md#userdelete--delete-a-user) | Delete a user | Operation | M32 | Built |
+| [`user.create-role`](user.md#usercreate-role--create-a-custom-role) | Create a custom role | Operation | M32 | Built |
+| [`user.edit-role`](user.md#useredit-role--edit-a-custom-role) | Edit a custom role | Operation | M32 | Built |
+| [`user.delete-role`](user.md#userdelete-role--delete-a-custom-role) | Delete a custom role | Operation | M32 | Built |
+| [`user.role-reference`](user.md#userrole-reference--how-a-role-is-written-suggested-and-sent) | How a role is written, suggested and sent | Derivation | M32 | Built |
+| [`user.privilege-summary`](user.md#userprivilege-summary--the-privileges-of-a-role-in-short) | The privileges of a role in short | Derivation | M32 | Built |
+| [`user.generate-password`](user.md#usergenerate-password--a-random-password) | A random password | Derivation | M32 | Built |
 
 ## Values
 

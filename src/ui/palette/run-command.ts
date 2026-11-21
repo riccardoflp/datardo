@@ -18,6 +18,7 @@ import { isDocumentCommand, runDocumentCommand } from '../pages/document/documen
 import { isFieldFeature, runFieldCommand } from '../pages/field/field-actions';
 import { isSectionCommand, runSectionCommand } from '../pages/manage/section-commands';
 import { isTableCommand, runTableCommand } from '../table/table-commands';
+import { isUserCommand, runUserCommand } from '../pages/user/user-commands';
 import { runTreeCommand } from '../tree/tree-commands';
 import { openAbout } from '../window/about';
 import { openGoTo } from './go-to-store';
@@ -108,6 +109,10 @@ export function runCommand(id: string, state: AppState): void {
   }
   if (isSectionCommand(id)) {
     runSectionCommand(id, state);
+    return;
+  }
+  if (isUserCommand(id)) {
+    runUserCommand(id, state);
     return;
   }
   const local = windowOnly[id];

@@ -190,6 +190,16 @@ export const text = {
     undo: 'It cannot be undone from the undo history: a role is not a document Datardo writes, and the server forgets who had it.',
   },
   readOnly: (connection: string) => `The connection ${connection} is read-only: users and roles can't be changed.`,
+  /** What only the window says: the names of its regions and of the controls that have no text of their own. */
+  window: {
+    sectionBar: 'Sections of Users and roles',
+    toolbar: 'Users and roles',
+    rowMenu: 'Actions of',
+    emptyLine: 'Select a user or a role to see it here.',
+    role: 'Role',
+    roleDatabase: 'Database of the role',
+    grantDatabase: 'Database of the role to grant',
+  },
   commands: {
     show: 'Users and roles',
     create: 'Create user…',

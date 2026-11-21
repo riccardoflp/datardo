@@ -10,6 +10,7 @@ import type { QuestionId } from '../../shared/ids';
 import { InsertDialog } from '../pages/document/insert-dialog';
 import { followInsert } from '../pages/document/insert-memory';
 import { UpdateForm } from '../pages/document/update-form';
+import { isUserDialog, UserDialog } from '../pages/user/user-dialogs';
 import { useAppState } from '../state/store';
 import { ConfirmationDialog } from './confirmation-dialog';
 import { Notifications } from './notifications';
@@ -38,6 +39,9 @@ function RunnerDialog(): React.JSX.Element | null {
     }
     if (dialog.question.element === 'document.update-many@form') {
       return <UpdateForm key={dialog.id} question={dialog.question} onAnswer={onAnswer} />;
+    }
+    if (isUserDialog(dialog.feature)) {
+      return <UserDialog key={dialog.id} feature={dialog.feature} question={dialog.question} onAnswer={onAnswer} />;
     }
     return (
       <QuestionDialog

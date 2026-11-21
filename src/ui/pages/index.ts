@@ -23,6 +23,10 @@ import { ConsoleInspector } from './console/console-inspector';
 import { ConsolePage } from './console/console-page';
 import { consoleExtras } from './console/console-state';
 import { useConsoleTab } from './console/console-store';
+import { UsersInspector } from './user/user-inspector';
+import { UsersPage } from './user/user-page';
+import { usersExtras } from './user/user-state';
+import { useUsersTab } from './user/user-store';
 
 /** A page as the main island draws it. */
 export type PageView = () => React.JSX.Element | null;
@@ -36,6 +40,7 @@ export const pages: Readonly<Record<string, PageView>> = {
   overview: OverviewPage,
   undo: UndoHistoryPage,
   server: ServerPage,
+  users: UsersPage,
 };
 
 /** The pages of the tabs that show a target of a connection, by the kind of what they show (`keys`, `key`). */
@@ -51,7 +56,13 @@ export const tabPages: Readonly<Partial<Record<string, PageView>>> = {
  */
 export const inspectors: Readonly<
   Partial<Record<string, (props: { readonly tabId: string }) => React.JSX.Element | null>>
-> = { keys: KeyInspector, key: ValueItemInspector, server: ServerInspector, console: ConsoleInspector };
+> = {
+  keys: KeyInspector,
+  key: ValueItemInspector,
+  server: ServerInspector,
+  console: ConsoleInspector,
+  users: UsersInspector,
+};
 
 /** What a page adds to the active tab, by its kind or its page: what the status line counts, what the inspector shows. */
 export const tabExtras: Readonly<Partial<Record<string, typeof keysExtras>>> = {
@@ -59,6 +70,7 @@ export const tabExtras: Readonly<Partial<Record<string, typeof keysExtras>>> = {
   key: valueExtras,
   server: serverExtras,
   console: consoleExtras,
+  users: usersExtras,
 };
 
 /** The name `inspectors` and `tabExtras` know a tab by: its page for a page tab, else the kind of what it shows. */
@@ -74,4 +86,5 @@ export function usePageStores(): void {
   useKeysTab(undefined);
   useValueTab(undefined);
   useConsoleTab(undefined);
+  useUsersTab(undefined);
 }
