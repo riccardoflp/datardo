@@ -10,6 +10,7 @@
 import type { Json } from '../../shared/engine-request';
 import { groupKey, slowQueryGroups, type SlowQueryGroup } from './group-slow-queries';
 import type { PartRead } from './parts/failure';
+import { sinceChoices, type Grouping, type SinceMinutes } from './parts/intervals';
 import { inspectorOf, type SlowQueryInspector } from './parts/slow-query-inspector';
 import {
   firstGroupSort,
@@ -35,17 +36,7 @@ import { errorLineOf } from './show';
 import { text } from './text';
 import type { SlowQuery, SlowQuerySource } from './types';
 
-/** The choices of **Since**, in minutes, in their order; 0 is **All**. */
-export const sinceChoices = [15, 60, 1440, 0] as const;
-
-/** A choice of **Since**. */
-export type SinceMinutes = (typeof sinceChoices)[number];
-
-/** **Since** to start with: 1 hour. */
-export const firstSince: SinceMinutes = 60;
-
-/** **By query** or **All**. */
-export type Grouping = 'by-query' | 'all';
+export { firstSince, sinceChoices, type Grouping, type SinceMinutes } from './parts/intervals';
 
 /** The databases the profiler is not chosen on to start with. */
 const serverDatabases = new Set(['admin', 'local', 'config']);

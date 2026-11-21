@@ -38,7 +38,8 @@ export async function sendRead(
 
 /**
  * The reply of one request, or its failure as `{ kind: 'error', message }` for a Read that takes failures as replies
- * (`failedRequests: 'are-replies'`): the server's message, without secrets. A cancelled read still ends.
+ * (`failedRequests: 'are-replies'`): the server's message, without secrets, and its code. A cancelled read still
+ * ends.
  */
 async function replyOrFailure(ports: RunnerPorts, request: ConnectionRequest, signal: AbortSignal): Promise<unknown> {
   try {
@@ -47,7 +48,14 @@ async function replyOrFailure(ports: RunnerPorts, request: ConnectionRequest, si
     if (signal.aborted) {
       throw new Cancelled();
     }
-    // The read asked for its failures: its `parse` says what each one means, and the next request goes on.
-    return { kind: 'error', message: withoutSecrets(error instanceof Error ? error.message : String(error)) };
+    // The read asked for its failures: its `parse` says what each one means, and the next request goes on. The
+    // server's code goes with the message when it has one, so that `parse` can tell a missing role (13) from a
+    // command the server does not allow (8000, 115, 59).
+    const code = typeof error === 'object' && error !== null ? (error as { code?: unknown }).code : undefined;
+    return {
+      kind: 'error',
+      message: withoutSecrets(error instanceof Error ? error.message : String(error)),
+      ...(typeof code === 'number' || typeof code === 'string' ? { code } : {}),
+    };
   }
 }

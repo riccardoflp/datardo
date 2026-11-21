@@ -11,6 +11,8 @@
 import type { Json } from '../../shared/engine-request';
 import { refuse, run, type Answers, type Context, type OperationFeature, type Outcome } from '../../shared/feature';
 import { featureId } from '../../shared/ids';
+import { bodyWidth } from '../aggregate/from-text';
+import { formattedValue as stageText } from '../aggregate/mongosh/format';
 import { appStep } from '../nav/types';
 import { formattedValue } from '../query/format';
 import { isRecord, listOf, recordOf } from './parts/ejson';
@@ -82,6 +84,28 @@ export function plan(context: Context, answers: Answers): Outcome {
     publishes: false,
     after: [],
   });
+}
+
+/** A stage of a pipeline as the pipeline editor holds it: its operator, its body in mongosh syntax, enabled. */
+function stageOf(stage: Json): Json {
+  const [entry] = Object.entries(recordOf(stage));
+  return entry === undefined
+    ? { name: '', body: '', enabled: true }
+    : { name: entry[0], body: stageText(entry[1], { kind: 'pretty', width: bodyWidth }), enabled: true };
+}
+
+/**
+ * The query the app step `monitor.open-query` puts in the collection tab, as a saved query is loaded there
+ * (`saved-query.run`): a find's filter, sort and projection in mongosh syntax, or a pipeline's stages, each enabled.
+ */
+export function openedQueryText(args: Json): Json {
+  const fields = recordOf(args);
+  const pipeline = fields['pipeline'];
+  if (Array.isArray(pipeline)) {
+    return { kind: 'pipeline', stages: listOf(pipeline).map(stageOf) };
+  }
+  const part = (name: string): string => (isRecord(fields[name]) ? formattedValue(fields[name], 'one-line') : '');
+  return { kind: 'find', filter: part('filter'), sort: part('sort'), projection: part('projection') };
 }
 
 /** The feature, as the runner starts it. */

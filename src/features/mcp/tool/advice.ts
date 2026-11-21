@@ -1,8 +1,8 @@
 /**
- * The text of `index_advice` (`mcp.performance-tools`). The advisor (`advisor.analyze`, `advisor.show`) is not on this
- * branch: the main process answers the app action `advisor.analyze` `{ connection, database, collection? }` with an
- * {@link AdvisorReply} once it is built (it reads the indexes, their uses, their sizes and the slow operations, and
- * analyses them), and this writes it.
+ * The text of `index_advice` (`mcp.performance-tools`). The main process answers the app action `advisor.analyze`
+ * `{ connection, database, collection? }` with an {@link AdvisorReply}: it reads the indexes, their uses, their sizes
+ * and the slow operations as the Index advisor does (`advisor.read-indexes`, `advisor.read-slow-operations`), and
+ * `advice-reply.ts` puts the advice (`advisor.analyze`) in this shape; this writes it.
  */
 import { counted } from '../output-limits';
 import { createIndexCommand } from './explain';

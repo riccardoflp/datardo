@@ -219,7 +219,7 @@ describe('advisor.show', () => {
     expect(item.buttons[1]).toMatchObject({
       label: 'Drop…',
       feature: 'index.drop',
-      args: { database: 'shop', collection: 'orders', name: 'note_1', reason: 'No query used it since 12 days ago.' },
+      args: { database: 'shop', collection: 'orders', index: 'note_1', advice: 'No query used it since 12 days ago.' },
       enabled: true,
     });
     expect(item.size).toBe('2.0 MB');

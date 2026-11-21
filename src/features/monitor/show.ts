@@ -23,22 +23,24 @@ import { targetConnection } from '../../shared/target';
 import { appPlan } from '../nav/types';
 import { connectionPageShows } from '../palette/sources';
 import { planOf } from '../tab/open';
+import { monitorChoicesAsked } from './parts/choices';
+import { autoIntervals, type AutoInterval } from './parts/intervals';
 import { recordOf } from './parts/ejson';
 import { refusalKindOf, type Failure } from './parts/failure';
 import { text } from './text';
 import { monitorSections, type MonitorSection } from './types';
 
-/** The intervals of **Auto**, in seconds; 0 is **Off**. */
-export const autoIntervals = [0, 2, 5, 15] as const;
-
-/** An interval of **Auto**. */
-export type AutoInterval = (typeof autoIntervals)[number];
-
-/** **Auto** to start with: 5 s. */
-export const defaultAuto: AutoInterval = 5;
+export { autoIntervals, defaultAuto, type AutoInterval } from './parts/intervals';
 
 /** The section the page shows the first time it opens. */
 export const firstSection: MonitorSection = 'operations';
+
+/**
+ * The sections that are built, in the order of the section bar: the Stats, Replication and Sharding sections join
+ * them with their milestone (M31); until then the section bar shows these, and a section asked for that is not built
+ * shows the first.
+ */
+export const builtSections: readonly MonitorSection[] = ['operations', 'slow-queries'];
 
 /** The page's name in a tab and in its path. */
 export const monitorPage = 'monitor';
@@ -71,6 +73,8 @@ const sectionElements = {
 /** What the reads of a section are given: the connection and the arguments each section's controls choose. */
 export interface ReadsInput {
   readonly connection: ConnectionId;
+  /** The arguments of the operations' read (`monitor.read-operations`): `idle` when **Idle connections** is on. */
+  readonly operations?: Json;
   /** The arguments of the slow operations' read (`monitor.read-slow-queries`), from the section's toolbar. */
   readonly slowQueries?: Json;
   /** The database chosen in the Stats section, whose collections are read. */
@@ -118,7 +122,7 @@ export function readsOf(section: MonitorSection, reason: ReadReason, input: Read
   const reads = ((): readonly ReadNeed[] => {
     switch (section) {
       case 'operations':
-        return [need('operations', 'monitor.read-operations', { connection })];
+        return [need('operations', 'monitor.read-operations', withConnection(connection, input.operations))];
       case 'slow-queries':
         return [need('slow-queries', 'monitor.read-slow-queries', withConnection(connection, input.slowQueries))];
       case 'stats':
@@ -256,7 +260,11 @@ export function sectionAsked(args: unknown): MonitorSection | undefined {
   return monitorSections.find((section) => section === asked);
 }
 
-/** Feature: monitor.show — **Monitor** of the tree, Go to and `open_monitor`: the tab of the page, on a section. */
+/**
+ * Feature: monitor.show — **Monitor** of the tree, Go to and `open_monitor`: the tab of the page, on a section. The
+ * page itself starts it with `{ section }` when a section is chosen and with `{ choices }` when **Auto**, a filter, a
+ * choice of a toolbar or a sort changes, so that they are kept with the tab (`parts/choices.ts`).
+ */
 export function plan(context: Context, answers: Answers): Outcome {
   const id = targetConnection(context.target) ?? context.state.nav.current;
   const connection = id === undefined ? undefined : savedConnection(context.state.connections, id);
@@ -264,10 +272,12 @@ export function plan(context: Context, answers: Answers): Outcome {
     return run(appPlan(text.openPlan, []));
   }
   const section = sectionAsked(answers['args']);
+  const choices = monitorChoicesAsked(answers['args']);
   return planOf(context.state, {
     shows: connectionPageShows(connection.id, monitorPage),
     background: false,
     ...(section === undefined ? {} : { section }),
+    ...(choices === undefined ? {} : { memory: { choices } }),
   });
 }
 

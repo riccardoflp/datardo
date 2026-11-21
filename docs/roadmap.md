@@ -2142,7 +2142,7 @@ reading data.
 **Goal**: The Monitor page shows the operations in progress and kills one, and the slow queries by query shape from
 the profiler and the server's log; the Index advisor says which indexes to create and which are redundant or unused.
 **Depends on**: M22, M23.
-**Status**: planned
+**Status**: done
 
 ### Features
 
@@ -2198,13 +2198,13 @@ the profiler and the server's log; the Index advisor says which indexes to creat
 
 ### Exit criteria
 
-- [ ] A collection scan repeated ten times shows as one slow query shape, and the advisor proposes the index that the
+- [x] A collection scan repeated ten times shows as one slow query shape, and the advisor proposes the index that the
       Explain section suggests for it.
-- [ ] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
+- [x] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
       `npm run test:integration`, `npm run test:ui`; `catalog.py --tests` reports none missing for these cards.
-- [ ] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
+- [x] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
       the keyboard alone (QA15, QA16).
-- [ ] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
+- [x] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
       and this milestone's **Status** is *done*.
 
 ### Not in this milestone

@@ -207,12 +207,26 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
   used an index, the documents returned and examined, the winning plan as a tree, shard by shard on a sharded
   cluster, and the stages after the query; it suggests an index by the equality, sort and range rule, which
   **Create…** opens in the index dialog, and **Raw** shows the server's output as it came.
+- The Monitor page of a MongoDB connection shows the operations in progress, filtered by namespace, by how long they
+  have run and with idle connections or not, refreshed by **Auto** or **Refresh**; **Kill…** stops one after a
+  confirmation. Its Slow queries section reads the profiler of a database or the server log, groups the operations by
+  query shape with their count, average and worst time, says when an index could help and creates the index it
+  suggests, opens a slow query in its collection or in Explain, and sets or clears the profiler and the log threshold
+  after showing the command. The page keeps its section and its choices with its tab; a read-only connection never
+  changes the profiler or kills an operation.
+- The Index advisor of a connection, a database or a collection lists the indexes to create for the slow operations
+  of the profiler or the server log (the same index Explain suggests), the unused indexes with how long their use has
+  been counted, and the redundant indexes that start another one; **Create index…** opens the index dialog with the
+  keys of the advice, and **Turn on…** turns on the profiler of a database after a confirmation.
+- The MCP server offers `index_advice`, the advice of the Index advisor as text, read only, and `open_monitor`, which
+  opens the Monitor page; no tool changes the profiler.
 
 ### Fixed
 
 - What a read of a key tab's toolbar refuses, said under the toolbar, can be read in the light theme.
 - The window opens again with exactly the size it was left with when Windows scales the display by a fraction such as
   125%, instead of growing by a few pixels at each start.
+- A menu of the tree taller than the window scrolls, instead of leaving its first entries out of reach.
 
 ### Security
 

@@ -55,15 +55,15 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`advisor.show`](advisor.md#advisorshow--the-index-advisor-page) | The Index advisor page | View | M30 | Specified |
-| [`advisor.read-indexes`](advisor.md#advisorread-indexes--the-indexes-of-a-scope-with-their-usage) | The indexes of a scope with their usage | Read | M30 | Specified |
-| [`advisor.read-slow-operations`](advisor.md#advisorread-slow-operations--the-slow-operations-of-a-scope) | The slow operations of a scope | Read | M30 | Specified |
-| [`advisor.analyze`](advisor.md#advisoranalyze--the-advice-for-a-scope) | The advice for a scope | Derivation | M30 | Specified |
-| [`advisor.indexes-to-create`](advisor.md#advisorindexes-to-create--the-indexes-the-slow-operations-need) | The indexes the slow operations need | Derivation | M30 | Specified |
-| [`advisor.prefix`](advisor.md#advisorprefix--whether-an-index-starts-with-the-keys-of-another) | Whether an index starts with the keys of another | Derivation | M30 | Specified |
-| [`advisor.redundant-indexes`](advisor.md#advisorredundant-indexes--the-indexes-another-index-replaces) | The indexes another index replaces | Derivation | M30 | Specified |
-| [`advisor.unused-indexes`](advisor.md#advisorunused-indexes--the-indexes-no-query-uses) | The indexes no query uses | Derivation | M30 | Specified |
-| [`advisor.turn-on-profiler`](advisor.md#advisorturn-on-profiler--turn-on-the-profiler-of-a-database) | Turn on the profiler of a database | Operation | M30 | Specified |
+| [`advisor.show`](advisor.md#advisorshow--the-index-advisor-page) | The Index advisor page | View | M30 | Built |
+| [`advisor.read-indexes`](advisor.md#advisorread-indexes--the-indexes-of-a-scope-with-their-usage) | The indexes of a scope with their usage | Read | M30 | Built |
+| [`advisor.read-slow-operations`](advisor.md#advisorread-slow-operations--the-slow-operations-of-a-scope) | The slow operations of a scope | Read | M30 | Built |
+| [`advisor.analyze`](advisor.md#advisoranalyze--the-advice-for-a-scope) | The advice for a scope | Derivation | M30 | Built |
+| [`advisor.indexes-to-create`](advisor.md#advisorindexes-to-create--the-indexes-the-slow-operations-need) | The indexes the slow operations need | Derivation | M30 | Built |
+| [`advisor.prefix`](advisor.md#advisorprefix--whether-an-index-starts-with-the-keys-of-another) | Whether an index starts with the keys of another | Derivation | M30 | Built |
+| [`advisor.redundant-indexes`](advisor.md#advisorredundant-indexes--the-indexes-another-index-replaces) | The indexes another index replaces | Derivation | M30 | Built |
+| [`advisor.unused-indexes`](advisor.md#advisorunused-indexes--the-indexes-no-query-uses) | The indexes no query uses | Derivation | M30 | Built |
+| [`advisor.turn-on-profiler`](advisor.md#advisorturn-on-profiler--turn-on-the-profiler-of-a-database) | Turn on the profiler of a database | Operation | M30 | Built |
 
 ## The pipeline editor
 
@@ -409,19 +409,19 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`monitor.show`](monitor.md#monitorshow--the-monitor-page) | The Monitor page | View | M30 | Specified |
-| [`monitor.operations`](monitor.md#monitoroperations--the-operations-section) | The Operations section | View | M30 | Specified |
-| [`monitor.read-operations`](monitor.md#monitorread-operations--read-the-operations-in-progress) | Read the operations in progress | Read | M30 | Specified |
-| [`monitor.kill-operation`](monitor.md#monitorkill-operation--kill-a-server-operation) | Kill a server operation | Operation | M30 | Specified |
-| [`monitor.slow-queries`](monitor.md#monitorslow-queries--the-slow-queries-section) | The Slow queries section | View | M30 | Specified |
-| [`monitor.read-slow-queries`](monitor.md#monitorread-slow-queries--read-the-slow-operations) | Read the slow operations | Read | M30 | Specified |
-| [`monitor.query-shape`](monitor.md#monitorquery-shape--the-shape-of-a-query) | The shape of a query | Derivation | M30 | Specified |
-| [`monitor.group-slow-queries`](monitor.md#monitorgroup-slow-queries--totals-per-query-shape) | Totals per query shape | Derivation | M30 | Specified |
-| [`monitor.set-profiler`](monitor.md#monitorset-profiler--set-the-profiler-of-a-database) | Set the profiler of a database | Operation | M30 | Specified |
-| [`monitor.set-log-threshold`](monitor.md#monitorset-log-threshold--set-the-threshold-of-slow-operations) | Set the threshold of slow operations | Operation | M30 | Specified |
-| [`monitor.clear-profiler`](monitor.md#monitorclear-profiler--clear-the-operations-the-profiler-recorded) | Clear the operations the profiler recorded | Operation | M30 | Specified |
-| [`monitor.create-suggested-index`](monitor.md#monitorcreate-suggested-index--create-the-index-a-slow-query-suggests) | Create the index a slow query suggests | Operation | M30 | Specified |
-| [`monitor.open-slow-query`](monitor.md#monitoropen-slow-query--open-a-slow-query-in-its-collection) | Open a slow query in its collection | Operation | M30 | Specified |
+| [`monitor.show`](monitor.md#monitorshow--the-monitor-page) | The Monitor page | View | M30 | Built |
+| [`monitor.operations`](monitor.md#monitoroperations--the-operations-section) | The Operations section | View | M30 | Built |
+| [`monitor.read-operations`](monitor.md#monitorread-operations--read-the-operations-in-progress) | Read the operations in progress | Read | M30 | Built |
+| [`monitor.kill-operation`](monitor.md#monitorkill-operation--kill-a-server-operation) | Kill a server operation | Operation | M30 | Built |
+| [`monitor.slow-queries`](monitor.md#monitorslow-queries--the-slow-queries-section) | The Slow queries section | View | M30 | Built |
+| [`monitor.read-slow-queries`](monitor.md#monitorread-slow-queries--read-the-slow-operations) | Read the slow operations | Read | M30 | Built |
+| [`monitor.query-shape`](monitor.md#monitorquery-shape--the-shape-of-a-query) | The shape of a query | Derivation | M30 | Built |
+| [`monitor.group-slow-queries`](monitor.md#monitorgroup-slow-queries--totals-per-query-shape) | Totals per query shape | Derivation | M30 | Built |
+| [`monitor.set-profiler`](monitor.md#monitorset-profiler--set-the-profiler-of-a-database) | Set the profiler of a database | Operation | M30 | Built |
+| [`monitor.set-log-threshold`](monitor.md#monitorset-log-threshold--set-the-threshold-of-slow-operations) | Set the threshold of slow operations | Operation | M30 | Built |
+| [`monitor.clear-profiler`](monitor.md#monitorclear-profiler--clear-the-operations-the-profiler-recorded) | Clear the operations the profiler recorded | Operation | M30 | Built |
+| [`monitor.create-suggested-index`](monitor.md#monitorcreate-suggested-index--create-the-index-a-slow-query-suggests) | Create the index a slow query suggests | Operation | M30 | Built |
+| [`monitor.open-slow-query`](monitor.md#monitoropen-slow-query--open-a-slow-query-in-its-collection) | Open a slow query in its collection | Operation | M30 | Built |
 | [`monitor.stats`](monitor.md#monitorstats--the-stats-section) | The Stats section | View | M31 | Specified |
 | [`monitor.read-server-status`](monitor.md#monitorread-server-status--read-the-servers-status) | Read the server's status | Read | M31 | Specified |
 | [`monitor.read-database-stats`](monitor.md#monitorread-database-stats--read-the-statistics-of-the-databases) | Read the statistics of the databases | Read | M31 | Specified |

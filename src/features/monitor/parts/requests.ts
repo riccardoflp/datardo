@@ -52,9 +52,16 @@ export function collectionCall(call: CollectionCall): MongoRequest {
   };
 }
 
-/** The read of requests on one connection. */
+/**
+ * The read of requests on one connection. A request that fails is given to `parse` as `{ kind: 'error', message,
+ * code }` (`parts/failure.ts`), so that each part of a page says its own error and the others are still shown.
+ */
 export function engineRead(connection: ConnectionId, requests: readonly MongoRequest[]): ReadRequest {
-  return { kind: 'engine', requests: requests.map((request) => ({ connection, request })) };
+  return {
+    kind: 'engine',
+    requests: requests.map((request) => ({ connection, request })),
+    failedRequests: 'are-replies',
+  };
 }
 
 function argumentsText(request: MongoRequest): string {

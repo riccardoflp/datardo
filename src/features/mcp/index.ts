@@ -54,9 +54,7 @@ export const allTools: readonly ToolDefinition[] = toolGroups.flatMap((group) =>
 export const waitingTools: ReadonlyMap<string, string> = new Map([
   ['open_explain', 'explain.show'],
   ['open_watch', 'watch.show'],
-  ['index_advice', 'advisor.show'],
-  ['open_monitor', 'monitor.show'],
-  ['sharding_status', 'monitor.show'],
+  ['sharding_status', 'monitor.sharding'],
   ['describe_relations', 'relation.detect'],
   ['open_search', 'search.show'],
 ]);

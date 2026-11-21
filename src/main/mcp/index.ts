@@ -2,7 +2,8 @@
  * The MCP server's area in the main process: the one {@link McpHost}, made at start with the engines, the secret
  * storage and the app's state, and started or stopped by `mcp.server` each time `datardo.mcp.enabled` or
  * `datardo.mcp.port` changes, and once at start. It also answers the app actions the tools ask (`mcp.connect`,
- * `mcp.undo-history`, `mcp.undo-write`, `mcp.open-tab`, `saved-query.list`), none of which writes to a deployment.
+ * `mcp.undo-history`, `mcp.undo-write`, `mcp.open-tab`, `saved-query.list`, `advisor.analyze`), none of which writes to
+ * a deployment.
  */
 import { app } from 'electron';
 import { randomBytes } from 'node:crypto';
@@ -17,6 +18,7 @@ import { appTarget } from '../../shared/target';
 import { start as startFeature } from '../../runner/start';
 import { readOperationFile } from '../../storage/undo';
 import { actions as savedQueryActions } from '../actions/saved-query';
+import { analyzeForTool } from '../advisor';
 import { whenRunnerReady } from '../bridge';
 import { appSecret, connectionEngines, isConnected, keepAppSecret } from '../connections';
 import type { MainServices } from '../services';
@@ -94,6 +96,16 @@ function toolActions(
     'saved-query.list': (args, signal) => {
       const list = savedQueries['saved-query.list'];
       return list === undefined ? Promise.reject(new Error('No saved-query.list.')) : list(args, signal);
+    },
+    'advisor.analyze': async (args, signal) => {
+      const ports = await whenRunnerReady();
+      return analyzeForTool(args, (need, connection) =>
+        startFeature(
+          ports,
+          { feature: need.read, target: { kind: 'connection', connection }, args: need.args },
+          { startedBy: 'mcp', signal },
+        ),
+      );
     },
   };
 }

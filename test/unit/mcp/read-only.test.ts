@@ -179,6 +179,7 @@ describe('mcp.server', () => {
 
   it('answers only the app actions the tools ask, and opens no console or playground', () => {
     expect([...toolActions].sort()).toEqual([
+      'advisor.analyze',
       'mcp.connect',
       'mcp.open-tab',
       'mcp.undo-history',

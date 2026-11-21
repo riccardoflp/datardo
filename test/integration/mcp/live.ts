@@ -16,7 +16,11 @@ import { createEngines, type EngineService } from '../../../src/engines';
 import { undoHistoryReply, undoWriteReply } from '../../../src/features/mcp/tool/undo-replies';
 import { isToolTab } from '../../../src/features/mcp/tool/read-only';
 import { mcpActions } from '../../../src/features/mcp/types';
+import { runnableFeatures } from '../../../src/features/registry';
+import { analyzeForTool } from '../../../src/main/advisor';
 import { McpHost, tokenKey } from '../../../src/main/mcp/host';
+import type { RunnerPorts } from '../../../src/runner/ports';
+import { start as startFeature } from '../../../src/runner/start';
 import { readOperationFile } from '../../../src/storage/undo';
 import { noSecretsSaved, type ConnectionView } from '../../../src/shared/connection';
 import { redisCommand, type ConnectionRequest, type Json } from '../../../src/shared/engine-request';
@@ -226,6 +230,26 @@ export async function liveMcp(options: { readonly settings?: Readonly<Record<str
   const opened: Json[] = [];
   const answered: string[] = [];
   const secrets = new Map<string, string>();
+  const recorded = {
+    send: (asked: ConnectionRequest, signal: AbortSignal) => {
+      sent.push(asked);
+      return engines.send(asked, signal);
+    },
+  };
+  // The runner of the main process, for the reads `advisor.analyze` starts: nothing it may ask is answered.
+  const ports: RunnerPorts = {
+    features: runnableFeatures(),
+    engines: recorded,
+    appActions: new Map(),
+    files: () => Promise.resolve(),
+    dialogs: { ask: () => Promise.resolve(undefined), confirm: () => Promise.resolve(false) },
+    state: holder,
+    platform: 'windows',
+    isReadOnly: (id) => holder.get().connections.saved.find((each) => each.id === id)?.readOnly === true,
+    isConnected: (id) => engines.isConnected(id),
+    connectionName: (id) => holder.get().connections.saved.find((each) => each.id === id)?.name ?? id,
+    now: () => Date.now(),
+  };
   const appAction = async (action: string, args: Json): Promise<unknown> => {
     const fields = (args ?? {}) as Readonly<Record<string, Json>>;
     switch (action) {
@@ -259,6 +283,14 @@ export async function liveMcp(options: { readonly settings?: Readonly<Record<str
         return { hidden: false };
       case 'saved-query.list':
         return { connectionName: 'Local', mine: [], recent: [], folder: null };
+      case 'advisor.analyze':
+        return analyzeForTool(args, (need, connection) =>
+          startFeature(
+            ports,
+            { feature: need.read, target: { kind: 'connection', connection }, args: need.args },
+            { startedBy: 'mcp' },
+          ),
+        );
       default:
         throw new Error(`No action ${action}.`);
     }
@@ -269,12 +301,7 @@ export async function liveMcp(options: { readonly settings?: Readonly<Record<str
     randomBytes: (count) => new Uint8Array(randomBytes(count)),
     retryMs: 200,
     calls: {
-      engines: {
-        send: (asked, signal) => {
-          sent.push(asked);
-          return engines.send(asked, signal);
-        },
-      },
+      engines: recorded,
       appAction,
       version: '0.1.0',
       platform: 'windows',
