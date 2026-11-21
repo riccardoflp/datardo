@@ -16,10 +16,12 @@ import {
   type Outcome,
 } from '../../shared/feature';
 import { featureId } from '../../shared/ids';
+import { noMakers, type Makers } from '../aggregate/mongosh/helpers';
+import { makersOf } from '../aggregate/types';
 import { text } from './text';
 import {
   databaseTarget,
-  isDocument,
+  isObjectValue,
   mongoRequest,
   namespaceOf,
   parsedAnswer,
@@ -38,12 +40,12 @@ export type Checked =
   | { readonly kind: 'refuse'; readonly outcome: Outcome };
 
 /** Feature: manage.edit-view — the definition typed, checked in the order of the card. */
-export function checkDefinition(answer: unknown): Checked {
-  const parsed = parsedAnswer(answer);
+export function checkDefinition(answer: unknown, makers: Makers = noMakers): Checked {
+  const parsed = parsedAnswer(answer, makers);
   if (parsed.kind === 'invalid') {
     return refused(refuse('manage.edit-view/invalid', text.definition.invalid(parsed.message)));
   }
-  if (parsed.kind === 'empty' || !isDocument(parsed.value)) {
+  if (parsed.kind === 'empty' || !isObjectValue(parsed.value)) {
     return refused(refuse('manage.edit-view/not-an-object', text.definition.notAnObject));
   }
   const { viewOn, pipeline } = parsed.value;
@@ -73,7 +75,7 @@ export function plan(context: Context, answers: Answers): Outcome {
   if (place.connection.readOnly) {
     return refuse('manage.edit-view/read-only', text.readOnly(place.connection.name));
   }
-  const checked = checkDefinition(place.args['definition']);
+  const checked = checkDefinition(place.args['definition'], makersOf(context));
   if (checked.kind === 'refuse') {
     return checked.outcome;
   }

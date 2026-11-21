@@ -15,13 +15,19 @@ import {
   type Danger,
   type EngineStep,
   type Outcome,
+  type Undo,
 } from '../../shared/feature';
 import { connectionId } from '../../shared/ids';
 import { mongoshValue } from '../../shared/mongosh-value';
 import type { Target } from '../../shared/target';
+import type { Makers } from '../aggregate/mongosh/helpers';
+import { valueOf } from '../aggregate/mongosh/parse';
+import { makersOf } from '../aggregate/types';
 import { startArgs } from '../nav/types';
+import { wrapperKey } from '../schema/types';
 import { stepText } from '../runner/step-text';
-import { setting } from '../settings/read';
+import { undoNote } from '../undo/note';
+import { undoSettings } from '../undo/types';
 import { text } from './text';
 
 /** A document of JSON: an object that is not an array. */
@@ -33,6 +39,11 @@ export type FieldPath = string;
 /** Whether a value is a document of JSON (not an array, not bytes). */
 export function isDocument(value: unknown): value is JsonDocument {
   return typeof value === 'object' && value !== null && !Array.isArray(value) && !(value instanceof Uint8Array);
+}
+
+/** Whether a filter read is a document: an object that is not a value of a BSON type (`{ $numberInt: "5" }`). */
+function isFilterDocument(value: unknown): value is JsonDocument {
+  return isDocument(value) && wrapperKey(value) === undefined;
 }
 
 const numberWrappers = ['$numberInt', '$numberLong', '$numberDouble', '$numberDecimal'];
@@ -75,9 +86,17 @@ export interface FieldPlace {
   readonly written: string;
 }
 
-function parsedOf(value: unknown): ParsedText {
+/**
+ * The filter given: text of the query bar, read in mongosh syntax as `query.parse` reads it, or what `query.parse` read
+ * already.
+ */
+function parsedOf(value: unknown, makers: Makers): ParsedText {
   if (value === undefined || (typeof value === 'string' && value.trim() === '')) {
     return { kind: 'empty' };
+  }
+  if (typeof value === 'string') {
+    const read = valueOf(value, makers);
+    return read.ok ? { kind: 'value', value: read.value } : { kind: 'invalid', message: read.message };
   }
   if (isDocument(value) && (value['kind'] === 'empty' || value['kind'] === 'value' || value['kind'] === 'invalid')) {
     return value as unknown as ParsedText;
@@ -92,7 +111,7 @@ function textOf(fields: Readonly<Record<string, unknown>>, name: string): string
 
 /**
  * The place a column action was started on, from its arguments: `{ connection, database, collection, field, array?,
- * view?, filter, written? }`, where `filter` is what `query.parse` read from the query bar. The connection, database
+ * view?, filter, written? }`, where `filter` is the text of the query bar, or what `query.parse` read from it. The connection, database
  * and collection fall back to the target. `undefined` when the connection is not a saved one.
  */
 export function placeOf(context: Context, answers: Answers): FieldPlace | undefined {
@@ -112,8 +131,8 @@ export function placeOf(context: Context, answers: Answers): FieldPlace | undefi
     field,
     ...(array === undefined ? {} : { array }),
     view: args['view'] === true,
-    filter: parsedOf(args['filter']),
-    written: textOf(args, 'written') ?? '',
+    filter: parsedOf(args['filter'], makersOf(context)),
+    written: textOf(args, 'written') ?? (typeof args['filter'] === 'string' ? args['filter'].trim() : ''),
   };
 }
 
@@ -132,14 +151,14 @@ export function guard(place: FieldPlace, codes: GuardCodes): Outcome | undefined
   if (place.view) {
     return refuse(codes.view, text.view);
   }
-  return place.filter.kind === 'invalid' || (place.filter.kind === 'value' && !isDocument(place.filter.value))
+  return place.filter.kind === 'invalid' || (place.filter.kind === 'value' && !isFilterDocument(place.filter.value))
     ? refuse(codes.invalidFilter, text.invalidFilter)
     : undefined;
 }
 
 /** The user's filter as a document: `{}` when nothing is typed. */
 export function filterOf(place: FieldPlace): JsonDocument {
-  return place.filter.kind === 'value' && isDocument(place.filter.value) ? place.filter.value : {};
+  return place.filter.kind === 'value' && isFilterDocument(place.filter.value) ? place.filter.value : {};
 }
 
 /** Whether the filter of the query bar is empty: `{}` once parsed, blank text included (D39). */
@@ -181,19 +200,6 @@ export function countNeed(context: Context, place: FieldPlace, key: string, filt
 export function countOf(answers: Answers, key: string): number | undefined {
   const count = answers[key];
   return isDocument(count) ? numberOf(count['count']) : numberOf(count);
-}
-
-/**
- * Whether the write of `count` documents will be recorded in the undo history, known before the confirmation: the
- * rules 2 and 3 of `undo.note` (the undo history on, for the connection, and within the number of documents).
- */
-export function isRecorded(context: Context, connection: ConnectionView, count: number): boolean {
-  const settings = context.state.settings;
-  return (
-    setting(settings, 'datardo.undo.enabled') &&
-    connection.keepsUndo &&
-    count <= setting(settings, 'datardo.undo.maxDocumentsPerOperation')
-  );
 }
 
 /** The two buttons of a confirmation: with a filter, and with an empty filter. */
@@ -263,15 +269,36 @@ export function layoutStep(place: FieldPlace, stepLine: string, to?: FieldPath):
   };
 }
 
-/** What the undo history keeps: the documents matching the filter the step sends, and the filter as written. */
-export function keptOf(place: FieldPlace, filter: JsonDocument): Json {
+/**
+ * What the undo history keeps: the documents matching the filter the step sends, the filter as written, and the number
+ * of documents counted, which `undo.note` compares with the limit of the settings.
+ */
+export function keptOf(place: FieldPlace, filter: JsonDocument, count: number): Json {
   return {
+    kind: 'filter',
     connection: place.connection.id,
     database: place.database,
     collection: place.collection,
     filter,
     written: filterOf(place),
+    count,
   };
+}
+
+/** The `undo` of a column action, and whether it will be recorded, known before its confirmation (`undo.note`). */
+export interface FieldUndo {
+  readonly undo: Undo;
+  readonly recorded: boolean;
+}
+
+/**
+ * The `undo` of a column action that writes the `count` documents matching `filter`: what to keep when `undo.note` says
+ * it will be recorded, and otherwise the line that says why not, which its confirmation shows.
+ */
+export function fieldUndo(context: Context, place: FieldPlace, filter: JsonDocument, count: number): FieldUndo {
+  const keeps = keptOf(place, filter, count);
+  const note = undoNote(place.connection, { keeps }, count, undoSettings(context.state.settings));
+  return { recorded: note.recorded, undo: note.recorded ? { keeps } : { cannot: note.line } };
 }
 
 /** The longest title of an operation in the undo history, in characters (the cards' 300). */

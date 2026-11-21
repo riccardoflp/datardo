@@ -130,6 +130,12 @@ export const text = {
     definitionTitle: (namespace: string): string => `Show the definition of ${namespace}`,
     validationTitle: (namespace: string): string => `Show the validation rules of ${namespace}`,
   },
+  /** The buttons of the section bar, and the Cancel of the question of Reload. */
+  sections: {
+    definition: 'Definition',
+    validation: 'Validation',
+    cancel: 'Cancel',
+  },
   commands: {
     createDatabase: 'Create database…',
     createCollection: 'Create collection…',

@@ -132,7 +132,7 @@ test.describe('table.column-menu', () => {
     await expect(menu.getByRole('menuitem', { name: 'Hide name' })).toBeVisible();
     await expect(menu.getByRole('menuitem', { name: 'Pin name to the left' })).toBeVisible();
     await expect(menu.getByRole('menuitem', { name: 'Reset width' })).toHaveCount(0);
-    await expect(menu.getByRole('menuitem', { name: 'Rename field…' })).toHaveCount(0);
+    await expect(menu.getByRole('menuitem', { name: 'Rename field…' })).toBeVisible();
     await menu.getByRole('menuitem', { name: 'Sort' }).hover();
     await window
       .getByRole('menu', { name: 'Sort' })

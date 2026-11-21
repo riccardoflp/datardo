@@ -74,6 +74,8 @@ export function request(_context: Context, args: Json): ReadRequest {
   return {
     kind: 'engine',
     requests: [{ connection: connectionId(argsOf(args).connection), request: typeCountsRequest(args) }],
+    // A count that fails gives no row: the list opens without its *now:* part.
+    failedRequests: 'are-replies',
   };
 }
 

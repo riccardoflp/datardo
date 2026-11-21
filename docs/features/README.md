@@ -247,16 +247,16 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`field.rename`](field.md#fieldrename--rename-a-field) | Rename a field | Operation | M21 | Specified |
-| [`field.remove`](field.md#fieldremove--remove-a-field) | Remove a field | Operation | M21 | Specified |
-| [`field.convert-type`](field.md#fieldconvert-type--convert-the-type-of-a-field) | Convert the type of a field | Operation | M21 | Specified |
-| [`field.path-rules`](field.md#fieldpath-rules--which-fields-a-column-action-can-change) | Which fields a column action can change | Derivation | M21 | Specified |
-| [`field.array-guard`](field.md#fieldarray-guard--leave-out-the-documents-where-a-parent-is-an-array) | Leave out the documents where a parent is an array | Derivation | M21 | Specified |
-| [`field.rename-plan`](field.md#fieldrename-plan--which-documents-a-rename-touches) | Which documents a rename touches | Derivation | M21 | Specified |
-| [`field.remove-plan`](field.md#fieldremove-plan--which-documents-a-removal-touches) | Which documents a removal touches | Derivation | M21 | Specified |
-| [`field.convert-plan`](field.md#fieldconvert-plan--which-values-a-conversion-touches) | Which values a conversion touches | Derivation | M21 | Specified |
-| [`field.type-counts`](field.md#fieldtype-counts--the-current-types-of-a-field) | The current types of a field | Derivation | M21 | Specified |
-| [`field.layout-follows`](field.md#fieldlayout-follows--the-column-follows-a-renamed-or-removed-field) | The column follows a renamed or removed field | Derivation | M21 | Specified |
+| [`field.rename`](field.md#fieldrename--rename-a-field) | Rename a field | Operation | M21 | Built |
+| [`field.remove`](field.md#fieldremove--remove-a-field) | Remove a field | Operation | M21 | Built |
+| [`field.convert-type`](field.md#fieldconvert-type--convert-the-type-of-a-field) | Convert the type of a field | Operation | M21 | Built |
+| [`field.path-rules`](field.md#fieldpath-rules--which-fields-a-column-action-can-change) | Which fields a column action can change | Derivation | M21 | Built |
+| [`field.array-guard`](field.md#fieldarray-guard--leave-out-the-documents-where-a-parent-is-an-array) | Leave out the documents where a parent is an array | Derivation | M21 | Built |
+| [`field.rename-plan`](field.md#fieldrename-plan--which-documents-a-rename-touches) | Which documents a rename touches | Derivation | M21 | Built |
+| [`field.remove-plan`](field.md#fieldremove-plan--which-documents-a-removal-touches) | Which documents a removal touches | Derivation | M21 | Built |
+| [`field.convert-plan`](field.md#fieldconvert-plan--which-values-a-conversion-touches) | Which values a conversion touches | Derivation | M21 | Built |
+| [`field.type-counts`](field.md#fieldtype-counts--the-current-types-of-a-field) | The current types of a field | Derivation | M21 | Built |
+| [`field.layout-follows`](field.md#fieldlayout-follows--the-column-follows-a-renamed-or-removed-field) | The column follows a renamed or removed field | Derivation | M21 | Built |
 
 ## GridFS
 
@@ -368,18 +368,18 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`manage.create-database`](manage.md#managecreate-database--create-a-database) | Create a database | Operation | M21 | Specified |
-| [`manage.create-collection`](manage.md#managecreate-collection--create-a-collection) | Create a collection | Operation | M21 | Specified |
-| [`manage.rename-collection`](manage.md#managerename-collection--rename-a-collection) | Rename a collection | Operation | M21 | Specified |
-| [`manage.drop-collection`](manage.md#managedrop-collection--drop-a-collection-or-a-view) | Drop a collection or a view | Operation | M21 | Specified |
-| [`manage.drop-database`](manage.md#managedrop-database--drop-a-database) | Drop a database | Operation | M21 | Specified |
-| [`manage.name-rules`](manage.md#managename-rules--valid-names-of-databases-and-collections) | Valid names of databases and collections | Derivation | M21 | Specified |
-| [`manage.read-options`](manage.md#manageread-options--the-options-of-a-collection-or-a-view) | The options of a collection or a view | Read | M21 | Specified |
-| [`manage.definition`](manage.md#managedefinition--the-definition-section-of-a-view) | The Definition section of a view | View | M21 | Specified |
-| [`manage.edit-view`](manage.md#manageedit-view--save-a-views-definition) | Save a view's definition | Operation | M21 | Specified |
-| [`manage.validation`](manage.md#managevalidation--the-validation-section-of-a-collection) | The Validation section of a collection | View | M21 | Specified |
-| [`manage.edit-validation`](manage.md#manageedit-validation--save-a-collections-validation-rules) | Save a collection's validation rules | Operation | M21 | Specified |
-| [`manage.generate-json-schema`](manage.md#managegenerate-json-schema--the-jsonschema-proposed-from-a-sample) | The `$jsonSchema` proposed from a sample | Derivation | M21 | Specified |
+| [`manage.create-database`](manage.md#managecreate-database--create-a-database) | Create a database | Operation | M21 | Built |
+| [`manage.create-collection`](manage.md#managecreate-collection--create-a-collection) | Create a collection | Operation | M21 | Built |
+| [`manage.rename-collection`](manage.md#managerename-collection--rename-a-collection) | Rename a collection | Operation | M21 | Built |
+| [`manage.drop-collection`](manage.md#managedrop-collection--drop-a-collection-or-a-view) | Drop a collection or a view | Operation | M21 | Built |
+| [`manage.drop-database`](manage.md#managedrop-database--drop-a-database) | Drop a database | Operation | M21 | Built |
+| [`manage.name-rules`](manage.md#managename-rules--valid-names-of-databases-and-collections) | Valid names of databases and collections | Derivation | M21 | Built |
+| [`manage.read-options`](manage.md#manageread-options--the-options-of-a-collection-or-a-view) | The options of a collection or a view | Read | M21 | Built |
+| [`manage.definition`](manage.md#managedefinition--the-definition-section-of-a-view) | The Definition section of a view | View | M21 | Built |
+| [`manage.edit-view`](manage.md#manageedit-view--save-a-views-definition) | Save a view's definition | Operation | M21 | Built |
+| [`manage.validation`](manage.md#managevalidation--the-validation-section-of-a-collection) | The Validation section of a collection | View | M21 | Built |
+| [`manage.edit-validation`](manage.md#manageedit-validation--save-a-collections-validation-rules) | Save a collection's validation rules | Operation | M21 | Built |
+| [`manage.generate-json-schema`](manage.md#managegenerate-json-schema--the-jsonschema-proposed-from-a-sample) | The `$jsonSchema` proposed from a sample | Derivation | M21 | Built |
 
 ## The MCP server
 

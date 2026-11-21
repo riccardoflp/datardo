@@ -23,6 +23,8 @@ import { activeTabOf, type TabShows } from '../../shared/state/tabs';
 import type { Target } from '../../shared/target';
 import type { Command } from '../command';
 import { commands as registeredCommands } from '../commands';
+import { isOffered as isFieldOffered } from '../field/commands';
+import { isOffered as isManageOffered } from '../manage/commands';
 import { canGo } from '../nav/back';
 import { isOffered as isCopyPathOffered } from '../nav/copy-path';
 import { pinOfTab } from '../nav/pin';
@@ -65,6 +67,14 @@ function isKeepUndoOffered(state: AppState, variant: 'stop' | 'keep'): boolean {
   const current = state.nav.current;
   const connection = current === undefined ? undefined : savedConnection(state.connections, current);
   return connection !== undefined && (connection.readOnly || isVariantOffered(connection, variant));
+}
+
+/** What the cards of an area that decides for its commands say of whether one is offered now; `undefined` for others. */
+function isOfferedByItsArea(state: AppState, id: string): boolean | undefined {
+  if (id.startsWith('manage.')) {
+    return isManageOffered(state, id);
+  }
+  return id.startsWith('field.') ? isFieldOffered(state) : undefined;
 }
 
 /** What a command's own card says of whether it is offered now. */
@@ -136,7 +146,10 @@ function isOfferedByItsCard(state: AppState, id: string): boolean {
 /** Whether a command is offered now: for every engine or the current connection's, and offered by its card. */
 export function isOffered(state: AppState, id: string): boolean {
   const engine = engineOf(id);
-  return (engine === 'any' || engine === currentEngine(state)) && isOfferedByItsCard(state, id);
+  return (
+    (engine === 'any' || engine === currentEngine(state)) &&
+    (isOfferedByItsArea(state, id) ?? isOfferedByItsCard(state, id))
+  );
 }
 
 /** The commands Go to lists after `>`, with the title that applies now, in the order they are registered. */

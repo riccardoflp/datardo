@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parse, typeCountsPipeline, typeCountsRequest } from '../../../src/features/field/type-counts';
+import { parse, request, typeCountsPipeline, typeCountsRequest } from '../../../src/features/field/type-counts';
 import { convertQuestion } from '../../../src/features/field/convert-type';
 import { placeOf } from '../../../src/features/field/types';
 import { fieldContext, notArray, started } from './harness';
@@ -14,10 +14,15 @@ describe('field.type-counts', () => {
   });
 
   it('counts for at most 30 seconds', () => {
-    const request = typeCountsRequest({ connection: 'c-local', database: 'shop', collection: 'people', field: 'v' });
-    expect(request.method).toBe('aggregate');
-    expect(request.timeLimitMs).toBe(30_000);
-    expect(request.arguments[1]).toEqual({ maxTimeMS: 30_000 });
+    const sent = typeCountsRequest({ connection: 'c-local', database: 'shop', collection: 'people', field: 'v' });
+    expect(sent.method).toBe('aggregate');
+    expect(sent.timeLimitMs).toBe(30_000);
+    expect(sent.arguments[1]).toEqual({ maxTimeMS: 30_000 });
+  });
+
+  it('gives a count that fails to parse, so that the list still opens', () => {
+    const read = request(fieldContext('field.convert-type'), { connection: 'c-local', field: 'v' });
+    expect(read).toMatchObject({ kind: 'engine', failedRequests: 'are-replies' });
   });
 
   it('shows now: string 2 · double 1 · null 1 in the list of Convert type…', () => {

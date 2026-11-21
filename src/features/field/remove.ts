@@ -16,10 +16,9 @@ import {
   countNeed,
   countOf,
   dangerOf,
+  fieldUndo,
   filterOf,
   guard,
-  isRecorded,
-  keptOf,
   labelOf,
   layoutStep,
   placeOf,
@@ -60,7 +59,7 @@ function removeRun(context: Context, place: FieldPlace, reached: number, removed
   if (removed === 0) {
     return refuse('field.remove/no-field', [text.noField(scopeOf(place), label), ...leftOut].join('\n'));
   }
-  const recorded = isRecorded(context, place.connection, removed);
+  const { recorded, undo } = fieldUndo(context, place, removal.filter, removed);
   const namespace = `${place.database}.${place.collection}`;
   return run({
     title: undoTitle(text.remove.undo(label), place),
@@ -73,7 +72,7 @@ function removeRun(context: Context, place: FieldPlace, reached: number, removed
       all: text.remove.confirmAll,
     }),
     touches: documentsText(removed),
-    undo: { keeps: keptOf(place, removal.filter) },
+    undo,
     publishes: true,
     after: afterOf(place, text.remove.done(label, removed, place.collection)),
   });

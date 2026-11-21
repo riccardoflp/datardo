@@ -37,8 +37,8 @@ describe('manage.drop-collection', () => {
     });
     expect(readOf(plan(context, started(onOrders, { count: { orders: 1 } })))).toEqual({
       key: 'indexes',
-      read: 'index.list',
-      args: { connection: 'c-local', database: 'shop', collection: 'orders', definitionsOnly: true },
+      read: 'manage.drop-collection:indexes',
+      args: { connection: 'c-local', database: 'shop', collection: 'orders' },
     });
   });
 

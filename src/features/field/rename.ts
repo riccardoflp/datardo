@@ -25,10 +25,9 @@ import {
   countNeed,
   countOf,
   dangerOf,
+  fieldUndo,
   filterOf,
   guard,
-  isRecorded,
-  keptOf,
   labelOf,
   layoutStep,
   placeOf,
@@ -105,7 +104,7 @@ function renameRun(context: Context, place: FieldPlace, to: string, counts: Rena
     ...(counts.overwrites > 0 ? [text.rename.overwrites(counts.overwrites, to, place.field)] : []),
     ...(leftOut > 0 ? [text.rename.leftOut(leftOut, place.field, to)] : []),
   ];
-  const recorded = isRecorded(context, place.connection, counts.renamed);
+  const { recorded, undo } = fieldUndo(context, place, plan.filter, counts.renamed);
   const namespace = `${place.database}.${place.collection}`;
   return run({
     title: undoTitle(text.rename.undo(place.field, to), place),
@@ -115,7 +114,7 @@ function renameRun(context: Context, place: FieldPlace, to: string, counts: Rena
     ],
     danger: dangerOf(place, lines, recorded, { some: text.rename.confirm, all: text.rename.confirmAll }),
     touches: documentsText(counts.renamed),
-    undo: { keeps: keptOf(place, plan.filter) },
+    undo,
     publishes: true,
     after: afterOf(place, text.rename.done(place.field, to, counts.renamed, place.collection)),
   });

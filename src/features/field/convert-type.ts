@@ -21,6 +21,7 @@ import { featureId } from '../../shared/ids';
 import type { Question } from '../../shared/question';
 import { CONVERT_TYPES, convertPlan, convertTypeOf, type ConvertType } from './convert-plan';
 import { fieldPathError } from './path-rules';
+import { leftAfter } from './reads/left';
 import { documentsText, text } from './text';
 import type { TypeCount } from './type-counts';
 import {
@@ -29,10 +30,9 @@ import {
   countNeed,
   countOf,
   dangerOf,
+  fieldUndo,
   filterOf,
   guard,
-  isRecorded,
-  keptOf,
   labelOf,
   placeOf,
   scopeOf,
@@ -101,15 +101,18 @@ function convertRun(
     text.convert.keep,
     ...(leftOut > 0 ? [text.convert.leftOut(leftOut, place.field)] : []),
   ];
-  const recorded = isRecorded(context, place.connection, converted);
+  const { recorded, undo } = fieldUndo(context, place, conversion.filter, converted);
   return run({
     title: undoTitle(text.convert.undo(place.field, type), place),
     steps: [updateManyStep(place, conversion.filter, conversion.update)],
     danger: dangerOf(place, lines, recorded, { some: text.convert.confirm, all: text.convert.confirmAll }),
     touches: documentsText(converted),
-    undo: { keeps: keptOf(place, conversion.filter) },
+    undo,
     publishes: true,
-    after: afterOf(place, text.convert.done(place.field, type, converted, place.collection)),
+    after: [
+      ...afterOf(place, text.convert.done(place.field, type, converted, place.collection)),
+      leftAfter(place, conversion.filter),
+    ],
   });
 }
 
