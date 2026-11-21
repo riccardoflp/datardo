@@ -44,7 +44,12 @@ export function listSearchRequest(args: Json): MongoRequest {
 /** Feature: index.list-search — the request for the collection of `args`. */
 export function request(_context: Context, args: Json): ReadRequest {
   const connection = connectionId(readTarget(args).connection);
-  return { kind: 'engine', requests: [{ connection, request: listSearchRequest(args) }] };
+  // A server without search answers with an error, which `parse` tells from other errors.
+  return {
+    kind: 'engine',
+    requests: [{ connection, request: listSearchRequest(args) }],
+    failedRequests: 'are-replies',
+  };
 }
 
 function textOf(value: Json | undefined): string | undefined {

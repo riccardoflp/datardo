@@ -7,7 +7,6 @@
  */
 import type { Json } from '../../shared/engine-request';
 import { mongoshValue } from '../../shared/mongosh-value';
-import type { Question } from '../../shared/question';
 import { groupThousands } from '../../shared/text-units';
 import {
   editableDefinition,
@@ -368,31 +367,6 @@ export function dialogNote(state: IndexDialogState, definition: IndexDefinition)
     case 'recreate':
       return text.dialog.rebuild(change.changed.join(', '));
   }
-}
-
-/** The question `index.create` and `index.edit` ask: the dialog, whose **Text** a generic form also shows. */
-export function dialogQuestion(title: string, button: string, definition?: IndexDefinition): Question {
-  const inputs = definition === undefined ? { keys: emptyInput, options: emptyInput } : textOf(definition);
-  return {
-    title,
-    button,
-    fields: [
-      {
-        kind: 'text',
-        key: 'keys',
-        label: text.dialog.keys,
-        default: inputs.keys.text,
-        placeholder: text.dialog.keysPlaceholder,
-      },
-      {
-        kind: 'text',
-        key: 'options',
-        label: text.dialog.options,
-        default: inputs.options.text,
-        placeholder: text.dialog.optionsPlaceholder,
-      },
-    ],
-  };
 }
 
 /** What the dialog answers when its main button is pressed: the normalized keys and options, read. */

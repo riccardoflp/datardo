@@ -66,7 +66,9 @@ export function plan(context: Context, answers: Answers): Outcome {
   }
   const edited = editedIndex(subject, name, list);
   if (answers['definition'] === undefined) {
-    return ask(searchDialogQuestion(text.searchDialog.editTitle(name), text.searchDialog.save, edited));
+    return ask(
+      searchDialogQuestion(text.searchDialog.editTitle(name), text.searchDialog.save, edited, readArgs(subject)),
+    );
   }
   const answered = answeredSearch(answers, edited.type);
   switch (answered.kind) {

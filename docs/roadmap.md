@@ -1637,7 +1637,7 @@ collection.
 **Goal**: The Indexes section lists the indexes and the search indexes of a collection with their size, usage and
 builds, and creates, edits, hides and drops them.
 **Depends on**: M21.
-**Status**: planned
+**Status**: done
 
 ### Features
 
@@ -1685,13 +1685,13 @@ builds, and creates, edits, hides and drops them.
 
 ### Exit criteria
 
-- [ ] Editing an index whose new definition the server refuses leaves the old index in place, and the notification
+- [x] Editing an index whose new definition the server refuses leaves the old index in place, and the notification
       says so.
-- [ ] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
+- [x] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
       `npm run test:integration`, `npm run test:ui`; `catalog.py --tests` reports none missing for these cards.
-- [ ] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
+- [x] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
       the keyboard alone (QA15, QA16).
-- [ ] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
+- [x] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
       and this milestone's **Status** is *done*.
 
 ### Not in this milestone

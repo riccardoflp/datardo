@@ -25,6 +25,7 @@ import type { Target } from '../../shared/target';
 import type { Command } from '../command';
 import { commands as registeredCommands } from '../commands';
 import { isOffered as isFieldOffered } from '../field/commands';
+import { isOffered as isIndexOffered } from '../index/commands';
 import { isOffered as isManageOffered } from '../manage/commands';
 import { canGo } from '../nav/back';
 import { isOffered as isCopyPathOffered } from '../nav/copy-path';
@@ -114,6 +115,9 @@ const collectionTabCommands: ReadonlySet<string> = new Set([
 function isOfferedByItsArea(state: AppState, id: string): boolean | undefined {
   if (id.startsWith('manage.')) {
     return isManageOffered(state, id);
+  }
+  if (id.startsWith('index.')) {
+    return isIndexOffered(state, id);
   }
   return id.startsWith('field.') ? isFieldOffered(state) : undefined;
 }

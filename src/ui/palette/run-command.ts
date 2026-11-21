@@ -17,6 +17,7 @@ import { queryCommandIds, runQueryCommand } from '../query/query-commands';
 import { isDocumentCommand, runDocumentCommand } from '../pages/document/document-commands';
 import { isFieldFeature, runFieldCommand } from '../pages/field/field-actions';
 import { isSectionCommand, runSectionCommand } from '../pages/manage/section-commands';
+import { isIndexCommand, runIndexCommand } from '../pages/index/index-commands';
 import { isTableCommand, runTableCommand } from '../table/table-commands';
 import { runTreeCommand } from '../tree/tree-commands';
 import { openAbout } from '../window/about';
@@ -108,6 +109,10 @@ export function runCommand(id: string, state: AppState): void {
   }
   if (isSectionCommand(id)) {
     runSectionCommand(id, state);
+    return;
+  }
+  if (isIndexCommand(id)) {
+    runIndexCommand(id, state);
     return;
   }
   const local = windowOnly[id];

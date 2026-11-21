@@ -19,13 +19,14 @@ import {
 } from '../../shared/feature';
 import { featureId } from '../../shared/ids';
 import { editableDefinition, indexName, normalized, stable } from './change-plan';
-import { dialogQuestion } from './dialog';
+import { dialogQuestion } from './parts/dialog-question';
 import { text } from './text';
 import {
   isDocument,
   mongoRequest,
   parsedAnswer,
   readArgs,
+  readTarget,
   subjectOf,
   writeStep,
   type IndexDefinition,
@@ -97,9 +98,10 @@ function refusal(wrong: Exclude<AnsweredDefinition, IndexDefinition>): Outcome {
   );
 }
 
+/** The keys the dialog opens with, and the options of a copy (`index.duplicate`): `{ keys, options }` of the arguments. */
 function startingKeys(subject: IndexSubject): IndexDefinition | undefined {
-  const keys = subject.args['keys'];
-  return isDocument(keys) ? { keys, options: {} } : undefined;
+  const { keys, options } = subject.args;
+  return isDocument(keys) ? { keys, options: isDocument(options) ? options : {} } : undefined;
 }
 
 /**
@@ -122,7 +124,9 @@ export function plan(context: Context, answers: Answers): Outcome {
     return needRead('indexes', 'index.list', readArgs(subject));
   }
   if (answers['keys'] === undefined) {
-    return ask(dialogQuestion(text.create.title(subject.collection), text.create.button, startingKeys(subject)));
+    const start = startingKeys(subject);
+    const about = { ...readTarget(readArgs(subject)), ...(start === undefined ? {} : { definition: start }), list };
+    return ask(dialogQuestion(text.create.title(subject.collection), text.create.button, start, about));
   }
   const definition = answeredDefinition(answers);
   if (typeof definition === 'string') {

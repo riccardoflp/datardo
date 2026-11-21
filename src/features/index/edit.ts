@@ -23,11 +23,12 @@ import {
 import { featureId } from '../../shared/ids';
 import { editableDefinition, indexChange, indexName, ttlParts, type IndexChange } from './change-plan';
 import { answeredDefinition, createIndexesCommand, createStep } from './create';
-import { dialogQuestion } from './dialog';
+import { dialogQuestion } from './parts/dialog-question';
 import { hideStep, idIndex } from './hide';
 import { text } from './text';
 import {
   mongoRequest,
+  readTarget,
   subjectOf,
   writeStep,
   type IndexDefinition,
@@ -98,8 +99,15 @@ export function recreateSteps(
     mongoRequest(subject, 'runCommand', [createIndexesCommand(subject.collection, next)], 'database'),
     { kind: 'instead', steps: dropFirst, codes: sideBySideCodes },
   );
-  return [build, dropStep(subject, current.name)];
+  // Once the old index was dropped first, dropping it again finds nothing (code 27): the change is made all the same.
+  return [
+    build,
+    { ...dropStep(subject, current.name), onFailure: { kind: 'instead', steps: [], codes: [indexNotFound] } },
+  ];
 }
+
+/** The server's code for an index it cannot find. */
+export const indexNotFound = 27;
 
 function modifySteps(subject: IndexSubject, name: string, change: IndexChange & { kind: 'modify' }): readonly Step[] {
   return [
@@ -192,7 +200,8 @@ export function plan(context: Context, answers: Answers): Outcome {
       return refuse('index.edit/gone', text.edit.gone(name));
     }
     const definition = editableDefinition(index.name, index.key, index.options);
-    return ask(dialogQuestion(text.edit.title(name), text.edit.button, definition));
+    const about = { ...readTarget(readArgs), definition, editing: name, list: listed };
+    return ask(dialogQuestion(text.edit.title(name), text.edit.button, definition, about));
   }
   const next = answeredDefinition(answers);
   if (typeof next === 'string') {

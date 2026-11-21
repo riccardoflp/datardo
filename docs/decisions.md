@@ -1020,3 +1020,39 @@ Raised while the catalog was written; each names the cards that hold the current
 - **Q86** — Go to keeps one row a title, and M14's `value.rename-field` and M21's `field.rename` were both **Rename
   field…**: Go to lists the first as **Rename hash field…**, as Q75 did for **Copy Redis value**; the row menu of the
   hash keeps **Rename field…** (`value.rename-field`, `field.rename`).
+- **Q120** — The index dialog and the search index dialog as built in M22, while the runner gives no Operation its
+  replies (Q58): the window draws them from the question's `about` (`index.dialog@dialog`,
+  `index.search-dialog@dialog`), keeps the dialog answered drawn and locked while its plan runs, and decides when the
+  plan has ended whether it closes or opens again with what was typed (`dialogOutcome`, a pure function of the
+  area). The server's errors are read from the lines the runner wrote in the Log for the feature while the plan ran
+  (`[index.edit] failed: …`), in the order of its steps; a dialog is followed this way when it was opened from the
+  Indexes section, the inspector or Go to, and a dialog opened by another start closes once answered. When the new
+  definition of `index.edit` is refused and the old index is created again, the runner still shows the plan's
+  notification of success (*Recreated index email_1.*) beside its warning *…: this step failed: …*; the dialog opens
+  again with the server's error and *The index email_1 was created again as it was.* The exit criterion of M22 (*the
+  notification says so*) is met by that warning and the dialog: a notification that says it alone needs the replies
+  of Q58 (`index.dialog`, `index.search-dialog`, `index.create`, `index.edit`, `index.create-search`,
+  `index.edit-search`).
+- **Q121** — `index.edit` under another name, as built in M22: when the server refuses the two indexes side by side
+  (codes 85 and 86) and the old index is dropped first, the last step, dropping the old index, finds nothing; it is
+  marked `instead` with no step for the code 27 (IndexNotFound), so the change ends done, and the runner's warning
+  lists that drop with the refused build. The runner runs the steps of an `instead` without their own `onFailure`:
+  when the server refuses the two side by side and then the new definition itself, the recovery step is not run and
+  the old index stays dropped; the plan fails with the server's error, shown in the dialog. To decide whether the
+  runner should run nested `onFailure` (D31) (`index.edit`).
+- **Q122** — The reads of the index area as built in M22: `index.list` and `index.list-search` take a failed request
+  as a reply (`failedRequests: 'are-replies'`), so that `parse` tells a missing privilege or a server without search
+  from an error as their cards say; the failure reaches `parse` as its message without its code, so a server without
+  search is told by its message (`index.search-checks`). The Indexes section reads both lists through the bridge
+  itself, as the manage sections do, when it is shown, on **Refresh**, after its own changes and while something is
+  built; the fields the dialogs suggest come from `query.field-hints`, the sample the query bar's suggestions use.
+  **Indexes** in the section bar and in Go to opens the section with `tab.open`, as `manage.definition` does; from
+  the tree's menu, `index.show` runs a plan whose After starts `tab.open`. The commands of a row in Go to act on the
+  row selected in the section (`index.list`, `index.list-search`, `index.show`, `index.dialog`).
+- **Q123** — Controls of M22 with no place on their card: **Copy command** of the two dialogs and **Copy** of the
+  inspector put the command on the clipboard in the window and carry no element; the table of the Indexes section
+  carries `index.inspect@table`, where a click or the arrows select the index the inspector shows; the button `…` of
+  a row opens its menu, as `Shift+F10` does; the search index dialog keeps **Cancel** while its plan runs, which
+  closes it and leaves the plan running, since its card names no **Close**; **Dimensions** takes a whole number above
+  zero and ignores anything else typed, the definition then saying what is sent (`index.dialog`,
+  `index.search-dialog`, `index.inspect`, `index.show`).

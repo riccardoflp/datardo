@@ -72,7 +72,9 @@ export function indexActions(index: IndexInfo, readOnly: boolean): readonly Insp
   return [
     { label: menu.edit, tooltip: text.show.editHint, element: 'index.edit@inspector' },
     { label: menu.duplicate, tooltip: text.show.duplicateHint, element: 'index.duplicate@inspector' },
-    { label: index.options['hidden'] === true ? menu.unhide : menu.hide, element: 'index.hide@inspector' },
+    index.options['hidden'] === true
+      ? { label: menu.unhide, tooltip: text.show.unhideHint, element: 'index.hide@inspector' }
+      : { label: menu.hide, tooltip: text.show.hideHint, element: 'index.hide@inspector' },
     { label: menu.drop, element: 'index.drop@inspector' },
   ];
 }

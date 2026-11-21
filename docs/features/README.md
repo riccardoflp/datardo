@@ -312,27 +312,27 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`index.show`](index.md#indexshow--the-indexes-section) | The Indexes section | View | M22 | Specified |
-| [`index.list`](index.md#indexlist--the-indexes-of-a-collection-with-size-usage-and-builds) | The indexes of a collection with size, usage and builds | Read | M22 | Specified |
-| [`index.list-search`](index.md#indexlist-search--the-search-indexes-of-a-collection) | The search indexes of a collection | Read | M22 | Specified |
-| [`index.properties`](index.md#indexproperties--the-badges-of-an-index) | The badges of an index | Derivation | M22 | Specified |
-| [`index.inspect`](index.md#indexinspect--an-index-in-the-inspector) | An index in the inspector | View | M22 | Specified |
-| [`index.command`](index.md#indexcommand--the-mongosh-command-of-an-index) | The mongosh command of an index | Derivation | M22 | Specified |
-| [`index.dialog`](index.md#indexdialog--the-index-dialog) | The index dialog | View | M22 | Specified |
-| [`index.create`](index.md#indexcreate--create-an-index) | Create an index | Operation | M22 | Specified |
-| [`index.duplicate`](index.md#indexduplicate--duplicate-an-index) | Duplicate an index | View | M22 | Specified |
-| [`index.edit`](index.md#indexedit--edit-an-index) | Edit an index | Operation | M22 | Specified |
-| [`index.hide`](index.md#indexhide--hide-or-unhide-an-index) | Hide or unhide an index | Operation | M22 | Specified |
-| [`index.drop`](index.md#indexdrop--drop-an-index) | Drop an index | Operation | M22 | Specified |
-| [`index.search-dialog`](index.md#indexsearch-dialog--the-search-index-dialog) | The search index dialog | View | M22 | Specified |
-| [`index.create-search`](index.md#indexcreate-search--create-a-search-index) | Create a search index | Operation | M22 | Specified |
-| [`index.edit-search`](index.md#indexedit-search--change-a-search-indexs-definition) | Change a search index's definition | Operation | M22 | Specified |
-| [`index.drop-search`](index.md#indexdrop-search--drop-a-search-index) | Drop a search index | Operation | M22 | Specified |
-| [`index.change-plan`](index.md#indexchange-plan--what-changing-an-index-takes) | What changing an index takes | Derivation | M22 | Specified |
-| [`index.wildcard-checks`](index.md#indexwildcard-checks--wildcards-written-wrong) | Wildcards written wrong | Derivation | M22 | Specified |
-| [`index.search-checks`](index.md#indexsearch-checks--what-a-search-index-definition-is-refused-for) | What a search index definition is refused for | Derivation | M22 | Specified |
-| [`index.search-summary`](index.md#indexsearch-summary--a-search-index-definition-in-short) | A search index definition in short | Derivation | M22 | Specified |
-| [`index.search-form`](index.md#indexsearch-form--a-search-index-definition-from-the-form) | A search index definition from the form | Derivation | M22 | Specified |
+| [`index.show`](index.md#indexshow--the-indexes-section) | The Indexes section | View | M22 | Built |
+| [`index.list`](index.md#indexlist--the-indexes-of-a-collection-with-size-usage-and-builds) | The indexes of a collection with size, usage and builds | Read | M22 | Built |
+| [`index.list-search`](index.md#indexlist-search--the-search-indexes-of-a-collection) | The search indexes of a collection | Read | M22 | Built |
+| [`index.properties`](index.md#indexproperties--the-badges-of-an-index) | The badges of an index | Derivation | M22 | Built |
+| [`index.inspect`](index.md#indexinspect--an-index-in-the-inspector) | An index in the inspector | View | M22 | Built |
+| [`index.command`](index.md#indexcommand--the-mongosh-command-of-an-index) | The mongosh command of an index | Derivation | M22 | Built |
+| [`index.dialog`](index.md#indexdialog--the-index-dialog) | The index dialog | View | M22 | Built |
+| [`index.create`](index.md#indexcreate--create-an-index) | Create an index | Operation | M22 | Built |
+| [`index.duplicate`](index.md#indexduplicate--duplicate-an-index) | Duplicate an index | View | M22 | Built |
+| [`index.edit`](index.md#indexedit--edit-an-index) | Edit an index | Operation | M22 | Built |
+| [`index.hide`](index.md#indexhide--hide-or-unhide-an-index) | Hide or unhide an index | Operation | M22 | Built |
+| [`index.drop`](index.md#indexdrop--drop-an-index) | Drop an index | Operation | M22 | Built |
+| [`index.search-dialog`](index.md#indexsearch-dialog--the-search-index-dialog) | The search index dialog | View | M22 | Built |
+| [`index.create-search`](index.md#indexcreate-search--create-a-search-index) | Create a search index | Operation | M22 | Built |
+| [`index.edit-search`](index.md#indexedit-search--change-a-search-indexs-definition) | Change a search index's definition | Operation | M22 | Built |
+| [`index.drop-search`](index.md#indexdrop-search--drop-a-search-index) | Drop a search index | Operation | M22 | Built |
+| [`index.change-plan`](index.md#indexchange-plan--what-changing-an-index-takes) | What changing an index takes | Derivation | M22 | Built |
+| [`index.wildcard-checks`](index.md#indexwildcard-checks--wildcards-written-wrong) | Wildcards written wrong | Derivation | M22 | Built |
+| [`index.search-checks`](index.md#indexsearch-checks--what-a-search-index-definition-is-refused-for) | What a search index definition is refused for | Derivation | M22 | Built |
+| [`index.search-summary`](index.md#indexsearch-summary--a-search-index-definition-in-short) | A search index definition in short | Derivation | M22 | Built |
+| [`index.search-form`](index.md#indexsearch-form--a-search-index-definition-from-the-form) | A search index definition from the form | Derivation | M22 | Built |
 
 ## Keys
 

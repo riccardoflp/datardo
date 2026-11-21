@@ -76,6 +76,8 @@ describe('index.edit', () => {
     ]);
     const instead = steps[0]?.onFailure;
     expect(instead?.kind === 'instead' ? instead.codes : undefined).toEqual([85, 86]);
+    // Dropped first when the two could not be side by side: the second drop finding nothing is no failure.
+    expect(steps[1]?.onFailure).toEqual({ kind: 'instead', steps: [], codes: [27] });
     expect(notices(shown)).toEqual(['Created index byStatus and dropped status_1.']);
   });
 
