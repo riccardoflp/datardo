@@ -1,13 +1,19 @@
 /**
  * What the runner shows above every island: its dialogs one at a time (`nav.dialog`, `runner.ask`,
  * `runner.confirm`), a question drawn by its feature's own dialog (the insert dialog and the form of **Update many**
- * of the document area, the form of an entry of a stream), its notifications (`runner.notify`), and the list of work in progress (`runner.progress`).
+ * of the document area, the form of an entry of a stream, the dialogs of users and roles, the index dialog and the
+ * search index dialog, which stay drawn while their plan runs), its notifications (`runner.notify`), and the list of
+ * work in progress (`runner.progress`).
  */
 import { useEffect } from 'react';
 import { view as dialogView } from '../../features/nav/dialog';
 import type { Answers } from '../../shared/feature';
 import type { QuestionId } from '../../shared/ids';
+import { dialogAboutOf, searchDialogAboutOf } from '../../features/index/parts/dialog-question';
 import { InsertDialog } from '../pages/document/insert-dialog';
+import { useAnswered } from '../pages/index/dialog-memory';
+import { AnsweredIndexDialog, IndexQuestionDialog } from '../pages/index/index-dialog';
+import { AnsweredSearchDialog, SearchQuestionDialog } from '../pages/index/search-dialog';
 import { followInsert } from '../pages/document/insert-memory';
 import { UpdateForm } from '../pages/document/update-form';
 import { EntryForm, isEntryForm } from '../pages/value/entry-form';
@@ -27,8 +33,13 @@ function RunnerDialog(): React.JSX.Element | null {
   const state = useAppState();
   const shown = dialogView(state.runner);
   const dialog = shown.shown;
+  const answered = useAnswered();
   if (dialog === undefined || shown.behavior === undefined) {
-    return null;
+    // An index dialog answered stays drawn, locked, while its plan runs and the runner asks nothing.
+    if (answered?.kind === 'index') {
+      return <AnsweredIndexDialog state={answered.state} where={answered.where} />;
+    }
+    return answered?.kind === 'search' ? <AnsweredSearchDialog state={answered.state} /> : null;
   }
   if (dialog.kind === 'question') {
     const onAnswer = (answers: Answers | undefined): void => {
@@ -46,6 +57,14 @@ function RunnerDialog(): React.JSX.Element | null {
     }
     if (isUserDialog(dialog.feature)) {
       return <UserDialog key={dialog.id} feature={dialog.feature} question={dialog.question} onAnswer={onAnswer} />;
+    }
+    const indexAbout = dialogAboutOf(dialog.question);
+    if (indexAbout !== undefined) {
+      return <IndexQuestionDialog key={dialog.id} about={indexAbout} onAnswer={onAnswer} />;
+    }
+    const searchAbout = searchDialogAboutOf(dialog.question);
+    if (searchAbout !== undefined) {
+      return <SearchQuestionDialog key={dialog.id} about={searchAbout} onAnswer={onAnswer} />;
     }
     return (
       <QuestionDialog

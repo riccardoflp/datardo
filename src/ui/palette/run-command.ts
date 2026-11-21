@@ -18,6 +18,7 @@ import { historyIntentOf, isDocumentCommand, runDocumentCommand } from '../pages
 import { isFieldFeature, runFieldCommand } from '../pages/field/field-actions';
 import { isSectionCommand, runSectionCommand } from '../pages/manage/section-commands';
 import { isGridFsCommand, runGridFsCommand } from '../pages/gridfs/gridfs-commands';
+import { isIndexCommand, runIndexCommand } from '../pages/index/index-commands';
 import { isTableCommand, runTableCommand } from '../table/table-commands';
 import { isUserCommand, runUserCommand } from '../pages/user/user-commands';
 import { runTreeCommand } from '../tree/tree-commands';
@@ -127,6 +128,10 @@ export function runCommand(id: string, state: AppState): void {
   }
   if (isUserCommand(id)) {
     runUserCommand(id, state);
+    return;
+  }
+  if (isIndexCommand(id)) {
+    runIndexCommand(id, state);
     return;
   }
   const local = windowOnly[id];

@@ -249,8 +249,16 @@ export function searchDialogNotes(state: SearchDialogState): readonly string[] {
   return notes;
 }
 
-/** The question `index.create-search` and `index.edit-search` ask; a generic form shows its fields. */
-export function searchDialogQuestion(title: string, button: string, editing?: EditedSearchIndex): Question {
+/**
+ * The question `index.create-search` and `index.edit-search` ask, drawn by the window from `about` (the collection and
+ * the index being edited, `index.search-dialog@dialog`); a generic form shows its fields.
+ */
+export function searchDialogQuestion(
+  title: string,
+  button: string,
+  editing?: EditedSearchIndex,
+  about?: Readonly<Record<string, Json>>,
+): Question {
   const types = (['search', 'vectorSearch'] as const).map((value) => ({
     value,
     label: text.searchDialog.typeLabels[value],
@@ -258,6 +266,8 @@ export function searchDialogQuestion(title: string, button: string, editing?: Ed
   return {
     title,
     button,
+    element: 'index.search-dialog@dialog',
+    about: { ...about, ...(editing === undefined ? {} : { editing: editing as unknown as Json }) },
     fields: [
       {
         kind: 'text',

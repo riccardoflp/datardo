@@ -169,6 +169,14 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
   Users are created with a generated password, their password changed and deleted; custom roles are created, edited
   and deleted. A password is written `***` in every step, confirmation and line of the Log, and the new password of
   the connection's own user can be saved in the connection.
+- The Indexes section of a collection lists its indexes with their keys, properties, sizes and uses (and which were
+  never used), sorted by a click on a column, with the build in progress and its percentage; the selected index is
+  shown in the inspector with its definition and the command that creates it, to copy. Indexes are created,
+  duplicated and edited in a dialog, as a form or as the keys and options of `createIndex`, which shows the command
+  and what saving takes and stays open on the server's error; a change MongoDB cannot make in place drops and builds
+  the index again after a confirmation, and puts the old one back when the new definition is refused. Indexes are
+  hidden, unhidden and dropped from their row, the keyboard or Go to. Search and Vector Search indexes are listed with
+  their status, created, changed and dropped on a server with search; a server without search says what it needs.
 
 ### Fixed
 

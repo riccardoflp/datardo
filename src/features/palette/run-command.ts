@@ -25,6 +25,7 @@ import type { Target } from '../../shared/target';
 import type { Command } from '../command';
 import { commands as registeredCommands } from '../commands';
 import { isOffered as isFieldOffered } from '../field/commands';
+import { isOffered as isIndexOffered } from '../index/commands';
 import { isOffered as isManageOffered } from '../manage/commands';
 import { isGridFsCommandOffered } from '../gridfs/commands';
 import { isOffered as isUserOffered } from '../user/commands';
@@ -119,6 +120,9 @@ function isOfferedByItsArea(state: AppState, id: string): boolean | undefined {
   }
   if (id.startsWith('user.')) {
     return isUserOffered(state, id);
+  }
+  if (id.startsWith('index.')) {
+    return isIndexOffered(state, id);
   }
   return id.startsWith('field.') ? isFieldOffered(state) : undefined;
 }

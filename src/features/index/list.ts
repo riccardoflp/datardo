@@ -81,7 +81,12 @@ export function listRequests(args: Json): readonly MongoRequest[] {
 /** Feature: index.list — the requests for the collection of `args`. */
 export function request(_context: Context, args: Json): ReadRequest {
   const connection = connectionId(readTarget(args).connection);
-  return { kind: 'engine', requests: listRequests(args).map((each) => ({ connection, request: each })) };
+  // Only a failure of getIndexes is an error: `parse` reads the others as missing usage, sizes or progress.
+  return {
+    kind: 'engine',
+    requests: listRequests(args).map((each) => ({ connection, request: each })),
+    failedRequests: 'are-replies',
+  };
 }
 
 function documentsOf(reply: unknown): readonly JsonDocument[] {

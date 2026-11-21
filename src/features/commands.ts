@@ -32,6 +32,7 @@ import { commands as historyCommands } from './history/commands';
 import { commands as watchCommands } from './watch/commands';
 import { commands as pubsubCommands } from './pubsub/commands';
 import { areaCommands as userCommands } from './user/commands';
+import { commands as indexCommands } from './index/commands';
 
 import type { Command } from './command';
 
@@ -69,4 +70,5 @@ export const commands: readonly Command[] = [
   ...watchCommands,
   ...pubsubCommands,
   ...userCommands,
+  ...indexCommands,
 ];

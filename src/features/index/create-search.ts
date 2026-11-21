@@ -99,7 +99,8 @@ export function plan(context: Context, answers: Answers): Outcome {
     return refuse('index.create-search/view', text.viewNoSearchIndexes);
   }
   if (answers['definition'] === undefined) {
-    return ask(searchDialogQuestion(text.searchDialog.createTitle(subject.collection), text.searchDialog.create));
+    const title = text.searchDialog.createTitle(subject.collection);
+    return ask(searchDialogQuestion(title, text.searchDialog.create, undefined, readArgs(subject)));
   }
   const answered = answeredSearch(answers);
   if (answered.kind !== 'definition') {

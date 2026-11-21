@@ -6,8 +6,17 @@
  * `plan` is what Go to starts: the active collection tab shows its Indexes section.
  */
 import { mongoshValue } from '../../shared/mongosh-value';
-import { noDanger, run, type Answers, type Context, type OperationFeature, type Outcome } from '../../shared/feature';
-import { featureId } from '../../shared/ids';
+import {
+  noDanger,
+  run,
+  type After,
+  type Answers,
+  type Context,
+  type OperationFeature,
+  type Outcome,
+} from '../../shared/feature';
+import { connectionId, featureId } from '../../shared/ids';
+import { startArgs } from '../nav/types';
 import { activeTabOf } from '../../shared/state/tabs';
 import { groupThousands } from '../../shared/text-units';
 import { editableDefinition } from './change-plan';
@@ -105,6 +114,8 @@ export interface SearchRow {
   readonly status: readonly StatusBadge[];
   readonly queryable: { readonly label: string; readonly tooltip: string };
   readonly definition: string;
+  /** The same lines one by one, as its tooltip shows them. */
+  readonly definitionLines: readonly string[];
   readonly selected: boolean;
   readonly menu: readonly RowAction[];
   readonly enter?: 'index.edit-search@table';
@@ -196,7 +207,9 @@ function rowMenu(index: IndexInfo, readOnly: boolean): readonly RowAction[] {
   return [
     { label: menu.edit, tooltip: text.show.editHint, element: 'index.edit@row-menu' },
     { label: menu.duplicate, tooltip: text.show.duplicateHint, element: 'index.duplicate@row-menu' },
-    { label: index.options['hidden'] === true ? menu.unhide : menu.hide, element: 'index.hide@row-menu' },
+    index.options['hidden'] === true
+      ? { label: menu.unhide, tooltip: text.show.unhideHint, element: 'index.hide@row-menu' }
+      : { label: menu.hide, tooltip: text.show.hideHint, element: 'index.hide@row-menu' },
     { label: menu.drop, element: 'index.drop@row-menu' },
   ];
 }
@@ -292,6 +305,7 @@ function searchRow(state: IndexSectionState, index: SearchIndexInfo): SearchRow 
         ? { label: text.show.queryable, tooltip: text.show.queryableHint }
         : { label: text.show.notQueryable, tooltip: text.show.notQueryableHint },
     definition: searchSummary(type, index.definition).join(' · '),
+    definitionLines: searchSummary(type, index.definition),
     selected: state.selected?.kind === 'search' && state.selected.name === index.name,
     menu,
     ...(menu.length > 0 ? { enter: 'index.edit-search@table', delete: 'index.drop-search@table' } : {}),
@@ -376,10 +390,20 @@ export function view(state: IndexSectionState): IndexSectionView {
   };
 }
 
-/** Feature: index.show — Go to's **Indexes**: the active collection tab shows its Indexes section. */
-export function plan(context: Context, _answers: Answers): Outcome {
+/**
+ * Feature: index.show — Go to's **Indexes**: the active collection tab shows its Indexes section; **Indexes** in the
+ * menu of a collection of the tree (`{ connection, database, collection }`) opens its tab on that section.
+ */
+export function plan(context: Context, answers: Answers): Outcome {
   const tab = activeTabOf(context.state.tabs);
   const empty = { danger: noDanger, undo: { cannot: text.nothingRecorded }, publishes: false, after: [] };
+  const { connection, database, collection: named } = startArgs(answers);
+  if (typeof connection === 'string' && typeof database === 'string' && typeof named === 'string') {
+    const shows = { kind: 'collection', connection, database, collection: named };
+    const target = { kind: 'connection', connection: connectionId(connection) } as const;
+    const open = { kind: 'start', feature: featureId('tab.open'), target, args: { shows, section: indexSection } };
+    return run({ title: text.show.plan(named), steps: [], ...empty, after: [open as After] });
+  }
   if (tab?.shows.kind !== 'collection' || tab.shows.view === true) {
     return run({ title: text.section, steps: [], ...empty });
   }

@@ -1,12 +1,15 @@
 /**
  * What the shell shows of the active collection tab: the count of its page on the status line (`table.show`,
- * `50 of 1,204 documents · 38 ms`), and the selection of its table in the inspector island (`document.inspect`). The window forgets what it kept of a collection tab once the tab is closed.
+ * `50 of 1,204 documents · 38 ms`), and the selection of its table, or of its Indexes section (`index.inspect`), in the inspector island (`document.inspect`). The window forgets what it kept of a collection tab once the tab is closed.
  */
 import { useEffect } from 'react';
-import type { NavInput } from '../../features/nav/types';
+import type { Inspection, NavInput } from '../../features/nav/types';
 import { view as showView } from '../../features/table/show';
 import type { AppState } from '../../shared/state';
+import { text as indexText } from '../../features/index/text';
 import { forgetClosedPipelines } from '../pages/aggregate/pipeline-store';
+import { inspectedOf } from '../pages/index/index-inspector';
+import { forgetClosedIndexes, useIndexMemory, type IndexMemory } from '../pages/index/index-store';
 import { inspectionOf } from '../pages/document/inspect-state';
 import { collectionRefOf } from './collection-reads';
 import { forgetClosed, useCollection } from './collection-store';
@@ -17,22 +20,37 @@ export function useCollectionStatus(state: AppState, input: NavInput): NavInput 
   const shown = input.activeTab;
   const tab = shown.kind === 'collection' ? shown.tab : undefined;
   const collection = useCollection(tab);
+  const indexes = useIndexMemory(tab);
   const open = state.tabs.tabs;
   useEffect(() => {
     forgetClosed(new Set(open.map((each) => each.id)));
     forgetClosedPipelines(new Set(open.map((each) => each.id)));
+    forgetClosedIndexes(new Set(open.map((each) => each.id)));
   }, [open]);
   if (tab === undefined) {
     return input;
   }
   const status = showView(showStateOf(collection, { view: false, readOnly: false })).statusLine;
   const ref = collectionRefOf(tab);
+  const section = open.find((each) => each.id === tab)?.section;
   return {
     ...input,
     activeTab: {
       ...shown,
       ...(status === undefined ? {} : { count: status }),
-      ...(ref === undefined ? {} : { inspection: inspectionOf(ref, collection) }),
+      ...(section === 'indexes'
+        ? { inspection: indexInspection(indexes) }
+        : ref === undefined
+          ? {}
+          : { inspection: inspectionOf(ref, collection) }),
     },
   };
+}
+
+/** What the inspector island shows of the Indexes section (`index.inspect`): the index selected, if any. */
+function indexInspection(memory: IndexMemory): Inspection {
+  const inspected = inspectedOf(memory);
+  return inspected === undefined
+    ? { selected: 0, emptyLine: indexText.inspect.empty }
+    : { selected: 1, title: inspected.index.name, emptyLine: indexText.inspect.empty };
 }

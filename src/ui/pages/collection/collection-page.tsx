@@ -5,6 +5,7 @@
  * query and runs it once the connection is connected.
  */
 import { useMemo } from 'react';
+import { text as indexText } from '../../../features/index/text';
 import { text as manageText } from '../../../features/manage/text';
 import { text as tableText } from '../../../features/table/text';
 import type { TabId } from '../../../shared/ids';
@@ -13,6 +14,7 @@ import { useAppState } from '../../state/store';
 import { useQueryLoad } from '../saved-query/use-query-load';
 import { EditorSection } from '../manage/editor-section';
 import { showSection, type SectionPlace } from '../manage/section-actions';
+import { IndexSection } from '../index/index-section';
 import { DocumentsSection } from './documents-section';
 import {
   collectionPageState,
@@ -25,7 +27,7 @@ import styles from './collection-page.module.css';
 
 /** The sections of a tab: Documents, then Definition for a view or Validation for a collection. */
 function SectionBar({ place, section }: { readonly place: SectionPlace; readonly section: string }): React.JSX.Element {
-  const documents = section !== 'definition' && section !== 'validation';
+  const documents = section !== 'definition' && section !== 'validation' && section !== 'indexes';
   return (
     <div className={styles['section-bar']} role="toolbar" aria-label={tableText.names.sections}>
       <button
@@ -43,6 +45,19 @@ function SectionBar({ place, section }: { readonly place: SectionPlace; readonly
       >
         {tableText.commands.show}
       </button>
+      {place.view ? null : (
+        <button
+          type="button"
+          className={styles['section-button']}
+          data-feature="index.show@section-bar"
+          aria-pressed={section === 'indexes'}
+          onClick={() => {
+            showSection(place, 'indexes', 'section-bar');
+          }}
+        >
+          {indexText.section}
+        </button>
+      )}
       {place.view ? (
         <button
           type="button"
@@ -104,7 +119,7 @@ export function CollectionPage({
     ? section === 'definition'
       ? section
       : 'documents'
-    : section === 'validation'
+    : section === 'validation' || section === 'indexes'
       ? section
       : 'documents';
   return (
@@ -113,6 +128,7 @@ export function CollectionPage({
       {shown === 'documents' ? <DocumentsSection collectionRef={ref} collection={collection} page={page} /> : null}
       {shown === 'definition' ? <EditorSection place={place} kind="definition" /> : null}
       {shown === 'validation' ? <EditorSection place={place} kind="validation" /> : null}
+      {shown === 'indexes' ? <IndexSection place={place} /> : null}
     </div>
   );
 }
