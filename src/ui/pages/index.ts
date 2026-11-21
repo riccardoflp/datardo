@@ -32,6 +32,10 @@ import { useHistoryChanges } from './history/history-store';
 import { WatchInspector, watchExtras } from './watch/watch-inspector';
 import { WatchPage } from './watch/watch-page';
 import { useWatchChanges } from './watch/watch-store';
+import { PubSubInspector } from './pubsub/pubsub-inspector';
+import { PubSubPage } from './pubsub/pubsub-page';
+import { pubsubExtras } from './pubsub/pubsub-state';
+import { usePubSubTab } from './pubsub/pubsub-store';
 
 /** A page as the main island draws it. */
 export type PageView = () => React.JSX.Element | null;
@@ -48,6 +52,7 @@ export const pages: Readonly<Record<string, PageView>> = {
   gridfs: GridFsPage,
   history: HistoryPage,
   watch: WatchPage,
+  pubsub: PubSubPage,
 };
 
 /** The pages of the tabs that show a target of a connection, by the kind of what they show (`keys`, `key`). */
@@ -71,6 +76,7 @@ export const inspectors: Readonly<
   gridfs: GridFsInspector,
   history: HistoryInspector,
   watch: WatchInspector,
+  pubsub: PubSubInspector,
 };
 
 /** What a page adds to the active tab, by its kind or its page: what the status line counts, what the inspector shows. */
@@ -82,6 +88,7 @@ export const tabExtras: Readonly<Partial<Record<string, typeof keysExtras>>> = {
   gridfs: gridFsExtras,
   history: historyExtras,
   watch: watchExtras,
+  pubsub: pubsubExtras,
 };
 
 /** The name `inspectors` and `tabExtras` know a tab by: its page for a page tab, else the kind of what it shows. */
@@ -99,4 +106,5 @@ export function usePageStores(): void {
   useConsoleTab(undefined);
   useHistoryChanges();
   useWatchChanges();
+  usePubSubTab(undefined);
 }

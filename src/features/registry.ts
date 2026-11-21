@@ -33,6 +33,7 @@ import { features as transferFeatures } from './transfer';
 import { features as backupFeatures } from './backup';
 import { features as historyFeatures } from './history';
 import { features as watchFeatures } from './watch';
+import { features as pubsubFeatures } from './pubsub';
 
 /** The features of every area, as each area's index lists them. */
 const areas: readonly (readonly RunnableFeature[])[] = [
@@ -65,6 +66,7 @@ const areas: readonly (readonly RunnableFeature[])[] = [
   backupFeatures,
   historyFeatures,
   watchFeatures,
+  pubsubFeatures,
 ];
 
 /** The features the runner can start, by identifier. */

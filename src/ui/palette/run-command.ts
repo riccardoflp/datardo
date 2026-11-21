@@ -23,6 +23,7 @@ import { runTreeCommand } from '../tree/tree-commands';
 import { openAbout } from '../window/about';
 import { openGoTo } from './go-to-store';
 import { flushPlaygrounds } from '../pages/playground/playground-store';
+import { isPubSubCommand, runPubSubCommand } from '../pages/pubsub/pubsub-commands';
 
 let switcherOpener: (() => void) | undefined;
 
@@ -100,6 +101,11 @@ export function runCommand(id: string, state: AppState): void {
   }
   // **Run console command** runs the lines of the active console's input, as `Enter` does (`console.input`).
   if (id === 'console.run' && runActiveConsole(state)) {
+    return;
+  }
+  // Copying and exporting Pub/Sub messages take the rows the window has selected and shows.
+  if (isPubSubCommand(id, state)) {
+    runPubSubCommand(id, state);
     return;
   }
   if (isSavedQueryCommand(id)) {

@@ -34,7 +34,7 @@ function noAnswer(address: RedisAddress, settings: ClientSettings): EngineError 
 }
 
 /** Opens the socket, plain or TLS, and waits until it is connected, within the time to find the server. */
-async function openSocket(settings: ClientSettings, servername: string, signal: AbortSignal): Promise<Socket> {
+export async function openSocket(settings: ClientSettings, servername: string, signal: AbortSignal): Promise<Socket> {
   const address = redisAddress(settings.connectionString);
   const tls = address.tls || settings.tls !== undefined;
   const socket = tls

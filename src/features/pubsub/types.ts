@@ -7,71 +7,27 @@ import type { Context } from '../../shared/feature';
 import type { ConnectionId } from '../../shared/ids';
 import { connectionId } from '../../shared/ids';
 import type { AppState } from '../../shared/state';
+import type { Gap, Kept, Message, PubSubPage, Row, SubscriptionKind } from '../../shared/state/pubsub';
 import { groupThousands } from '../../shared/text-units';
 import { hexText } from '../console/copy-reply';
 import { quotedString, utf8Text } from '../console/reply';
 
-/** What a subscription follows: one channel by its name, or every channel whose name matches a pattern. */
-export type SubscriptionKind = 'channel' | 'pattern';
-
-/** The kind chosen beside the field **Channel or pattern**: **Auto** reads a name with `*`, `?` or `[` as a pattern. */
-export type NameKind = 'auto' | SubscriptionKind;
-
-/** A channel or a pattern the page is subscribed to (glossary, "subscription"). */
-export interface Subscription {
-  readonly kind: SubscriptionKind;
-  readonly name: Uint8Array;
-  /** Whether the server answered its command; until then it is shown dimmed, *Subscribing…* */
-  readonly answered: boolean;
-  /** The messages received through it since it was made, or since **Clear**. */
-  readonly received: number;
-}
-
-/** A message the page received (glossary, "message"), numbered from 1 since the tab was opened (`pubsub.keep`). */
-export interface Message {
-  readonly kind: 'message';
-  readonly number: number;
-  /** When Datardo received it, in milliseconds since 1970: a message carries no time of its own. */
-  readonly receivedAt: number;
-  readonly channel: Uint8Array;
-  /** The pattern it arrived through, for a message of a pattern subscription. */
-  readonly pattern?: Uint8Array;
-  readonly message: Uint8Array;
-}
-
-/** The row that marks where the page's connection was closed and messages may be missing (`pubsub.reconnect`). */
-export interface Gap {
-  readonly kind: 'gap';
-  readonly number: number;
-  readonly from: number;
-  readonly to: number;
-}
-
-/** What a message published for redis-oplog is about (`pubsub.oplog-event`). */
-export interface OplogEvent {
-  readonly operation: 'insert' | 'update' | 'remove';
-  readonly collection: string;
-  /** The `_id` in mongosh syntax: `"abc"`, `3`, `ObjectId("…")`. */
-  readonly document: string;
-  /** The fields of an update, when it says them. */
-  readonly fields?: readonly string[];
-  readonly channelKind: 'collection' | 'namespace' | 'document';
-  /** The redis-oplog namespace of a namespace's channel. */
-  readonly namespace?: string;
-}
-
-/** One event shown once, with the messages that brought it on each of its channels (`pubsub.event-rows`). */
-export interface EventRow {
-  readonly kind: 'event';
-  /** The number of its first message. */
-  readonly number: number;
-  readonly event: OplogEvent;
-  /** Its messages in the order they arrived; their bytes are equal, their channels differ. */
-  readonly messages: readonly Message[];
-}
-
-/** A row of the list of messages. */
-export type Row = Message | Gap | EventRow;
+export type {
+  EventRow,
+  Gap,
+  Kept,
+  Message,
+  MessageFilter,
+  NameKind,
+  OplogEvent,
+  OplogLink,
+  PageConnection,
+  PubSubPage,
+  PubSubPages,
+  Row,
+  Subscription,
+  SubscriptionKind,
+} from '../../shared/state/pubsub';
 
 /** What arrives to the list, before `pubsub.keep` numbers it. */
 export type Arrived =
@@ -83,65 +39,6 @@ export type Arrived =
       readonly message: Uint8Array;
     }
   | { readonly kind: 'gap'; readonly from: number; readonly to: number };
-
-/** What a MongoDB connection publishes with for redis-oplog: its channel prefix and its namespaces. */
-export interface OplogLink {
-  readonly prefix: string;
-  readonly namespaces: readonly string[];
-}
-
-/** What the list keeps (`pubsub.keep`): the rows, those a pause holds, and how many were dropped. */
-export interface Kept {
-  readonly listed: readonly Row[];
-  readonly held: readonly Row[];
-  readonly paused: boolean;
-  readonly dropped: number;
-  /** The number the next message gets. */
-  readonly next: number;
-  /** With **Events of** on, the link whose events are made rows of (`pubsub.event-rows`). */
-  readonly link?: OplogLink;
-}
-
-/** What the field **Filter messages** and **Show only its messages** hold (`pubsub.filter`). */
-export interface MessageFilter {
-  readonly text: string;
-  readonly subscription?: { readonly kind: SubscriptionKind; readonly name: Uint8Array };
-}
-
-/**
- * The page's own connection: none yet, being opened, open, closed by the server or the network (retrying), or closed
- * because the user disconnected the saved connection (no retry).
- */
-export type PageConnection = 'closed' | 'connecting' | 'open' | 'disconnected' | 'not-connected';
-
-/** The Pub/Sub page of one Redis connection, as the main process keeps it. */
-export interface PubSubPage {
-  readonly connection: ConnectionId;
-  readonly pageConnection: PageConnection;
-  /** In the order they were made. */
-  readonly subscriptions: readonly Subscription[];
-  readonly kept: Kept;
-  readonly filter: MessageFilter;
-  readonly nameKind: NameKind;
-  /** The MongoDB connection whose events the list shows (`pubsub.follow-oplog`). */
-  readonly eventsOf?: ConnectionId;
-  /** The channel published to last from this page (`pubsub.publish`). */
-  readonly lastChannel?: string;
-  /** When the page's connection closed, while it is disconnected. */
-  readonly disconnectedAt?: number;
-  /** How many tries failed since it closed, when the next one is, and the error of the last one. */
-  readonly tries: number;
-  readonly retryAt?: number;
-  readonly retryError?: string;
-  /** The numbers of the rows selected, and of the row the inspector island shows. */
-  readonly selected: readonly number[];
-  readonly inspected?: number;
-  /** The computer's time zone, in minutes east of UTC, for the times the page writes. */
-  readonly offsetMinutes: number;
-}
-
-/** The Pub/Sub pages, by connection. */
-export type PubSubPages = Readonly<Record<string, PubSubPage>>;
 
 /** A Pub/Sub page just opened: nothing subscribed, nothing listed. */
 export function openedPage(connection: ConnectionId, offsetMinutes: number): PubSubPage {
@@ -160,9 +57,11 @@ export function openedPage(connection: ConnectionId, offsetMinutes: number): Pub
 
 /** The Pub/Sub page of a connection in the app's state, when one is open (the part of the state named `pubsubPages`). */
 export function pubsubPageOf(state: AppState, connection: ConnectionId): PubSubPage | undefined {
-  const pages = (state as AppState & { readonly pubsubPages?: PubSubPages }).pubsubPages;
-  return pages?.[connection];
+  return state.pubsubPages[connection];
 }
+
+/** What ends the id of a page's own client among the clients of the engines. */
+const pubsubSuffix = '#pubsub';
 
 /** The name the server sees for the page's connection (`CLIENT LIST` shows `name=datardo-pubsub`). */
 export const pubsubClientName = 'datardo-pubsub';
@@ -173,7 +72,12 @@ export const pubsubClientName = 'datardo-pubsub';
  * not delay the keys tabs.
  */
 export function pubsubClient(connection: ConnectionId): ConnectionId {
-  return connectionId(`${connection}#pubsub`);
+  return connectionId(`${connection}${pubsubSuffix}`);
+}
+
+/** The connection whose Pub/Sub page a client of the engines is, or none when it is another client. */
+export function pubsubOwner(client: ConnectionId): ConnectionId | undefined {
+  return client.endsWith(pubsubSuffix) ? connectionId(client.slice(0, -pubsubSuffix.length)) : undefined;
 }
 
 /** The Redis connection a feature of the page was started on. */

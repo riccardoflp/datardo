@@ -29,6 +29,7 @@ import { actions as mcpActions } from './mcp';
 import { actions as transferActions, backupActions } from './transfer';
 import { actions as historyActions } from './history';
 import { actions as watchActions } from './watch';
+import { actions as pubsubActions } from './pubsub';
 
 /** The actions of one area, by name. */
 export type AreaActions = (services: MainServices) => Readonly<Record<string, AppAction>>;
@@ -60,6 +61,7 @@ const areas: readonly AreaActions[] = [
   backupActions,
   historyActions,
   watchActions,
+  pubsubActions,
 ];
 
 /** Every action of every area, by name; two areas never name an action alike. */

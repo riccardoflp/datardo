@@ -8,6 +8,7 @@ import { EngineError, type ClientSettings, type Engine, type EngineClient } from
 import { mongoEngine } from './mongodb';
 import { redisEngine } from './redis';
 import { openConsoleClient } from './redis/console-client';
+import { openPubSubClient, type PubSubPush } from './redis/pubsub-client';
 
 export type {
   ClientSettings,
@@ -26,6 +27,7 @@ export { redisAddress } from './redis';
 export { closedBeforeReply } from './redis/console-client';
 export { newObjectId } from './mongodb/gridfs';
 export { documentOfBytes } from './mongodb/document-bytes';
+export type { PubSubPush } from './redis/pubsub-client';
 
 /** Carries out requests on the connections it holds a client for. */
 export interface EngineService {
@@ -39,6 +41,16 @@ export interface EngineService {
    * included.
    */
   readonly openConsole: (connection: ConnectionId, settings: ClientSettings, signal: AbortSignal) => Promise<void>;
+  /**
+   * Opens the Pub/Sub page's own connection to a Redis server (`pubsub.subscribe`) under an id of its own, closing the
+   * one it had: the messages the server pushes go to `listener`, and an error of the server fails its command.
+   */
+  readonly openPubSub: (
+    connection: ConnectionId,
+    settings: ClientSettings,
+    signal: AbortSignal,
+    listener: (push: PubSubPush) => void,
+  ) => Promise<void>;
   /** Closes the client of a connection, if it has one. */
   readonly disconnect: (connection: ConnectionId) => Promise<void>;
   /** Closes every client: when Datardo quits. */
@@ -89,8 +101,13 @@ export function createEngines(options: EngineOptions = {}): EngineService {
     await disconnect(connection);
     keep(connection, await openConsoleClient(settings, signal));
   };
+  const openPubSub: EngineService['openPubSub'] = async (connection, settings, signal, listener) => {
+    await disconnect(connection);
+    keep(connection, await openPubSubClient(settings, signal, listener));
+  };
   return {
     openConsole,
+    openPubSub,
     send: (request, signal) => {
       const client = clients.get(request.connection);
       if (client === undefined) {

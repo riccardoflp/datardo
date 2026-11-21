@@ -22,6 +22,7 @@ import { startAreas } from './areas';
 import { islandFields, islandsOf } from './nav';
 import { connectionEngines, connectionName, isConnected, isReadOnly } from './connections';
 import { withConsoles } from './console-commands';
+import { withPubSub } from './pubsub-commands';
 import { WindowDialogs } from './dialogs';
 import { fileWriter } from './files';
 import { oplogClients } from './oplog';
@@ -74,7 +75,7 @@ const services: MainServices = {
 function runnerPorts(): RunnerPorts {
   return {
     features: runnableFeatures(),
-    engines: withConsoles(connectionEngines()),
+    engines: withPubSub(withConsoles(connectionEngines())),
     appActions: appActions(services),
     files: fileWriter,
     dialogs,

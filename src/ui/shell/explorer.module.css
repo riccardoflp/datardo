@@ -223,6 +223,16 @@
 
 .small-button:hover,
 .add:hover,
+.linked-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.linked-row > .linked {
+  flex: 1;
+}
+
 .linked:hover {
   background: var(--color-hover);
 }

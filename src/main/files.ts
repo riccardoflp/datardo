@@ -26,6 +26,7 @@ import { keyExportOf, writeKeyExport } from './key-export';
 import { savedQueriesData } from './saved-queries';
 import { writeDownload } from './gridfs';
 import { carryOutTransferStep, type TransferStepServices } from './transfer-steps';
+import { messagesFile } from './pubsub-commands';
 
 const formats: readonly ExportFormat[] = ['datardo', 'compass', 'list'];
 const modes: readonly ExportSecrets[] = ['remove', 'include', 'encrypt'];
@@ -65,6 +66,7 @@ const writers: Readonly<Record<string, (args: Json) => Promise<string>>> = {
   'connection.write-file': connectionsFile,
   'playground.text': playgroundText,
   'watch.export': watchText,
+  'pubsub.messages': messagesFile,
 };
 
 /**

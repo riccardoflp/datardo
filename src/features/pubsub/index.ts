@@ -28,4 +28,5 @@ export const features: readonly RunnableFeature[] = [
   { kind: 'operation', id: featureId('pubsub.reconnect'), plan: reconnect.plan },
   { kind: 'operation', id: featureId('pubsub.follow-oplog'), plan: followOplog.plan },
   { kind: 'read', id: featureId('pubsub.channels'), request: channels.request, parse: channels.parse },
+  exportMessages.fileRead,
 ];

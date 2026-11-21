@@ -154,6 +154,15 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
   events arrive newest first, are filtered by the server and by type and text in the page, show what each changed in
   the inspector, can be paused, stopped, resumed from the last one, cleared, copied and exported as JSON Lines, and a
   collection can be made to record pre-images.
+- A Redis connection opens a Pub/Sub page, on a connection of its own named `datardo-pubsub`: subscribe to channels
+  and patterns by typing them or from the list of the channels active on the server, and see the messages as they
+  arrive, the newest at the top, with the time they arrived, their channel and what they say; the list keeps the
+  newest 10,000, pauses and resumes, is cleared and filtered, and a message is shown whole in the inspector island.
+  Messages are copied in four ways, exported as JSON Lines, JSON or CSV, and published from a form, which says how many
+  clients received them; a read-only connection subscribes and does not publish. When the page's connection drops,
+  the page says so, subscribes again by itself and marks the gap in the list. **Follow events** on a MongoDB
+  connection linked to Redis shows each redis-oplog event as one row with its operation, collection, document and
+  fields. The subscriptions, the filter and **Events of** come back with the tab.
 
 ### Fixed
 

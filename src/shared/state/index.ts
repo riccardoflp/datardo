@@ -33,6 +33,7 @@ import { initialConsolesState, reduceConsoles, type ConsolesEvent, type Consoles
 import { initialSavedQueryState, reduceSavedQuery, type SavedQueryEvent, type SavedQueryState } from './saved-query';
 import { initialMcpState, reduceMcp, type McpEvent, type McpState } from './mcp';
 import { initialWatchState, reduceWatch, type WatchPages, type WatchStateEvent } from './watch';
+import { initialPubSubPages, reducePubSub, type PubSubEvent, type PubSubPages } from './pubsub';
 
 /** Everything the window shows and the features decide from, apart from the results of reads. */
 export interface AppState {
@@ -52,6 +53,7 @@ export interface AppState {
   readonly savedQuery: SavedQueryState;
   readonly mcp: McpState;
   readonly watch: WatchPages;
+  readonly pubsubPages: PubSubPages;
 }
 
 /** Every change to the app's state. */
@@ -71,7 +73,8 @@ export type AppEvent =
   | ConsolesEvent
   | SavedQueryEvent
   | McpEvent
-  | WatchStateEvent;
+  | WatchStateEvent
+  | PubSubEvent;
 
 /** The state at start, before anything is loaded. */
 export const initialState: AppState = {
@@ -91,6 +94,7 @@ export const initialState: AppState = {
   savedQuery: initialSavedQueryState,
   mcp: initialMcpState,
   watch: initialWatchState,
+  pubsubPages: initialPubSubPages,
 };
 
 /** The one function that changes the app's state. */
@@ -128,5 +132,7 @@ export function reduce(state: AppState, event: AppEvent): AppState {
       return { ...state, mcp: reduceMcp(state.mcp, event) };
     case 'watch':
       return { ...state, watch: reduceWatch(state.watch, event) };
+    case 'pubsub':
+      return { ...state, pubsubPages: reducePubSub(state.pubsubPages, event) };
   }
 }
