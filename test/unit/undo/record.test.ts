@@ -237,4 +237,11 @@ describe('undo.record', () => {
     const outcome = record({ keeps: inserted }, { wrote: { failedIds: [1] } });
     expect(outcome).toMatchObject({ kind: 'read', need: { key: 'after', args: { ids: [2] } } });
   });
+
+  it('keeps also the _ids the server gave to inserted documents that had none, from the replies', () => {
+    const given = { $oid: '6afe48bc6ece4e0d19cc4293' };
+    const inserted: Keeps = { kind: 'inserted', database: 'shop', collection: 'orders', ids: [41] };
+    const outcome = record({ keeps: inserted, count: 2 }, { wrote: { failedIds: [], insertedIds: [given] } });
+    expect(outcome).toMatchObject({ kind: 'read', need: { key: 'after', args: { ids: [41, given] } } });
+  });
 });

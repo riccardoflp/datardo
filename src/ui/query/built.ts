@@ -8,6 +8,9 @@ import { runnableFeatures } from '../../features/registry';
 
 const runnable: ReadonlySet<string> = new Set(runnableFeatures().keys());
 
+/** The Views of the document area, which the window draws and the runner does not start. */
+const documentViews: ReadonlySet<string> = new Set(['document.inspect', 'document.open']);
+
 /** The feature of an element, `query.run` for `query.run@query-bar`. */
 export function featureOfElement(element: string): string {
   const at = element.indexOf('@');
@@ -18,6 +21,10 @@ export function featureOfElement(element: string): string {
 export function isBuilt(element: string): boolean {
   const feature = featureOfElement(element);
   return (
-    runnable.has(feature) || feature.startsWith('query.') || feature.startsWith('table.') || feature === 'runner.cancel'
+    runnable.has(feature) ||
+    documentViews.has(feature) ||
+    feature.startsWith('query.') ||
+    feature.startsWith('table.') ||
+    feature === 'runner.cancel'
   );
 }

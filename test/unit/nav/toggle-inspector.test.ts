@@ -19,6 +19,11 @@ describe('nav.toggle-inspector', () => {
     expect(planFor(input(), { args: null })).toMatchObject({ kind: 'run', plan: { steps: [] } });
   });
 
+  it('is offered on a collection tab as the main process knows it, without the inspection of the window', () => {
+    const { inspection: _inspection, ...known } = ordersTab;
+    expect(isOffered(input({ connections: [local], activeTab: known }))).toBe(true);
+  });
+
   it('with the island hidden, Show inspector is offered on a keys tab', () => {
     const keys = {
       kind: 'keys',

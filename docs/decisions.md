@@ -805,3 +805,24 @@ Raised while the catalog was written; each names the cards that hold the current
   the matching `_id`s itself rather than taking those `undo.record` keeps; an operation file written for an operation
   that the index then cannot take (a newer index) stays until the index can be written again.
   (`undo.revert`, `undo.details`, `undo.show`, `oplog.publish`, `undo.record`).
+- **Q65** — The documents as built in M12, while the runner gives no Operation its replies (Q58): the notification
+  of a write is the one known before it runs, so **Delete**, **Delete the selected rows** and **Delete many** say the
+  count confirmed (*Deleted 3 documents from people.*), **Update many** says *Updated orders: 12 matched.* without
+  the count modified, an insert of documents without `_id` says *Inserted 1 document into people.*, and the lines
+  *Deleted 2 of 3 documents…*, *The value changed again…* and *Document not found…* after a write are not reached
+  (their `afterReplies` are written and tested); the tab of a new document becomes the tab of the inserted document
+  when its text names the `_id`, and closes otherwise, since the `_id` the server gives is in a reply. Apart from
+  Q58: the `_id`s the server gives to inserted documents reach `undo.record` from the replies, so that undoing such an
+  insert deletes them; the engine refuses a write that carries a BSON undefined or a date beyond the range of
+  JavaScript, with nothing sent, since the driver would write a null or cannot hold the date (an undo of such a
+  document fails the same way); a question may carry `about`, plain values for the dialog a feature draws itself
+  (the insert dialog, the form of **Update many**); a document tab carries `newDocument` and `view` in the saved
+  tabs, optional fields that need no new version; its draft is kept by `tab.restore` started with `{ tab, draft }`,
+  and **Save** in the question of `tab.close` starts `document.save` or `document.insert-from-tab` from the main
+  process; the editor of a value takes the text the window sends with the start; **Copy as** in a document tab
+  starts `table.copy-as` with no place, since no card names a place for it there; a failed insert from the insert
+  dialog opens the dialog again from its error notification, with the text and the error; a collection tab always has
+  something to inspect, so that the main process, which has no inspection of the window's page, offers
+  `nav.toggle-inspector` there; the title of a new document's tab, *people · New document 1*, is never cut.
+  (`runner.run`, `nav.toggle-inspector`, `tab.title`, `document.delete`, `document.delete-many`, `document.update-many`, `document.insert`, `document.insert-from-tab`,
+  `document.inline-edit`, `document.open`, `undo.record`, `tab.restore`, `tab.close`).

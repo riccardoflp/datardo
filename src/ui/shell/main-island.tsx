@@ -10,6 +10,7 @@ import type { NavInput } from '../../features/nav/types';
 import { useLayoutEffect, useRef, useState } from 'react';
 import { pages } from '../pages';
 import { CollectionPage } from '../pages/collection/collection-page';
+import { DocumentPage } from '../pages/document/document-page';
 import { startFeature } from './intent';
 import { TabStrip } from './tab-strip';
 import styles from './bars.module.css';
@@ -159,6 +160,8 @@ export function MainIsland({
           <Page />
         ) : shown.kind === 'collection' && shown.tab !== undefined ? (
           <CollectionPage key={shown.tab} tab={shown.tab} shows={shown} />
+        ) : shown.kind === 'document' && shown.tab !== undefined ? (
+          <DocumentPage key={shown.tab} tab={shown.tab} shows={shown} />
         ) : null}
       </div>
     </section>

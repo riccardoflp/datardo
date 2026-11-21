@@ -51,6 +51,7 @@ function rowOrCellMenu(props: TablePartProps, request: Extract<TableMenuRequest,
     collection,
     columns: props.columns,
     documents: documentsOf(collection, document),
+    target,
   };
   const number = rowNumber(collection, request.row);
   if (request.kind === 'row') {
@@ -68,7 +69,13 @@ function rowOrCellMenu(props: TablePartProps, request: Extract<TableMenuRequest,
     label: text.names.cellMenu(request.column, number),
     element: 'table.cell-menu@cell-menu',
     entries,
-    context: { ...base, field: { key: request.column, ...value, ...within } },
+    context: {
+      ...base,
+      field: { key: request.column, ...value, ...within },
+      ...(request.cell === undefined
+        ? {}
+        : { cell: { cell: request.cell, row: request.row, anchor: request.returnFocus ?? null } }),
+    },
   };
 }
 
@@ -85,6 +92,7 @@ function columnMenu(props: TablePartProps, request: Extract<TableMenuRequest, { 
     collection,
     columns,
     documents: [],
+    target,
     ...(request.column === '#' ? {} : { field: { key: request.column, ...within } }),
   };
   return { label: text.names.columnMenu(request.column), element: 'table.column-menu@column-menu', entries, context };

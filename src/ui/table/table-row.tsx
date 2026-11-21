@@ -12,6 +12,8 @@ import { startDrag } from '../query/drag-data';
 import { positionKey, subRowHeight, syntaxOf } from './grid-model';
 import type { GridView } from './grid-view';
 import { openTableMenu } from './menu-request';
+import { editOrInspect } from '../pages/document/table-entries';
+import { collectionOf } from '../query/collection-store';
 import { changeSelection, selectCell } from './table-actions';
 import styles from './table.module.css';
 
@@ -92,9 +94,15 @@ function ValueCell({ grid, index, cell }: { readonly grid: GridView; readonly in
           x: event.clientX,
           y: event.clientY,
           returnFocus: event.currentTarget,
+          cell,
           ...(within === undefined ? {} : { within }),
           ...(value === undefined ? {} : { value }),
         });
+      }}
+      onDoubleClick={(event) => {
+        const collection = collectionOf(grid.ref.tab);
+        const at = { cell, row: index, anchor: event.currentTarget };
+        editOrInspect({ ref: grid.ref, collection, target: grid.target, cell: at }, true);
       }}
       onDragStart={(event) => {
         if (value !== undefined) {

@@ -3,6 +3,7 @@
  * several fields of the other three.
  */
 import type { ConnectionColor } from './connection';
+import type { Json } from './engine-request';
 
 /** One item of a list to pick from. */
 export interface Choice {
@@ -65,6 +66,11 @@ export interface Question {
   readonly fields: readonly Field[];
   /** The identifier of the button that answers, when the feature's card lists the place `@dialog`. */
   readonly element?: string;
+  /**
+   * What a feature's own dialog needs besides its fields, for a question the window draws with a view of the feature's
+   * area (the insert dialog, the form of **Update many**): the collection, the options of the dialog.
+   */
+  readonly about?: Json;
 }
 
 /** Whether a text keeps every rule of its field, and the message of the first it breaks. */

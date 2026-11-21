@@ -29,9 +29,16 @@ export type InspectorView =
       readonly body: InspectorBody;
     };
 
+/**
+ * The pages that always have something to inspect, known from what the tab shows: a collection tab inspects its
+ * documents (`document.inspect`). The main process has no inspection of the window's page, and offers
+ * `nav.toggle-inspector` on these.
+ */
+const inspectingPages: ReadonlySet<ActiveTab['kind']> = new Set(['collection']);
+
 /** Whether the page of the active tab has something to inspect: a page with nothing to inspect gives no inspection. */
 export function hasSomethingToInspect(tab: ActiveTab): boolean {
-  return tab.inspection !== undefined;
+  return tab.inspection !== undefined || inspectingPages.has(tab.kind);
 }
 
 /** Whether the inspector island is wanted: the page has something to inspect and the user did not hide it. */

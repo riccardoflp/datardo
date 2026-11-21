@@ -51,6 +51,14 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
   age and number, can be cleared, and can be turned off for one connection.
 - Writes to documents through a MongoDB connection linked to a Redis connection are published for redis-oplog, in the
   background, so that the Meteor apps using it see them; a failure to publish is a warning that leaves the write done.
+- The selected document is shown in the inspector island, as a tree read with the keyboard or as text, with its values
+  and paths to copy; a value is edited in its cell or in the inspector, keeping its numeric type; a document opens in a
+  document tab, in mongosh syntax, and is saved with `Ctrl+S`, asking first when another client changed it meanwhile.
+- Documents are inserted from the insert dialog, with a template of the collection's fields, or from the tab of a new
+  document; a document is duplicated and deleted; the selected rows and the documents matching the filter are updated
+  or deleted, each write shown before it runs, refused on a read-only connection and on a view, and in the undo
+  history. A write that would change the type of a value (a BSON undefined, a date beyond the range of JavaScript)
+  is not sent.
 
 ### Security
 

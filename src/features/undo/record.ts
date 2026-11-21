@@ -374,12 +374,20 @@ export function plan(context: Context, answers: Answers): Outcome {
   if (answers['wrote'] === undefined) {
     return decided(args.title, { keeps: read as unknown as Json });
   }
-  const failed = fieldsOfWrote(answers['wrote']);
-  const kept = withoutIds(read, failed);
+  const kept = withGeneratedIds(withoutIds(read, idsOfWrote(answers['wrote'], 'failedIds')), args.keeps, answers);
   return save(context, answers, args, kept as Exclude<BeforeRead, { kind: 'failed' }>);
 }
 
-function fieldsOfWrote(value: unknown): readonly Json[] {
-  const failed = (value as { readonly failedIds?: unknown } | null)?.failedIds;
-  return Array.isArray(failed) ? (failed as readonly Json[]) : [];
+function idsOfWrote(value: unknown, name: 'failedIds' | 'insertedIds'): readonly Json[] {
+  const ids = (value as Readonly<Record<string, unknown>> | null)?.[name];
+  return Array.isArray(ids) ? (ids as readonly Json[]) : [];
+}
+
+/** An insert keeps also the `_id`s the server gave to the documents that had none, from the replies of its steps. */
+function withGeneratedIds(kept: BeforeRead, keeps: Keeps, answers: Answers): BeforeRead {
+  const generated = idsOfWrote(answers['wrote'], 'insertedIds');
+  if (keeps.kind !== 'inserted' || generated.length === 0) {
+    return kept;
+  }
+  return withImages(kept, givenImages({ ...keeps, ids: generated }) ?? kept);
 }

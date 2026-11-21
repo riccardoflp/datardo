@@ -17,6 +17,7 @@ import { features as undoFeatures } from './undo';
 import { features as oplogFeatures } from './oplog';
 import { features as queryFeatures } from './query';
 import { features as tableFeatures } from './table';
+import { features as documentFeatures } from './document';
 
 /** The features of every area, as each area's index lists them. */
 const areas: readonly (readonly RunnableFeature[])[] = [
@@ -33,6 +34,7 @@ const areas: readonly (readonly RunnableFeature[])[] = [
   oplogFeatures,
   queryFeatures,
   tableFeatures,
+  documentFeatures,
 ];
 
 /** The features the runner can start, by identifier. */

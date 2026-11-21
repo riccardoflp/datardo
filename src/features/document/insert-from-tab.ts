@@ -46,8 +46,20 @@ export function plan(context: Context, answers: Answers): Outcome {
     danger: { kind: 'none' },
     undo: undoOf(undoNoteOf(place, context.state.settings, kept), kept),
     publishes: true,
-    after: [refreshAfter(place)],
+    after: [
+      { kind: 'notify', level: 'success', text: insertedNotice(document, place.collection) },
+      refreshAfter(place),
+    ],
   });
+}
+
+/**
+ * The notification of the insert, known before it runs: *Inserted document 7* when the document carries its `_id`,
+ * else *Inserted 1 document into people.*, since the `_id` the server gives is in a reply (Q58, Q65).
+ */
+export function insertedNotice(document: JsonRecord, collection: string): string {
+  const id = document['_id'];
+  return id === undefined ? text.insert.insertedCount(1, collection) : text.insertFromTab.inserted(oneLineText(id));
 }
 
 /** What follows, from the reply of `insertOne`: *Inserted document ObjectId("…")*. */

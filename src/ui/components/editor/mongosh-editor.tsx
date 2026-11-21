@@ -30,6 +30,8 @@ export interface MongoshEditorProps {
   readonly maxHeight?: number;
   /** Outlined as invalid, and said so to a screen reader. */
   readonly invalid: boolean;
+  /** The text can be read and selected, not typed in. */
+  readonly readOnly?: boolean;
   /** Each time this number changes, the editor flashes once. */
   readonly flash?: number;
   /** Each time this number changes to one above 0, the editor takes the focus with its text selected. */

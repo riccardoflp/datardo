@@ -21,6 +21,8 @@ export interface SelectedCell {
   readonly value?: Json;
   /** The expanded array it is an element of. */
   readonly within?: string;
+  /** The cell drawn there, for **Edit value** (`document.inline-edit`). */
+  readonly cell?: Cell;
 }
 
 function firstLeaves(columns: readonly ColumnNode[]): ReadonlyMap<string, number> {
@@ -66,5 +68,6 @@ export function selectedCell(
   const cell = coveringCell(rows[0]?.cells ?? [], firstLeaves(drawn), at);
   const value = cell?.content.kind === 'value' ? { value: cell.content.value } : {};
   const within = cell?.element === undefined ? {} : { within: cell.element.array };
-  return { row: at.row, document, ...(column === undefined ? {} : { column }), ...value, ...within };
+  const drawnCell = cell === undefined ? {} : { cell };
+  return { row: at.row, document, ...(column === undefined ? {} : { column }), ...value, ...within, ...drawnCell };
 }

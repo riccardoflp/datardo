@@ -74,7 +74,10 @@ export function plan(context: Context, answers: Answers): Outcome {
     touches: documentsText(count),
     undo: undoOf(note, kept),
     publishes: true,
-    after: [refreshAfter(place)],
+    after: [
+      { kind: 'notify', level: 'success', text: text.deleteMany.deleted(count, place.collection) },
+      refreshAfter(place),
+    ],
   });
 }
 

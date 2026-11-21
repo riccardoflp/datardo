@@ -3,6 +3,7 @@
  * area that carries out app steps receives these in `src/main/actions/<area>.ts`.
  */
 import type { BrowserWindow } from 'electron';
+import type { Intent, IntentResult } from '../shared/bridge';
 import type { Platform } from '../shared/feature';
 import type { Dialogs } from '../runner/ports';
 import type { AppStateHolder } from './app-state';
@@ -19,4 +20,6 @@ export interface MainServices {
   /** The runner's questions and confirmations in the window, for what asks outside a plan (the SSH host keys). */
   readonly dialogs: Dialogs;
   readonly platform: Platform;
+  /** Starts a feature as the window does, for an app step that is the save of a page (`tab.save`). */
+  readonly start: (intent: Intent) => Promise<IntentResult>;
 }

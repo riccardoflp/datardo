@@ -9,8 +9,8 @@
  *
  * Started with `{ id, path, value }`: the `_id`, the field path with the positions of arrays (`items.2.qty`), and the
  * value as the table showed it, as canonical Extended JSON; `value` is absent, with `missing: true`, for an empty cell.
- * The answer `value` is the text of the editor; a text that does not parse asks again with the reader's message in
- * place of the hint, and nothing is sent.
+ * The answer `value` is the text of the editor, or `args.text` when the window's editor over the cell sends it; a text
+ * that does not parse asks again with the reader's message in place of the hint, and nothing is sent.
  */
 import type { Json } from '../../shared/engine-request';
 import {
@@ -119,7 +119,7 @@ export function plan(context: Context, answers: Answers): Outcome {
   }
   const kept: KeptDocuments = { kind: 'ids', ...keptCollection(place), ids: [cell.id], count: 1 };
   const note = undoNoteOf(place, context.state.settings, kept);
-  const typed = answers['value'];
+  const typed = answers['value'] ?? textArg(startArgs(answers), 'text');
   if (typeof typed !== 'string') {
     return ask(editorQuestion(cell, note));
   }

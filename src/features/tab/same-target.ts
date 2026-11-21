@@ -45,6 +45,9 @@ function idValue(json: unknown): string {
 
 /** The key of an `_id`: from its Extended JSON when it is known, else from its text as the table shows it. */
 function idKey(shows: Extract<TabShows, { kind: 'document' }>): string {
+  if (shows.newDocument !== undefined) {
+    return `new:${String(shows.newDocument)}`;
+  }
   if (shows.idJson === undefined) {
     return `text:${shows.id}`;
   }

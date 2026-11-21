@@ -89,6 +89,8 @@ export function updateForm(input: UpdateInput, typed: string, problem?: string):
     title: text.updateMany.form(input.place.collection),
     text: lines.join('\n'),
     button: text.updateMany.continue,
+    element: 'document.update-many@form',
+    about: { filter: filterLine(input.filter), count: input.count, problem: problem ?? null },
     fields: [
       {
         kind: 'text',
@@ -134,7 +136,10 @@ export function planUpdate(context: Context, answers: Answers, input: UpdateInpu
     touches: documentsText(input.count),
     undo: undoOf(input.note, input.kept),
     publishes: true,
-    after: [refreshAfter(input.place)],
+    after: [
+      { kind: 'notify', level: 'success', text: text.updateMany.matched(input.place.collection, input.count) },
+      refreshAfter(input.place),
+    ],
   });
 }
 

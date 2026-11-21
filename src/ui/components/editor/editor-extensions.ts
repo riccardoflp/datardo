@@ -38,6 +38,8 @@ export interface EditorOptions {
   readonly multiline: boolean;
   readonly maxHeight: number | undefined;
   readonly invalid: boolean;
+  /** The text can be read and selected, not typed in (a document tab on a read-only connection). */
+  readonly readOnly?: boolean;
   /** The class of the placeholder's text. */
   readonly placeholderClass: string;
 }
@@ -122,6 +124,9 @@ export function optionExtensions(options: EditorOptions, callbacks: () => Editor
       options.maxHeight === undefined ? {} : { style: `max-height: ${String(options.maxHeight)}px` },
     ),
     options.multiline ? EditorView.lineWrapping : oneLine,
+    options.readOnly === true
+      ? [EditorState.readOnly.of(true), EditorView.contentAttributes.of({ 'aria-readonly': 'true' })]
+      : [],
   ];
 }
 

@@ -4,8 +4,8 @@
  * **Back** (`tab.activate`, `nav.back`).
  */
 import type { Json } from '../../shared/engine-request';
-import { connectionId, tabId, type TabId } from '../../shared/ids';
-import { activeTabOf, tabConnectionOf, type Tab, type TabSeed } from '../../shared/state/tabs';
+import { connectionId, featureId, tabId, type TabId } from '../../shared/ids';
+import { activeTabOf, tabConnectionOf, type Draft, type Tab, type TabSeed } from '../../shared/state/tabs';
 import { visit } from '../../features/nav/back';
 import { targetKey } from '../../features/tab/same-target';
 import { readMemory, readTabShows } from '../../features/tab/types';
@@ -127,11 +127,63 @@ function seedOf(args: Json): TabSeed {
   }
   const section = field(args, 'section');
   const memory = readMemory(field(args, 'memory'));
+  const draft = draftOf(field(args, 'draft'));
   return {
     shows,
     ...(typeof section === 'string' ? { section } : {}),
     ...(memory === undefined ? {} : { memory }),
+    ...(draft === undefined ? {} : { draft }),
   };
+}
+
+function draftOf(value: Json | undefined): Draft | undefined {
+  const text = field(value ?? null, 'text');
+  const original = field(value ?? null, 'original');
+  if (typeof text !== 'string') {
+    return undefined;
+  }
+  return typeof original === 'string' ? { text, original } : { text };
+}
+
+/** Keeps the draft of a tab, or drops it once the tab has no unsaved changes (`tab.restore`, D33). */
+function keepDraft(services: MainServices, args: Json): Promise<void> {
+  const tab = tabOf(services, args);
+  const draft = draftOf(field(args, 'draft'));
+  services.state.dispatch({
+    slice: 'tabs',
+    type: 'changed',
+    tab: tab.id,
+    unsaved: draft !== undefined,
+    draft: draft ?? null,
+  });
+  return Promise.resolve();
+}
+
+/**
+ * Saves a tab before it closes (`tab.close`, **Save**): the save of its page, as `Ctrl+S` there; a refusal or a
+ * failure stops the plan, and the tab stays open with its changes.
+ */
+async function saveTab(services: MainServices, args: Json): Promise<void> {
+  const tab = tabOf(services, args);
+  const shows = tab.shows;
+  if (shows.kind !== 'document') {
+    throw new Error('Datardo cannot save this tab.');
+  }
+  const feature = shows.newDocument === undefined ? 'document.save' : 'document.insert-from-tab';
+  const result = await services.start({
+    feature: featureId(feature),
+    target: {
+      kind: 'collection',
+      connection: shows.connection,
+      database: shows.database,
+      collection: shows.collection,
+    },
+    args: { tab: tab.id },
+  });
+  if (result.kind !== 'done') {
+    throw new Error(result.kind === 'failed' || result.kind === 'refused' ? result.message : 'Not saved.');
+  }
+  services.state.dispatch({ slice: 'tabs', type: 'changed', tab: tab.id, unsaved: false, draft: null });
 }
 
 function open(services: MainServices, args: Json): Promise<void> {
@@ -198,5 +250,7 @@ export const actions: AreaActions = (services) => ({
       });
     }),
   'tab.save-session': () => saveTabsNow(services),
+  'tab.keep-draft': (args) => keepDraft(services, args),
+  'tab.save': (args) => saveTab(services, args),
   'tab.open-saved': () => openSavedTabs(services),
 });

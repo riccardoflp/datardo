@@ -12,6 +12,7 @@ import { changeQuery, type CollectionTab } from '../../query/collection-store';
 import { showStateOf } from '../../query/collection-view';
 import { QueryBar } from '../../query/query-bar';
 import { startFeature } from '../../shell/intent';
+import { startOnDocuments } from '../document/document-actions';
 import { DocumentTable } from '../../table/document-table';
 import { PagingRow } from '../../table/paging-row';
 import { SelectionBar } from '../../table/selection-bar';
@@ -32,6 +33,9 @@ function pressed(ref: CollectionRef, button: ToolbarButton): void {
     case 'query.reset@empty-state':
       changeQuery(ref.tab, resetQuery);
       void runQuery(ref, { texts: 'bar', count: true });
+      return;
+    case 'document.insert@empty-state':
+      void startOnDocuments(ref, button.element);
       return;
     case 'connection.connect@toolbar':
       startFeature('connection.connect', {

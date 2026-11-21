@@ -101,6 +101,19 @@ function isOfferedByItsCard(state: AppState, id: string): boolean {
     case 'query.mode:aggregate':
       // Aggregate is built in M19.
       return false;
+    case 'document.inspect':
+    case 'document.open':
+    case 'document.inline-edit':
+    case 'document.insert':
+    case 'document.duplicate':
+    case 'document.delete':
+    case 'document.update-many':
+    case 'document.delete-many':
+      // They act on the selected row, or on the collection, of the active collection tab.
+      return active?.shows.kind === 'collection';
+    case 'document.save':
+      // A document tab of an existing document, with unsaved changes.
+      return active?.shows.kind === 'document' && active.shows.newDocument === undefined && active.unsaved === true;
     case 'tree.refresh':
     case 'tree.filter':
       // The tree island shows the current connection: with none, there is nothing to refresh or filter.

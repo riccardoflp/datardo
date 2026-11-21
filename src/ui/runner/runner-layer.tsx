@@ -1,10 +1,15 @@
 /**
  * What the runner shows above every island: its dialogs one at a time (`nav.dialog`, `runner.ask`,
- * `runner.confirm`), its notifications (`runner.notify`), and the list of work in progress (`runner.progress`).
+ * `runner.confirm`), a question drawn by its feature's own dialog (the insert dialog and the form of **Update many**
+ * of the document area), its notifications (`runner.notify`), and the list of work in progress (`runner.progress`).
  */
+import { useEffect } from 'react';
 import { view as dialogView } from '../../features/nav/dialog';
 import type { Answers } from '../../shared/feature';
 import type { QuestionId } from '../../shared/ids';
+import { InsertDialog } from '../pages/document/insert-dialog';
+import { followInsert } from '../pages/document/insert-memory';
+import { UpdateForm } from '../pages/document/update-form';
 import { useAppState } from '../state/store';
 import { ConfirmationDialog } from './confirmation-dialog';
 import { Notifications } from './notifications';
@@ -24,6 +29,16 @@ function RunnerDialog(): React.JSX.Element | null {
     return null;
   }
   if (dialog.kind === 'question') {
+    const onAnswer = (answers: Answers | undefined): void => {
+      answer(dialog.id, answers);
+    };
+    // A question a feature's own dialog draws: the insert dialog, the form of Update many.
+    if (dialog.question.element === 'document.insert@dialog') {
+      return <InsertDialog key={dialog.id} question={dialog.question} onAnswer={onAnswer} />;
+    }
+    if (dialog.question.element === 'document.update-many@form') {
+      return <UpdateForm key={dialog.id} question={dialog.question} onAnswer={onAnswer} />;
+    }
     return (
       <QuestionDialog
         key={dialog.id}
@@ -46,8 +61,17 @@ function RunnerDialog(): React.JSX.Element | null {
   );
 }
 
+/** Follows the notifications of an insert sent by the insert dialog, which opens again when it failed. */
+function useInsertFollowed(): void {
+  const last = useAppState().runner.notifications.at(-1);
+  useEffect(() => {
+    followInsert(last);
+  }, [last]);
+}
+
 /** The dialogs, notifications and work in progress of the runner. */
 export function RunnerLayer(): React.JSX.Element {
+  useInsertFollowed();
   return (
     <>
       <RunnerDialog />

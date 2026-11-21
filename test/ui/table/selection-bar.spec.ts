@@ -43,7 +43,8 @@ test.describe('table.selection-bar', () => {
     await expect(barOf(window)).toBeVisible();
     await expect(barOf(window).getByRole('status')).toHaveText('2 selected');
     expect(await gridTop(window)).toBe(before);
-    await expect(barOf(window).getByRole('button', { name: /Export|Update|Delete/u })).toHaveCount(0);
+    await expect(barOf(window).getByRole('button', { name: /Export/u })).toHaveCount(0);
+    await expect(barOf(window).getByRole('button', { name: /Update|Delete/u })).toHaveCount(2);
     await bothThemes(window);
     await cellAt(window, 1, 0).click({ modifiers: ['Control'] });
     await expect(barOf(window).getByRole('status')).toHaveText('3 selected');

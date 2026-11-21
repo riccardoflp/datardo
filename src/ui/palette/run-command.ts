@@ -8,6 +8,7 @@ import type { AppState } from '../../shared/state';
 import { focusNextIsland } from '../shell/focus';
 import { startIntent } from '../shell/top-bar/start';
 import { queryCommandIds, runQueryCommand } from '../query/query-commands';
+import { isDocumentCommand, runDocumentCommand } from '../pages/document/document-commands';
 import { isTableCommand, runTableCommand } from '../table/table-commands';
 import { runTreeCommand } from '../tree/tree-commands';
 import { openAbout } from '../window/about';
@@ -55,6 +56,10 @@ export function runCommand(id: string, state: AppState): void {
   }
   if (isTableCommand(id)) {
     runTableCommand(id, state);
+    return;
+  }
+  if (isDocumentCommand(id)) {
+    runDocumentCommand(id, state);
     return;
   }
   const local = windowOnly[id];

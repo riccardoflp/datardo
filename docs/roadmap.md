@@ -946,7 +946,7 @@ within limits the user sets; a write to MongoDB documents is published to the li
 inserted, duplicated, deleted; the selected rows and the documents matching a filter are updated or deleted, each
 shown before it runs and undone after.
 **Depends on**: M11.
-**Status**: planned
+**Status**: done
 
 ### Features
 
@@ -997,15 +997,15 @@ shown before it runs and undone after.
 
 ### Exit criteria
 
-- [ ] A document with a value of every BSON type is edited in a cell, in a document tab, duplicated, deleted and
+- [x] A document with a value of every BSON type is edited in a cell, in a document tab, duplicated, deleted and
       undone, and comes back with every type: the types-survive suite (QA2).
-- [ ] **Update many** on 50,000 documents says in its confirmation that it cannot be undone, and runs (QA4).
-- [ ] Every Operation of this milestone is refused on a read-only connection and on a view, with nothing sent (QA1).
-- [ ] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
+- [x] **Update many** on 50,000 documents says in its confirmation that it cannot be undone, and runs (QA4).
+- [x] Every Operation of this milestone is refused on a read-only connection and on a view, with nothing sent (QA1).
+- [x] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
       `npm run test:integration`, `npm run test:ui`; `catalog.py --tests` reports none missing for these cards.
-- [ ] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
+- [x] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
       the keyboard alone (QA15, QA16).
-- [ ] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
+- [x] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
       and this milestone's **Status** is *done*.
 
 ### Not in this milestone

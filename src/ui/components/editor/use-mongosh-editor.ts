@@ -30,6 +30,7 @@ export interface EditorInputs {
   readonly multiline: boolean;
   readonly maxHeight?: number;
   readonly invalid: boolean;
+  readonly readOnly?: boolean;
   readonly focusRequest?: number;
   readonly onChange: (text: string) => void;
   readonly onRun: () => void;
@@ -98,6 +99,7 @@ function optionsOf(inputs: EditorInputs): EditorOptions {
     multiline: inputs.multiline,
     maxHeight: inputs.maxHeight,
     invalid: inputs.invalid,
+    readOnly: inputs.readOnly === true,
     placeholderClass,
   };
 }
@@ -168,10 +170,11 @@ export function useMongoshEditor(
     };
   }, [parentRef, latestRef, viewRef, callbacks, listId]);
   const { label, placeholder, multiline, maxHeight, invalid, kind, fields, text, focusRequest } = inputs;
+  const readOnly = inputs.readOnly === true;
   useEffect(() => {
-    const options = { label, placeholder, multiline, maxHeight, invalid, placeholderClass };
+    const options = { label, placeholder, multiline, maxHeight, invalid, readOnly, placeholderClass };
     viewRef.current?.dispatch({ effects: optionsSlot.reconfigure(optionExtensions(options, callbacks)) });
-  }, [viewRef, callbacks, label, placeholder, multiline, maxHeight, invalid]);
+  }, [viewRef, callbacks, label, placeholder, multiline, maxHeight, invalid, readOnly]);
   useEffect(() => {
     viewRef.current?.dispatch({ effects: setSource.of({ kind, fields }) });
   }, [viewRef, kind, fields]);

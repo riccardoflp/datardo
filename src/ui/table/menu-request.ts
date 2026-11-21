@@ -4,6 +4,7 @@
  * open at a time, in the window.
  */
 import { useSyncExternalStore } from 'react';
+import type { Cell } from '../../features/table/rows';
 import type { Json } from '../../shared/engine-request';
 import type { TabId } from '../../shared/ids';
 
@@ -29,6 +30,8 @@ export type TableMenuRequest = MenuPlace &
         readonly within?: string;
         /** The value of the cell; none when the document has no such field. */
         readonly value?: Json;
+        /** The cell itself, for **Edit value** (`document.inline-edit`). */
+        readonly cell?: Cell;
       }
     | {
         readonly kind: 'column';

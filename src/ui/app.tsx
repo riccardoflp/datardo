@@ -5,6 +5,7 @@
  */
 import { TopBar } from './shell/top-bar';
 import { Islands } from './shell/islands';
+import { InlineEditor } from './pages/document/inline-editor';
 import { RunnerLayer } from './runner/runner-layer';
 import styles from './app.module.css';
 
@@ -14,6 +15,7 @@ export function App(): React.JSX.Element {
     <div className={styles['app']}>
       <TopBar />
       <Islands />
+      <InlineEditor />
       <RunnerLayer />
     </div>
   );

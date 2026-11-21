@@ -146,6 +146,27 @@ export function failedInsertIds(step: Step, outcome: InsertOutcome): readonly Js
   });
 }
 
+/**
+ * The `_id`s an insert step gave to the documents that had none, from its reply: `insertedId` of an `insertOne`,
+ * `insertedIds` of an `insertMany` (by the position of each document). The documents that carried an `_id` are kept
+ * by it already.
+ */
+export function generatedInsertIds(step: Step, reply: unknown): readonly Json[] {
+  if (step.kind !== 'engine') {
+    return [];
+  }
+  const documents = insertedDocuments(step);
+  const fields = fieldsOf(reply);
+  const given =
+    step.request.engine === 'mongodb' && step.request.method === 'insertOne'
+      ? { '0': fields['insertedId'] ?? null }
+      : fieldsOf(fields['insertedIds'] ?? null);
+  return documents.flatMap((document, index) => {
+    const id = given[String(index)];
+    return fieldsOf(document)['_id'] === undefined && id !== undefined && id !== null ? [id as Json] : [];
+  });
+}
+
 /** The operation `undo.record` adds to the index, from the steps of its saving plan, with the size of its file. */
 export function recordedEntry(plan: Plan, size: number): UndoEntry | undefined {
   const [add] = appSteps(plan.steps, addOperationAction);
