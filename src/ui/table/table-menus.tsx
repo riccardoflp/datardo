@@ -14,6 +14,7 @@ import { rowKeyOf, type Document, type MenuEntry } from '../../features/table/ty
 import { isBuilt } from '../query/built';
 import { changeQuery, type CollectionTab } from '../query/collection-store';
 import { chooseEntry, type EntryContext } from './menu-entries';
+import { cellReferenceEntries, referencesNow, rowReferenceEntries } from '../pages/relation/table-links';
 import { MenuList } from './menu-list';
 import { closeTableMenu, useTableMenu, type TableMenuRequest } from './menu-request';
 import { shownEntries } from './shown-entries';
@@ -55,7 +56,10 @@ function rowOrCellMenu(props: TablePartProps, request: Extract<TableMenuRequest,
   };
   const number = rowNumber(collection, request.row);
   if (request.kind === 'row') {
-    const entries = rowMenuView({ document, selected, target });
+    const entries = [
+      ...rowMenuView({ document, selected, target }),
+      ...rowReferenceEntries(referencesNow(props.collectionRef, target), target, document),
+    ];
     return { label: text.names.rowMenu(number), element: 'table.row-menu@row-menu', entries, context: base };
   }
   const column = columnByKey(props.columns.columns, request.column);
@@ -64,7 +68,10 @@ function rowOrCellMenu(props: TablePartProps, request: Extract<TableMenuRequest,
   }
   const within = request.within === undefined ? {} : { within: request.within };
   const value = request.value === undefined ? {} : { value: request.value };
-  const entries = cellMenuView({ document, selected, target, column, ...value, ...within });
+  const entries = [
+    ...cellReferenceEntries(referencesNow(props.collectionRef, target), target, { key: request.column, ...value }),
+    ...cellMenuView({ document, selected, target, column, ...value, ...within }),
+  ];
   return {
     label: text.names.cellMenu(request.column, number),
     element: 'table.cell-menu@cell-menu',

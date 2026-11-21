@@ -15,6 +15,9 @@ import { openTableMenu } from './menu-request';
 import { editOrInspect } from '../pages/document/table-entries';
 import { collectionOf } from '../query/collection-store';
 import { changeSelection, selectCell } from './table-actions';
+import type { TableReferences } from '../../features/relation/follow';
+import { useTableReferences } from '../pages/relation/references';
+import { followCell, linkClass, linkOf } from '../pages/relation/table-links';
 import styles from './table.module.css';
 
 /** A click on a cell or a row number: the cell selected, and the document alone, added, or the range to it. */
@@ -56,7 +59,13 @@ function contentOf(cell: Cell): {
   }
 }
 
-function ValueCell({ grid, index, cell }: { readonly grid: GridView; readonly index: number; readonly cell: Cell }) {
+function ValueCell(props: {
+  readonly grid: GridView;
+  readonly index: number;
+  readonly cell: Cell;
+  readonly references: TableReferences;
+}) {
+  const { grid, index, cell } = props;
   const column = grid.places.get(cell.column) ?? 1;
   const at: Position = { at: 'cell', row: index, subRow: cell.subRow, column };
   const selected = grid.cell.at === 'cell' && positionKey(grid.cell) === positionKey(at);
@@ -64,11 +73,14 @@ function ValueCell({ grid, index, cell }: { readonly grid: GridView; readonly in
   const left = grid.lefts[column - 1];
   const value = cell.content.kind === 'value' ? cell.content.value : undefined;
   const within = cell.element?.array;
+  // A cell that holds a reference is a link (`relation.follow`): `Ctrl`+click and `Ctrl+Enter` follow it.
+  const link = linkOf(props.references, cell.column, value);
+  const title = link === undefined ? shown.title : [shown.title, link.tooltip].filter(Boolean).join('\n');
   return (
     <td
       colSpan={cell.span}
       rowSpan={cell.height}
-      className={styles['cell']}
+      className={link === undefined ? styles['cell'] : `${styles['cell'] ?? ''} ${linkClass}`}
       style={left === undefined ? undefined : { left, position: 'sticky', zIndex: 'var(--z-sticky-number)' }}
       data-pos={positionKey(at)}
       data-selected={selected ? 'true' : undefined}
@@ -77,11 +89,23 @@ function ValueCell({ grid, index, cell }: { readonly grid: GridView; readonly in
       data-syntax={shown.kind}
       aria-colindex={column + 1}
       tabIndex={selected ? 0 : -1}
-      title={shown.title}
+      title={title}
       draggable={value !== undefined}
-      data-feature={value === undefined ? undefined : 'query.drag@table'}
+      data-feature={value === undefined ? undefined : link === undefined ? 'query.drag@table' : link.element}
+      // A cell that holds a reference is marked by `relation.follow`, and following it is `relation.open-referenced`.
+      data-follow={link === undefined ? undefined : 'relation.follow@table'}
       onClick={(event) => {
+        if (link !== undefined && value !== undefined && (event.ctrlKey || event.metaKey)) {
+          followCell(grid.ref, props.references, cell.column, value);
+          return;
+        }
         clicked(grid, index, at, event);
+      }}
+      onKeyDown={(event) => {
+        if (link !== undefined && value !== undefined && event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
+          event.preventDefault();
+          followCell(grid.ref, props.references, cell.column, value);
+        }
       }}
       onContextMenu={(event) => {
         event.preventDefault();
@@ -164,6 +188,7 @@ export function DocumentRows({
   readonly index: number;
 }): React.JSX.Element | null {
   const row = grid.rows[index];
+  const references = useTableReferences(grid.ref, grid.target.mode);
   if (row === undefined) {
     return null;
   }
@@ -184,7 +209,7 @@ export function DocumentRows({
           {row.cells
             .filter((cell) => cell.subRow === subRow)
             .map((cell) => (
-              <ValueCell key={cell.column} grid={grid} index={index} cell={cell} />
+              <ValueCell key={cell.column} grid={grid} index={index} cell={cell} references={references} />
             ))}
         </tr>
       ))}

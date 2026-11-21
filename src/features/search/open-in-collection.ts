@@ -3,7 +3,7 @@
  *
  * Opens the collection tab of a group filtered on the documents the search found in it: `open shop.orders with the
  * filter { _id: { $in: [ObjectId("…"), ObjectId("…")] } }`, with the `_id`s kept (the first 1,000, in the order they
- * were found), or `{ _id: ObjectId("…") }` for one document; the sort and the projection are empty, and the query runs.
+ * were found), or `{ _id: ObjectId("…") }` for one document; the sort and the projection are empty, and the window runs the query.
  * Nothing is written, so it works on a read-only connection, where the tab opens read-only.
  *
  * Started with `{ connection, database, collection, ids, found }` from a group (the `_id`s kept and the number of
@@ -92,7 +92,8 @@ export function plan(_context: Context, answers: Answers): Outcome {
     ...appPlan(text.open.title(namespace), [step]),
     danger: noDanger,
     undo: { cannot: text.open.nothingWritten },
-    after: [{ kind: 'start', feature: featureId('query.run'), target }, ...more],
+    // The window shows the filter in the bar of the tab and runs it (`query.run`), as for a saved query.
+    after: more,
   });
 }
 

@@ -293,7 +293,8 @@ the main island and to change it as a whole.
 - **Function**: `src/features/document/open.ts › view(state)`
 - **Entry points**: **Open in a tab** in the inspector (`@inspector`) and in the context menu of a row
   (`@row-menu`); **Open document** on the document history page (`history.show`) and in the detail of a change event
-  (`watch.event-detail`); **Open in a tab** in the insert dialog, for a new document (`@dialog`). Go to: **Open
+  (`watch.event-detail`); **Open document** in the context menu of a document found on the Search documents page
+  (`search.show`, `@item-menu`); **Open in a tab** in the insert dialog, for a new document (`@dialog`). Go to: **Open
   document in a tab**, on the selected row.
 - **Offered when**: the document has an `_id`; in **Find**. On a view or a read-only connection the tab opens
   read-only.

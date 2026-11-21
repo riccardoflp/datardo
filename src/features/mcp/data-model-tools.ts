@@ -119,8 +119,8 @@ function distinctValues(session: ToolSession): string {
 }
 
 /**
- * A reference between collections as `relation.detect` (M34) finds it. That card is not built yet: the main process
- * answers the app action `relation.detect` with these once it is, and the tool writes them.
+ * A reference between collections as `relation.detect` finds it: the main process answers the app action
+ * `relation.detect` with these (`src/main/relations.ts`), and the tool writes them.
  */
 export interface DetectedRelation {
   readonly kind: 'reference' | 'dbref' | 'view';

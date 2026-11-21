@@ -1,0 +1,194 @@
+/* search.show: the three rows of the toolbar, the error line and the documents found, grouped by collection. */
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.field,
+.tick {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.text,
+.input {
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-small);
+  background: var(--color-canvas);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.text {
+  flex: 1;
+  min-width: 240px;
+}
+
+.ticks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  max-height: 96px;
+  margin: 0;
+  padding: 0 var(--space-2) var(--space-1);
+  overflow: auto;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-small);
+}
+
+.button,
+.fold {
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-small);
+  background: var(--color-island);
+  color: var(--color-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.fold {
+  display: inline-flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  border-color: transparent;
+  background: transparent;
+  text-align: left;
+}
+
+.button:hover,
+.fold:hover {
+  background: var(--color-hover);
+}
+
+.link {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-accent);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.summary,
+.head-part,
+.more,
+.empty,
+.path {
+  color: var(--color-text-muted);
+}
+
+.summary {
+  margin-left: auto;
+}
+
+.error {
+  margin: var(--space-2) var(--space-3) 0;
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-width) solid var(--color-danger);
+  border-radius: var(--radius-small);
+  color: var(--color-text);
+}
+
+.empty {
+  margin: var(--space-3);
+}
+
+.results {
+  flex: 1;
+  min-height: 0;
+  padding: var(--space-2) var(--space-3);
+  overflow: auto;
+}
+
+.group {
+  margin-bottom: var(--space-3);
+}
+
+.group-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.name {
+  font-weight: var(--font-weight-strong);
+}
+
+.badge {
+  padding: 0 var(--space-1);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-small);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-small);
+}
+
+.items {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-small);
+  cursor: default;
+}
+
+.item:hover {
+  background: var(--color-hover);
+}
+
+.item[aria-current='true'] {
+  background: var(--color-selected);
+}
+
+.item:focus-visible {
+  outline: var(--focus-width) solid var(--color-focus);
+}
+
+.item-head,
+.line {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.id,
+.context {
+  font-family: var(--font-family-code);
+}
+
+.context {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.match {
+  border-radius: var(--radius-small);
+  background: var(--color-warning);
+  color: var(--color-canvas);
+}
+
+.more {
+  padding: var(--space-1) var(--space-2);
+}

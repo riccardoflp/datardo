@@ -177,6 +177,16 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
   the index again after a confirmation, and puts the old one back when the new definition is refused. Indexes are
   hidden, unhidden and dropped from their row, the keyboard or Go to. Search and Vector Search indexes are listed with
   their status, created, changed and dropped on a server with search; a server without search says what it needs.
+- Search documents (Go to, or the menu of a database or a collection) looks for a text or a regular expression in
+  every value, and optionally in field names, of the collections of a database or of every database, three at a time
+  with no time limit until **Stop**; the documents found are grouped by collection, shown in the inspector island,
+  opened in a document tab, opened together in their collection with **Open in collection**, and their `_id` copied.
+- The Relationship diagram of a database samples its collections, finds the fields that refer to another collection
+  and draws them as boxes and arrows that can be moved, zoomed and opened; it is copied as a Mermaid `erDiagram` or
+  saved as an SVG image, and the MCP tool `describe_relations` uses the same references.
+- A document of a collection tab shows **Go from here** in the inspector island: the documents it refers to and the
+  collections that refer to it, each opened filtered in its collection; a reference cell opens what it refers to with
+  `Ctrl`+click, `Ctrl+Enter` or its context menu.
 
 ### Fixed
 

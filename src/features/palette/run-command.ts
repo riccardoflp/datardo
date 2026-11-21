@@ -170,6 +170,15 @@ function isOfferedByItsCard(state: AppState, id: string): boolean {
     case 'server.largest-keys':
       // The search is the Memory section's: it is offered while the Server page is the active tab.
       return active?.shows.kind === 'page' && active.shows.page === 'server';
+    case 'search.show':
+      // The page of the current connection, which the engine of the area already makes a MongoDB one.
+      return state.nav.current !== undefined;
+    case 'relation.diagram':
+      // The diagram of the database of the active tab: a database must be known.
+      return 'database' in targetNow(state);
+    case 'relation.open-referenced':
+      // The reference of the selected cell of the table: the table says when there is none.
+      return active?.shows.kind === 'collection';
     case 'server.slow-log-reset':
       return currentConnectionOf(state)?.readOnly === false;
     default:

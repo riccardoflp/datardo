@@ -21,6 +21,8 @@ import { start as startGridFs } from './gridfs';
 import { start as startMcp } from './mcp';
 import { start as startWatch } from './watch';
 import { start as startPubSub } from './pubsub';
+import { start as startSearch } from './search';
+import { start as startRelations } from './relations';
 
 /** What one area does at start. */
 export type AreaStart = (services: MainServices) => Promise<void>;
@@ -45,6 +47,8 @@ const starts: readonly AreaStart[] = [
   startSavedQueries,
   startGridFs,
   startMcp,
+  startSearch,
+  startRelations,
   startPing,
   startCheckUpdate,
 ];

@@ -10,6 +10,8 @@ import { connectionsToText, type ExportFormat, type ExportSecrets } from '../fea
 import { fileOfConnection, isFileProblem, jsonFields } from '../features/connection/types';
 import { transferText } from '../features/connection/text';
 import { saveFailedMessage } from '../features/playground/save';
+import { svgWriter } from '../features/relation/export-svg';
+import { text as relationText } from '../features/relation/text';
 import { queryFileWriter } from '../features/saved-query/types';
 import { writeAtomically } from '../storage/store';
 import { notify } from '../runner/notify';
@@ -61,13 +63,29 @@ function watchText(args: Json): Promise<string> {
   return Promise.resolve(typeof text === 'string' ? text : '');
 }
 
+/** relation.svg { text }: the picture of a Relationship diagram, as the page drew it (relation.export-svg). */
+function diagramText(args: Json): Promise<string> {
+  const text = jsonFields(args)['text'];
+  return Promise.resolve(typeof text === 'string' ? text : '');
+}
+
 /** The writers of the content of a file, by name. */
 const writers: Readonly<Record<string, (args: Json) => Promise<string>>> = {
   'connection.write-file': connectionsFile,
   'playground.text': playgroundText,
   'watch.export': watchText,
   'pubsub.messages': messagesFile,
+  [svgWriter]: diagramText,
 };
+
+/** The message a file that could not be written ends with, for the writers whose card words it. */
+function failureOf(writer: string, path: string, error: unknown): string | undefined {
+  const message = error instanceof Error ? error.message : String(error);
+  if (writer === 'playground.text') {
+    return saveFailedMessage(path, message);
+  }
+  return writer === svgWriter ? relationText.svg.notSaved(message) : undefined;
+}
 
 /**
  * `key.export`: the keys read a page at a time and written beside the file as `.part`, renamed once complete; what it
@@ -79,12 +97,16 @@ async function writeKeys(step: FileStep, args: Json, signal: AbortSignal): Promi
   notify(ports, { feature: 'key.export', level: 'success', text: done.message });
 }
 
-/** Writes a playground's file; what fails says *Could not save <file>: <error>* (playground.save). */
-async function writePlayground(path: string, content: string): Promise<void> {
+/**
+ * Writes a file; what fails says what the card of its writer words: *Could not save <file>: <error>*
+ * (playground.save), *Diagram not saved: <error>* (relation.export-svg).
+ */
+async function writeFile(writer: string, path: string, content: string): Promise<void> {
   try {
     await writeAtomically(path, content);
   } catch (error: unknown) {
-    throw new Error(saveFailedMessage(path, error instanceof Error ? error.message : String(error)));
+    const failure = failureOf(writer, path, error);
+    throw failure === undefined ? error : new Error(failure);
   }
 }
 
@@ -176,9 +198,7 @@ export const fileWriter: FileWriter = async (step: FileStep, signal: AbortSignal
         throw new Error(`Datardo has no writer for ${step.path}.`);
       }
       const written = await writer(content.args);
-      await (content.writer === 'playground.text'
-        ? writePlayground(step.path, written)
-        : writeAtomically(step.path, written));
+      await writeFile(content.writer, step.path, written);
     }
   }
 };

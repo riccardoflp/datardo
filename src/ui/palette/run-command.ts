@@ -26,6 +26,7 @@ import { openAbout } from '../window/about';
 import { openGoTo } from './go-to-store';
 import { flushPlaygrounds } from '../pages/playground/playground-store';
 import { isPubSubCommand, runPubSubCommand } from '../pages/pubsub/pubsub-commands';
+import { followSelectedCell } from '../pages/relation/table-links';
 
 let switcherOpener: (() => void) | undefined;
 
@@ -132,6 +133,11 @@ export function runCommand(id: string, state: AppState): void {
   }
   if (isIndexCommand(id)) {
     runIndexCommand(id, state);
+    return;
+  }
+  // **Open referenced document** follows the reference of the selected cell, as `Ctrl+Enter` does (`relation.follow`).
+  if (id === 'relation.open-referenced') {
+    followSelectedCell(state);
     return;
   }
   const local = windowOnly[id];

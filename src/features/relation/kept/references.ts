@@ -31,7 +31,9 @@ export type KeptEvent =
   /** **Refresh** of the tree island, on a database or on every database of a connection. */
   | { readonly kind: 'refreshed'; readonly connection: ConnectionId; readonly database?: string }
   /** The connection was disconnected or removed. */
-  | { readonly kind: 'forgotten'; readonly connection: ConnectionId };
+  | { readonly kind: 'forgotten'; readonly connection: ConnectionId }
+  /** A collection of the database was renamed or dropped, or the database dropped (`manage.rename-collection`). */
+  | { readonly kind: 'database-forgotten'; readonly connection: ConnectionId; readonly database: string };
 
 function isOf(entry: KeptEntry, connection: ConnectionId, database?: string): boolean {
   return entry.connection === connection && (database === undefined || entry.database === database);
@@ -79,6 +81,8 @@ export function keptAfter(kept: KeptReferences, event: KeptEvent): KeptReference
       );
     case 'forgotten':
       return kept.filter((entry) => entry.connection !== event.connection);
+    case 'database-forgotten':
+      return kept.filter((entry) => !isOf(entry, event.connection, event.database) || entry.reading);
   }
 }
 

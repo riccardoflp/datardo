@@ -39,13 +39,8 @@ describe('relation.open-referenced', () => {
         },
       },
     ]);
-    expect(opened.after).toEqual([
-      {
-        kind: 'start',
-        feature: 'query.run',
-        target: { kind: 'collection', connection: local.id, database: 'shop', collection: 'users' },
-      },
-    ]);
+    // The window shows the filter in the bar of the tab and runs it: the plan starts nothing after its step.
+    expect(opened.after).toEqual([]);
     expect(opened.danger).toEqual({ kind: 'none' });
     expect(opened.undo).toEqual({ cannot: 'Nothing is written; Back returns to where you were.' });
   });
