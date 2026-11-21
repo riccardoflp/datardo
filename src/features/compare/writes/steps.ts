@@ -147,6 +147,17 @@ export function refreshAfter(target: SideRef): After {
 }
 
 /**
+ * What a write says once its steps have run, from what it plans (the runner does not give a plan the replies of its
+ * steps, Q58): *Wrote 5 documents, deleted 4 in Production › shop.orders.*, and the pages read again.
+ */
+export function plannedAfter(target: SideInfo, written: number, deleted: number): readonly After[] {
+  return [
+    { kind: 'notify', level: 'success', text: text.writes.wrote(written, deleted, sideText(target)) },
+    refreshAfter(target),
+  ];
+}
+
+/**
  * What a write says once its steps have run, from their replies: *Wrote 5 documents, deleted 4 in Production ›
  * shop.orders.*, and the pages read again. A document written is one the server inserted or matched.
  */

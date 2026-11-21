@@ -6,7 +6,7 @@
 import type { Json } from '../../shared/engine-request';
 import type { Context } from '../../shared/feature';
 import { connectionId, type ConnectionId } from '../../shared/ids';
-import { savedConnection } from '../../shared/state/connections';
+import { savedConnection, type ConnectionsState } from '../../shared/state/connections';
 import type { Target } from '../../shared/target';
 
 /** Documents compared per side at most (`compare.show`, "The bounds"). */
@@ -164,7 +164,12 @@ export function readDifferences(value: unknown): readonly Difference[] {
 
 /** A side with how its connection is now: its name, and whether its documents can be changed (D14, R5.2). */
 export function sideInfo(context: Context, side: SideRef): SideInfo {
-  const saved = savedConnection(context.state.connections, side.connection);
+  return sideInfoIn(context.state.connections, side);
+}
+
+/** A side as the page shows it, from the saved connections: its connection's name and why it can't be changed. */
+export function sideInfoIn(connections: ConnectionsState, side: SideRef): SideInfo {
+  const saved = savedConnection(connections, side.connection);
   const why = saved?.readOnly === true ? 'read-only' : side.view ? 'view' : undefined;
   return {
     ...side,

@@ -35,6 +35,8 @@ import { areaCommands as userCommands } from './user/commands';
 import { commands as indexCommands } from './index/commands';
 import { areaCommands as searchCommands } from './search/commands';
 import { areaCommands as relationCommands } from './relation/commands';
+import { areaCommands as compareCommands } from './compare/commands';
+import { areaCommands as structureCommands } from './structure/commands';
 
 import type { Command } from './command';
 
@@ -75,4 +77,6 @@ export const commands: readonly Command[] = [
   ...indexCommands,
   ...searchCommands,
   ...relationCommands,
+  ...compareCommands,
+  ...structureCommands,
 ];

@@ -18,7 +18,9 @@ describe('structure.open-in-playground', () => {
         args: {
           connection: 'c-prod',
           database: 'shop',
+          title: 'Playground 1',
           text: structureScript(differences, { ...sides, drops: true }),
+          caret: 'start',
         },
       },
     ]);

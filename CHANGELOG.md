@@ -187,6 +187,13 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
 - A document of a collection tab shows **Go from here** in the inspector island: the documents it refers to and the
   collections that refer to it, each opened filtered in its collection; a reference cell opens what it refers to with
   `Ctrl`+click, `Ctrl+Enter` or its context menu.
+- **Compare with…** compares two collections of any MongoDB connections document by document, with a filter, fields
+  to ignore and numbers compared by value or by type: the counts, the first 300 differences of each kind, the
+  difference of a document field by field in the inspector, and one document or a whole side made like the other
+  after a confirmation, every BSON type kept and recorded for undo, refused on a read-only side or a view.
+- **Compare structure with…** compares the collections, views, options, indexes, search indexes and shard keys of two
+  databases, and makes the right one like the left one: with the script copied or opened in a playground, or applied
+  after a confirmation that asks to type the name of what it drops.
 
 ### Fixed
 

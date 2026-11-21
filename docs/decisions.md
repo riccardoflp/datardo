@@ -1282,3 +1282,27 @@ Raised while the catalog was written; each names the cards that hold the current
   samples the database again with the size the tool gives, keeps what it found for the tabs as a diagram's sample
   does, and answers with the collections and the relations; an assistant asking about a database therefore also
   refreshes the references its tabs use (`mcp.data-model-tools`, `relation.read`).
+- **Q114** — The comparison of two collections as built in M35, where the cards say nothing: Datardo chose the least
+  surprising behavior, to be confirmed. `compare.read` started by the page is one app action of the main process,
+  which reads each side to its end in batches of 1,000 documents as stored (in bytes, `cursorNextBytes`) and gives
+  them to the pairing on a worker thread (`src/runner/workers/`), so that only the `_id`s and the hashes stay in
+  memory (QA11); its progress is the detail of its one item of work in progress, which a read of the application now
+  may report. A filter that is not valid is refused before anything is read, with the runner's message of a refusal.
+  While the runner gives no Operation its replies (Q58), *Wrote 5 documents, deleted 4 in Production ›
+  shop.orders.* is written from the plan that ran, not from the server's counts; `afterReplies` waits for Q58. What
+  the tab keeps (the two sides, the filter, **Ignore** and the two options) and its title are an Operation with an
+  app step, `compare.show` started by the page with `{ keep }`, as D57 says of what Datardo remembers, so it is in the
+  log; the tab's memory keeps them as text in `choices`. **Compare with…** from the tree reads the collections of the
+  left database once, to know whether the left side is a view. **Cancel** pressed before the item of work appears
+  stops it as soon as it appears. After a write the page compares again. The columns of the list are headed **Kind**,
+  **_id** and **What differs**. (`compare.show`, `compare.read`, `compare.copy-document`, `compare.make-like`).
+- **Q115** — The structure comparison of two databases as built in M35, where the cards say nothing: the read of both
+  sides is one app action of the main process (`src/main/structure-reads.ts`), which runs each side's loop of `request`,
+  `nextRequests` and `parse` at the same time and says how far each is in its item of work in progress; the page
+  has no **Cancel** of its own, only the status line's. What the tab keeps (the two sides after **⇄**, **Only
+  differences** or **All**, the chip, the folded groups and **Include drops in the script**) and its title are an
+  Operation with an app step, `structure.show` started with `{ keep }` (D57); the folded groups are kept as a JSON
+  list in `choices`. **Open in playground** titles the new playground as **New playground** does (*Playground 2*) and
+  puts the caret at its first line. `structure.apply` says nothing of its own after it ran while Q58 waits: the
+  runner's warning names the steps that failed, and the page compares again. (`structure.show`, `structure.read`,
+  `structure.open-in-playground`, `structure.apply`).

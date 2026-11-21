@@ -22,7 +22,7 @@ import { carryOutAfter } from './after';
 import { Cancelled, unlessCancelled } from './cancel';
 import { writeLog } from './log';
 import { notify, reportRefusal } from './notify';
-import type { RunnerPorts } from './ports';
+import type { ProgressReport, RunnerPorts } from './ports';
 import { runPlan } from './run';
 import { sendRead } from './read';
 import { runtimeOf } from './runtime';
@@ -175,7 +175,10 @@ async function startRead(
   });
   let result: unknown;
   try {
-    result = feature.parse(await unlessCancelled(sendRead(ports, request, work.signal), work.signal), args);
+    const progress: ProgressReport = (change) => {
+      work.change(change);
+    };
+    result = feature.parse(await unlessCancelled(sendRead(ports, request, work.signal, progress), work.signal), args);
   } finally {
     work.end();
   }

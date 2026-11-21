@@ -31,7 +31,7 @@ import {
   deleteSteps,
   documentsInOrder,
   keptOf,
-  refreshAfter,
+  plannedAfter,
   refusedTarget,
   targetPlace,
   writeSides,
@@ -98,7 +98,7 @@ export function plan(context: Context, answers: Answers): Outcome {
     touches: documentsText(1),
     undo: undoOf(undoNoteOf(targetPlace(context, target), context.state.settings, kept), kept),
     publishes: false,
-    after: [refreshAfter(target)],
+    after: plannedAfter(target, action === 'delete' ? 0 : 1, action === 'delete' ? 1 : 0),
   });
 }
 
