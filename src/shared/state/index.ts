@@ -37,6 +37,7 @@ import { initialPubSubPages, reducePubSub, type PubSubEvent, type PubSubPages } 
 import { initialSearchState, reduceSearch, type SearchState, type SearchStateEvent } from './search';
 import { initialRelationState, reduceRelation, type RelationState, type RelationStateEvent } from './relation';
 import { initialTasksState, reduceTasks, type TasksEvent, type TasksState } from './tasks';
+import { initialSchemaState, reduceSchema, type SchemaEvent, type SchemaState } from './schema';
 
 /** Everything the window shows and the features decide from, apart from the results of reads. */
 export interface AppState {
@@ -60,6 +61,7 @@ export interface AppState {
   readonly search: SearchState;
   readonly relation: RelationState;
   readonly tasks: TasksState;
+  readonly schema: SchemaState;
 }
 
 /** Every change to the app's state. */
@@ -83,7 +85,8 @@ export type AppEvent =
   | PubSubEvent
   | SearchStateEvent
   | RelationStateEvent
-  | TasksEvent;
+  | TasksEvent
+  | SchemaEvent;
 
 /** The state at start, before anything is loaded. */
 export const initialState: AppState = {
@@ -107,6 +110,7 @@ export const initialState: AppState = {
   search: initialSearchState,
   relation: initialRelationState,
   tasks: initialTasksState,
+  schema: initialSchemaState,
 };
 
 /** The one function that changes the app's state. */
@@ -152,5 +156,7 @@ export function reduce(state: AppState, event: AppEvent): AppState {
       return { ...state, relation: reduceRelation(state.relation, event) };
     case 'tasks':
       return { ...state, tasks: reduceTasks(state.tasks, event) };
+    case 'schema':
+      return { ...state, schema: reduceSchema(state.schema, event) };
   }
 }

@@ -236,12 +236,12 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`explain.show`](explain.md#explainshow--the-explain-section) | The Explain section | View | M23 | Specified |
-| [`explain.run`](explain.md#explainrun--ask-the-server-for-the-explain) | Ask the server for the explain | Read | M23 | Specified |
-| [`explain.summary`](explain.md#explainsummary--the-summary-of-an-explain) | The summary of an explain | Derivation | M23 | Specified |
-| [`explain.shards`](explain.md#explainshards--the-winning-plan-of-each-shard) | The winning plan of each shard | Derivation | M23 | Specified |
-| [`explain.suggest-index`](explain.md#explainsuggest-index--the-index-that-would-serve-a-query) | The index that would serve a query | Derivation | M23 | Specified |
-| [`explain.raw`](explain.md#explainraw--the-raw-output-of-an-explain) | The raw output of an explain | View | M23 | Specified |
+| [`explain.show`](explain.md#explainshow--the-explain-section) | The Explain section | View | M23 | Built |
+| [`explain.run`](explain.md#explainrun--ask-the-server-for-the-explain) | Ask the server for the explain | Read | M23 | Built |
+| [`explain.summary`](explain.md#explainsummary--the-summary-of-an-explain) | The summary of an explain | Derivation | M23 | Built |
+| [`explain.shards`](explain.md#explainshards--the-winning-plan-of-each-shard) | The winning plan of each shard | Derivation | M23 | Built |
+| [`explain.suggest-index`](explain.md#explainsuggest-index--the-index-that-would-serve-a-query) | The index that would serve a query | Derivation | M23 | Built |
+| [`explain.raw`](explain.md#explainraw--the-raw-output-of-an-explain) | The raw output of an explain | View | M23 | Built |
 
 ## Column actions
 
@@ -619,12 +619,12 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`schema.show`](schema.md#schemashow--the-schema-section) | The Schema section | View | M23 | Specified |
-| [`schema.sample`](schema.md#schemasample--the-documents-that-are-analyzed) | The documents that are analyzed | Read | M23 | Specified |
-| [`schema.analyze`](schema.md#schemaanalyze--the-summary-of-a-sample-of-documents) | The summary of a sample of documents | Derivation | M23 | Specified |
-| [`schema.histogram`](schema.md#schemahistogram--the-ranges-of-a-histogram) | The ranges of a histogram | Derivation | M23 | Specified |
-| [`schema.share`](schema.md#schemashare--how-a-share-is-written) | How a share is written | Derivation | M23 | Specified |
-| [`schema.filter-from-value`](schema.md#schemafilter-from-value--filter-on-a-value-a-range-or-a-type) | Filter on a value, a range or a type | Operation | M23 | Specified |
+| [`schema.show`](schema.md#schemashow--the-schema-section) | The Schema section | View | M23 | Built |
+| [`schema.sample`](schema.md#schemasample--the-documents-that-are-analyzed) | The documents that are analyzed | Read | M23 | Built |
+| [`schema.analyze`](schema.md#schemaanalyze--the-summary-of-a-sample-of-documents) | The summary of a sample of documents | Derivation | M23 | Built |
+| [`schema.histogram`](schema.md#schemahistogram--the-ranges-of-a-histogram) | The ranges of a histogram | Derivation | M23 | Built |
+| [`schema.share`](schema.md#schemashare--how-a-share-is-written) | How a share is written | Derivation | M23 | Built |
+| [`schema.filter-from-value`](schema.md#schemafilter-from-value--filter-on-a-value-a-range-or-a-type) | Filter on a value, a range or a type | Operation | M23 | Built |
 
 ## Search
 

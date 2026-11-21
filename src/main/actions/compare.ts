@@ -14,15 +14,11 @@ import { connectionEngines } from '../connections';
 import { compareSides } from '../compare-reads';
 import type { MainServices } from '../services';
 import { readBoth } from '../structure-reads';
+import { workerFolder } from '../worker-folder';
 
-/**
- * The worker of the pairing, started for each comparison; built beside the main process (`pairing.js`). In an
- * installed Datardo it and its chunks are kept out of the archive (`asarUnpack`), since a worker thread is started
- * from a file on the disk.
- */
+/** The worker of the pairing, started for each comparison: the bundle `pairing.js` ({@link workerFolder}). */
 function pairing(): PairingStarter {
-  const folder = import.meta.dirname.replace(/app\.asar(?=[\\/]|$)/, 'app.asar.unpacked');
-  return onWorker(join(folder, 'pairing.js'));
+  return onWorker(join(workerFolder(), 'pairing.js'));
 }
 
 function choicesOf(value: unknown): Readonly<Record<string, string>> {

@@ -12,12 +12,13 @@ export default defineConfig({
       outDir: 'out/main',
       externalizeDeps: false,
       rolldownOptions: {
-        // The process of a playground's run (`playground.run`) and the worker thread of a comparison (`compare.read`)
-        // are bundles of their own.
+        // The process of a playground's run (`playground.run`), the worker thread of a comparison (`compare.read`) and
+        // the worker threads of `schema.analyze` are bundles of their own.
         input: {
           index: resolve('src/main/index.ts'),
           playground: resolve('src/main/playground/process-entry.ts'),
           pairing: resolve('src/runner/workers/pairing-entry.ts'),
+          workers: resolve('src/runner/workers/entry.ts'),
         },
         external: ['electron'],
       },

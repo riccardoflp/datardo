@@ -571,6 +571,18 @@ for the database, which the next collection tab or diagram finds again; **Refres
 old, and a connection disconnected or removed forgets its own. This answers the part of Q84 on references. Rejected:
 an After step on each card of the manage area, which would make three cards of M21 name an action of M34.
 *Built in M34 on 2026-11-21; unless the author decides otherwise.*
+## D62 — Schema and Explain read again each time they are shown, and Schema analyzes the find filter in Aggregate
+
+The Schema and Explain sections are built as their cards say (M23). Each reads from the server when it is shown and
+connected, as the Indexes section does: Schema samples again (`schema.sample`), Explain explains again
+(`explain.run`), and Explain also when its tab becomes active again, so that a pipeline changed in the editor and
+explained from there is shown as it is. The last result stays on screen, dimmed, while the new one is read. In
+**Aggregate**, the Schema section analyzes the documents of the filter that **Find** keeps for the tab, not those of
+the pipeline. The chart part of Q26 is left to M24. Rejected: keeping the last result until **Analyze** or
+**Explain** is pressed, which shows a sample or a plan that may no longer be true; sampling the output of the
+pipeline, which can be of any shape and which Schema's card does not describe.
+*Built in M23 on 2026-11-21 as Q26 describes; answers the Schema and Explain part of Q26 unless the author decides
+otherwise.*
 
 ## Open questions
 
@@ -647,9 +659,11 @@ Raised while the catalog was written; each names the cards that hold the current
   Changes to what a tab shows (sorting from a header, switching mode, expanding a column) are written as
   Derivations in the query and table areas and as Operations with an app step in the aggregate area. One convention?
   (`table.sort`, `aggregate.sort-column`).
-- **Q26** — Schema, Chart and Explain read from the server each time their section is shown; Schema analyzes the
-  filter's documents also in Aggregate; a chart needs MongoDB 5.0 for histograms and dates by unit. (`schema.sample`,
-  `chart.draw`, `explain.run`).
+- **Q26** — *Schema and Explain answered on 2026-11-21 by
+  [D62](#d62--schema-and-explain-read-again-each-time-they-are-shown-and-schema-analyzes-the-find-filter-in-aggregate)*,
+  unless the author decides otherwise; Chart is open. Schema, Chart and Explain read from the server each time their
+  section is shown; Schema analyzes the filter's documents also in Aggregate; a chart needs MongoDB 5.0 for histograms
+  and dates by unit. (`schema.sample`, `chart.draw`, `explain.run`).
 - **Q27** — Saved query files keep Mongoster's format with no version; the queries folder is the folder itself;
   **Reveal file** replaces Open File. (`saved-query.file-format`, `saved-query.choose-folder`).
 - **Q28** — No notification after an edit in a cell or a save of a document tab, as in Mongoster, or one with
@@ -1347,3 +1361,32 @@ Raised while the catalog was written; each names the cards that hold the current
   checklist, not by a UI test. The scheduler runs in every UI test, checking first 3 s after the start, then every
   15 s. The field names of `tasks/tasks.json` and `tasks/<id>.json` are now in [data.md](data.md#the-data-folder);
   the rest of Q39 stays. (`task.run`, `task.due`, `task.tray`).
+- **Q120** — The Schema section as built in M23 keeps the size chosen in **Sample** and the fields expanded in the
+  window while Datardo runs, for each tab, not in the tab's memory: they are not restored with the tab, as the card
+  says they are kept with it. The last sample of each tab, whether it runs, its result and how it ended, is in the
+  app's state (the part `schema`), because the sample that `schema.filter-from-value` starts as its After is read in
+  the main process and its result never reaches the window otherwise; the analysis runs on a worker thread of the
+  bundle `workers.js` (`schema.show`, `schema.sample`).
+- **Q121** — `schema.filter-from-value` puts its filter in the tab's **Filter** with the app action
+  query.set-filter, which the schema area registers: the field takes the text and flashes once, and the Documents
+  section does not run the query again until the user does. M24's `chart.filter-from-mark` names an action of the
+  same name: one area must keep it, or the app does not start (`schema.filter-from-value`).
+- **Q122** — The section bar as built in M23: **Schema** follows **Documents**, and **More** is a menu after the
+  other sections with **Explain**, pressed while Explain is shown. **Schema** and **Explain** there and in Go to start
+  `schema.show` and `explain.show`, whose plans make the active tab show the section (an app step `tab.activate`),
+  where **Indexes** starts `tab.open`. The Explain section explains again when its tab becomes active, which is how
+  **Explain** of the pipeline editor shows a changed pipeline (`schema.show`, `explain.show`).
+- **Q123** — In the Schema and Explain sections, the query bar's run button becomes **Analyze** and **Explain**, and
+  `Ctrl+Enter` in the filter runs them, as it runs the query; `Enter` adds a line, as everywhere in the bar, where the
+  card of `schema.sample` says `Enter`. In **Aggregate**, the Schema section shows the pipeline editor's bar, without
+  **Analyze**: **Sample** or Go to analyzes again (`schema.sample`, `explain.run`).
+- **Q124** — Cancelling `schema.sample` or `explain.run` stops waiting at once and shows *Cancelled*, but the
+  command goes on on the server until it ends or reaches its time limit: no `killOp` is sent, though `runner.cancel`
+  says a MongoDB operation is stopped on the server with it when the server allows it. Their cards say Cancel ends the
+  command on the server; the integration tests check only that the cancel comes while the server runs it
+  (`runner.cancel`, `schema.sample`, `explain.run`).
+- **Q125** — Controls of M23 with no place on their card: **Validation rules…** of the Schema section shows the
+  Validation section (`manage.validation`); **Expand all**, **Collapse all**, the arrow of a field and the arrows of
+  the raw output change only the window; **Create…** of a suggested index opens `index.create` on the suggested
+  keys, which that dialog now opens as plain numbers (`{ status: 1 }`, named `status_1`) whatever way they are given
+  (`schema.show`, `explain.show`, `explain.raw`, `index.create`).

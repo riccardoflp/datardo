@@ -199,6 +199,14 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
   a database or a collection, or **New task…** on the Scheduled tasks page, which shows each task's next run and last
   runs. A run missed while Datardo was closed is logged or run once at the next start, older outputs past **Keep**
   are deleted (never a file the task did not write), a run can be run now or cancelled, and failed runs notify.
+- The Schema section of a collection analyzes a sample of 100, 1,000 or 10,000 documents of the filter, at random
+  when more match, on a worker thread that **Cancel** stops within one batch: each field with its share of the
+  documents, its types, its most frequent values or a histogram, the sizes of its arrays, and its nested fields,
+  expanded one by one or all at once. A click on a value, a range or a type adds it to the filter and analyzes again.
+- The Explain section shows how a find or a pipeline ran: whether it read the whole collection, sorted in memory or
+  used an index, the documents returned and examined, the winning plan as a tree, shard by shard on a sharded
+  cluster, and the stages after the query; it suggests an index by the equality, sort and range rule, which
+  **Create…** opens in the index dialog, and **Raw** shows the server's output as it came.
 
 ### Fixed
 
