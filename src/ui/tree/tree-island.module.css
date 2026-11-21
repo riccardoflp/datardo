@@ -165,6 +165,7 @@
 .menu {
   z-index: var(--z-dialog);
   min-width: calc(var(--dialog-width) / 2);
+
   /* A long menu (a collection's) scrolls rather than going past the window. */
   max-height: var(--radix-dropdown-menu-content-available-height);
   overflow-y: auto;
