@@ -151,7 +151,12 @@ test.describe('document.open', () => {
     await bothThemes(window);
     const allowed = startIntent(window, 'connection.allow-changes', null, target);
     const asked = window.getByRole('alertdialog').or(window.getByRole('dialog')).last();
-    if (await asked.isVisible({ timeout: 2000 }).catch(() => false)) {
+    // Allow changes may ask first: whichever comes first, the question or the end, under the load of a whole suite.
+    const shown = asked
+      .waitFor({ state: 'visible', timeout: 30_000 })
+      .then(() => 'asked' as const)
+      .catch(() => 'not asked' as const);
+    if ((await Promise.race([allowed.then(() => 'ended' as const), shown])) === 'asked') {
       await asked.getByRole('button').last().click();
     }
     await allowed;
