@@ -2,8 +2,8 @@
  * The writes of the keys area against the test Redis (M13): each runs through the runner as the window starts it,
  * with the answers its question gets and its confirmation accepted, and the server is looked at afterwards. A write
  * that is recorded is undone from the Undo history (`undo.last`), the key back with its value and the time it had
- * left. A read-only connection is refused before anything is sent. The keys are `m13:write:*` in the databases 13
- * and 14.
+ * left. A read-only connection is refused before anything is sent. The keys are `m13:write:*` in the databases 12
+ * and 13.
  */
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { hexOf } from '../../../src/features/key/types';

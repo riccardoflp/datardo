@@ -2,7 +2,7 @@
  * The reads of the keys tab against the test Redis (M13; QA7, R9.3): `key.scan` with a pattern and a type,
  * `key.details`, `key.inspect`, the database of each tab (`key.switch-database`), and a large database opened with
  * `SCAN` alone. The server's `INFO commandstats` shows that it never received `KEYS`. The keys are `m13:read:*` in
- * database 13, and `m13:many:*` for the large database, whose size `DATARDO_TEST_MANY_KEYS` sets (500,000 by default;
+ * database 12, and `m13:many:*` for the large database, whose size `DATARDO_TEST_MANY_KEYS` sets (500,000 by default;
  * 5,000,000 for QA7 as written).
  */
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -72,7 +72,7 @@ beforeAll(async () => {
   await live.command(database, 'SET', 'm13:read:session:1', 'x', 'PX', '7500000');
   await live.command(database, 'RPUSH', 'm13:read:queue', 'a', 'b');
   await live.command(database, 'SET', Uint8Array.from([...bytes('m13:read:bin:'), 0xff]), 'raw');
-  await live.command(other, 'SET', 'm13:read:other', 'in 14');
+  await live.command(other, 'SET', 'm13:read:other', 'in the other database');
 });
 
 afterAll(async () => {

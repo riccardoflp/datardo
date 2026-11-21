@@ -3,7 +3,7 @@
  * connected to the server as Cache (writable, keeping its undo history) and as Cache read-only, the scans of
  * `src/main/key-scans.ts`, the writer of `key.export`, the actions of the undo history on a temporary data folder,
  * and the window's dialogs answered from a queue. The file dialogs of an export and of an import answer with the paths
- * a test gives. Its keys are prefixed `m13:`, in the databases 13 and 14 of a shared server.
+ * a test gives. Its keys are prefixed `m13:`, in the databases 12 and 13 of a shared server, away from 14 and 15, which other tests empty.
  */
 import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -33,7 +33,7 @@ export const readOnlyId = connectionId('c-m13-read-only');
 const toolId = connectionId('c-m13-tool');
 
 /** The databases the tests of this milestone may use on a shared server. */
-export const databases: readonly [number, number] = [13, 14];
+export const databases: readonly [number, number] = [12, 13];
 
 /** The runner on the test Redis, what it keeps, and a way to start a feature. */
 export interface LiveKeys {

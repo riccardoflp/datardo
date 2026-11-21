@@ -1,7 +1,7 @@
 /**
  * `key.export` and `key.import` against the test Redis (M13; QA3): a key of each type, whose name and values are not
  * valid UTF-8, is exported to a file, deleted, imported from that file, and is then equal by `DUMP`, with the same
- * expiry to the second. The keys are `m13:qa3:*` in database 13; the file is in a temporary folder.
+ * expiry to the second. The keys are `m13:qa3:*` in database 12; the file is in a temporary folder.
  */
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';

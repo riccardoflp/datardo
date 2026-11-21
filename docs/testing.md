@@ -24,9 +24,11 @@ read-only connection', …) })`. `catalog.py --tests test` reports a card with n
   time; `MONGOMS_SYSTEM_BINARY` points it at an installed one instead.
 - **Redis**: the same file starts `redis-server` on a free port with no persistence, from `DATARDO_TEST_REDIS_BINARY`
   when set, else from the `PATH`. On Windows, where Redis has no build of its own, set `DATARDO_TEST_REDIS_URL` to a
-  server that may be emptied (Redis in WSL or in Docker, or Memurai): the tests use databases 14 and 15 of it and
-  flush only those. With neither, the Redis integration tests are skipped and say so in their summary; the CI never
-  skips them.
+  server that may be emptied (Redis in WSL or in Docker, or Memurai): the tests that empty a database use 14 and 15
+  of it and flush only those; the other tests use databases of their own, one or two for each area, and touch only
+  their own keys there (the keys 12 and 13, the values 4 and 5, the console 6 and 7, the Server page 8 and 9), never
+  14 or 15, since test files run at the same time. With neither, the Redis integration tests are skipped and say so in
+  their summary; the CI never skips them.
 - **A second Redis with an ACL user, TLS and a password**, for the connection tests, is started the same way with a
   configuration of `test/fixtures/redis/`.
 - **A Redis whose `CONFIG` and `CLIENT` are renamed away**, as a managed service turns them off, for the Server
