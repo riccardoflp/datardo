@@ -593,6 +593,21 @@ since is never shown as if it were still true. While it runs, the chart drawn be
 dates by a unit need MongoDB 5.0, as the card says, and are refused before anything is sent on an older server.
 Rejected: keeping the last chart until **Draw** is pressed, which shows numbers that may no longer be true.
 *Built in M24 on 2026-11-21 as Q26 describes; answers the Chart part of Q26 unless the author decides otherwise.*
+## D64 — An index a slow query suggests, the profiler turned on, and read-only, as each card says
+
+Q30 is settled as the cards describe, each page keeping its own control (M30). On the Monitor page, **Create index…**
+of a slow query is `monitor.create-suggested-index`: it reads the indexes of the collection, refuses when one has the
+same keys in the same order, and asks before it builds the index with no options, which the server names. In the
+Index advisor, **Create index…** opens `index.create`, the index dialog filled with the keys of the advice, where
+options and a name can be chosen. The profiler is turned on in the advisor by `advisor.turn-on-profiler` (level 1 at
+the server's threshold, with its confirmation) and set on the Monitor page by `monitor.set-profiler` (any level and
+threshold, no confirmation). On a read-only connection the Monitor page disables its writing controls with *The
+connection <name> is read-only.* as tooltip and has no **Kill…** on the rows; the advisor disables **Create index…**,
+**Hide**, **Unhide** and **Drop…** with *The connection is read-only* and does not show **Turn on…**; every one of
+these Operations also refuses on such a connection. Rejected: one Operation for both pages, which would give the
+Monitor page a dialog where its card asks for one confirmation, or the advisor a build with no choice of options;
+one rule for read-only, which would change the cards of both pages.
+*Built in M30 on 2026-11-21 as Q30 describes; answers Q30 unless the author decides otherwise.*
 
 ## Open questions
 
@@ -684,7 +699,10 @@ Raised while the catalog was written; each names the cards that hold the current
   the type toggles hide lines without narrowing the stream; the resume token is not kept across starts; the buttons
   keep **Copy event**. The document history's bounds stay constants. (`watch.show`, `watch.pipeline`, `watch.resume`,
   `history.read-writes`).
-- **Q30** — Creating the index a slow query suggests: the advisor opens the index dialog filled in, the Monitor page
+- **Q30** — *Answered on 2026-11-21 by
+  [D64](#d64--an-index-a-slow-query-suggests-the-profiler-turned-on-and-read-only-as-each-card-says)*, unless the
+  author decides otherwise: each page keeps its own control, as its card says. Creating the index a slow query
+  suggests: the advisor opens the index dialog filled in, the Monitor page
   has an operation of its own. The advisor's **Turn on** for the profiler overlaps the Monitor's control. On a
   read-only connection some pages hide the buttons that write and one disables them with a text. One rule for each.
   (`advisor.show`, `monitor.create-suggested-index`, `advisor.turn-on-profiler`, `monitor.set-profiler`).
@@ -1429,3 +1447,31 @@ Raised while the catalog was written; each names the cards that hold the current
   under **More**, after **Explain**, and **More** reads as pressed while either is shown. Cancelling `chart.draw` is
   as Q124: the aggregation goes on on the server until its time limit (`chart.draw`, `chart.show`,
   `codegen.show`, `palette.run-command`).
+- **Q130** — The Monitor page as built in M30 shows only the sections that are built, **Operations** and **Slow
+  queries**: its section bar leaves out **Stats**, **Replication** and **Sharding**, Go to offers **Monitor**,
+  **Monitor: Operations** and **Monitor: Slow queries** only, and a section asked for that is not built
+  (`open_monitor` with `replication`, a tab restored on one) shows **Operations**. The tool `sharding_status` waits for
+  `monitor.read-sharding` (M31). `monitor.read-database-stats` is registered for the **Database** lists, its step
+  `list` only, before its card is built in M31 (`monitor.show`, `mcp.tab-tools`).
+- **Q131** — The reads of the Monitor page take a failed request as a reply (`failedRequests: 'are-replies'`), and
+  the runner now gives `parse` the server's error code with its message, `{ kind: 'error', message, code }`, so that
+  the code 13 is told from 8000, 115 and 59 as `monitor.show` says. Every Read that takes failed requests as replies
+  now receives the code too, where Q107 says that it receives the message alone (`monitor.show`, `runner.run`).
+- **Q132** — The Log writes each step with `runner.step-text`, which writes a command of the `admin` database as
+  `db.getSiblingDB("admin").runCommand({ killOp: 1, op: 4721 })`, where the card of `monitor.kill-operation` gives
+  the line as `db.adminCommand({ killOp: 1, op: 4721 })`, the text the plan gives its step and the confirmation
+  shows. The integration test checks the line the runner writes (`monitor.kill-operation`, `runner.step-text`).
+- **Q133** — Controls of M30 with no place on their card: the Monitor page's **Refresh** and **Auto**, the filters
+  and the choices of its sections, **Copy**, **Copy query** and **Show operations** of the inspector island change
+  only the window or start the page's own reads and carry no element; the advisor's **Refresh**, **Copy**, **Open**,
+  **Explain**, **+N more queries**, **Hide**, **Unhide** and **Drop…** carry none either, as `advisor.show` lists no
+  place for them. The values typed in the profiler's and the threshold's controls are kept in the window until
+  **Apply** runs, not with the tab (`monitor.show`, `monitor.slow-queries`, `advisor.show`).
+- **Q134** — The Monitor page knows which namespaces are views from what the tree island has read of their databases:
+  a view whose database the tree has not listed is taken as a collection, so **Create index…** is not refused there
+  with `monitor.create-suggested-index/view` and the server's error is shown instead (`monitor.slow-queries`,
+  `monitor.create-suggested-index`).
+- **Q135** — `index_advice` reads through the runner of the main process the reads `advisor.show` sends (the app
+  action `advisor.analyze`), for a database or one collection. The stand-ins of `mcp/tool/explain.ts` (`explain_query`)
+  and `mcp/tool/slow-ops.ts` (`slow_queries`) are not replaced by the features of M23 and M30: they read the same
+  fields, and replacing them changes what those tools write (`mcp.performance-tools`, `advisor.analyze`).

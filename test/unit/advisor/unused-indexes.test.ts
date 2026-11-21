@@ -109,6 +109,6 @@ describe('advisor.unused-indexes', () => {
       hidden as UnusedAdvice,
     );
     expect(item.buttons.map((each) => each.label)).toEqual(['Unhide', 'Drop…']);
-    expect(item.buttons[0]).toMatchObject({ feature: 'index.hide', args: { name: 'note_1', hidden: false } });
+    expect(item.buttons[0]).toMatchObject({ feature: 'index.hide', args: { index: 'note_1', hidden: false } });
   });
 });

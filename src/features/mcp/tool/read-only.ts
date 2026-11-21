@@ -164,6 +164,8 @@ export const toolActions: ReadonlySet<string> = new Set([
   mcpActions.undoWrite,
   mcpActions.openTab,
   'saved-query.list',
+  // The advice of the Index advisor, from reads only (`advisor.read-indexes`, `advisor.read-slow-operations`).
+  'advisor.analyze',
 ]);
 
 /** The kinds of tab no tool opens: a console or a playground, where a command or a script would run. */

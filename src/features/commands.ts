@@ -42,6 +42,8 @@ import { commands as schemaCommands } from './schema/commands';
 import { commands as explainCommands } from './explain/commands';
 import { commands as chartCommands } from './chart/commands';
 import { commands as codegenCommands } from './codegen/commands';
+import { commands as monitorCommands } from './monitor/commands';
+import { commands as advisorCommands } from './advisor/commands';
 
 import type { Command } from './command';
 
@@ -89,4 +91,6 @@ export const commands: readonly Command[] = [
   ...explainCommands,
   ...chartCommands,
   ...codegenCommands,
+  ...monitorCommands,
+  ...advisorCommands,
 ];

@@ -51,6 +51,11 @@ import { StructureInspector, structureExtras } from './structure/structure-inspe
 import { StructurePage } from './structure/structure-page';
 import { useStructureChanges } from './structure/structure-store';
 import { TasksPage } from './tasks/tasks-page';
+import { MonitorInspector } from './monitor/monitor-inspector';
+import { MonitorPage } from './monitor/monitor-page';
+import { monitorExtras } from './monitor/monitor-state';
+import { useMonitorTab } from './monitor/monitor-store';
+import { AdvisorPage } from './advisor/advisor-page';
 
 /** A page as the main island draws it. */
 export type PageView = () => React.JSX.Element | null;
@@ -74,6 +79,8 @@ export const pages: Readonly<Record<string, PageView>> = {
   compare: ComparePage,
   structure: StructurePage,
   tasks: TasksPage,
+  monitor: MonitorPage,
+  advisor: AdvisorPage,
 };
 
 /** The pages of the tabs that show a target of a connection, by the kind of what they show (`keys`, `key`). */
@@ -102,6 +109,7 @@ export const inspectors: Readonly<
   search: SearchInspector,
   compare: CompareInspector,
   structure: StructureInspector,
+  monitor: MonitorInspector,
 };
 
 /** What a page adds to the active tab, by its kind or its page: what the status line counts, what the inspector shows. */
@@ -118,6 +126,7 @@ export const tabExtras: Readonly<Partial<Record<string, typeof keysExtras>>> = {
   search: searchExtras,
   compare: compareExtras,
   structure: structureExtras,
+  monitor: monitorExtras,
 };
 
 /** The name `inspectors` and `tabExtras` know a tab by: its page for a page tab, else the kind of what it shows. */
@@ -140,4 +149,5 @@ export function usePageStores(): void {
   useSearchTab(undefined);
   useCompareChanges();
   useStructureChanges();
+  useMonitorTab(undefined);
 }

@@ -168,7 +168,9 @@ export function createItem(input: ItemsInput, advice: CreateAdvice): CreateItem 
 
 function indexButtons(input: ItemsInput, advice: RedundantAdvice | UnusedAdvice, reason: string): AdvisorControl[] {
   const target = collectionTarget(input, advice);
-  const args = { ...on(input, advice), name: advice.index.name };
+  // `index.hide` and `index.drop` take the index as `index`, and the reason of the advice as `advice`, which begins
+  // the confirmation of the drop and makes the hide say what it did.
+  const args = { ...on(input, advice), index: advice.index.name, advice: reason };
   const hidden = advice.index.hidden;
   return [
     startControl({
@@ -183,7 +185,7 @@ function indexButtons(input: ItemsInput, advice: RedundantAdvice | UnusedAdvice,
       label: text.buttons.drop,
       feature: 'index.drop',
       target,
-      args: { ...args, reason },
+      args,
       readOnly: input.readOnly,
     }),
   ];

@@ -286,6 +286,30 @@ describe('mcp.tab-tools', () => {
   });
 });
 
+describe('mcp.performance-tools', () => {
+  it('index_advice reads the indexes and the slow operations of a database through the advisor, and writes nothing', async () => {
+    const sent = live.sent.length;
+    const reply = await live.tool('index_advice', { connection: 'Local', database: shopDatabase });
+    expect(reply.isError, reply.text).toBe(false);
+    expect(reply.text).toContain(`Index advice for ${shopDatabase}: 1 collection, 2 indexes`);
+    const asked = live.sent.slice(sent);
+    expect(asked.length).toBeGreaterThan(0);
+    for (const each of asked) {
+      expect(isReadingRequest(each), JSON.stringify(each.request)).toBe(true);
+    }
+  });
+
+  it('open_monitor opens the Monitor page of the connection on a section', async () => {
+    live.opened.length = 0;
+    const reply = await live.tool('open_monitor', { connection: 'Local', section: 'slow-queries' });
+    expect(reply.isError, reply.text).toBe(false);
+    expect(live.opened).toHaveLength(1);
+    expect(live.opened[0]).toMatchObject({
+      args: { shows: { kind: 'page', page: 'monitor' }, section: 'slow-queries' },
+    });
+  });
+});
+
 describe('mcp.redis-key-tools', () => {
   it('scans the keys of database 11 and gives the details of one, leaving the database of the tabs alone', async () => {
     const scanned = await live.tool('redis_scan_keys', {

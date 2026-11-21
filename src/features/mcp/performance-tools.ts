@@ -36,7 +36,7 @@ import { refusedSentence, readSlowOps } from './tool/slow-read';
 import { groupOps, groupText, inNamespace } from './tool/slow-ops';
 import { isFailed, type ToolCall, type ToolEnd, type ToolStep } from './types';
 
-/** The app action the advisor answers (`advisor.analyze`, not on this branch). */
+/** The app action the main process answers with the advice of the Index advisor (`advisor.analyze`). */
 export const advisorAction = 'advisor.analyze';
 
 function indexableOf(pipeline: readonly Json[]): { filter: Record<string, Json>; sort?: Record<string, Json> } {

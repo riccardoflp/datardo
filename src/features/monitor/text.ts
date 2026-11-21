@@ -30,6 +30,23 @@ export const text = {
   },
   readOnlyStatus: 'Read-only',
   copy: 'Copy',
+  /** The names the window gives its parts, for the accessibility of the page; no card writes them. */
+  window: {
+    sectionBar: 'Sections of the Monitor page',
+    toolbar: 'Toolbar of the Monitor page',
+    sectionToolbar: (section: string) => `Toolbar of ${section}`,
+    rowMenu: 'More',
+    /** The mark after the type of an operation that waits for a lock, whose tooltip says so. */
+    lockMark: 'lock',
+    emptyLine: 'Select a row to see it here.',
+    operationsTable: 'Operations in progress',
+    slowTable: 'Slow queries',
+    profilerLevel: 'Profiler level',
+    threshold: 'Threshold in ms',
+    reading: 'Reading…',
+    why: 'Why an index could help',
+    query: 'Query',
+  },
   /** *The connection Production is read-only.* */
   readOnly: (connection: string) => `The connection ${connection} is read-only.`,
   /** The sentences of a command the server does not allow (`monitor.show`, "States"). */

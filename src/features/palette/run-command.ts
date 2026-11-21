@@ -30,6 +30,8 @@ import { isOffered as isSchemaOffered } from '../schema/commands';
 import { isOffered as isExplainOffered } from '../explain/commands';
 import { isOffered as isChartOffered } from '../chart/commands';
 import { isOffered as isCodegenOffered } from '../codegen/commands';
+import { isOffered as isMonitorOffered } from '../monitor/commands';
+import { isOffered as isAdvisorOffered } from '../advisor/commands';
 import { isOffered as isManageOffered } from '../manage/commands';
 import { isGridFsCommandOffered } from '../gridfs/commands';
 import { isOffered as isUserOffered } from '../user/commands';
@@ -147,6 +149,9 @@ function isOfferedByItsArea(state: AppState, id: string): boolean | undefined {
   }
   if (id.startsWith('chart.') || id.startsWith('codegen.')) {
     return id.startsWith('chart.') ? isChartOffered(state, id) : isCodegenOffered(state, id);
+  }
+  if (id.startsWith('monitor.') || id.startsWith('advisor.')) {
+    return id.startsWith('monitor.') ? isMonitorOffered(state, id) : isAdvisorOffered(state, id);
   }
   return id.startsWith('field.') ? isFieldOffered(state) : undefined;
 }
@@ -330,8 +335,13 @@ export function intentOf(state: AppState, id: string): Intent | undefined {
   const args = argsOf(state, feature, variant);
   // The undo history of a connection is the current connection's, whatever tab is active (`undo.per-connection`).
   const current = state.nav.current;
-  // A backup and a restore from Go to are of the current connection, whatever tab is active (`backup.create`).
-  const onConnection = feature === 'undo.per-connection' || feature === 'backup.create' || feature === 'backup.restore';
+  // A backup and a restore from Go to are of the current connection, whatever tab is active (`backup.create`), and
+  // so is the Index advisor (`advisor.show`, "Entry points").
+  const onConnection =
+    feature === 'undo.per-connection' ||
+    feature === 'backup.create' ||
+    feature === 'backup.restore' ||
+    feature === 'advisor.show';
   const target: Target =
     onConnection && current !== undefined ? { kind: 'connection', connection: current } : targetNow(state, feature);
   return { feature: featureId(feature), target, ...(args === undefined ? {} : { args }) };

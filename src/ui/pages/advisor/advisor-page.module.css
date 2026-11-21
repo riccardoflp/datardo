@@ -1,0 +1,128 @@
+/* advisor.show: the toolbar, the summary, where the slow operations come from, and the three lists of advices. */
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-height: 0;
+  padding: var(--space-2) var(--space-3);
+  overflow: auto;
+}
+
+.body p {
+  margin: 0;
+}
+
+.scope {
+  font-weight: var(--font-weight-strong);
+}
+
+.button {
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-small);
+  background: var(--color-island);
+  color: var(--color-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.button[aria-disabled='true'],
+.button:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.button:hover:not([aria-disabled='true'], :disabled) {
+  background: var(--color-hover);
+}
+
+.count,
+.note,
+.empty {
+  color: var(--color-text-muted);
+}
+
+.line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.sources {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.error {
+  margin: 0;
+  padding: var(--space-2);
+  border: var(--border-width) solid var(--color-danger);
+  border-radius: var(--radius-small);
+  overflow-wrap: anywhere;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.list-heading {
+  margin: 0;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-strong);
+}
+
+.items,
+.queries {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.queries {
+  gap: var(--space-1);
+  padding-left: var(--space-3);
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-small);
+  overflow-wrap: anywhere;
+}
+
+.heading {
+  font-weight: var(--font-weight-strong);
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
