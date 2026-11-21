@@ -2,7 +2,11 @@ import { describe, expect, it } from 'vitest';
 import { commands } from '../../../src/features/server/commands';
 import { plan as slowLogPlan } from '../../../src/features/server/slow-log';
 import {
+  choicesOf,
+  choicesRecord,
+  clientIdRead,
   defaultAuto,
+  initialChoices,
   firstSection,
   isAutoRefreshDue,
   isLatestReply,
@@ -18,7 +22,8 @@ import { partOf } from '../../../src/features/server/unavailable';
 import type { Context } from '../../../src/shared/feature';
 import { tabId } from '../../../src/shared/ids';
 import { mongoConnection, stateWith } from '../connection/context';
-import { at, cacheLocal, cacheProduction, contextOn, failed, planOf, serverState } from './context';
+import { at, cacheLocal, cacheProduction, commandsOf, contextOn, failed, planOf, serverState } from './context';
+import type { ReadRequest } from '../../../src/shared/feature';
 
 const serverShows = { kind: 'page', connection: cacheLocal.id, page: 'server', title: 'Server' } as const;
 
@@ -167,5 +172,40 @@ describe('server.show', () => {
     expect(view({ connection: cacheProduction, section: 'clients', auto: 5 }).readOnly).toBe(
       'The connection Cache production is read-only.',
     );
+  });
+
+  it('after a restart the restored tab shows the section, Auto and the filters it had: they travel with tab.activate', () => {
+    const choices = choicesRecord({
+      ...initialChoices,
+      auto: 2,
+      clientsFilter: 'blpop',
+      slowerThan: '100',
+      clientsSort: { column: 'memory', direction: 'descending' },
+    });
+    const kept = planOf(plan(withServerTab(), { args: { choices } }));
+    expect(kept.steps).toEqual([
+      expect.objectContaining({ action: 'tab.activate', args: { tab: 't-server', memory: { choices } } }),
+    ]);
+    const restored = choicesOf(choices);
+    expect(restored).toMatchObject({ auto: 2, clientsFilter: 'blpop', slowerThan: '100' });
+    expect(restored.clientsSort).toEqual({ column: 'memory', direction: 'descending' });
+    const section = planOf(plan(withServerTab(), { args: { section: 'memory' } }));
+    expect(section.steps).toEqual([
+      expect.objectContaining({ action: 'tab.activate', args: { tab: 't-server', section: 'memory' } }),
+    ]);
+  });
+
+  it('choices kept that are missing or not valid start as a page never shown: Auto at 5 s, the clients by ID', () => {
+    expect(choicesOf(undefined)).toEqual(initialChoices);
+    expect(choicesOf({ auto: '7', clientsSort: 'nothing up', slowLogOrder: 'other', configFilter: 3 })).toEqual(
+      initialChoices,
+    );
+  });
+
+  it('CLIENT ID is read once on the ordinary client and gives the id of the page’s own client', () => {
+    const request = clientIdRead.request(contextOn('server.show'), { connection: cacheLocal.id });
+    expect(commandsOf(request as ReadRequest)).toEqual(['CLIENT ID']);
+    expect(clientIdRead.parse([42], null)).toBe('42');
+    expect(clientIdRead.parse([failed('NOPERM no CLIENT')], null)).toBeNull();
   });
 });

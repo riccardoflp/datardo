@@ -902,3 +902,24 @@ Raised while the catalog was written; each names the cards that hold the current
   `nav.toggle-inspector` there; the title of a new document's tab, *people · New document 1*, is never cut.
   (`runner.run`, `nav.toggle-inspector`, `tab.title`, `document.delete`, `document.delete-many`, `document.update-many`, `document.insert`, `document.insert-from-tab`,
   `document.inline-edit`, `document.open`, `undo.record`, `tab.restore`, `tab.close`).
+- **Q73** — The Server page as built in M17: `server.slow-log` and `server.show:slow-log` both open the page on its
+  Slow log section and both cards title them **Server: Slow log**, but Go to lists no two commands with one title, so
+  `server.slow-log` is titled **Slow log**; **Find largest keys** of Go to opens the page on Memory and leaves a
+  remembered ask (an `After` of the kind `remember`) that the page follows once, when the databases are known, since a Read cannot
+  start a search that runs call after call in the window; the notifications of `server.kill-client` that depend on
+  its reply (*Disconnected client 42.*, *Client 42 was already gone.*) wait for Q58, their pure `killNotification`
+  being tested alone, and the page reads the clients again once the Operation ran; the page asks `CLIENT ID` with a
+  Read of its own, `server.show:client-id`; the section and the choices are kept with the tab by `server.show` with
+  `{ section }` or `{ choices }`, an Operation whose app step is `tab.activate`, as D57 says of a change Datardo
+  remembers (the choices once they stayed unchanged for 600 ms, and only while the tab is the active tab); a read
+  that fails for another reason than a refusal of the server (a connection lost) puts its message in the part's
+  error line as the sentence *other*; a second click on **Duration** puts the slow log back in the server's order;
+  **Keys per database** and the configuration have rows that can be selected, shown whole in the inspector island,
+  while the rows of **Where the overhead goes** cannot; the requests of the largest keys of one reply of `SCAN` are
+  sent one after the other, as Q65 says of the keys tab; the search is run in the window, with **Cancel** beside its
+  line rather than in the status line. (`server.show`, `server.slow-log`, `server.largest-keys`,
+  `server.kill-client`, `server.clients`, `server.config`, `server.overview`).
+- **Q74** — The tabs of the Server page keep their choices in `session.json` as `memory.choices`, text by name (at
+  most 40, of at most 1,000 characters each). The field is optional and a file without it is read as before, so the
+  version of the file is unchanged and no migration is added; the author may prefer a new version with its recorded
+  old file (`server.show`, `tab.restore`).

@@ -32,6 +32,7 @@ export function request(_context: Context, args: Json): ReadRequest {
   return {
     kind: 'engine',
     requests: [{ connection: connectionId(textArg(args, 'connection')), request: serverCommand('CONFIG', 'GET', '*') }],
+    failedRequests: 'are-replies',
   };
 }
 

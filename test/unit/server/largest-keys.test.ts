@@ -6,7 +6,7 @@ import {
   callArgs,
   cancelSearch,
   examineMore,
-  largestKeysView,
+  largestKeysAsk,
   nextCall,
   parse,
   request,
@@ -14,9 +14,11 @@ import {
   startSearch,
   type LargestKeysSearch,
 } from '../../../src/features/server/largest-keys';
+import { largestKeysView } from '../../../src/features/server/memory';
 import { parse as parseInfo } from '../../../src/features/server/read-info';
 import { hexOf } from '../../../src/features/server/types';
-import { bytes, cacheLocal, cacheProduction, commandsOf, contextOn, failed, recordedRedis } from './context';
+import type { Outcome } from '../../../src/shared/feature';
+import { bytes, cacheLocal, cacheProduction, commandsOf, contextOn, failed, planOf, recordedRedis } from './context';
 
 const context = contextOn('server.largest-keys');
 
@@ -264,5 +266,18 @@ describe('server.largest-keys', () => {
       1,
     );
     expect(largestKeysView({ connection: cacheLocal, databases: [], search }).table?.rows[0]?.key).toBe('"k\\xff"');
+  });
+
+  it('Go to’s Find largest keys opens the page on its Memory section and asks it to search, sending nothing', () => {
+    const outcome = request(context, null);
+    expect(commandsOf(outcome)).toEqual([]);
+    const shown = planOf(outcome as Outcome);
+    expect(shown.steps.map((step) => (step.kind === 'app' ? step.action : step.kind))).toEqual(['tab.open']);
+    expect(shown.steps[0]).toMatchObject({ args: { section: 'memory' } });
+    expect(shown.after.at(-1)).toEqual({
+      kind: 'remember',
+      key: largestKeysAsk,
+      value: { connection: cacheLocal.id, asked: context.now },
+    });
   });
 });

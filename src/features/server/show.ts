@@ -10,18 +10,21 @@
  */
 import type { ConnectionView } from '../../shared/connection';
 import type { Json } from '../../shared/engine-request';
-import type { Answers, Context, OperationFeature, Outcome, ReadNeed } from '../../shared/feature';
+import type { Answers, Context, OperationFeature, Outcome, ReadFeature, ReadNeed } from '../../shared/feature';
 import { run } from '../../shared/feature';
-import { featureId, type ConnectionId } from '../../shared/ids';
+import { connectionId, featureId, type ConnectionId } from '../../shared/ids';
 import { savedConnection } from '../../shared/state/connections';
 import { targetConnection } from '../../shared/target';
 import { appPlan } from '../nav/types';
 import { connectionPageShows } from '../palette/sources';
 import { runnerText } from '../runner/text';
 import { planOf } from '../tab/open';
+import { clientColumns, initialClientSort, type ClientSort } from './clients';
+import { clientIdRequest, parseClientId } from './read-clients';
+import type { SlowLogOrder } from './slow-log';
 import { text } from './text';
 import { isReadByAutoRefresh } from './unavailable';
-import { clockText, serverSections, type PartRead, type ServerSection } from './types';
+import { clockText, serverSections, textArg, type PartRead, type ServerSection } from './types';
 
 /** The intervals of **Auto**, in seconds; 0 is **Off**. */
 export const autoIntervals = [0, 2, 5, 15] as const;
@@ -232,8 +235,90 @@ export function sectionAsked(args: unknown): ServerSection | undefined {
   return serverSections.find((section) => section === asked);
 }
 
-/** The plan that opens the page of a connection, or makes its tab active, on a section when one is asked for. */
-export function openPlan(context: Context, section: ServerSection | undefined): Outcome {
+/** What the page keeps of its controls with its tab (`tab.restore`): **Auto**, the filters and the sorts. */
+export interface ServerChoices {
+  readonly auto: AutoInterval;
+  readonly clientsFilter: string;
+  /** **Idle ≤**, as typed. */
+  readonly clientsIdle: string;
+  readonly clientsSort: ClientSort;
+  readonly slowLogFilter: string;
+  /** **Slower than**, in milliseconds, as typed. */
+  readonly slowerThan: string;
+  readonly slowLogOrder: SlowLogOrder;
+  readonly configFilter: string;
+}
+
+/** The choices of a page never shown: **Auto** at 5 s, no filter, the clients by **ID**, the slow log as the server's. */
+export const initialChoices: ServerChoices = {
+  auto: defaultAuto,
+  clientsFilter: '',
+  clientsIdle: '',
+  clientsSort: initialClientSort,
+  slowLogFilter: '',
+  slowerThan: '0',
+  slowLogOrder: 'server',
+  configFilter: '',
+};
+
+function sortOfText(value: string | undefined): ClientSort {
+  const [column, direction] = (value ?? '').split(' ');
+  const known = clientColumns.find((each) => each === column);
+  return known === undefined || (direction !== 'ascending' && direction !== 'descending')
+    ? initialClientSort
+    : { column: known, direction };
+}
+
+/** The choices kept with a tab, each one that is missing or not valid as it starts. */
+export function choicesOf(kept: Readonly<Record<string, unknown>> | undefined): ServerChoices {
+  const textOf = (name: keyof ServerChoices): string | undefined => {
+    const value = kept?.[name];
+    return typeof value === 'string' ? value : undefined;
+  };
+  const auto = autoIntervals.find((each) => String(each) === textOf('auto'));
+  return {
+    auto: auto ?? initialChoices.auto,
+    clientsFilter: textOf('clientsFilter') ?? '',
+    clientsIdle: textOf('clientsIdle') ?? '',
+    clientsSort: sortOfText(textOf('clientsSort')),
+    slowLogFilter: textOf('slowLogFilter') ?? '',
+    slowerThan: textOf('slowerThan') ?? initialChoices.slowerThan,
+    slowLogOrder: textOf('slowLogOrder') === 'duration' ? 'duration' : 'server',
+    configFilter: textOf('configFilter') ?? '',
+  };
+}
+
+/** The choices as the tab keeps them: text by name. */
+export function choicesRecord(choices: ServerChoices): Readonly<Record<string, string>> {
+  return {
+    auto: String(choices.auto),
+    clientsFilter: choices.clientsFilter,
+    clientsIdle: choices.clientsIdle,
+    clientsSort: `${choices.clientsSort.column} ${choices.clientsSort.direction}`,
+    slowLogFilter: choices.slowLogFilter,
+    slowerThan: choices.slowerThan,
+    slowLogOrder: choices.slowLogOrder,
+    configFilter: choices.configFilter,
+  };
+}
+
+/** The choices asked to be kept with the tab: `args.choices`, made valid. */
+function choicesAsked(args: unknown): Readonly<Record<string, string>> | undefined {
+  const asked = typeof args === 'object' && args !== null ? (args as Record<string, unknown>)['choices'] : undefined;
+  return typeof asked === 'object' && asked !== null
+    ? choicesRecord(choicesOf(asked as Readonly<Record<string, unknown>>))
+    : undefined;
+}
+
+/**
+ * The plan that opens the page of a connection, or makes its tab active, on a section when one is asked for, keeping
+ * the choices given with the tab.
+ */
+export function openPlan(
+  context: Context,
+  section: ServerSection | undefined,
+  choices?: Readonly<Record<string, string>>,
+): Outcome {
   const id = targetConnection(context.target) ?? context.state.nav.current;
   const connection = id === undefined ? undefined : savedConnection(context.state.connections, id);
   if (connection?.engine !== 'redis') {
@@ -243,13 +328,31 @@ export function openPlan(context: Context, section: ServerSection | undefined): 
     shows: connectionPageShows(connection.id, serverPage),
     background: false,
     ...(section === undefined ? {} : { section }),
+    ...(choices === undefined ? {} : { memory: { choices } }),
   });
 }
 
-/** Feature: server.show — the tree's **Server** and Go to's **Server**, **Server: Overview**, …: the tab of the page. */
+/**
+ * Feature: server.show — the tree's **Server** and Go to's **Server**, **Server: Overview**, …: the tab of the page.
+ * The page itself starts it with `{ section }` when a section is chosen and with `{ choices }` when **Auto**, a filter
+ * or a sort changes, so that they are kept with the tab.
+ */
 export function plan(context: Context, answers: Answers): Outcome {
-  return openPlan(context, sectionAsked(answers['args']));
+  const args = answers['args'];
+  return openPlan(context, sectionAsked(args), choicesAsked(args));
 }
 
 /** The feature, as the runner starts it. */
 export const feature: OperationFeature = { kind: 'operation', id: featureId('server.show'), plan };
+
+/** `server.show:client-id`: `CLIENT ID` on the connection's ordinary client, once when the page opens. */
+export const clientIdRead: ReadFeature = {
+  kind: 'read',
+  id: featureId('server.show:client-id'),
+  request: (_context, args) => ({
+    kind: 'engine',
+    requests: [{ connection: connectionId(textArg(args, 'connection')), request: clientIdRequest() }],
+    failedRequests: 'are-replies',
+  }),
+  parse: (replies) => parseClientId(replies[0]) ?? null,
+};

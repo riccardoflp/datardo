@@ -69,6 +69,7 @@ export interface DatabaseRow {
   readonly keys: string;
   readonly expires: string;
   readonly averageTtl: string;
+  readonly selected: boolean;
   readonly open: ServerControl;
 }
 
@@ -79,6 +80,8 @@ export interface OverviewState {
   /** The time, in milliseconds since 1970, for the time since the last snapshot. */
   readonly now: number;
   readonly selected?: OverviewTileName;
+  /** The row of the table selected, by its database, when no tile is. */
+  readonly selectedDatabase?: number;
 }
 
 /** What the Overview section shows: the error line, the tiles, the table or *No keys.*, and the inspector island. */
@@ -260,7 +263,7 @@ export function databasesWithKeys(report: InfoReport): readonly KeyspaceDatabase
   return report.databases.filter((database) => (database.keys ?? 0) > 0);
 }
 
-function databaseRow(connection: ConnectionId, database: KeyspaceDatabase): DatabaseRow {
+function databaseRow(connection: ConnectionId, database: KeyspaceDatabase, selected?: number): DatabaseRow {
   const ttl = database.averageTtlMs;
   return {
     database: database.database,
@@ -268,6 +271,7 @@ function databaseRow(connection: ConnectionId, database: KeyspaceDatabase): Data
     keys: countText(database.keys),
     expires: countText(database.expires),
     averageTtl: ttl === undefined || ttl === 0 ? text.missing : timeText(ttl / 1000),
+    selected: database.database === selected,
     open: startControl(text.overview.openKeys, undefined, 'key.show', {
       target: { kind: 'redis-database', connection, database: database.database },
     }),
@@ -293,11 +297,21 @@ export function view(state: OverviewState): OverviewView {
           databases: {
             title: text.overview.databases,
             columns: text.overview.columns,
-            rows: databases.map((database) => databaseRow(state.connection, database)),
+            rows: databases.map((database) => databaseRow(state.connection, database, state.selectedDatabase)),
           },
         }),
-    ...(selected === undefined
-      ? {}
-      : { inspector: { title: text.overview.tiles[selected], fields: sectionFields(report, tileSections[selected]) } }),
+    ...inspection(report, state),
   };
+}
+
+/** What the inspector island shows: the fields of the section of the tile selected, or the pairs of a database. */
+function inspection(report: InfoReport, state: OverviewState): { inspector?: Inspection } {
+  const selected = state.selected;
+  if (selected !== undefined) {
+    return {
+      inspector: { title: text.overview.tiles[selected], fields: sectionFields(report, tileSections[selected]) },
+    };
+  }
+  const database = report.databases.find((each) => each.database === state.selectedDatabase);
+  return database === undefined ? {} : { inspector: { title: database.name, fields: database.pairs } };
 }

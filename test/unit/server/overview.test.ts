@@ -146,4 +146,16 @@ describe('server.overview', () => {
     expect(shown.error).toMatch(/^INFO needs a user that may run it: /u);
     expect(shown.tiles).toEqual([]);
   });
+
+  it('selecting a row of Keys per database shows every pair of its line in the inspector island', () => {
+    const shown = view({
+      connection: cacheLocal.id,
+      info: infoOf('# Keyspace', 'db3:keys=7,expires=0,avg_ttl=0,subexpiry=0'),
+      now,
+      selectedDatabase: 3,
+    });
+    expect(shown.databases?.rows[0]?.selected).toBe(true);
+    expect(shown.inspector?.title).toBe('db3');
+    expect(shown.inspector?.fields).toContainEqual(['subexpiry', '0']);
+  });
 });

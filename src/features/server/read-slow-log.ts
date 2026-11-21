@@ -76,7 +76,11 @@ export function slowLogRequests(part: SlowLogPart): readonly RedisRequest[] {
 /** Feature: server.read-slow-log — `{ connection, part }`; the threshold only when the section is chosen and with **Refresh**. */
 export function request(_context: Context, args: Json): ReadRequest {
   const connection = connectionId(textArg(args, 'connection'));
-  return { kind: 'engine', requests: slowLogRequests(partOfArgs(args)).map((each) => ({ connection, request: each })) };
+  return {
+    kind: 'engine',
+    requests: slowLogRequests(partOfArgs(args)).map((each) => ({ connection, request: each })),
+    failedRequests: 'are-replies',
+  };
 }
 
 /** One entry of `SLOWLOG GET`, its secrets masked; `undefined` for a reply that is not an entry. */

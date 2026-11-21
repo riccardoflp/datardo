@@ -90,6 +90,8 @@ export interface TabMemory {
   readonly pattern?: string;
   /** The type filter of a keys tab. */
   readonly typeFilter?: string;
+  /** What a page of sections keeps of its controls, by name: **Auto**, the filters, the sorts (`server.show`). */
+  readonly choices?: Readonly<Record<string, string>>;
 }
 
 /** The unsaved text of a document tab or a playground tab, kept aside so that a crash does not lose it (D33). */

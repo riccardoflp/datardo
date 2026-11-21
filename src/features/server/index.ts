@@ -11,13 +11,14 @@ import * as readConfig from './read-config';
 import * as readInfo from './read-info';
 import * as readMemory from './read-memory';
 import * as readSlowLog from './read-slow-log';
-import { feature as show } from './show';
+import { clientIdRead, feature as show } from './show';
 import * as slowLogReset from './slow-log-reset';
 import { feature as slowLog } from './slow-log';
 
 /** The features of this area the runner can start. */
 export const features: readonly RunnableFeature[] = [
   show,
+  clientIdRead,
   slowLog,
   { kind: 'read', id: featureId('server.read-info'), request: readInfo.request, parse: readInfo.parse },
   { kind: 'read', id: featureId('server.read-clients'), request: readClients.request, parse: readClients.parse },

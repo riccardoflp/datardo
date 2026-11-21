@@ -7,6 +7,7 @@
  * own card offers it now.
  */
 import type { Intent } from '../../shared/bridge';
+import type { ConnectionView } from '../../shared/connection';
 import type { Json } from '../../shared/engine-request';
 import {
   run,
@@ -51,10 +52,15 @@ export function isRepeated(id: string): boolean {
   return repeatedCommands.has(id);
 }
 
+/** The current connection, when there is one. */
+function currentConnectionOf(state: AppState): ConnectionView | undefined {
+  const current = state.nav.current;
+  return current === undefined ? undefined : savedConnection(state.connections, current);
+}
+
 /** The engine of the current connection, when there is one. */
 function currentEngine(state: AppState): 'mongodb' | 'redis' | undefined {
-  const current = state.nav.current;
-  return current === undefined ? undefined : savedConnection(state.connections, current)?.engine;
+  return currentConnectionOf(state)?.engine;
 }
 
 /**
@@ -67,9 +73,43 @@ function isKeepUndoOffered(state: AppState, variant: 'stop' | 'keep'): boolean {
   return connection !== undefined && (connection.readOnly || isVariantOffered(connection, variant));
 }
 
+/**
+ * The commands of a collection tab: the query bar's; the pipeline editor's, which shows the editor first when Find is
+ * shown; and the document commands, which act on the selected row or on the collection. With no collection tab
+ * active, there is nothing for them to act on.
+ */
+const collectionTabCommands: ReadonlySet<string> = new Set([
+  'query.bar',
+  'query.run',
+  'query.reset',
+  'query.mode:find',
+  'query.builder',
+  'query.mode:aggregate',
+  'aggregate.add-stage',
+  'aggregate.move-stage:left',
+  'aggregate.move-stage:right',
+  'aggregate.clear',
+  'aggregate.edit-as-text:text',
+  'aggregate.edit-as-text:stages',
+  'aggregate.copy',
+  'aggregate.run',
+  'aggregate.save-as-view',
+  'document.inspect',
+  'document.open',
+  'document.inline-edit',
+  'document.insert',
+  'document.duplicate',
+  'document.delete',
+  'document.update-many',
+  'document.delete-many',
+]);
+
 /** What a command's own card says of whether it is offered now. */
 function isOfferedByItsCard(state: AppState, id: string): boolean {
   const active = activeTabOf(state.tabs);
+  if (collectionTabCommands.has(id)) {
+    return active?.shows.kind === 'collection';
+  }
   switch (id) {
     case 'nav.back:back':
       return canGo(navInput(state), 'back');
@@ -91,35 +131,6 @@ function isOfferedByItsCard(state: AppState, id: string): boolean {
       return isKeepUndoOffered(state, 'stop');
     case 'undo.per-connection:keep':
       return isKeepUndoOffered(state, 'keep');
-    case 'query.bar':
-    case 'query.run':
-    case 'query.reset':
-    case 'query.mode:find':
-    case 'query.builder':
-      // The query bar is a collection tab's: with none active, there is no query.
-      return active?.shows.kind === 'collection';
-    case 'query.mode:aggregate':
-    case 'aggregate.add-stage':
-    case 'aggregate.move-stage:left':
-    case 'aggregate.move-stage:right':
-    case 'aggregate.clear':
-    case 'aggregate.edit-as-text:text':
-    case 'aggregate.edit-as-text:stages':
-    case 'aggregate.copy':
-    case 'aggregate.run':
-    case 'aggregate.save-as-view':
-      // The pipeline editor is a collection tab's; a command of it shows the editor first when Find is shown.
-      return active?.shows.kind === 'collection';
-    case 'document.inspect':
-    case 'document.open':
-    case 'document.inline-edit':
-    case 'document.insert':
-    case 'document.duplicate':
-    case 'document.delete':
-    case 'document.update-many':
-    case 'document.delete-many':
-      // They act on the selected row, or on the collection, of the active collection tab.
-      return active?.shows.kind === 'collection';
     case 'document.save':
       // A document tab of an existing document, with unsaved changes.
       return active?.shows.kind === 'document' && active.shows.newDocument === undefined && active.unsaved === true;
@@ -127,6 +138,11 @@ function isOfferedByItsCard(state: AppState, id: string): boolean {
     case 'tree.filter':
       // The tree island shows the current connection: with none, there is nothing to refresh or filter.
       return state.nav.current !== undefined;
+    case 'server.largest-keys':
+      // The search is the Memory section's: it is offered while the Server page is the active tab.
+      return active?.shows.kind === 'page' && active.shows.page === 'server';
+    case 'server.slow-log-reset':
+      return currentConnectionOf(state)?.readOnly === false;
     default:
       // The commands of the table act on the active collection tab: with none, there is no table.
       return id.startsWith('table.') ? active?.shows.kind === 'collection' : isWindowCommandOffered(state, id);

@@ -84,6 +84,12 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
   or deleted, each write shown before it runs, refused on a read-only connection and on a view, and in the undo
   history. A write that would change the type of a value (a BSON undefined, a date beyond the range of JavaScript)
   is not sent.
+- The Server page of a Redis connection, from the tree or Go to, shows the server a section at a time, read again with
+  **Refresh** or by itself every 2, 5 or 15 seconds while it is in view: the overview from `INFO` with the keys of each
+  database, the clients with a filter and **Disconnect…**, the slow log with its threshold and **Clear…**, the memory
+  with the advice of the server and the largest keys of a database, found with `SCAN` a bounded number at a time,
+  replication, and the configuration, read-only, with its passwords hidden. A section whose command the server refuses
+  says why and the rest of the page works; the section, **Auto** and the filters come back at the next start.
 
 ### Fixed
 

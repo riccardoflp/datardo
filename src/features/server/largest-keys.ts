@@ -9,31 +9,27 @@
  * nothing, so it is allowed on a read-only connection.
  */
 import type { Json } from '../../shared/engine-request';
-import type { Context, ReadRequest } from '../../shared/feature';
+import { run, type Context, type Outcome, type ReadRequest } from '../../shared/feature';
 import { connectionId } from '../../shared/ids';
-import type { ConnectionView } from '../../shared/connection';
+import { targetConnection } from '../../shared/target';
 import { groupThousands } from '../../shared/text-units';
-import { emptyRanking, largestKeys, type MeasuredKey, type Ranking, type RankedKey } from './rank-keys';
+import { emptyRanking, largestKeys, type MeasuredKey, type Ranking } from './rank-keys';
 import type { KeyspaceDatabase } from './read-info';
 import { commandLine } from './read-slow-log';
+import { openPlan } from './show';
 import { text } from './text';
 import { partOf, unavailableSentence } from './unavailable';
 import {
   argsOf,
   bytesOfHex,
-  bytesTooltip,
-  connectionTarget,
   failureOf,
   hexOf,
   readPart,
   serverCommand,
-  sizeText,
-  startControl,
   textArg,
   textOf,
   wholeArg,
   type PartRead,
-  type ServerControl,
   type Unavailable,
 } from './types';
 
@@ -60,11 +56,47 @@ function keysArg(args: Json): readonly Uint8Array[] {
   return Array.isArray(keys) ? keys.flatMap((each) => (typeof each === 'string' ? [bytesOfHex(each)] : [])) : [];
 }
 
+/** The key of `state.runner.remembered` under which Go to's **Find largest keys** asks the page to search. */
+export const largestKeysAsk = 'server.largest-keys';
+
+/** What Go to's **Find largest keys** asks the page of the connection: a search, asked at a time. */
+export interface LargestKeysAsk {
+  readonly connection: string;
+  readonly asked: number;
+}
+
+/** A search asked of the page, from what `state.runner.remembered` holds; `undefined` when it holds none. */
+export function largestKeysAskOf(remembered: unknown): LargestKeysAsk | undefined {
+  const connection = textArg(remembered, 'connection');
+  const asked = argsOf(remembered)['asked'];
+  return connection === '' || typeof asked !== 'number' ? undefined : { connection, asked };
+}
+
+/**
+ * Go to's **Find largest keys**, started with no call: the Server page of the connection on its Memory section, and
+ * the search asked of it, which it starts on the database of its **Database** menu.
+ */
+function askedFromGoTo(context: Context): Outcome {
+  const opened = openPlan(context, 'memory');
+  const connection = targetConnection(context.target) ?? context.state.nav.current;
+  if (opened.kind !== 'run' || connection === undefined || opened.plan.steps.length === 0) {
+    return opened;
+  }
+  const ask: LargestKeysAsk = { connection, asked: context.now };
+  return run({
+    ...opened.plan,
+    after: [...opened.plan.after, { kind: 'remember', key: largestKeysAsk, value: { ...ask } }],
+  });
+}
+
 /**
  * Feature: server.largest-keys — one call, `{ connection, database, step, cursor }` for a `SCAN`, or `{ connection,
  * database, step, keys }` with the names in hexadecimal for `MEMORY USAGE` and `TYPE`, all in one round trip.
  */
-export function request(_context: Context, args: Json): ReadRequest {
+export function request(context: Context, args: Json): ReadRequest | Outcome {
+  if (argsOf(args)['step'] === undefined) {
+    return askedFromGoTo(context);
+  }
   const connection = connectionId(textArg(args, 'connection'));
   const database = wholeArg(args, 'database');
   const step = textArg(args, 'step');
@@ -75,7 +107,11 @@ export function request(_context: Context, args: Json): ReadRequest {
       : step === 'type'
         ? keys.map((key) => serverCommand('TYPE', key))
         : [serverCommand('SCAN', textArg(args, 'cursor', '0'), 'COUNT', String(scanCount))];
-  return { kind: 'engine', requests: commands.map((command) => ({ connection, request: { ...command, database } })) };
+  return {
+    kind: 'engine',
+    requests: commands.map((command) => ({ connection, request: { ...command, database } })),
+    failedRequests: 'are-replies',
+  };
 }
 
 /** What one `SCAN` gave: the next cursor, and the names returned, as bytes. */
@@ -290,119 +326,4 @@ export function databaseWithMostKeys(databases: readonly KeyspaceDatabase[]): nu
     (most, each) => (most === undefined || (each.keys ?? 0) > (most.keys ?? 0) ? each : most),
     undefined,
   )?.database;
-}
-
-/** What the part of the largest keys is drawn from. */
-export interface LargestKeysState {
-  readonly connection: ConnectionView;
-  /** The databases of `# Keyspace` of `INFO`, for the **Database** menu. */
-  readonly databases: readonly KeyspaceDatabase[];
-  /** The database chosen in the menu; the one with the most keys to start with. */
-  readonly chosen?: number;
-  readonly search?: LargestKeysSearch;
-  /** The key selected, by the hexadecimal of its name. */
-  readonly selected?: string;
-}
-
-/** A row of the table of the largest keys. */
-export interface LargestKeyRow {
-  readonly rank: number;
-  readonly key: string;
-  readonly type: string;
-  readonly memory: string;
-  readonly memoryTooltip: string;
-  readonly selected: boolean;
-  /** A click shows the key in the inspector island (`key.inspect`); a double click opens its key tab (`key.open`). */
-  readonly click: ServerControl;
-  readonly open: ServerControl;
-  /** **Open key**, **Copy name**, **Delete key…**. */
-  readonly menu: readonly ServerControl[];
-}
-
-/** What the part of the largest keys shows. */
-export interface LargestKeysView {
-  readonly title: string;
-  readonly database: {
-    readonly label: string;
-    readonly value?: number;
-    readonly choices: readonly { readonly database: number; readonly label: string }[];
-  };
-  readonly find: ServerControl;
-  /** What the part shows until **Find largest keys** is pressed. */
-  readonly before?: string;
-  readonly line?: string;
-  readonly more?: ServerControl;
-  readonly table?: {
-    readonly element: 'server.largest-keys@table';
-    readonly menuElement: 'server.largest-keys@row-menu';
-    readonly columns: typeof text.largestKeys.columns;
-    readonly rows: readonly LargestKeyRow[];
-    readonly note: string;
-  };
-}
-
-function keyRow(state: LargestKeysState, search: LargestKeysSearch, key: RankedKey, index: number): LargestKeyRow {
-  const hex = hexOf(key.name);
-  const name = keyName(key.name);
-  const target = { kind: 'key', connection: state.connection.id, database: search.database, key: key.name } as const;
-  return {
-    rank: index + 1,
-    key: name,
-    type: search.types?.[hex] ?? text.missing,
-    memory: sizeText(key.bytes),
-    memoryTooltip: bytesTooltip(key.bytes) ?? '',
-    selected: hex === state.selected,
-    click: startControl(name, 'key.inspect@table', 'key.inspect', { target }),
-    open: startControl(text.largestKeys.openKey, 'key.open@table', 'key.open', { target }),
-    menu: [
-      startControl(text.largestKeys.openKey, 'key.open@row-menu', 'key.open', { target }),
-      { kind: 'copy', label: text.largestKeys.copyName, text: name },
-      startControl(text.largestKeys.deleteKey, 'key.delete@row-menu', 'key.delete', { target }),
-    ],
-  };
-}
-
-/** What the part of the largest keys shows, in the Memory section. */
-export function largestKeysView(state: LargestKeysState): LargestKeysView {
-  const chosen = state.chosen ?? databaseWithMostKeys(state.databases);
-  const search = state.search;
-  const args = { connection: state.connection.id, database: chosen ?? 0 };
-  const target = connectionTarget(state.connection.id);
-  const resumable = search?.ended === 'bound' || search?.ended === 'cancelled';
-  return {
-    title: text.memory.largestKeys,
-    database: {
-      label: text.largestKeys.database,
-      ...(chosen === undefined ? {} : { value: chosen }),
-      choices: state.databases.map((each) => ({
-        database: each.database,
-        label: text.largestKeys.databaseChoice(each.name, each.keys ?? 0),
-      })),
-    },
-    find: startControl(text.largestKeys.find, 'server.largest-keys@toolbar', 'server.largest-keys', {
-      target,
-      args,
-      busy: search !== undefined && search.ended === undefined,
-    }),
-    ...(search === undefined ? { before: text.largestKeys.before } : { line: searchLine(search) }),
-    ...(resumable
-      ? {
-          more: startControl(text.largestKeys.more, 'server.largest-keys@toolbar', 'server.largest-keys', {
-            target,
-            args: { ...args, database: search.database, more: true },
-          }),
-        }
-      : {}),
-    ...(search === undefined || search.ranking.keys.length === 0
-      ? {}
-      : {
-          table: {
-            element: 'server.largest-keys@table',
-            menuElement: 'server.largest-keys@row-menu',
-            columns: text.largestKeys.columns,
-            rows: search.ranking.keys.map((key, index) => keyRow(state, search, key, index)),
-            note: text.largestKeys.estimate,
-          },
-        }),
-  };
 }

@@ -642,23 +642,23 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`server.show`](server.md#servershow--the-server-page) | The Server page | View | M17 | Specified |
-| [`server.unavailable`](server.md#serverunavailable--what-a-section-shows-when-its-command-cannot-run) | What a section shows when its command cannot run | Derivation | M17 | Specified |
-| [`server.read-info`](server.md#serverread-info--read-info) | Read INFO | Read | M17 | Specified |
-| [`server.overview`](server.md#serveroverview--the-overview-section) | The Overview section | View | M17 | Specified |
-| [`server.read-clients`](server.md#serverread-clients--read-the-connected-clients) | Read the connected clients | Read | M17 | Specified |
-| [`server.clients`](server.md#serverclients--the-clients-section) | The Clients section | View | M17 | Specified |
-| [`server.kill-client`](server.md#serverkill-client--disconnect-a-client) | Disconnect a client | Operation | M17 | Specified |
-| [`server.read-slow-log`](server.md#serverread-slow-log--read-the-slow-log) | Read the slow log | Read | M17 | Specified |
-| [`server.slow-log`](server.md#serverslow-log--the-slow-log-section) | The Slow log section | View | M17 | Specified |
-| [`server.slow-log-reset`](server.md#serverslow-log-reset--clear-the-slow-log) | Clear the slow log | Operation | M17 | Specified |
-| [`server.read-memory`](server.md#serverread-memory--read-the-memory-of-the-server) | Read the memory of the server | Read | M17 | Specified |
-| [`server.memory`](server.md#servermemory--the-memory-section) | The Memory section | View | M17 | Specified |
-| [`server.largest-keys`](server.md#serverlargest-keys--find-the-largest-keys) | Find the largest keys | Read | M17 | Specified |
-| [`server.rank-keys`](server.md#serverrank-keys--rank-keys-by-memory) | Rank keys by memory | Derivation | M17 | Specified |
-| [`server.replication`](server.md#serverreplication--the-replication-section) | The Replication section | View | M17 | Specified |
-| [`server.read-config`](server.md#serverread-config--read-the-configuration) | Read the configuration | Read | M17 | Specified |
-| [`server.config`](server.md#serverconfig--the-configuration-section) | The Configuration section | View | M17 | Specified |
+| [`server.show`](server.md#servershow--the-server-page) | The Server page | View | M17 | Built |
+| [`server.unavailable`](server.md#serverunavailable--what-a-section-shows-when-its-command-cannot-run) | What a section shows when its command cannot run | Derivation | M17 | Built |
+| [`server.read-info`](server.md#serverread-info--read-info) | Read INFO | Read | M17 | Built |
+| [`server.overview`](server.md#serveroverview--the-overview-section) | The Overview section | View | M17 | Built |
+| [`server.read-clients`](server.md#serverread-clients--read-the-connected-clients) | Read the connected clients | Read | M17 | Built |
+| [`server.clients`](server.md#serverclients--the-clients-section) | The Clients section | View | M17 | Built |
+| [`server.kill-client`](server.md#serverkill-client--disconnect-a-client) | Disconnect a client | Operation | M17 | Built |
+| [`server.read-slow-log`](server.md#serverread-slow-log--read-the-slow-log) | Read the slow log | Read | M17 | Built |
+| [`server.slow-log`](server.md#serverslow-log--the-slow-log-section) | The Slow log section | View | M17 | Built |
+| [`server.slow-log-reset`](server.md#serverslow-log-reset--clear-the-slow-log) | Clear the slow log | Operation | M17 | Built |
+| [`server.read-memory`](server.md#serverread-memory--read-the-memory-of-the-server) | Read the memory of the server | Read | M17 | Built |
+| [`server.memory`](server.md#servermemory--the-memory-section) | The Memory section | View | M17 | Built |
+| [`server.largest-keys`](server.md#serverlargest-keys--find-the-largest-keys) | Find the largest keys | Read | M17 | Built |
+| [`server.rank-keys`](server.md#serverrank-keys--rank-keys-by-memory) | Rank keys by memory | Derivation | M17 | Built |
+| [`server.replication`](server.md#serverreplication--the-replication-section) | The Replication section | View | M17 | Built |
+| [`server.read-config`](server.md#serverread-config--read-the-configuration) | Read the configuration | Read | M17 | Built |
+| [`server.config`](server.md#serverconfig--the-configuration-section) | The Configuration section | View | M17 | Built |
 
 ## Settings
 
