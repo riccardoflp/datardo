@@ -146,6 +146,36 @@ describe('palette.run-command', () => {
     expect(intentOf(h.state(), 'window.zoom:in')).toMatchObject({ feature: 'window.zoom', args: 'in' });
   });
 
+  it('offers the commands of the document area on a collection tab, and Save document on an unsaved document tab', async () => {
+    const h = harness();
+    h.connect(local.id);
+    h.makeCurrent(local.id);
+    const documentIds = () =>
+      offeredCommands(registeredCommands, h.state(), 'windows')
+        .map((entry) => entry.id)
+        .filter((id) => id.startsWith('document.'));
+    expect(documentIds()).toEqual([]);
+    await h.open(orders);
+    expect(documentIds()).toEqual([
+      'document.inspect',
+      'document.open',
+      'document.inline-edit',
+      'document.insert',
+      'document.duplicate',
+      'document.delete',
+      'document.update-many',
+      'document.delete-many',
+    ]);
+    await h.open({ kind: 'document', connection: local.id, database: 'shop', collection: 'orders', id: '7' });
+    expect(documentIds()).toEqual([]);
+    const tab = h.state().tabs.active;
+    if (tab === undefined) {
+      throw new Error('Expected the document tab');
+    }
+    h.holder.dispatch({ slice: 'tabs', type: 'changed', tab, unsaved: true, draft: { text: '{ _id: 7 }' } });
+    expect(documentIds()).toEqual(['document.save']);
+  });
+
   it('is one app step that starts the command, with the title of the command', () => {
     const outcome = runCommand.plan(contextOf(harness().state(), 'palette.run-command'), {
       args: { command: 'window.zoom:in' },

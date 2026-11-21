@@ -92,7 +92,10 @@ export async function recordBefore(
 }
 
 /** After the steps: the plan that saves the operation, carried out; a failure warns and the write stays done. */
-export async function recordAfter(recording: Recording, failedIds: readonly Json[]): Promise<Recorded> {
+export async function recordAfter(
+  recording: Recording,
+  wrote: { readonly failedIds: readonly Json[]; readonly insertedIds: readonly Json[] },
+): Promise<Recorded> {
   if (recording.kind !== 'on') {
     return { after: [] };
   }
@@ -102,7 +105,7 @@ export async function recordAfter(recording: Recording, failedIds: readonly Json
     const decided = await decide(
       { ...hook, context: { ...hook.context, now: ports.now(), state: ports.state.get() } },
       recordFeature,
-      { ...recording.answers, wrote: { failedIds: [...failedIds] } },
+      { ...recording.answers, wrote: { failedIds: [...wrote.failedIds], insertedIds: [...wrote.insertedIds] } },
     );
     if (decided.kind !== 'plan' || decided.plan.steps.length === 0) {
       return { after: [] };

@@ -7,7 +7,13 @@ import type { TabId } from '../../../shared/ids';
 import { useCollection } from '../../query/collection-store';
 import { useAppState } from '../../state/store';
 import { DocumentsSection } from './documents-section';
-import { collectionPageState, useCollectionRef, useCollectionStart, type CollectionShows } from './use-collection';
+import {
+  collectionPageState,
+  useCollectionRef,
+  useCollectionStart,
+  useRefreshAfterWrites,
+  type CollectionShows,
+} from './use-collection';
 import { text as tableText } from '../../../features/table/text';
 import styles from './collection-page.module.css';
 
@@ -23,6 +29,7 @@ export function CollectionPage({
   const page = collectionPageState(state, tab, shows);
   const ref = useCollectionRef(page);
   useCollectionStart(ref, page);
+  useRefreshAfterWrites(ref, state.runner.refreshed);
   const collection = useCollection(tab);
   return (
     <div className={styles['page']} data-collection={shows.collection}>

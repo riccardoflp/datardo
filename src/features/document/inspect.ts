@@ -63,6 +63,10 @@ export interface InspectControl {
 export interface TreeLine {
   /** The field path, `items.2.qty`. */
   readonly path: string;
+  /** The names and positions from the top of the document, `["items", 2, "qty"]`, as `document.copy-path` takes them. */
+  readonly segments: readonly (string | number)[];
+  /** The value of the line, every type kept, as `document.copy-value` and `document.inline-edit` take it. */
+  readonly item: Json;
   readonly depth: number;
   /** The name of the field, or the position of the element. */
   readonly name: string;
@@ -126,20 +130,21 @@ interface Walk {
   readonly lines: TreeLine[];
 }
 
-function walk(walked: Walk, value: Json, parent: string, depth: number): void {
+function walk(walked: Walk, value: Json, parents: readonly (string | number)[], depth: number): void {
   for (const [name, item] of entriesOf(value) ?? []) {
-    const path = parent === '' ? name : `${parent}.${name}`;
+    const segments = [...parents, Array.isArray(value) ? Number(name) : name];
+    const path = segments.join('.');
     const editable = walked.editable && path !== '_id' && !path.startsWith('_id.');
     const children = entriesOf(item);
     if (children === undefined) {
-      walked.lines.push({ path, depth, name, value: oneLineText(item), editable });
+      walked.lines.push({ path, segments, item, depth, name, value: oneLineText(item), editable });
       continue;
     }
     const open = isOpen(walked.state, path, depth);
     const summary = Array.isArray(item) ? text.inspect.items(children.length) : text.inspect.fields(children.length);
-    walked.lines.push({ path, depth, name, value: summary, open, editable });
+    walked.lines.push({ path, segments, item, depth, name, value: summary, open, editable });
     if (open) {
-      walk(walked, item, path, depth + 1);
+      walk(walked, item, segments, depth + 1);
     }
   }
 }
@@ -147,7 +152,7 @@ function walk(walked: Walk, value: Json, parent: string, depth: number): void {
 /** The lines of the tree of a document, open as the state says. */
 export function treeLines(state: InspectState, document: JsonRecord, editable: boolean): readonly TreeLine[] {
   const lines: TreeLine[] = [];
-  walk({ state, editable, lines }, document, '', 0);
+  walk({ state, editable, lines }, document, [], 0);
   return lines;
 }
 

@@ -140,7 +140,10 @@ async function runConfirmed(ports: RunnerPorts, plan: Plan, context: Context, op
         ports.state.dispatch({ slice: 'runner', type: 'refresh-asked', connection });
       }
     }
-    const recorded = await recordAfter(recording, watch.failedIds(plan));
+    const recorded = await recordAfter(recording, {
+      failedIds: watch.failedIds(plan),
+      insertedIds: watch.insertedIds(plan),
+    });
     await publishing?.publish();
     const result = ended(ports, { plan, context, operation }, outcome);
     work.end(result.kind === 'failed' ? result.message : undefined);

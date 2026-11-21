@@ -41,7 +41,7 @@ test.describe('table.row-menu', () => {
       'YAML',
       'insertOne command',
     ]);
-    await expect(menu.getByRole('menuitem', { name: 'Inspect document' })).toHaveCount(0);
+    await expect(menu.getByRole('menuitem', { name: 'Inspect document' })).toHaveCount(1);
     await bothThemes(window);
   });
 
@@ -67,7 +67,16 @@ test.describe('table.row-menu', () => {
     const menu = window.getByRole('menu', { name: 'Menu of document 1' });
     await expect(menu).toBeVisible();
     await window.keyboard.press('ArrowDown');
-    await expect(menu.getByRole('menuitem', { name: 'Copy as' })).toBeFocused();
+    await expect(menu.getByRole('menuitem', { name: 'Inspect document' })).toBeFocused();
+    // The entries of the document area come first (M12): the arrows go down to Copy as.
+    const copyAs = menu.getByRole('menuitem', { name: 'Copy as' });
+    for (let presses = 0; presses < 6; presses += 1) {
+      if (await copyAs.evaluate((item) => item === document.activeElement)) {
+        break;
+      }
+      await window.keyboard.press('ArrowDown');
+    }
+    await expect(copyAs).toBeFocused();
     await window.keyboard.press('ArrowRight');
     await expect(
       window.getByRole('menu', { name: 'Copy as' }).getByRole('menuitem', { name: 'mongosh' }),
@@ -87,7 +96,7 @@ test.describe('table.cell-menu', () => {
     const menu = window.getByRole('menu', { name: 'Menu of name in document 1' });
     await expect(menu.getByRole('menuitem', { name: 'Copy value' })).toBeVisible();
     await expect(menu.getByRole('menuitem', { name: 'Copy field path' })).toBeVisible();
-    await expect(menu.getByRole('menuitem', { name: 'Edit value' })).toHaveCount(0);
+    await expect(menu.getByRole('menuitem', { name: 'Edit value' })).toHaveCount(1);
     await menu.getByRole('menuitem', { name: 'Add to filter' }).hover();
     const conditions = window.getByRole('menu', { name: 'Add to filter' });
     await conditions.getByRole('menuitem', { name: /equals/u }).click();

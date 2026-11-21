@@ -13,6 +13,7 @@ import { pages, tabPages } from '../pages';
 import { CollectionPage } from '../pages/collection/collection-page';
 import { KeysPathSegment } from '../pages/keys/keys-path';
 import { PlaygroundPage } from '../pages/playground/playground-page';
+import { DocumentPage } from '../pages/document/document-page';
 import { startFeature } from './intent';
 import { TabStrip } from './tab-strip';
 import styles from './bars.module.css';
@@ -169,6 +170,8 @@ export function MainIsland({
           <CollectionPage key={shown.tab} tab={shown.tab} shows={shown} />
         ) : shown.kind === 'playground' && shown.tab !== undefined ? (
           <PlaygroundPage key={shown.tab} tab={shown.tab} />
+        ) : shown.kind === 'document' && shown.tab !== undefined ? (
+          <DocumentPage key={shown.tab} tab={shown.tab} shows={shown} />
         ) : null}
       </div>
     </section>

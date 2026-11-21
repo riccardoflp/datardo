@@ -20,6 +20,7 @@ import { features as tableFeatures } from './table';
 import { features as keyFeatures } from './key';
 import { features as aggregateFeatures } from './aggregate';
 import { features as playgroundFeatures } from './playground';
+import { features as documentFeatures } from './document';
 
 /** The features of every area, as each area's index lists them. */
 const areas: readonly (readonly RunnableFeature[])[] = [
@@ -39,6 +40,7 @@ const areas: readonly (readonly RunnableFeature[])[] = [
   keyFeatures,
   aggregateFeatures,
   playgroundFeatures,
+  documentFeatures,
 ];
 
 /** The features the runner can start, by identifier. */

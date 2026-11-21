@@ -78,7 +78,11 @@ function parts(shows: TabShows, names: ConnectionNames): readonly [string, strin
     case 'collection':
       return [shows.collection, shows.database];
     case 'document':
-      return [`${shows.collection} · ${cutInTheMiddle(idShown(shows.id), idCut)}`, shows.database];
+      // A new document has no `_id` yet: its name, **New document 1**, is shown whole (`document.open`).
+      return [
+        `${shows.collection} · ${shows.newDocument === undefined ? cutInTheMiddle(idShown(shows.id), idCut) : shows.id}`,
+        shows.database,
+      ];
     case 'keys':
       if (shows.namespace === undefined) {
         return [shows.database === 0 ? text.titles.keys : `${text.titles.keys} · db${String(shows.database)}`];

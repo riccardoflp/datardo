@@ -76,6 +76,14 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
   writes are published for redis-oplog on a linked connection. The editor colors the script and suggests the
   collections, the methods and the fields; playgrounds are opened from the tree, Go to and Home, saved as
   `.mongodb.js` files that remember their connection and database, and opened again.
+- The selected document is shown in the inspector island, as a tree read with the keyboard or as text, with its values
+  and paths to copy; a value is edited in its cell or in the inspector, keeping its numeric type; a document opens in a
+  document tab, in mongosh syntax, and is saved with `Ctrl+S`, asking first when another client changed it meanwhile.
+- Documents are inserted from the insert dialog, with a template of the collection's fields, or from the tab of a new
+  document; a document is duplicated and deleted; the selected rows and the documents matching the filter are updated
+  or deleted, each write shown before it runs, refused on a read-only connection and on a view, and in the undo
+  history. A write that would change the type of a value (a BSON undefined, a date beyond the range of JavaScript)
+  is not sent.
 
 ### Fixed
 

@@ -1,12 +1,14 @@
 /**
  * `nav.inspector`: the island at the right of the main island, for the thing selected in the page. What one selected
- * thing looks like is drawn by the page's feature (`document.inspect`, `key.inspect`), which M12 and M13 bring.
+ * thing looks like is drawn by the page's feature: the document of a collection tab (`document.inspect`); the key of a
+ * keys tab comes with M13 (`key.inspect`).
  */
 import { useEffect, useState } from 'react';
 import { view } from '../../features/nav/inspector';
 import { text } from '../../features/nav/text';
 import type { NavInput } from '../../features/nav/types';
 import { inspectors } from '../pages';
+import { DocumentInspector } from '../pages/document/document-inspector';
 import { startFeature } from './intent';
 import styles from './bars.module.css';
 
@@ -25,9 +27,12 @@ function Loading({ delayMs, label }: { readonly delayMs: number; readonly label:
   ) : null;
 }
 
-/** The one thing selected, as the page of the active tab draws it (`key.inspect`). */
+/** The one thing selected, as the page of the active tab draws it (`document.inspect`, `key.inspect`). */
 function SelectedThing({ input }: { readonly input: NavInput }): React.JSX.Element | null {
   const tab = input.activeTab;
+  if (tab.kind === 'collection' && tab.tab !== undefined) {
+    return <DocumentInspector tab={tab.tab} />;
+  }
   const Drawn = inspectors[tab.kind];
   return Drawn === undefined || tab.tab === undefined ? null : <Drawn tabId={tab.tab} />;
 }

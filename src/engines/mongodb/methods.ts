@@ -6,6 +6,7 @@ import { BSON, type AbstractCursor, type ClientSession, type Collection, type Db
 import type { Json, MongoRequest } from '../../shared/engine-request';
 import { EngineError } from '../engine';
 import { documentOfBytes } from './document-bytes';
+import { checkWritable } from './unwritable';
 
 /** How many documents a method that returns many gives at most when the request names no limit (R9.2). */
 export const mostDocuments = 1000;
@@ -170,6 +171,7 @@ export async function callMethod(
   signal: AbortSignal,
   session?: ClientSession,
 ): Promise<unknown> {
+  checkWritable(request.method, request.arguments);
   const args = request.arguments.map(fromExtendedJson);
   const options: Options = {
     signal,

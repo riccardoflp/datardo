@@ -1,14 +1,17 @@
 /**
  * What an entry of a context menu of the table does once chosen (`table.row-menu`, `table.cell-menu`,
- * `table.column-menu`): the Operations of the table started through the bridge on the tab's collection, and what the
+ * `table.column-menu`): the Operations of the table started through the bridge on the tab's collection, those of the
+ * document area (`table-entries`), and what the
  * window carries out itself: the **Columns** panel, the selection, and the conditions, sorts and projections written
  * into the bar as a drop writes them (`query.add-condition`, `query.add-sort`, `query.add-projection`).
  */
 import type { Dragged, Zone, ZoneAction } from '../../features/query/drag';
 import type { LayoutChange } from '../../features/table/arrange-columns';
 import type { CopyFormat } from '../../features/table/copy-text';
-import type { Document, MenuEntry } from '../../features/table/types';
+import type { Cell } from '../../features/table/rows';
+import type { Document, MenuEntry, TableTarget } from '../../features/table/types';
 import type { Json } from '../../shared/engine-request';
+import { chooseDocumentEntry } from '../pages/document/table-entries';
 import { dropOnZone } from '../query/bar-actions';
 import { featureOfElement } from '../query/built';
 import type { CollectionRef } from '../query/collection-reads';
@@ -25,6 +28,9 @@ export interface EntryContext {
   readonly documents: readonly Document[];
   /** The field of the cell or of the header, and the expanded array it is in. */
   readonly field?: { readonly key: string; readonly value?: Json; readonly within?: string };
+  readonly target: TableTarget;
+  /** The cell of the menu, for **Edit value**, and the element its editor goes over. */
+  readonly cell?: { readonly cell: Cell; readonly row: number; readonly anchor: HTMLElement | null };
 }
 
 /** An entry that can be chosen. */
@@ -106,6 +112,8 @@ export function chooseEntry(context: EntryContext, entry: ChosenEntry): void {
       changeQuery(ref.tab, (query) => ({ ...query, selection: { keys: [] } }));
       return;
     default:
-      writeIntoBar(context, entry, feature);
+      if (!chooseDocumentEntry({ ...context, element: entry.element })) {
+        writeIntoBar(context, entry, feature);
+      }
   }
 }

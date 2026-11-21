@@ -38,6 +38,10 @@ export type TabShows =
       readonly id: string;
       /** The `_id` as canonical Extended JSON, which tells two `_id` apart by type and value. */
       readonly idJson?: string;
+      /** `n` of **New document n**, for the tab of a new document, which has no `_id` yet (`document.open`). */
+      readonly newDocument?: number;
+      /** The collection is a view: the tab is read-only. */
+      readonly view?: boolean;
     }
   | {
       readonly kind: 'keys';

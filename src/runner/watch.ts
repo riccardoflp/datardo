@@ -2,7 +2,7 @@
  * What watches the steps of a plan while they run: how each ended, for the `_id`s of the inserts that failed, which
  * the undo history does not keep (`undo.kept`), and the writes to publish for redis-oplog (`oplog.publish`).
  */
-import { failedInsertIds, type InsertOutcome } from '../features/undo/plans/record-args';
+import { failedInsertIds, generatedInsertIds, type InsertOutcome } from '../features/undo/plans/record-args';
 import type { Json } from '../shared/engine-request';
 import type { Plan, Step } from '../shared/feature';
 import type { Publishing } from './publish';
@@ -40,5 +40,13 @@ export class PlanWatch implements StepObserver {
   /** The `_id`s of the documents the plan's inserts did not insert: failed, or never sent. */
   failedIds(plan: Plan): readonly Json[] {
     return plan.steps.flatMap((step, index) => failedInsertIds(step, insertOutcome(this.ended.get(index))));
+  }
+
+  /** The `_id`s the plan's inserts gave to the documents that had none, from their replies. */
+  insertedIds(plan: Plan): readonly Json[] {
+    return plan.steps.flatMap((step, index) => {
+      const ended = this.ended.get(index);
+      return ended?.kind === 'done' ? generatedInsertIds(step, ended.reply) : [];
+    });
   }
 }

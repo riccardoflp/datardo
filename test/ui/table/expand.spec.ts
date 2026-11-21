@@ -6,7 +6,7 @@
  */
 import { expect, test } from '@playwright/test';
 import type { StartedApp } from '../app';
-import { openCollection, testMongo } from '../query/collection-app';
+import { openCollection, startIntent, testMongo } from '../query/collection-app';
 import { gridOf, headingOf, leafHeadings, openTable, seedTables } from './table-app';
 
 const mongo = testMongo();
@@ -95,6 +95,9 @@ test.describe('table.arrange-columns on the headings', () => {
     test.setTimeout(120_000);
     const window = await openTable(mongo, running, 'people', 3);
     const name = headingOf(window, 'name');
+    // The inspector island shows the selected document beside the table (M12): hidden, every heading is in sight.
+    await startIntent(window, 'nav.toggle-inspector', { hidden: true });
+    await expect(window.locator('[data-island="inspector"]')).toBeHidden();
     const box = await name.boundingBox();
     await headingOf(window, 'tags').dragTo(name, { targetPosition: { x: 4, y: 8 } });
     await expect.poll(() => leafHeadings(window)).toEqual(['_id', 'tags', 'name', 'address', 'items', 'email']);

@@ -53,7 +53,10 @@ export function plan(context: Context, answers: Answers): Outcome {
     touches: documentsText(1),
     undo: undoOf(undoNoteOf(place, context.state.settings, kept), kept),
     publishes: true,
-    after: [refreshAfter(place)],
+    after: [
+      { kind: 'notify', level: 'success', text: text.delete.deleted(shown, place.collection) },
+      refreshAfter(place),
+    ],
   });
 }
 

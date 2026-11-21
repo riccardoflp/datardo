@@ -82,7 +82,7 @@ function namespaceOfTab(tab: Tab | undefined, args: JsonRecord): Namespace | und
   if (tab === undefined || (shows?.kind !== 'collection' && shows?.kind !== 'document')) {
     return undefined;
   }
-  const view = shows.kind === 'collection' ? shows.view === true : args['view'] === true;
+  const view = shows.view === true || args['view'] === true;
   return { connection: shows.connection, database: shows.database, collection: shows.collection, view, tab: tab.id };
 }
 

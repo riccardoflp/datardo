@@ -1,0 +1,222 @@
+/*
+ * The document area: the document in the inspector (header, buttons, tree and text), the editor over a value, the
+ * document tab (toolbar and editor), the insert dialog and the form of Update many.
+ */
+.inspector {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-height: 0;
+  padding: var(--space-2);
+  overflow: auto;
+}
+
+.header {
+  margin: 0;
+  overflow: hidden;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-strong);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.buttons,
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.toolbar {
+  padding: var(--space-1) var(--space-3);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.group,
+.switch {
+  display: inline-flex;
+  gap: var(--space-1);
+}
+
+.button {
+  min-height: var(--space-5);
+  padding: var(--space-0) var(--space-2);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-small);
+  background: var(--color-island);
+  color: var(--color-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.button:disabled {
+  color: var(--color-text-muted);
+  cursor: default;
+}
+
+.button:hover:not(:disabled) {
+  background: var(--color-hover);
+}
+
+.button[aria-pressed='true'] {
+  border-color: var(--color-accent);
+  background: var(--color-selected);
+}
+
+.menu {
+  z-index: var(--z-dialog);
+  min-width: calc(var(--dialog-width) / 2);
+  padding: var(--space-1);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-medium);
+  background: var(--color-raised);
+  color: var(--color-text);
+}
+
+.item {
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-small);
+  outline: none;
+  cursor: default;
+}
+
+.item[data-highlighted] {
+  background: var(--color-selected);
+}
+
+.item[data-disabled] {
+  color: var(--color-text-muted);
+}
+
+.tree {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-family-code);
+}
+
+.line {
+  display: flex;
+  gap: var(--space-2);
+  min-height: var(--space-5);
+  align-items: center;
+  border-radius: var(--radius-small);
+  outline: none;
+  white-space: nowrap;
+}
+
+.line[aria-selected='true'] {
+  background: var(--color-selected);
+}
+
+.line:focus-visible {
+  outline: var(--focus-width) solid var(--color-focus);
+  outline-offset: calc(var(--focus-width) * -1);
+}
+
+.name {
+  color: var(--color-syntax-key);
+}
+
+.value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.text {
+  margin: 0;
+  padding: var(--space-2);
+  border-radius: var(--radius-small);
+  background: var(--color-canvas);
+  font-family: var(--font-family-code);
+  white-space: pre-wrap;
+  user-select: text;
+}
+
+.text:focus-visible {
+  outline: var(--focus-width) solid var(--color-focus);
+}
+
+.inline-editor {
+  position: fixed;
+  z-index: var(--z-dialog);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  max-width: calc(var(--dialog-width) * 1.5);
+  padding: var(--space-1);
+  border: var(--border-width) solid var(--color-accent);
+  border-radius: var(--radius-small);
+  background: var(--color-raised);
+  color: var(--color-text);
+}
+
+.hint,
+.problem,
+.note {
+  margin: 0;
+  font-size: var(--font-size-small);
+  white-space: pre-line;
+}
+
+.hint,
+.note {
+  color: var(--color-text-muted);
+}
+
+.problem {
+  color: var(--color-danger-text);
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.page-body {
+  flex: 1;
+  min-height: 0;
+  padding: var(--space-2) var(--space-3);
+  overflow: auto;
+}
+
+.mark {
+  margin-left: auto;
+  padding: var(--space-0) var(--space-2);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-round);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-small);
+}
+
+.message {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-4);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: var(--dialog-width);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.filter {
+  margin: 0;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-small);
+  background: var(--color-canvas);
+  font-family: var(--font-family-code);
+  white-space: pre-wrap;
+}

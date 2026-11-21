@@ -5,6 +5,7 @@
  */
 import { view as showView, type ToolbarButton } from '../../features/table/show';
 import { text } from '../../features/table/text';
+import { startOnDocuments, startOnFilter } from '../pages/document/document-actions';
 import { startFeature } from '../shell/intent';
 import { isBuilt } from '../query/built';
 import { showStateOf } from '../query/collection-view';
@@ -22,6 +23,13 @@ function pressed(props: TablePartProps, button: ToolbarButton): void {
       return;
     case 'table.columns@toolbar':
       toggleColumnsPanel(ref.tab);
+      return;
+    case 'document.insert@toolbar':
+      void startOnDocuments(ref, button.element);
+      return;
+    case 'document.update-many@toolbar':
+    case 'document.delete-many@toolbar':
+      void startOnFilter(ref, button.element);
       return;
     default: {
       const at = button.element.indexOf('@');

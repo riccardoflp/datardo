@@ -7,7 +7,7 @@ import { command, type Command } from '../command';
 import { text } from './text';
 
 /** The commands of the document area, in the order Go to lists them. */
-export const areaCommands: readonly Command[] = [
+export const commands: readonly Command[] = [
   command('document.inspect', text.commands.inspect),
   command('document.open', text.commands.open),
   command('document.inline-edit', text.commands.inlineEdit),

@@ -17,6 +17,7 @@ import { commands as tableCommands } from './table/commands';
 import { commands as keyCommands } from './key/commands';
 import { areaCommands as aggregateCommands } from './aggregate/commands';
 import { commands as playgroundCommands } from './playground/commands';
+import { commands as documentCommands } from './document/commands';
 
 import type { Command } from './command';
 
@@ -39,4 +40,5 @@ export const commands: readonly Command[] = [
   ...keyCommands,
   ...aggregateCommands,
   ...playgroundCommands,
+  ...documentCommands,
 ];

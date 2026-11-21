@@ -70,6 +70,8 @@ export const text = {
     expand: (connection: string) => `expand the group of ${connection}`,
     saveSession: 'save the open tabs',
     openSaved: 'open the saved tabs',
+    keepDraft: (name: string) => `keep the unsaved changes of ${name}`,
+    dropDraft: (name: string) => `forget the draft of ${name}`,
     of: (name: string, connection: string) => `${name} of ${connection}`,
   },
   question: {

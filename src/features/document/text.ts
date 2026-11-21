@@ -96,6 +96,7 @@ export const text = {
     insertedOne: (id: string, collection: string) => `Inserted document ${id} into ${collection}.`,
     insertedMany: (count: number, collection: string) =>
       `Inserted ${groupThousands(count)} documents into ${collection}.`,
+    insertedCount: (count: number, collection: string) => `Inserted ${documentsText(count)} into ${collection}.`,
     insertedSome: (inserted: number, count: number, collection: string) =>
       `Inserted ${groupThousands(inserted)} of ${groupThousands(count)} documents into ${collection}.`,
     insertedThen: (inserted: number, count: number, error: string) =>
@@ -159,6 +160,7 @@ export const text = {
     allButton: 'Update all',
     updated: (collection: string, matched: number, modified: number) =>
       `Updated ${collection}: ${groupThousands(matched)} matched, ${groupThousands(modified)} modified.`,
+    matched: (collection: string, matched: number) => `Updated ${collection}: ${groupThousands(matched)} matched.`,
   },
   updateSelected: {
     entry: (count: number) => `Update ${documentsText(count)}…`,
@@ -194,6 +196,8 @@ export const text = {
   },
   inspect: {
     nothing: 'Select a document to inspect it.',
+    more: 'More actions',
+    toolbar: 'Document actions',
     several: (count: number) => `${groupThousands(count)} documents selected`,
     previous: 'Previous document',
     next: 'Next document',

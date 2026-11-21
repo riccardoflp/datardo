@@ -3,13 +3,17 @@
  * `PageUp` and `PageDown` move the selected cell (`table.navigate`), and select the document moved to; `Shift` with
  * `↑` or `↓`, `Ctrl+Space`, `Ctrl+A` and `Esc` change the selection (`table.selection`); `Enter` on a heading sorts
  * (`table.sort`); `Ctrl+C` copies the value of the cell (`table.copy-value`); `Shift+F10` and the menu key open the
- * menu of the cell, of the row number or of the heading.
+ * menu of the cell, of the row number or of the heading. On a cell, `Enter`, `F2` and `Delete` are the document
+ * area's.
  */
 import { cellAfterKey, type MoveKey, type Position } from '../../features/table/navigate';
 import type { Cell } from '../../features/table/rows';
 import type { SelectionAction } from '../../features/table/selection';
 import { positionKey } from './grid-model';
 import type { GridView } from './grid-view';
+import { deleteKey, editOrInspect } from '../pages/document/table-entries';
+import { showInInspector } from '../pages/document/inspect-state';
+import { collectionOf } from '../query/collection-store';
 import { openTableMenu } from './menu-request';
 import { changeSelection, copyCellValue, selectCell, sortByHeader } from './table-actions';
 
@@ -81,7 +85,7 @@ function menuKey(grid: GridView, place: KeyPlace): void {
   }
   const value = cell.content.kind === 'value' ? { value: cell.content.value } : {};
   const within = cell.element === undefined ? {} : { within: cell.element.array };
-  openTableMenu({ kind: 'cell', ...where, row: at.row, column: cell.column, ...value, ...within });
+  openTableMenu({ kind: 'cell', ...where, row: at.row, column: cell.column, cell, ...value, ...within });
 }
 
 function selectionKey(grid: GridView, event: React.KeyboardEvent): SelectionAction | undefined {
@@ -98,8 +102,42 @@ function selectionKey(grid: GridView, event: React.KeyboardEvent): SelectionActi
   return undefined;
 }
 
+/**
+ * The keys of the document area on a cell: `Enter` shows the document in the inspector (`document.inspect`), `F2`
+ * edits the value there (`document.inline-edit`), `Delete` deletes the selected rows or the row
+ * (`document.delete`, `document.delete-selected`).
+ */
+function documentKey(grid: GridView, event: React.KeyboardEvent, place: KeyPlace): boolean {
+  const at = grid.cell;
+  if (at.at !== 'cell' || event.ctrlKey || event.metaKey || event.shiftKey) {
+    return false;
+  }
+  const collection = collectionOf(grid.ref.tab);
+  switch (event.key) {
+    case 'Enter':
+      showInInspector(grid.ref, at.row);
+      return true;
+    case 'F2': {
+      const cell = cellAt(grid, at);
+      if (cell !== undefined) {
+        const anchor = place.elementOf(at);
+        editOrInspect({ ref: grid.ref, collection, target: grid.target, cell: { cell, row: at.row, anchor } }, false);
+      }
+      return true;
+    }
+    case 'Delete':
+      deleteKey(grid.ref, collection, grid.target, at.row);
+      return true;
+    default:
+      return false;
+  }
+}
+
 function otherKey(grid: GridView, event: React.KeyboardEvent, place: KeyPlace): boolean {
   const ctrl = event.ctrlKey || event.metaKey;
+  if (documentKey(grid, event, place)) {
+    return true;
+  }
   if ((event.shiftKey && event.key === 'F10') || event.key === 'ContextMenu') {
     menuKey(grid, place);
     return true;

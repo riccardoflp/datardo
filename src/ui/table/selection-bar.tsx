@@ -11,6 +11,7 @@ import { text } from '../../features/table/text';
 import { emptySelection } from '../../features/table/types';
 import { isBuilt } from '../query/built';
 import { changeQuery } from '../query/collection-store';
+import { idsOf, startOnDocuments } from '../pages/document/document-actions';
 import { copyDocuments } from './table-start';
 import type { TablePartProps } from './table-parts';
 import styles from './table-panels.module.css';
@@ -46,12 +47,24 @@ function CopyAs({ bar, props }: { readonly bar: SelectionBarView; readonly props
   );
 }
 
-function Other({ button }: { readonly button: SelectionButton | undefined }): React.JSX.Element | null {
+function Other({
+  button,
+  onPress,
+}: {
+  readonly button: SelectionButton | undefined;
+  readonly onPress?: () => void;
+}): React.JSX.Element | null {
   if (button === undefined || !isBuilt(button.element)) {
     return null;
   }
   return (
-    <button type="button" className={styles['button']} data-feature={button.element} title={button.tip}>
+    <button
+      type="button"
+      className={styles['button']}
+      data-feature={button.element}
+      title={button.tip}
+      onClick={onPress}
+    >
       {button.label}
     </button>
   );
@@ -77,8 +90,18 @@ export function SelectionBar(props: TablePartProps): React.JSX.Element {
         <>
           <CopyAs bar={bar} props={props} />
           <Other button={bar.export} />
-          <Other button={bar.update} />
-          <Other button={bar.delete} />
+          <Other
+            button={bar.update}
+            onPress={() => {
+              void startOnDocuments(collectionRef, bar.update?.element ?? '', { ids: idsOf(selected) });
+            }}
+          />
+          <Other
+            button={bar.delete}
+            onPress={() => {
+              void startOnDocuments(collectionRef, bar.delete?.element ?? '', { ids: idsOf(selected) });
+            }}
+          />
           <button
             type="button"
             className={styles['button']}

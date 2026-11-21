@@ -212,25 +212,25 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`document.inspect`](document.md#documentinspect--the-document-in-the-inspector) | The document in the inspector | View | M12 | Specified |
-| [`document.copy-value`](document.md#documentcopy-value--copy-a-value-from-the-inspector) | Copy a value from the inspector | Operation | M12 | Specified |
-| [`document.copy-path`](document.md#documentcopy-path--copy-a-field-path-from-the-inspector) | Copy a field path from the inspector | Operation | M12 | Specified |
-| [`document.read`](document.md#documentread--read-one-document-with-its-types) | Read one document with its types | Read | M12 | Specified |
-| [`document.inline-edit`](document.md#documentinline-edit--edit-a-value-in-its-cell) | Edit a value in its cell | Operation | M12 | Specified |
-| [`document.keep-numeric-types`](document.md#documentkeep-numeric-types--keep-the-numeric-type-of-an-edited-value) | Keep the numeric type of an edited value | Derivation | M12 | Specified |
-| [`document.open`](document.md#documentopen--the-document-tab) | The document tab | View | M12 | Specified |
-| [`document.save`](document.md#documentsave--save-the-document-of-a-document-tab) | Save the document of a document tab | Operation | M12 | Specified |
-| [`document.insert`](document.md#documentinsert--insert-documents-from-the-insert-dialog) | Insert documents from the insert dialog | Operation | M12 | Specified |
-| [`document.parse-insert-text`](document.md#documentparse-insert-text--read-the-documents-of-the-insert-dialog) | Read the documents of the insert dialog | Derivation | M12 | Specified |
-| [`document.insert-template`](document.md#documentinsert-template--template-of-the-insert-dialog) | Template of the insert dialog | Derivation | M12 | Specified |
-| [`document.insert-from-tab`](document.md#documentinsert-from-tab--insert-the-new-document-of-a-document-tab) | Insert the new document of a document tab | Operation | M12 | Specified |
-| [`document.duplicate`](document.md#documentduplicate--duplicate-a-document) | Duplicate a document | Operation | M12 | Specified |
-| [`document.delete`](document.md#documentdelete--delete-a-document) | Delete a document | Operation | M12 | Specified |
-| [`document.delete-selected`](document.md#documentdelete-selected--delete-the-selected-rows) | Delete the selected rows | Operation | M12 | Specified |
-| [`document.update-selected`](document.md#documentupdate-selected--update-the-selected-rows) | Update the selected rows | Operation | M12 | Specified |
-| [`document.update-many`](document.md#documentupdate-many--update-many) | Update many | Operation | M12 | Specified |
-| [`document.delete-many`](document.md#documentdelete-many--delete-many) | Delete many | Operation | M12 | Specified |
-| [`document.restore-version`](document.md#documentrestore-version--restore-a-version-from-the-document-history) | Restore a version from the document history | Operation | M12 | Specified |
+| [`document.inspect`](document.md#documentinspect--the-document-in-the-inspector) | The document in the inspector | View | M12 | Built |
+| [`document.copy-value`](document.md#documentcopy-value--copy-a-value-from-the-inspector) | Copy a value from the inspector | Operation | M12 | Built |
+| [`document.copy-path`](document.md#documentcopy-path--copy-a-field-path-from-the-inspector) | Copy a field path from the inspector | Operation | M12 | Built |
+| [`document.read`](document.md#documentread--read-one-document-with-its-types) | Read one document with its types | Read | M12 | Built |
+| [`document.inline-edit`](document.md#documentinline-edit--edit-a-value-in-its-cell) | Edit a value in its cell | Operation | M12 | Built |
+| [`document.keep-numeric-types`](document.md#documentkeep-numeric-types--keep-the-numeric-type-of-an-edited-value) | Keep the numeric type of an edited value | Derivation | M12 | Built |
+| [`document.open`](document.md#documentopen--the-document-tab) | The document tab | View | M12 | Built |
+| [`document.save`](document.md#documentsave--save-the-document-of-a-document-tab) | Save the document of a document tab | Operation | M12 | Built |
+| [`document.insert`](document.md#documentinsert--insert-documents-from-the-insert-dialog) | Insert documents from the insert dialog | Operation | M12 | Built |
+| [`document.parse-insert-text`](document.md#documentparse-insert-text--read-the-documents-of-the-insert-dialog) | Read the documents of the insert dialog | Derivation | M12 | Built |
+| [`document.insert-template`](document.md#documentinsert-template--template-of-the-insert-dialog) | Template of the insert dialog | Derivation | M12 | Built |
+| [`document.insert-from-tab`](document.md#documentinsert-from-tab--insert-the-new-document-of-a-document-tab) | Insert the new document of a document tab | Operation | M12 | Built |
+| [`document.duplicate`](document.md#documentduplicate--duplicate-a-document) | Duplicate a document | Operation | M12 | Built |
+| [`document.delete`](document.md#documentdelete--delete-a-document) | Delete a document | Operation | M12 | Built |
+| [`document.delete-selected`](document.md#documentdelete-selected--delete-the-selected-rows) | Delete the selected rows | Operation | M12 | Built |
+| [`document.update-selected`](document.md#documentupdate-selected--update-the-selected-rows) | Update the selected rows | Operation | M12 | Built |
+| [`document.update-many`](document.md#documentupdate-many--update-many) | Update many | Operation | M12 | Built |
+| [`document.delete-many`](document.md#documentdelete-many--delete-many) | Delete many | Operation | M12 | Built |
+| [`document.restore-version`](document.md#documentrestore-version--restore-a-version-from-the-document-history) | Restore a version from the document history | Operation | M12 | Built |
 
 ## Explain
 

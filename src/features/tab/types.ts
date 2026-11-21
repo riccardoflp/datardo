@@ -141,6 +141,8 @@ function readConnectionShows(
             collection: object['collection'],
             id: object['id'],
             ...texts(object, ['idJson']),
+            ...(isWhole(object['newDocument']) ? { newDocument: object['newDocument'] } : {}),
+            ...(object['view'] === true ? { view: true } : {}),
           }
         : undefined;
     case 'keys':

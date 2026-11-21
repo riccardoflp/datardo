@@ -18,7 +18,7 @@ import {
 import { featureId } from '../../shared/ids';
 import type { AppState } from '../../shared/state';
 import { connectionState } from '../../shared/state/connections';
-import { connectionOfShows, type Tab, type TabMemory, type TabShows } from '../../shared/state/tabs';
+import { connectionOfShows, type Draft, type Tab, type TabMemory, type TabShows } from '../../shared/state/tabs';
 import { appPlan, appStep } from '../nav/types';
 import { targetKey } from './same-target';
 import { text } from './text';
@@ -32,9 +32,22 @@ export interface OpenRequest {
   readonly background: boolean;
   readonly section?: string;
   readonly memory?: TabMemory;
+  /** The text a new tab opens with, unsaved: a new document's, from the insert dialog (`document.open`). */
+  readonly draft?: Draft;
 }
 
-/** The request of `args`: `{ shows, background?, section?, memory? }`; `undefined` when `shows` is not a tab. */
+function draftOf(value: Json | undefined): Draft | undefined {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+    return undefined;
+  }
+  const { text: draftText, original } = value as { readonly [key: string]: Json };
+  if (typeof draftText !== 'string') {
+    return undefined;
+  }
+  return typeof original === 'string' ? { text: draftText, original } : { text: draftText };
+}
+
+/** The request of `args`: `{ shows, background?, section?, memory?, draft? }`; `undefined` when `shows` is not a tab. */
 export function openRequest(answers: Answers): OpenRequest | undefined {
   const started = startedWith(answers);
   if (started.kind !== 'object') {
@@ -44,6 +57,7 @@ export function openRequest(answers: Answers): OpenRequest | undefined {
   const shows = readTabShows(args['shows']);
   const memory = readMemory(args['memory']);
   const section = args['section'];
+  const draft = draftOf(args['draft']);
   return shows === undefined
     ? undefined
     : {
@@ -51,6 +65,7 @@ export function openRequest(answers: Answers): OpenRequest | undefined {
         background: args['background'] === true,
         ...(typeof section === 'string' ? { section } : {}),
         ...(memory === undefined ? {} : { memory }),
+        ...(draft === undefined ? {} : { draft }),
       };
 }
 
@@ -112,7 +127,12 @@ export function planOf(state: AppState, request: OpenRequest): Outcome {
   const step = appStep(
     text.steps.open(stepName(state, shows)),
     'tab.open',
-    json({ shows, background: request.background, ...given }),
+    json({
+      shows,
+      background: request.background,
+      ...given,
+      ...(request.draft === undefined ? {} : { draft: request.draft }),
+    }),
   );
   return run(appPlan(text.plans.open, [step], connecting(state, request)));
 }

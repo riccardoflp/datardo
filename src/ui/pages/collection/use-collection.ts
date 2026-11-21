@@ -3,11 +3,12 @@
  * state, whether it is read-only), and the start of the tab, which restores the query the tab kept and runs it once
  * the connection is connected (`query.restore`, `query.run`).
  */
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { restoredQuery, restoredState } from '../../../features/query/restore';
 import type { ConnectionStateName } from '../../../shared/connection';
 import type { TabId } from '../../../shared/ids';
 import type { AppState } from '../../../shared/state';
+import type { RunnerState } from '../../../shared/state/runner';
 import type { TabShows } from '../../../shared/state/tabs';
 import { registerCollection, runQuery, type CollectionRef } from '../../query/collection-reads';
 import { changeCollection, collectionOf } from '../../query/collection-store';
@@ -76,4 +77,22 @@ export function useCollectionStart(ref: CollectionRef, page: CollectionPageState
       phase: notConnected ? { kind: 'failed', notConnected: true } : { kind: 'loading' },
     }));
   }, [ref, connectionState, kept]);
+}
+
+/**
+ * After a plan wrote through the tab's connection (`runner/refresh-asked`), the page reads its query again, keeping
+ * the selection of the documents still there (`table.refresh`).
+ */
+export function useRefreshAfterWrites(ref: CollectionRef, refreshed: RunnerState['refreshed']): void {
+  const seen = useRef(refreshed.times);
+  useEffect(() => {
+    if (seen.current === refreshed.times) {
+      return;
+    }
+    seen.current = refreshed.times;
+    const ours = refreshed.connection === undefined || refreshed.connection === ref.connection;
+    if (ours && collectionOf(ref.tab).started) {
+      void runQuery(ref, { texts: 'ran', refresh: true, count: true });
+    }
+  }, [ref, refreshed]);
 }

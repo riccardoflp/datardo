@@ -64,6 +64,7 @@ const services: MainServices = {
   onQuit: (flush) => flushes.push(flush),
   dialogs,
   platform,
+  start: (asked) => start(sharedPorts(), asked),
 };
 
 function runnerPorts(): RunnerPorts {
@@ -81,6 +82,14 @@ function runnerPorts(): RunnerPorts {
     now: () => Date.now(),
     oplog: oplogClients,
   };
+}
+
+let ports: RunnerPorts | undefined;
+
+/** The one set of ports every start goes through, made when first needed. */
+function sharedPorts(): RunnerPorts {
+  ports ??= runnerPorts();
+  return ports;
 }
 
 /** The system and its architecture as About shows them: `Windows 11 x64`, `macOS 15.1 arm64`, `Linux 6.8 x64`. */
@@ -124,10 +133,9 @@ async function startDatardo(): Promise<void> {
     },
   });
   await startAreas(services);
-  const ports = runnerPorts();
-  const startFeature = (asked: Intent): ReturnType<typeof start> => start(ports, asked);
+  const startFeature = (asked: Intent): ReturnType<typeof start> => start(sharedPorts(), asked);
   const log = (feature: string, text: string): void => {
-    writeLog(ports, [{ feature, kind: 'info', text }]);
+    writeLog(sharedPorts(), [{ feature, kind: 'info', text }]);
   };
   const place = new WindowPlace(services.dataFolder, (text) => {
     log('window.remember', text);
@@ -153,7 +161,7 @@ async function startDatardo(): Promise<void> {
       dialogs.cancelAll();
     },
   });
-  answerTheBridge(ports, state, dialogs);
+  answerTheBridge(sharedPorts(), state, dialogs);
   guardTheSession();
   setTheMenuBar(platform, state, (asked) => void startFeature(asked));
   followTheLook(state, () => windowHost.current(), platform);

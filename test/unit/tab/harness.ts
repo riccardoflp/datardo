@@ -110,6 +110,7 @@ export function harness(connections: readonly ConnectionView[] = [local, cacheLo
     dataFolder,
     window: () => undefined,
     onQuit: () => undefined,
+    start: () => Promise.resolve({ kind: 'cancelled' }),
     dialogs: { ask: () => Promise.resolve(undefined), confirm: () => Promise.resolve(false) },
     platform: 'windows',
   };

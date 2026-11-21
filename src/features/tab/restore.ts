@@ -5,12 +5,13 @@
  * tabs are saved 1 second after the last change and when it quits; at start the saved tabs are opened, only the
  * active one loading its page. With `datardo.tab.restore` off only drafts are saved and restored.
  */
+import type { Json } from '../../shared/engine-request';
 import { run, type Answers, type Context, type OperationFeature, type Outcome } from '../../shared/feature';
 import { featureId, type ConnectionId } from '../../shared/ids';
 import { connectionOfShows, type TabSeed, type TabsState } from '../../shared/state/tabs';
 import { appPlan, appStep } from '../nav/types';
 import { text } from './text';
-import { startedWith } from './types';
+import { startedWith, stepName, tabOfArgs } from './types';
 
 /** How long after the last change the open tabs are saved, in ms (Datardo's choice). */
 export const saveDelayMs = 1000;
@@ -80,9 +81,30 @@ export function restoredSession(
   };
 }
 
-/** Saves the open tabs (the variant `save`), or opens the saved ones (`start`). */
-export function plan(_context: Context, answers: Answers): Outcome {
+/**
+ * Keeps the draft of a tab with unsaved changes, so that a crash does not lose it (D33): started by the page with
+ * `{ tab, draft }`, the draft `{ text, original? }`, or `draft: null` once the changes are saved or dropped.
+ */
+function draftPlan(context: Context, args: Readonly<Record<string, Json>>): Outcome {
+  const tab = tabOfArgs(context.state.tabs, { args });
+  if (tab === undefined) {
+    return run(appPlan(text.plans.restore, []));
+  }
+  const name = stepName(context.state, tab.shows);
+  const draft = args['draft'] ?? null;
+  const step = appStep(draft === null ? text.steps.dropDraft(name) : text.steps.keepDraft(name), 'tab.keep-draft', {
+    tab: tab.id,
+    draft,
+  });
+  return run(appPlan(text.plans.restore, [step]));
+}
+
+/** Saves the open tabs (the variant `save`), opens the saved ones (`start`), or keeps the draft of a tab. */
+export function plan(context: Context, answers: Answers): Outcome {
   const started = startedWith(answers);
+  if (started.kind === 'object' && 'draft' in started.args) {
+    return draftPlan(context, started.args);
+  }
   const step =
     started.kind === 'variant' && started.variant === 'start'
       ? appStep(text.steps.openSaved, 'tab.open-saved', null)
