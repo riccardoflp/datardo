@@ -25,7 +25,8 @@ const result = spawnSync(
     '--production',
     '--excludePrivatePackages',
     '--onlyAllow',
-    `"${allowedLicenses.join(';')}"`,
+    // The Windows shell needs the list quoted; elsewhere it is passed as one argument as it is.
+    process.platform === 'win32' ? `"${allowedLicenses.join(';')}"` : allowedLicenses.join(';'),
     '--summary',
   ],
   { cwd: root, stdio: 'inherit', shell: process.platform === 'win32' },
