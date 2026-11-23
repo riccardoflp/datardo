@@ -172,11 +172,11 @@
   flex: none;
 }
 
+/* The close button of a tab: its icon and the dot of unsaved changes share one cell, one of them visible. */
 .close {
-  display: inline-flex;
+  display: inline-grid;
   flex: none;
-  align-items: center;
-  justify-content: center;
+  place-items: center;
   width: var(--icon-size);
   height: var(--icon-size);
   border-radius: var(--radius-small);
@@ -194,6 +194,7 @@
 }
 
 .unsaved-dot {
+  visibility: hidden;
   width: var(--space-2);
   height: var(--space-2);
   border-radius: var(--radius-round);
@@ -204,13 +205,24 @@
   visibility: visible;
 }
 
-.close[data-unsaved='true'] .close-icon,
+.close > * {
+  grid-area: 1 / 1;
+}
+
+.close[data-unsaved='true'] .unsaved-dot {
+  visibility: visible;
+}
+
+.close[data-unsaved='true'] .close-icon {
+  visibility: hidden;
+}
+
 .tab:hover .close[data-unsaved='true'] .unsaved-dot {
-  display: none;
+  visibility: hidden;
 }
 
 .tab:hover .close[data-unsaved='true'] .close-icon {
-  display: inline-block;
+  visibility: visible;
 }
 
 .all-tabs {

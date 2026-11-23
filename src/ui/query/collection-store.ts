@@ -123,3 +123,8 @@ function subscribe(listener: () => void): () => void {
 export function useCollection(tab: TabId | undefined): CollectionTab {
   return useSyncExternalStore(subscribe, () => (tab === undefined ? freshTab : collectionOf(tab)));
 }
+
+/** Whether the tab shows the answer of a read, rows or the message of an empty result, which stays while it runs again. */
+export function shownBefore(before: CollectionTab): boolean {
+  return before.hasRows || before.phase.kind === 'shown' || before.phase.kind === 'running';
+}

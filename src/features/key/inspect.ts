@@ -114,6 +114,14 @@ function loadedLines(key: InspectedKey, readAt: number, state: InspectState): re
   ];
 }
 
+/** The lines while the key is read: their labels at once, so that the island does not grow when they come. */
+const loadingLines: readonly InspectLine[] = [
+  { label: text.inspect.type, value: '' },
+  { label: text.inspect.expiry, value: '' },
+  { label: text.inspect.size, value: '' },
+  { label: text.inspect.encoding, value: '' },
+];
+
 /** Feature: key.inspect — the island for one selected key, in its states: loading, gone, read, of a module's type. */
 export function view(state: InspectState): InspectView {
   const name = nameText(state.name);
@@ -122,7 +130,7 @@ export function view(state: InspectState): InspectView {
     case 'gone':
       return { ...base, message: text.gone(name), lines: [], buttons: [] };
     case 'loading':
-      return { ...base, loading: true, lines: [], buttons: writeButtons(state.readOnly) };
+      return { ...base, loading: true, lines: loadingLines, buttons: writeButtons(state.readOnly) };
     case 'failed':
       return { ...base, message: state.read.error, lines: [], buttons: writeButtons(state.readOnly) };
     case 'loaded': {

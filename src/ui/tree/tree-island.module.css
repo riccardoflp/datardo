@@ -4,6 +4,7 @@
   min-height: 0;
   overflow: auto;
   padding: var(--space-2);
+  border: var(--border-width) solid var(--color-island-border);
   border-radius: var(--radius-island);
   background: var(--color-island);
 }
@@ -60,7 +61,7 @@
   flex: 1;
   min-width: 0;
   padding: var(--space-1) var(--space-2);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-control-border);
   border-radius: var(--radius-small);
   background: var(--color-canvas);
   color: var(--color-text);
@@ -98,17 +99,25 @@
   font-size: var(--font-size-small);
 }
 
+/* The buttons of a line are drawn over its end when it is hovered or has the focus, and keep their place while hidden:
+ * nothing on the line moves when they show (R10.8). */
 .buttons {
-  display: none;
-  flex: none;
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0;
+  display: inline-flex;
   gap: var(--space-0);
-  margin-inline-start: auto;
+  align-items: center;
+  padding-inline: var(--space-1);
+  border-radius: var(--radius-small);
+  background: var(--row-background);
+  visibility: hidden;
 }
 
 [role='treeitem']:hover > .buttons,
 [role='treeitem']:focus > .buttons,
 [role='treeitem']:focus-within > .buttons {
-  display: inline-flex;
+  visibility: visible;
 }
 
 .hover-button,

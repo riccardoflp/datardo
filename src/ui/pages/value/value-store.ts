@@ -59,6 +59,8 @@ export interface ValueTab {
   /** The rows read, in the server's order, and the scan of a hash or a set. */
   readonly rows: readonly ValueRow[];
   readonly scan?: ScanState<ValueRow>;
+  /** Whether **Load more** was offered before a refresh, while its scan has found no row yet and the rows stay. */
+  readonly moreBefore?: boolean;
   /** The arguments of **Load more** for a list, a sorted set or a stream; none when everything is loaded. */
   readonly next?: Json;
   /**

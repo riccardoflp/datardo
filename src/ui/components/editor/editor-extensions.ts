@@ -70,10 +70,14 @@ function onOneLine(tr: Transaction): TransactionSpec {
   };
 }
 
-/** An editor of one line: a pasted or typed line break becomes a space. */
-const oneLine = EditorState.transactionFilter.of((tr) =>
-  !tr.docChanged || tr.newDoc.lines === 1 ? tr : onOneLine(tr),
-);
+/**
+ * An editor of one line: a pasted or typed line break becomes a space, and a long line scrolls with the caret without
+ * a scroll bar, which would take half the field's height (R10.9).
+ */
+const oneLine = [
+  EditorState.transactionFilter.of((tr) => (!tr.docChanged || tr.newDoc.lines === 1 ? tr : onOneLine(tr))),
+  EditorView.theme({ '.cm-scroller': { scrollbarWidth: 'none' } }),
+];
 
 function runKeys(callbacks: () => EditorCallbacks, multiline: boolean): readonly KeyBinding[] {
   const run: Command = (view) => {

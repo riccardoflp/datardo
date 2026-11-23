@@ -21,7 +21,8 @@ import { fieldExpiryVersion, hexOf, isValueType, type ValueType } from '../../..
 import type { Json } from '../../../shared/engine-request';
 import { currentAppState } from '../../state/store';
 import { loadGroups } from './value-groups-reads';
-import { firstArgs, readOrdered } from './value-pages';
+import { hasMore } from './value-state';
+import { firstArgs, readFirstOrdered, readOrdered } from './value-pages';
 import { failedRead as failed, isCurrent, readValue as read } from './value-start';
 import { changeValue, valueTabOf, type ValueTab, type ValueWhere } from './value-store';
 
@@ -77,10 +78,14 @@ async function continueScan(tab: string, run: number): Promise<void> {
       }
       const scan = afterScanPage(now.scan, { cursor: page.cursor, items: rows }, rowName);
       const expiry = rows.some((row) => row.cells['Expiry'] !== undefined);
+      // The rows read before a refresh stay until the scan finds a row or its run ends.
+      const waiting = scan.items.length === 0 && scan.ended === undefined;
+      const { moreBefore, ...rest } = now;
       return {
-        ...now,
+        ...rest,
+        ...(waiting && moreBefore !== undefined ? { moreBefore } : {}),
         scan,
-        rows: scan.items,
+        rows: waiting ? now.rows : scan.items,
         loadingMore: scan.ended === undefined,
         fieldExpiry: now.fieldExpiry || expiry,
       };
@@ -127,61 +132,88 @@ async function readStringPart(tab: string, run: number, load: StringLoad, asked:
     changeValue(tab, (now) => (now.run === run ? { ...now, changedWhileRead: true } : now));
     return;
   }
-  changeValue(tab, (now) => (now.run === run ? { ...now, string: withPart(load, part), loadingMore: false } : now));
+  // A part read from the bytes shown before a refresh is dropped once the refresh's first part replaced them.
+  const from = load.loaded.length === 0;
+  changeValue(tab, (now) =>
+    now.run !== run
+      ? now
+      : from || now.string === load
+        ? { ...now, string: withPart(load, part), loadingMore: false }
+        : { ...now, loadingMore: false },
+  );
 }
 
 /** The first page of the type, once its count is known. */
 async function readFirstPage(tab: string, run: number, type: ValueType, count: number): Promise<void> {
   if (type === 'string') {
     if (count === 0) {
-      changeValue(tab, (now) => ({ ...now, string: { length: 0, loaded: new Uint8Array() } }));
+      changeValue(tab, (now) =>
+        now.run === run ? { ...now, string: { length: 0, loaded: new Uint8Array() }, loadingMore: false } : now,
+      );
       return;
     }
     await readStringPart(tab, run, { length: count, loaded: new Uint8Array() }, { form: 'full', length: count });
     return;
   }
   if (type === 'hash' || type === 'set') {
-    changeValue(tab, (now) => ({ ...now, scan: scanStart<ValueRow>(), loadingMore: true }));
+    // While the rows of before the refresh stay, so does **Load more** as it was.
+    changeValue(tab, (now) => ({
+      ...now,
+      scan: scanStart<ValueRow>(),
+      loadingMore: true,
+      ...(now.rows.length === 0 ? {} : { moreBefore: hasMore(now) }),
+    }));
     await continueScan(tab, run);
     return;
   }
   const state = valueTabOf(tab);
   if (state !== undefined) {
-    await readOrdered(tab, run, firstArgs(state));
+    await readFirstOrdered(tab, run, firstArgs(state));
   }
 }
 
 /**
- * The tab once `TYPE` and the count are known: what was read before is dropped, the selection is kept (it holds names,
- * and only the rows read again are drawn selected) except in a list, whose indexes may name other elements now; a type
- * that changed drops the sort, the formats, the order and range of the pages and the section, and keeps the old type
- * for the notice; the text typed stays only when the refresh is not the tab's own.
+ * The tab once `TYPE` and the count are known: the selection is kept (it holds names, and only the rows read again are
+ * drawn selected) except in a list, whose indexes may name other elements now; a type that changed drops what was read,
+ * the sort, the formats, the order and range of the pages and the section, and keeps the old type for the notice; the
+ * text typed stays only when the refresh is not the tab's own. Of the same type, what was read stays on screen until
+ * the first page replaces it, and **Load more** waits for it.
  */
 function readAgain(state: ValueTab, type: string, count: number, keepsDraft: boolean): ValueTab {
   const {
     draft,
     line,
     editing: _editing,
-    string: _string,
-    scan: _scan,
-    next: _next,
+    string,
+    scan,
+    next,
     was: _was,
     found: _found,
-    problem: _problem,
-    beyond: _beyond,
-    inRange: _inRange,
+    problem,
+    beyond,
+    inRange,
     sort,
+    rows,
+    moreBefore: _moreBefore,
     ...rest
   } = state;
   const changed = state.type !== '' && state.type !== type;
   const { first: _first, groups: _groups, ...kept } = rest;
+  const stays = {
+    ...(string === undefined ? {} : { string }),
+    ...(scan === undefined ? {} : { scan }),
+    ...(next === undefined ? {} : { next }),
+    ...(problem === undefined ? {} : { problem }),
+    ...(beyond === undefined ? {} : { beyond }),
+    ...(inRange === undefined ? {} : { inRange }),
+  };
   return {
-    ...(changed ? { ...kept, typed: {}, section: 'entries' as const } : rest),
+    ...(changed ? { ...kept, typed: {}, section: 'entries' as const } : { ...rest, ...stays }),
     type,
     count,
     status: 'ready',
-    rows: [],
-    loadingMore: false,
+    rows: changed ? [] : rows,
+    loadingMore: !changed,
     ownRefresh: false,
     ...(type === 'list' ? { selection: { keys: new Set<string>() } } : {}),
     ...(changed ? { was: state.type, choices: {} } : sort === undefined ? {} : { sort }),
@@ -228,7 +260,7 @@ async function afterCheck(tab: string, run: number, type: string): Promise<void>
     return;
   }
   if (!isValueType(type)) {
-    changeValue(tab, (now) => ({ ...readAgain(now, type, 0, false), rows: [] }));
+    changeValue(tab, (now) => ({ ...readAgain(now, type, 0, false), rows: [], loadingMore: false }));
     return;
   }
   const count = await read(state.where, 'value.count', { type });
@@ -241,10 +273,8 @@ async function afterCheck(tab: string, run: number, type: string): Promise<void>
   }
   const total = (count.result as ValueCount).count;
   changeValue(tab, (now) => readAgain(now, type, total, keepsDraft));
-  if (type === 'stream' && valueTabOf(tab)?.section === 'groups') {
-    await loadGroups(tab);
-  }
-  await readFirstPage(tab, run, type, total);
+  const groups = type === 'stream' && valueTabOf(tab)?.section === 'groups' ? loadGroups(tab) : Promise.resolve();
+  await Promise.all([groups, readFirstPage(tab, run, type, total)]);
 }
 
 /** **Load more**: the next part of a string, another run of a scan, or the next page of the other types. */
@@ -294,7 +324,8 @@ export async function applyFilter(tab: string): Promise<void> {
   let run = 0;
   changeValue(tab, (state) => {
     run = state.run + 1;
-    return { ...state, run, filter: state.field, rows: [], scan: scanStart<ValueRow>(), loadingMore: true };
+    const { moreBefore: _moreBefore, ...rest } = state;
+    return { ...rest, run, filter: state.field, rows: [], scan: scanStart<ValueRow>(), loadingMore: true };
   });
   await continueScan(tab, run);
 }

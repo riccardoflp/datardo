@@ -870,7 +870,8 @@ Acceptance:
 - [ ] Not connected, it shows the header and **Connection** only, with **Connect**; nothing is read from the server
       and opening the page does not connect.
 - [ ] While it reads, each of **Server** and **Databases** shows **Loading…**; one that fails shows the server's
-      error and **Retry**, and the other is still shown.
+      error and **Retry**, and the other is still shown. Read again (**Refresh**, `F5`, coming back to its tab),
+      **Server** keeps what it showed, dimmed, until the answer comes.
 - [ ] MongoDB: sizes are written as the tree writes them (`tree.count`): `1.5 KB`, `1.0 GB`. A database beyond the
       first 100 shows its size and no counts.
 - [ ] MongoDB: a user who may not list the databases sees the one database of the connection string, as the tree

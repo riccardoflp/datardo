@@ -3,13 +3,16 @@
  * values for the color tokens. The dark theme is the default; the light one applies when the window's color scheme is
  * light, which the main process sets from `datardo.window.theme` (Electron's `nativeTheme.themeSource`), so that it
  * is right from the first frame and follows the system at once when the setting is `system` (`window.theme`).
- * These are the only literal values the styles hold.
+ * These are the only literal values the styles hold. The colors are those of sketch A1 (D65): a teal accent, islands of
+ * their own color with a border on a darker canvas, and steps between the surfaces wide enough that what is selected
+ * is never only a shade away. Every text color is at least 4.5:1 against every surface, and the borders of controls
+ * and the focus at least 3:1 (R10.10, `test/unit/theme/contrast.test.ts`). The fonts are shipped with Datardo (D66).
  */
 :root {
   color-scheme: dark;
 
-  --font-family-ui: system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-family-code: 'Cascadia Code', 'SF Mono', 'Menlo', 'Consolas', monospace;
+  --font-family-ui: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-family-code: 'JetBrains Mono Variable', 'Cascadia Code', 'SF Mono', 'Menlo', 'Consolas', monospace;
   --font-size-small: 11px;
   --font-size-body: 13px;
   --font-size-large: 15px;
@@ -28,9 +31,13 @@
   --radius-medium: 8px;
   --radius-island: 12px;
   --radius-round: 50%;
+  --radius-pill: 999px;
   --border-width: 1px;
   --focus-width: 2px;
   --duration-short: 120ms;
+
+  /* How long a read runs before it says it is working (R10.8; loadingSignDelayMs in src/features/nav/inspector.ts). */
+  --delay-busy: 200ms;
   --top-bar-height: 40px;
   --top-bar-side: 260px;
   --go-to-width: 480px;
@@ -50,47 +57,50 @@
   --suggestion-list-min-width: 240px;
   --suggestion-list-max-width: 480px;
   --editor-line-min-height: 26px;
-  --color-canvas: #101216;
-  --color-island: #181b21;
-  --color-raised: #20242c;
-  --color-hover: #282d37;
-  --color-selected: #2c3a52;
-  --color-border: #2e333d;
-  --color-text: #e6e8ec;
-  --color-text-muted: #a3a9b5;
-  --color-accent: #6ea8fe;
-  --color-accent-text: #0b1220;
-  --color-focus: #8ab8ff;
-  --color-success: #5fcf8a;
+  --color-canvas: #0b0d11;
+  --color-island: #14171d;
+  --color-raised: #1b1f27;
+  --color-hover: #232934;
+  --color-selected: #173b35;
+  --color-border: #262c37;
+  --color-island-border: #232832;
+  --color-control-border: #6b7486;
+  --color-text: #e7e9ee;
+  --color-text-muted: #9ea6b5;
+  --color-accent: #4fd1b5;
+  --color-accent-text: #06231d;
+  --color-accent-hover: #74ddc6;
+  --color-focus: #7fe3cc;
+  --color-success: #5bd38c;
   --color-warning: #f2c35b;
   --color-danger: #ff7a7a;
   --color-danger-text: #1d0909;
   --color-connection-red: #ff7a7a;
   --color-connection-orange: #ffa45c;
   --color-connection-yellow: #f2c35b;
-  --color-connection-green: #5fcf8a;
-  --color-connection-blue: #6ea8fe;
-  --color-connection-purple: #c39bff;
+  --color-connection-green: #5bd38c;
+  --color-connection-blue: #7db8ff;
+  --color-connection-purple: #c4a7ff;
 
   /* The syntax colors of mongosh text (query.highlight), one for each role, the same in the editors and the cells: at
    * least 4.5:1 against the canvas, the island, the raised surfaces, a hovered and a selected line. */
-  --color-syntax-key: #9cdcfe;
-  --color-syntax-op: #d7a0ff;
-  --color-syntax-string: #e6a07c;
-  --color-syntax-ref: #4ec9b0;
-  --color-syntax-number: #b5cea8;
-  --color-syntax-bool: #79b8ff;
-  --color-syntax-oid: #dcdcaa;
-  --color-syntax-date: #e2c08d;
+  --color-syntax-key: #9cc7ff;
+  --color-syntax-op: #f2b36d;
+  --color-syntax-string: #9bd8a0;
+  --color-syntax-ref: #4fd1b5;
+  --color-syntax-number: #7db8ff;
+  --color-syntax-bool: #c4a7ff;
+  --color-syntax-oid: #e2d28d;
+  --color-syntax-date: #e6b97a;
   --color-syntax-regex: #ff9492;
-  --color-syntax-comment: #a7aebb;
-  --color-chart-1: #6ea8fe;
+  --color-syntax-comment: #97a0af;
+  --color-chart-1: #4fd1b5;
   --color-chart-2: #ffa45c;
   --color-chart-3: #5fcf8a;
   --color-chart-4: #ff7a7a;
   --color-chart-5: #c39bff;
   --color-chart-6: #f2c35b;
-  --color-chart-7: #4ec9d6;
+  --color-chart-7: #7db8ff;
   --color-chart-8: #ff8fc7;
   --color-chart-9: #a3d977;
   --color-chart-10: #d4a373;
@@ -102,44 +112,47 @@
   :root {
     color-scheme: light;
 
-    --color-canvas: #eceef2;
+    --color-canvas: #e8ebf0;
     --color-island: #fff;
-    --color-raised: #f6f7f9;
-    --color-hover: #eef0f4;
-    --color-selected: #dbe7ff;
-    --color-border: #d6d9e0;
-    --color-text: #1b1e24;
-    --color-text-muted: #5b6270;
-    --color-accent: #2f6fde;
+    --color-raised: #f4f6f9;
+    --color-hover: #ebeef3;
+    --color-selected: #d2f0e9;
+    --color-border: #dce0e7;
+    --color-island-border: #d3d8e0;
+    --color-control-border: #7b8290;
+    --color-text: #161a21;
+    --color-text-muted: #535b69;
+    --color-accent: #08705e;
     --color-accent-text: #fff;
-    --color-focus: #2f6fde;
-    --color-success: #1b7b44;
-    --color-warning: #8a5a00;
-    --color-danger: #c42b2b;
+    --color-accent-hover: #065a4b;
+    --color-focus: #08705e;
+    --color-success: #17703e;
+    --color-warning: #7f5300;
+    --color-danger: #bb2828;
     --color-danger-text: #fff;
-    --color-connection-red: #c42b2b;
-    --color-connection-orange: #b4540a;
-    --color-connection-yellow: #8a5a00;
-    --color-connection-green: #1b7b44;
-    --color-connection-blue: #2f6fde;
-    --color-connection-purple: #7a3fd1;
+    --color-connection-red: #bb2828;
+    --color-connection-orange: #a94e08;
+    --color-connection-yellow: #7f5300;
+    --color-connection-green: #17703e;
+    --color-connection-blue: #1d55c2;
+    --color-connection-purple: #7136c8;
     --color-syntax-key: #0451a5;
-    --color-syntax-op: #9a1fb8;
-    --color-syntax-string: #a31515;
-    --color-syntax-ref: #11667a;
-    --color-syntax-number: #0a6b47;
-    --color-syntax-bool: #1f4fd1;
-    --color-syntax-oid: #6b5220;
-    --color-syntax-date: #7a4f00;
+    --color-syntax-op: #a14806;
+    --color-syntax-string: #17703e;
+    --color-syntax-ref: #0b6e5c;
+    --color-syntax-number: #1d55c2;
+    --color-syntax-bool: #7136c8;
+    --color-syntax-oid: #64491a;
+    --color-syntax-date: #714700;
     --color-syntax-regex: #a3264f;
-    --color-syntax-comment: #4f6b3d;
-    --color-chart-1: #2f6fde;
+    --color-syntax-comment: #566650;
+    --color-chart-1: #08705e;
     --color-chart-2: #c25e00;
     --color-chart-3: #1b7b44;
     --color-chart-4: #c42b2b;
     --color-chart-5: #7a3fd1;
     --color-chart-6: #8a6a00;
-    --color-chart-7: #0f7f8f;
+    --color-chart-7: #1d55c2;
     --color-chart-8: #c2307a;
     --color-chart-9: #4d7a12;
     --color-chart-10: #8b5a2b;

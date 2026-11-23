@@ -83,7 +83,9 @@ keys found · about 100,000 of 1,204,331 scanned**, then **37 of 1,204,331 keys*
 States:
 
 - loading: the toolbar, and a placeholder in the table until the first reply; a scan that goes on shows on the
-  status line with **Cancel** (`runner.progress`);
+  status line with **Cancel** (`runner.progress`). A new scan (a new pattern, a new type, **Refresh**) leaves the
+  rows of the last one in place, dimmed once it has lasted 300 ms, until its first page comes; **Cancel** in the
+  toolbar keeps its place, unseen, while no scan runs;
 - empty database (`DBSIZE` answers 0): *db0 has no keys.*, with **New key** and **Import keys…** (`@empty-state`);
 - nothing found, scan complete: *No keys match `orders:*`.*, or *No keys of type Hash match `orders:*`.* with a type;
 - nothing found yet: *No keys found among the about 100,000 scanned of 1,204,331.*, with **Scan more**
@@ -315,8 +317,9 @@ Chooses the keys that the next action applies to, and shows what can be done wit
   `Shift` and a click extends to it, `Ctrl+A` selects every loaded key, `Esc` clears.
 - **Offered when**: the table has rows.
 
-The selection is kept by key name: it survives sorting and **Scan more**. **Refresh**, a new pattern and a new type
-filter clear it; a row marked **gone** leaves it. `Ctrl+A` selects the keys loaded, not those the scan has not
+The selection is kept by key name: it survives sorting and **Scan more**. After **Refresh**, a new pattern or a new
+type filter it keeps the keys the first run of the new scan finds, and the others leave it; a row marked **gone**
+leaves it. `Ctrl+A` selects the keys loaded, not those the scan has not
 reached. With one key selected the inspector island shows it (`key.inspect`); with none it reads **Nothing
 selected** and *Select a key to see its value here.*; with several, **37 selected** and *Select one key to see its
 value.*
@@ -334,7 +337,7 @@ Acceptance:
 - [ ] A click on a row, then `Shift` and a click five rows below, selects six keys and shows **6 keys selected**.
 - [ ] Sorting by **Key** keeps the same six keys selected.
 - [ ] `Ctrl+A` with 500 keys loaded of 1,204,331 selects 500 keys.
-- [ ] **Refresh** clears the selection.
+- [ ] **Refresh** keeps selected the keys the first run finds, and a key deleted meanwhile leaves the selection.
 - [ ] With one key selected there is no selection bar, and the inspector island shows that key; with three it
   reads **3 selected** and *Select one key to see its value.*
 - [ ] On a read-only connection the selection bar has **Copy names** and **Export…** only, besides **Clear**.
@@ -354,8 +357,9 @@ Scans again from the start with the same pattern and type, and forgets what was 
 - **Danger**: None.
 - **Read-only**: Allowed, because it writes nothing to a deployment.
 - **Undo**: Cannot be undone: there is nothing to undo.
-- **After**: the sort column and direction, the pattern and the type are kept; the selection is cleared; the
-  inspector island shows the selected key again if the scan's first run finds it, and empties otherwise.
+- **After**: the sort column and direction, the pattern and the type are kept; the rows stay drawn until the first
+  page comes; the selection keeps the keys the scan's first run finds; the inspector island reads the selected key
+  again, and empties if the first run does not find it.
 - **Commands**: `key.refresh`
 - **Uses**: `key.scan`, `key.details`.
 - **Ported from**: *New in Datardo*
@@ -395,7 +399,8 @@ The inspector island (`@inspector`) shows, in order:
 7. **Open in a tab** (`key.open`), **Rename…** (`key.rename`), **Copy to…** (`key.copy`), **Delete key…**
    (`key.delete`).
 
-States: loading (the name at once, the rest when read); a key that is gone (*The key orders:42 no longer exists: it
+States: loading (the name and the labels of the lines at once, the rest when read; while another key is read, the
+key shown before stays, dimmed once the read has lasted 300 ms, value included); a key that is gone (*The key orders:42 no longer exists: it
 was deleted or it expired.*, and nothing else); a key of a module's type (the lines 1 to 5 and 7, and *Datardo does
 not show values of the type ReJSON-RL yet.* in place of the value); a line the server refuses (`MEMORY USAGE`,
 `OBJECT ENCODING` without the permission) reads `—`; on a read-only connection there are no **Set expiry…**, **Make

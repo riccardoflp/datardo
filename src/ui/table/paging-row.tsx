@@ -1,7 +1,8 @@
 /**
  * The paging row under the documents (`table.paging`): the range with its total, **Previous page**, **Next page** and
  * **Page size**. A page turn runs the query as it was last run, without counting again; an estimated total, or one
- * that could not be counted, is a button that counts exactly (`query.count`).
+ * that could not be counted, is a button that counts exactly (`query.count`). While the total is counted again, the
+ * one counted before stays, dimmed after a moment, so that the row keeps its width.
  */
 import { text as queryText } from '../../features/query/text';
 import { isPageSize } from '../../features/query/types';
@@ -54,21 +55,23 @@ export function PagingRow({
     <div className={styles['paging']} role="group" aria-label={tableText.paging.label}>
       <span className={styles['range']} role="status">
         {before}
-        {clickable ? (
-          <button
-            type="button"
-            className={styles['total']}
-            data-feature="query.count@paging"
-            title={total.tip}
-            onClick={() => {
-              countTab(collectionRef.tab, 'paging');
-            }}
-          >
-            {total.text}
-          </button>
-        ) : (
-          total.text
-        )}
+        <span className={styles['total-shown']} data-counting={total.counting ? 'true' : undefined}>
+          {clickable ? (
+            <button
+              type="button"
+              className={styles['total']}
+              data-feature="query.count@paging"
+              title={total.tip}
+              onClick={() => {
+                countTab(collectionRef.tab, 'paging');
+              }}
+            >
+              {total.text}
+            </button>
+          ) : (
+            total.text
+          )}
+        </span>
       </span>
       <PageButton button={paging.previous} collectionRef={collectionRef} />
       <PageButton button={paging.next} collectionRef={collectionRef} />

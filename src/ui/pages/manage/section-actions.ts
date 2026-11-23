@@ -43,25 +43,26 @@ function messageOf(result: IntentResult): string {
   return result.kind === 'failed' || result.kind === 'refused' ? result.message : '';
 }
 
-/** Reads the options again; the text typed is forgotten when `forget` is set (**Reload**, a save). */
+/**
+ * Reads the options again; the text typed is forgotten when `forget` is set (**Reload**, a save). What the section
+ * shows stays until the answer comes, which replaces it at once: nothing reads *Reading…* meanwhile but a first read.
+ */
 export async function readSection(place: SectionPlace, forget: boolean): Promise<void> {
+  changeSection(place.tab, (before) => ({ ...before, asked: true, confirmReload: false }));
+  const typedBefore = sectionOf(place.tab).typed;
+  const result = await start(place, 'manage.read-options', {});
   changeSection(place.tab, (before) => {
     const { typed: _typed, refused: _refused, sample: _sample, ...rest } = before;
+    // A text typed while the options were read is the user's newer work: it stays.
+    const kept = before.typed === typedBefore ? rest : { ...rest, typed: before.typed };
     return {
-      ...(forget ? rest : before),
-      read: { kind: 'loading' },
-      asked: true,
-      confirmReload: false,
+      ...(forget ? kept : before),
+      read:
+        result.kind === 'read'
+          ? { kind: 'read', options: result.result as CollectionOptions }
+          : { kind: 'error', message: messageOf(result) },
     };
   });
-  const result = await start(place, 'manage.read-options', {});
-  changeSection(place.tab, (before) => ({
-    ...before,
-    read:
-      result.kind === 'read'
-        ? { kind: 'read', options: result.result as CollectionOptions }
-        : { kind: 'error', message: messageOf(result) },
-  }));
 }
 
 /** Reads the sample of a collection without rules, once. */

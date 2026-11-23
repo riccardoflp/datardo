@@ -240,8 +240,37 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
 - The MCP server offers `sharding_status`: the shards, the balancer, the sharded collections and the recent events of
   a cluster, read through its mongos.
 
+### Changed
+
+- The colors are those of the first sketch: a teal accent, islands with a border of their own, wider steps between the
+  canvas, the islands and what is raised, and a selected line tinted with the accent. Text reads at 4.5:1 at least on
+  every surface, and the border of a field and the focus at 3:1, in both themes.
+- An island of a connection with a color shows it on its border.
+- Datardo ships the fonts Inter and JetBrains Mono, so the window looks the same on every system.
+- The MCP indicator of the top bar is a pill, and the section of a collection tab that is shown is underlined in the
+  accent.
+- The title bar drawn by the system takes the color of the new canvas.
+
 ### Fixed
 
+- Nothing moves when the pointer passes over it: **Add connection** and the buttons of the explorer, the buttons of a
+  line of the tree, and the close button of a tab kept their place and size only some of the time.
+- A field of one line, such as the filter of the query bar, no longer shows a scroll bar when its text is longer than
+  the field.
+- A notification no longer covers the pager row of a tab.
+- A read in progress leaves what was shown in place until its answer comes, and dims it or says it is working only
+  after 200 ms: the table of a collection or of a pipeline, its pager and its total, the keys tab, the key in the
+  inspector and the largest keys of the Server page, the value of a key tab and the groups of a stream, the header of
+  a key tab, the overview of a connection, the Monitor page, and the definition and validation of a collection. Before,
+  each of them emptied itself or showed **Loading…** for a moment at every refresh.
+- Refreshing the keys tab keeps the keys selected that are still found; a selected consumer of a stream stays selected
+  after Refresh.
+- While the inspector still shows the key selected before, its buttons are disabled until the new key is read.
+- The console keeps its prompt while a command runs, and **Run** and **Stop** have the same width; **Cancel** of the
+  keys tab and **Make persistent** of a key tab keep their place while hidden.
+- The list of Go to no longer scrolls under the pointer.
+- A data folder where a file stands in place of a folder is treated as empty on Linux and macOS too, as on Windows.
+- The license check of `npm run check` works on Linux and macOS.
 - What a read of a key tab's toolbar refuses, said under the toolbar, can be read in the light theme.
 - The window opens again with exactly the size it was left with when Windows scales the display by a fraction such as
   125%, instead of growing by a few pixels at each start.

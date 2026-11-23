@@ -6,11 +6,13 @@
   min-height: 0;
 }
 
+/* The islands have a border of their own on the canvas, as in sketch A1 (D65). */
 .connection-island,
 .tree-island {
+  padding: var(--space-2);
+  border: var(--border-width) solid var(--color-island-border);
   border-radius: var(--radius-island);
   background: var(--color-island);
-  padding: var(--space-2);
 }
 
 .connection-island {
@@ -189,7 +191,7 @@
 
 .filter {
   padding: var(--space-1) var(--space-2);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-control-border);
   border-radius: var(--radius-small);
   background: var(--color-island);
   color: var(--color-text);
@@ -222,7 +224,10 @@
 }
 
 .small-button:hover,
-.add:hover,
+.add:hover {
+  background: var(--color-hover);
+}
+
 .linked-row {
   display: flex;
   align-items: center;
@@ -239,6 +244,7 @@
 
 /* The color of the current connection, and of a connection in the switcher (connection.set-color). */
 .connection-island[data-color] {
+  border-color: color-mix(in srgb, var(--connection-color) 55%, var(--color-island));
   box-shadow: inset var(--space-1) 0 0 var(--connection-color);
 }
 

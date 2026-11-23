@@ -2,8 +2,9 @@
  * Feature: key.select
  *
  * Chooses the keys the next action applies to, and shows what can be done with them. The selection is kept by key
- * name: it survives sorting and **Scan more**; **Refresh**, a new pattern and a new type clear it; a row marked
- * **gone** leaves it. `Ctrl+A` selects the keys loaded, not those the scan has not reached.
+ * name: it survives sorting and **Scan more**; after **Refresh**, a new pattern or a new type, the keys the first run
+ * of the new scan does not find leave it; a row marked **gone** leaves it. `Ctrl+A` selects the keys loaded, not
+ * those the scan has not reached.
  */
 import { text } from './text';
 import type { KeyName } from './types';
@@ -75,6 +76,19 @@ export function selectionAfter(
       return { ...selection, keys };
     }
   }
+}
+
+/**
+ * The selection once a run of the scan ends: the keys it did not find leave it, so that **Refresh**, a new pattern or
+ * a new type keep selected the keys still found.
+ */
+export function selectionFound(selection: KeySelection, rows: readonly KeyName[]): KeySelection {
+  const found = new Set(rows.map(hexOf));
+  const keys = new Set([...selection.keys].filter((key) => found.has(key)));
+  if (keys.size === selection.keys.size) {
+    return selection;
+  }
+  return selection.anchor !== undefined && keys.has(selection.anchor) ? { keys, anchor: selection.anchor } : { keys };
 }
 
 /** The selected keys in the order of the table: what the actions on several keys receive. */

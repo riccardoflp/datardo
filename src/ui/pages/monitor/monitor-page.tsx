@@ -30,6 +30,7 @@ import {
   type MonitorTab,
 } from './monitor-store';
 import styles from '../server/server-page.module.css';
+import own from './monitor-page.module.css';
 
 type PageShows = Extract<TabShows, { kind: 'page' }>;
 
@@ -146,11 +147,15 @@ function PageToolbar(props: {
       >
         {toolbar.refresh}
       </button>
-      {props.shown.loading ? (
-        <span className={styles['count']} role="status">
-          {text.window.reading}
-        </span>
-      ) : null}
+      {/* Kept in its place while nothing is read, so that the toolbar does not change with each refresh. */}
+      <span
+        className={`${styles['count'] ?? ''} ${own['reading'] ?? ''}`}
+        role="status"
+        data-reading={props.shown.loading ? 'true' : undefined}
+        aria-hidden={props.shown.loading ? undefined : true}
+      >
+        {text.window.reading}
+      </span>
     </div>
   );
 }

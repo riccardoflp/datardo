@@ -122,7 +122,7 @@ function useRowsOnScreen(props: KeysTableProps, scroller: React.RefObject<HTMLDi
       const shown = page.rows.slice(range.first, range.first + range.count).filter((row) => !row.gone);
       const unread = unreadOnScreen(
         shown.map((row) => row.name),
-        new Set(shown.filter((row) => row.expiry !== '' || row.size !== '').map((row) => row.id)),
+        new Set(shown.filter((row) => row.read).map((row) => row.id)),
       );
       void readDetails(tabId, unread);
     }, settleMs);
@@ -195,6 +195,7 @@ export function KeysTable(props: KeysTableProps): React.JSX.Element {
       aria-label={text.show.table}
       aria-multiselectable="true"
       aria-rowcount={rows.length + 1}
+      aria-busy={props.page.busy ? true : undefined}
       tabIndex={0}
       className={styles['grid']}
       data-feature="key.select@table"

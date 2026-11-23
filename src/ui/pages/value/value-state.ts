@@ -27,8 +27,14 @@ export function selectedCount(tab: ValueTab): number {
   return tab.rows.filter((row) => tab.selection.keys.has(hexOf(rowName(row)))).length;
 }
 
-/** Whether more of the value can be read: a scan not ended, a next page. */
+/**
+ * Whether more of the value can be read: a scan not ended, a next page; while a refresh's scan has found nothing yet,
+ * what it was before.
+ */
 export function hasMore(tab: ValueTab): boolean {
+  if (tab.moreBefore !== undefined) {
+    return tab.moreBefore;
+  }
   return (tab.scan !== undefined && tab.scan.ended === undefined) || tab.next !== undefined;
 }
 

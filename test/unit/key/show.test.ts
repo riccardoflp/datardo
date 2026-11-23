@@ -6,6 +6,7 @@ import type { KeysPageState } from '../../../src/features/key/show';
 import { open, scanArgsOf, startingField, startingScan, view } from '../../../src/features/key/show';
 import { noSelection } from '../../../src/features/key/select';
 import type { ReadRequest } from '../../../src/shared/feature';
+import { hexOf } from '../../../src/features/key/types';
 import { cache, connected, keyContext, name, onDatabase, planOf, requestWords } from './context';
 
 const now = 1_763_400_000_000;
@@ -167,6 +168,26 @@ describe('key.show', () => {
     expect(view(offline).table).toMatchObject({ kind: 'not-connected', connect: { feature: 'connection.connect' } });
     expect(view(page({ error: 'NOPERM' })).table).toMatchObject({ kind: 'error', text: 'NOPERM' });
     expect(view(page()).table).toEqual({ kind: 'loading' });
+  });
+
+  it('keeps the rows of the last scan drawn, marked busy, until a new pattern gives its first page', () => {
+    const before = scanOf(['user:1', 'user:2'], 'complete', 10);
+    const details = new Map([[hexOf(name('user:1')), { expiresAt: null, size: 64, stale: true }]]);
+    const asked = { ...startingScan(undefined), typed: 'orders', pattern: pattern({ kind: 'typed', text: 'orders' }) };
+    const scanning = page({ last: asked, field: 'orders', previous: { scan: before, last: startingScan(undefined) } });
+    const drawn = view({ ...scanning, details });
+    expect(drawn.busy).toBe(true);
+    expect(drawn.table).toEqual({ kind: 'rows' });
+    expect(drawn.rows.map((row) => row.key)).toEqual(['user:1', 'user:2']);
+    expect(drawn.rows[0]).toMatchObject({ size: '64 B', read: false });
+    expect(drawn.count).toBe('2 keys');
+    expect(drawn.toolbar.field.sent).toBe('*orders*');
+    expect(drawn.toolbar.scanMore.enabled).toBe(false);
+    const found = view({ ...scanning, scan: scanOf(['orders:1'], undefined, 10) });
+    expect(found.busy).toBe(false);
+    expect(found.rows.map((row) => row.key)).toEqual(['orders:1']);
+    const nothingBefore = page({ previous: { scan: scanOf([], 'complete', 10), last: asked } });
+    expect(view(nothingBefore).table).toMatchObject({ kind: 'no-match', text: 'No keys match `*orders*`.' });
   });
 
   it('Search in the rail opens the keys tab of the database it names, and makes it active when it is open', () => {

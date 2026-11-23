@@ -79,9 +79,7 @@ test.describe('palette.open', () => {
     await window.keyboard.press('ArrowDown');
     await expect(options.nth(0)).toHaveAttribute('aria-selected', 'true');
     for (const theme of ['light', 'dark']) {
-      await window.evaluate((name) => {
-        document.documentElement.dataset['theme'] = name;
-      }, theme);
+      await window.emulateMedia({ colorScheme: theme as 'light' | 'dark' });
       await expectAccessible(window);
     }
   });

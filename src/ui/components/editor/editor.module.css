@@ -6,7 +6,7 @@
   position: relative;
   min-width: 0;
   min-height: var(--editor-line-min-height);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-control-border);
   border-radius: var(--radius-small);
   background: var(--color-canvas);
   color: var(--color-text);

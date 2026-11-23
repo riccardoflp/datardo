@@ -38,7 +38,7 @@
 .input {
   min-width: 140px;
   padding: var(--space-1) var(--space-2);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-control-border);
   border-radius: var(--radius-small);
   background: var(--color-canvas);
   color: var(--color-text);
@@ -209,4 +209,12 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
+}
+
+/* A read in progress leaves what was shown in place, and dims it only once it has lasted 300 ms (R10.8). */
+.empty[aria-busy='true'],
+.grid[aria-busy='true'] .body,
+.inspected[aria-busy='true'] {
+  opacity: 0.6;
+  transition: opacity var(--duration-short) linear var(--delay-busy);
 }

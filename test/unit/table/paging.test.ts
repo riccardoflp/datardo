@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { pageWindow } from '../../../src/features/table/page-window';
-import { view as pagingView, type PagingState } from '../../../src/features/table/paging';
+import { countAgain, view as pagingView, type PagingState } from '../../../src/features/table/paging';
 import { sortAfterClick, sortDirections } from '../../../src/features/table/sort';
 
 const count = 1204;
@@ -80,6 +80,18 @@ describe('table.paging', () => {
     );
     expect(pagingView(paging({ count: { kind: 'pending' } })).range).toBe('1–50 of …');
     expect(pagingView(paging({ count: { kind: 'failed' } })).range).toBe('1–50 of ?');
+  });
+
+  it('keeps the total counted before, dimmed, while it is counted again', () => {
+    const again = countAgain({ kind: 'counted', count, estimated: false });
+    expect(again).toEqual({ kind: 'pending', last: { kind: 'counted', count, estimated: false } });
+    expect(countAgain(again)).toEqual(again);
+    expect(countAgain({ kind: 'failed' })).toEqual({ kind: 'pending' });
+    const shown = pagingView(paging({ count: again }));
+    expect(shown.range).toBe('1–50 of 1,204');
+    expect(shown.total).toMatchObject({ text: '1,204', counting: true });
+    expect(pagingView(paging({})).total.counting).toBe(false);
+    expect(pagingView(paging({ count: again, received: 37 })).next.enabled).toBe(false);
   });
 
   it('disables Previous page on the first page and Next page after the last document', () => {

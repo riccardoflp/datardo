@@ -8,7 +8,7 @@ import { useSyncExternalStore } from 'react';
 import type { InspectRead } from '../../../features/key/inspect';
 import type { ScanState } from '../../../features/key/scan';
 import { noSelection, type KeySelection } from '../../../features/key/select';
-import { startingScan, type LastScan, type ReadDetails } from '../../../features/key/show';
+import { startingScan, type LastScan, type ReadDetails, type ShownScan } from '../../../features/key/show';
 import type { KeySort } from '../../../features/key/sort';
 import type { ConnectionId } from '../../../shared/ids';
 
@@ -23,6 +23,8 @@ export interface KeysWhere {
 export interface InspectedState {
   readonly key: string;
   readonly read: InspectRead;
+  /** Read before the scan started again: still shown, and read again. */
+  readonly stale?: boolean;
 }
 
 /** What one keys tab keeps. */
@@ -31,6 +33,8 @@ export interface KeysTab {
   readonly field: string;
   readonly last: LastScan;
   readonly scan?: ScanState;
+  /** The scan before, drawn until the new one gives its first page. */
+  readonly previous?: ShownScan;
   readonly error?: string;
   readonly details: ReadonlyMap<string, ReadDetails>;
   readonly sizesRefused: boolean;

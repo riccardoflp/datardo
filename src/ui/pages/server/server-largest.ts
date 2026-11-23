@@ -147,17 +147,16 @@ export function followAsk(tab: string, app: AppState): void {
   findLargestKeys(tab);
 }
 
-/** Reads what the inspector island shows of the key selected in the table of the largest keys. */
+/**
+ * Reads what the inspector island shows of the key selected in the table of the largest keys. What it showed stays
+ * until the read comes; a read of a key no longer selected is left.
+ */
 export async function readLargestKey(tab: string, keyHex: string): Promise<void> {
   const state = serverTabOf(tab);
   const search = state?.largest.search;
   if (state === undefined || search === undefined) {
     return;
   }
-  changeServerTab(tab, (now) => ({
-    ...now,
-    largest: { ...now.largest, inspected: { key: keyHex, read: { kind: 'loading' } } },
-  }));
   const result = await startOn(state, 'key.inspect:read', 'table', {
     connection: state.connection,
     database: search.database,
@@ -172,9 +171,7 @@ export async function readLargestKey(tab: string, keyHex: string): Promise<void>
         ? { kind: 'gone' as const }
         : { kind: 'loaded' as const, key, readAt };
   changeServerTab(tab, (now) =>
-    now.largest.inspected?.key === keyHex
-      ? { ...now, largest: { ...now.largest, inspected: { key: keyHex, read } } }
-      : now,
+    now.selected.largest === keyHex ? { ...now, largest: { ...now.largest, inspected: { key: keyHex, read } } } : now,
   );
 }
 

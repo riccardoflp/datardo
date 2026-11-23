@@ -52,7 +52,7 @@
 .input {
   min-width: 0;
   padding: var(--space-1) var(--space-2);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-control-border);
   border-radius: var(--radius-small);
   background: var(--color-canvas);
   color: var(--color-text);
@@ -224,4 +224,27 @@
 .table td {
   padding: var(--space-1) var(--space-4) var(--space-1) 0;
   user-select: text;
+}
+
+/* connection.overview: a read of the server says it is working only after 200 ms (loadingSignDelayMs); read again, the
+   section keeps what it showed, dimmed after the same delay, until the answer comes. */
+.loading-sign {
+  visibility: hidden;
+  animation: show-sign 0s linear var(--delay-busy) forwards;
+}
+
+.part[data-reading='true'] > :not(.partTitle) {
+  animation: dim-reading 0s linear var(--delay-busy) forwards;
+}
+
+@keyframes show-sign {
+  to {
+    visibility: visible;
+  }
+}
+
+@keyframes dim-reading {
+  to {
+    opacity: 0.55;
+  }
 }

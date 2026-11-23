@@ -135,6 +135,8 @@
 }
 
 .input-row .prompt {
+  display: inline-grid;
+  place-items: center start;
   padding-top: var(--space-1);
   font-family: var(--font-family-code);
 }
@@ -201,6 +203,55 @@
 @media (prefers-reduced-motion: reduce) {
   .spinner {
     animation: none;
+  }
+}
+
+/* console.input: while a command runs the prompt keeps its place, and after 200 ms (loadingSignDelayMs) the moving
+   mark is drawn in it instead of its text, so that a quick command shows nothing and the editor never moves. */
+.input-row .prompt-text,
+.input-row .prompt .spinner {
+  grid-area: 1 / 1;
+}
+
+.input-row .prompt[data-running='true'] .prompt-text {
+  animation: hide-sign 0s linear var(--delay-busy) forwards;
+}
+
+.input-row .prompt .spinner {
+  visibility: hidden;
+  animation:
+    show-sign 0s linear var(--delay-busy) forwards,
+    turn 1s linear infinite;
+}
+
+@keyframes show-sign {
+  to {
+    visibility: visible;
+  }
+}
+
+@keyframes hide-sign {
+  to {
+    visibility: hidden;
+  }
+}
+
+/* Run and Stop share one cell, the text not shown hidden in it, so that the button keeps one width. */
+.button-labels {
+  display: inline-grid;
+}
+
+.button-labels > span {
+  grid-area: 1 / 1;
+}
+
+.button-labels > span[aria-hidden='true'] {
+  visibility: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .input-row .prompt .spinner {
+    animation: show-sign 0s linear var(--delay-busy) forwards;
   }
 }
 

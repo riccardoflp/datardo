@@ -10,11 +10,24 @@ import { pageSizes, type PageSize } from '../query/types';
 import { pageWindow } from './page-window';
 import { text } from './text';
 
-/** The count of the query, as `query.count` gave it: being read, read, or not counted. */
-export type CountState =
-  | { readonly kind: 'pending' }
-  | { readonly kind: 'failed' }
-  | { readonly kind: 'counted'; readonly count: number; readonly estimated: boolean };
+/** A count `query.count` gave. */
+export interface Counted {
+  readonly kind: 'counted';
+  readonly count: number;
+  readonly estimated: boolean;
+}
+
+/**
+ * The count of the query, as `query.count` gave it: being read (with the count read before, shown meanwhile), read, or
+ * not counted.
+ */
+export type CountState = { readonly kind: 'pending'; readonly last?: Counted } | { readonly kind: 'failed' } | Counted;
+
+/** The count as it is read again: the one read before stays shown, dimmed, until the new one comes. */
+export function countAgain(before: CountState): CountState {
+  const last = before.kind === 'counted' ? before : before.kind === 'pending' ? before.last : undefined;
+  return last === undefined ? { kind: 'pending' } : { kind: 'pending', last };
+}
 
 /** What the paging row is drawn from. */
 export interface PagingState {
@@ -43,8 +56,16 @@ export interface PagingButton {
 export interface PagingView {
   /** `1–50 of 1,204`. */
   readonly range: string;
-  /** The total, with the tooltip and the click of `query.count` when it is an estimate. */
-  readonly total: { readonly text: string; readonly estimated: boolean; readonly tip?: string };
+  /**
+   * The total, with the tooltip and the click of `query.count` when it is an estimate; `counting` while it is the
+   * total read before, shown dimmed until the new count comes.
+   */
+  readonly total: {
+    readonly text: string;
+    readonly estimated: boolean;
+    readonly tip?: string;
+    readonly counting: boolean;
+  };
   readonly previous: PagingButton;
   readonly next: PagingButton;
   readonly pageSize: {
@@ -56,7 +77,7 @@ export interface PagingView {
 }
 
 function totalText(count: CountState, total: number | undefined): string {
-  if (count.kind === 'pending') {
+  if (count.kind === 'pending' && total === undefined) {
     return queryText.count.pending;
   }
   if (count.kind === 'failed' || total === undefined) {
@@ -68,25 +89,33 @@ function totalText(count: CountState, total: number | undefined): string {
 /**
  * Feature: table.paging
  *
- * The range (`1–50 of 1,204`, `0–0 of 0`, `1–50 of …` while counting, `1–50 of ?` when it could not be counted),
- * **Previous page** disabled on the first page, **Next page** disabled after the last document of the total or, with
- * the total unknown, when the page is not full; **Page size**.
+ * The range (`1–50 of 1,204`, `0–0 of 0`, `1–50 of …` while counting the first time, the total counted before while
+ * counting again, `1–50 of ?` when it could not be counted), **Previous page** disabled on the first page, **Next
+ * page** disabled after the last document of the total or, with the total unknown, when the page is not full; **Page
+ * size**.
  */
 export function view(state: PagingState): PagingView {
-  const count = state.count.kind === 'counted' ? state.count.count : undefined;
-  const window = pageWindow({
+  const asked = {
     page: state.page,
     pageSize: state.pageSize,
     skip: state.skip,
     received: state.received,
     ...(state.limit === undefined ? {} : { limit: state.limit }),
-    ...(count === undefined ? {} : { count }),
-  });
-  const total = totalText(state.count, window.total);
-  const estimated = state.count.kind === 'counted' && state.count.estimated;
+  };
+  const count = state.count.kind === 'counted' ? state.count.count : undefined;
+  const window = pageWindow({ ...asked, ...(count === undefined ? {} : { count }) });
+  const last = state.count.kind === 'pending' ? state.count.last : undefined;
+  const shownTotal = last === undefined ? window.total : pageWindow({ ...asked, count: last.count }).total;
+  const total = totalText(state.count, shownTotal);
+  const estimated = (state.count.kind === 'counted' && state.count.estimated) || last?.estimated === true;
   return {
     range: text.paging.range(countWritten(window.first), countWritten(window.last), total),
-    total: { text: total, estimated, ...(estimated ? { tip: queryText.count.estimated } : {}) },
+    total: {
+      text: total,
+      estimated,
+      ...(estimated ? { tip: queryText.count.estimated } : {}),
+      counting: last !== undefined,
+    },
     previous: {
       label: '‹',
       name: text.paging.previous,

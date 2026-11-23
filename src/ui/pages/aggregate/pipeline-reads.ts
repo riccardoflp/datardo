@@ -15,13 +15,20 @@ import { editorJson, makersOf, upToIndex, type PipelineEditor } from '../../../f
 import { keptQuery, keptText } from '../../../features/query/restore';
 import { cancelledLine } from '../../../features/query/run';
 import type { ErrorLine } from '../../../features/query/types';
+import { countAgain } from '../../../features/table/paging';
 import type { Document } from '../../../features/table/types';
 import type { IntentResult } from '../../../shared/bridge';
 import type { Json } from '../../../shared/engine-request';
 import type { Context } from '../../../shared/feature';
 import { featureId, type Place } from '../../../shared/ids';
 import type { CollectionRef, RunHow } from '../../query/collection-reads';
-import { changeCollection, changeQuery, collectionOf, type CollectionTab } from '../../query/collection-store';
+import {
+  changeCollection,
+  changeQuery,
+  collectionOf,
+  shownBefore,
+  type CollectionTab,
+} from '../../query/collection-store';
 import { changeDraft, changePipeline, expectKept, pipelineOf } from './pipeline-store';
 import { queryJson } from '../../../features/saved-query/types';
 import { recordRecent } from '../saved-query/queries-store';
@@ -111,11 +118,11 @@ function beginning(before: CollectionTab, how: RunHow, now: number): CollectionT
       invalid: [],
       selection: how.page === undefined && how.texts === 'ran' ? before.query.selection : { keys: [] },
     },
-    phase: before.hasRows ? { kind: 'running' } : { kind: 'loading' },
+    phase: shownBefore(before) ? { kind: 'running' } : { kind: 'loading' },
     ranAt: now,
     ranSkip: 0,
     running: true,
-    count: { kind: 'pending' },
+    count: countAgain(before.count),
   };
 }
 

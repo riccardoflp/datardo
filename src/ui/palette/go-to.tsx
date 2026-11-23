@@ -208,6 +208,14 @@ function OpenGoTo(props: { readonly field: GoToField; readonly prefix: string })
   const shown = view({ state, knowledge, typed, ...(keys === undefined ? {} : { keys }) });
   const rows = [...shown.sections.flatMap((section) => section.rows), ...(shown.keys?.rows ?? [])];
   const current = rows[Math.min(selected, rows.length - 1)];
+  /** Whether the pointer chose the selection last: the list then stays where it is under the pointer. */
+  const pointed = useRef(false);
+  const point = (index: number): void => {
+    if (index !== selected) {
+      pointed.current = true;
+      setSelected(index);
+    }
+  };
   useEffect(() => {
     input.current?.focus();
     const outside = (event: PointerEvent): void => {
@@ -221,6 +229,10 @@ function OpenGoTo(props: { readonly field: GoToField; readonly prefix: string })
     };
   }, []);
   useEffect(() => {
+    if (pointed.current) {
+      pointed.current = false;
+      return;
+    }
     if (current !== undefined) {
       document.getElementById(`go-to-${current.id}`)?.scrollIntoView({ block: 'nearest' });
     }
@@ -267,7 +279,7 @@ function OpenGoTo(props: { readonly field: GoToField; readonly prefix: string })
           onKeyDown={keyDown}
         />
       </div>
-      <List shown={shown} rows={rows} selected={selected} setSelected={setSelected} open={open} state={state} />
+      <List shown={shown} rows={rows} selected={selected} setSelected={point} open={open} state={state} />
       <div className={styles['spoken']} role="status" aria-live="polite">
         {shown.announcement}
       </div>

@@ -72,7 +72,7 @@
   flex: 1;
   min-height: var(--space-5);
   padding: var(--space-0) var(--space-2);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-control-border);
   border-radius: var(--radius-small);
   background: var(--color-canvas);
   color: var(--color-text);

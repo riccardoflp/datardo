@@ -42,9 +42,7 @@ test.describe('nav.empty', () => {
     await expect(window.getByRole('contentinfo', { name: 'Status line' })).toContainText('No connection');
     await expect(window.locator('[data-feature="nav.path@scope-bar"]')).toHaveText('Home');
     for (const theme of ['light', 'dark']) {
-      await window.evaluate((name) => {
-        document.documentElement.dataset['theme'] = name;
-      }, theme);
+      await window.emulateMedia({ colorScheme: theme as 'light' | 'dark' });
       await expectAccessible(window);
     }
   });

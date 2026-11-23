@@ -13,7 +13,7 @@ import { bytesOfHex, valueOf, type Inspection, type ServerControl } from '../../
 import type { ConnectionView } from '../../../shared/connection';
 import type { AppState } from '../../../shared/state';
 import { useAppState } from '../../state/store';
-import { KeyDetails, useClock } from '../keys/key-inspector';
+import { KeyDetails, useClock, useKeptRead } from '../keys/key-inspector';
 import { readLargestKey } from './server-largest';
 import { ControlButton } from './server-parts';
 import { clientsState, connectionOf, inspectionOf, sectionOf, slowLogState } from './server-state';
@@ -101,9 +101,12 @@ function LargestKey(props: {
     };
   }, [tabId, keyHex, readFor]);
   const database = tab.largest.search?.database ?? 0;
-  const name = bytesOfHex(keyHex);
   const inspected = tab.largest.inspected;
-  const read = inspected?.key === keyHex ? inspected.read : { kind: 'loading' as const };
+  const fresh = inspected?.key === keyHex ? inspected : undefined;
+  // The key shown before stays, dimmed after a moment, until the one selected now is read (R10.8).
+  const kept = useKeptRead(fresh);
+  const name = bytesOfHex(kept?.key ?? keyHex);
+  const read = kept?.read ?? { kind: 'loading' as const };
   const readOnly = connectionOf(app, tab.connection)?.readOnly ?? true;
   const shown = inspectView({ name, readOnly, read, now });
   return (
@@ -111,6 +114,7 @@ function LargestKey(props: {
       shown={shown}
       target={{ kind: 'key', connection: tab.connection, database, key: name }}
       place="inspector"
+      busy={fresh === undefined}
     />
   );
 }

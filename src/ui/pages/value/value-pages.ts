@@ -89,13 +89,16 @@ function orderedPage(type: ValueType, asked: Json, result: unknown): OrderedPage
   return { rows: page.entries.map((entry) => ({ cells: {}, entry })), ...(next === undefined ? {} : { next }) };
 }
 
-/** How a page is added: after the rows read (the first page, **Load more**), or in their place (the toolbar). */
-type Adding = 'append' | 'replace';
+/**
+ * How a page is added: after the rows read (**Load more**), in place of the rows of before a refresh (`first`, its
+ * first page), or in their place with the arguments kept for the next refresh (the toolbar).
+ */
+type Adding = 'append' | 'first' | 'replace';
 
 /** The tab with a page added: its rows, where the next starts, its notes, and the first row selected when asked. */
 function withPage(now: ValueTab, page: OrderedPage, adding: Adding): ValueTab {
   const { next: _next, beyond: _beyond, inRange: _inRange, problem: _problem, selectFirst, ...rest } = now;
-  const before = adding === 'replace' ? [] : now.rows;
+  const before = adding === 'append' ? now.rows : [];
   const first = page.rows[0];
   const selects = selectFirst === true && before.length === 0 && first !== undefined;
   const name = first === undefined ? '' : hexOf(rowName(first));
@@ -153,6 +156,11 @@ async function readPage(tab: string, run: number, asked: Json, adding: Adding): 
 /** Reads the page of a list, a sorted set or a stream that `asked` names, and adds its rows. */
 export async function readOrdered(tab: string, run: number, asked: Json): Promise<void> {
   await readPage(tab, run, asked, 'append');
+}
+
+/** Reads the first page of a list, a sorted set or a stream again, whose rows then replace those shown. */
+export async function readFirstOrdered(tab: string, run: number, asked: Json): Promise<void> {
+  await readPage(tab, run, asked, 'first');
 }
 
 /**

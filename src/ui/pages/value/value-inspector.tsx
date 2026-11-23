@@ -138,8 +138,11 @@ function compactRows(type: ValueType, result: unknown): readonly ValueRow[] {
 }
 
 /** Reads the count and the beginning of the value, again after each refresh of the app. */
-function useCompactRead(where: CompactWhere, refreshed: number): ValueView | undefined {
-  const [shown, setShown] = useState<ValueView | undefined>(undefined);
+function useCompactRead(
+  where: CompactWhere,
+  refreshed: number,
+): { readonly shown: ValueView | undefined; readonly reading: boolean } {
+  const [shown, setShown] = useState<{ readonly view: ValueView; readonly of: string } | undefined>(undefined);
   const keyText = nameText(where.key);
   const keyHex = hexOf(where.key);
   useEffect(() => {
@@ -160,8 +163,9 @@ function useCompactRead(where: CompactWhere, refreshed: number): ValueView | und
       const failed = count.kind !== 'read' ? count : first.kind !== 'read' ? first : undefined;
       const total = count.kind === 'read' ? (count.result as ValueCount).count : 0;
       const part = type === 'string' && first.kind === 'read' ? (first.result as StringPart) : undefined;
-      setShown(
-        view({
+      setShown({
+        of: `${keyHex} ${type} ${String(refreshed)}`,
+        view: view({
           form: 'compact',
           key: keyText,
           type,
@@ -172,7 +176,7 @@ function useCompactRead(where: CompactWhere, refreshed: number): ValueView | und
           ...(part === undefined ? {} : { string: { length: part.length, loaded: part.bytes ?? new Uint8Array() } }),
           rows: first.kind === 'read' ? compactRows(type, first.result) : [],
         }),
-      );
+      });
     });
     return () => {
       current = false;
@@ -180,19 +184,29 @@ function useCompactRead(where: CompactWhere, refreshed: number): ValueView | und
     // The key is followed by its bytes in hexadecimal: the array itself is made again at each drawing.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [where.connection, where.database, keyHex, where.type, refreshed]);
-  return shown;
+  // What was shown stays in place while the value of another key, or the same again, is read (R10.8).
+  return { shown: shown?.view, reading: shown?.of !== `${keyHex} ${where.type} ${String(refreshed)}` };
 }
 
-/** The compact form of the value of the key selected in a keys tab. */
-export function ValueCompact({ where }: { readonly where: CompactWhere }): React.JSX.Element | null {
+/**
+ * The compact form of the value of the key selected in a keys tab; the value shown before stays, dimmed after a
+ * moment, while the next is read or while `busy` (the island still shows the key selected before).
+ */
+export function ValueCompact({
+  where,
+  busy = false,
+}: {
+  readonly where: CompactWhere;
+  readonly busy?: boolean;
+}): React.JSX.Element | null {
   const refreshed = useAppState().runner.refreshed.times;
-  const shown = useCompactRead(where, refreshed);
+  const { shown, reading } = useCompactRead(where, refreshed);
   return (
     <section
       className={styles['compact']}
       aria-label="Value"
       data-feature="value.show@inspector"
-      aria-busy={shown === undefined ? true : undefined}
+      aria-busy={reading || busy ? true : undefined}
     >
       {shown?.message === undefined ? null : <p className={styles['muted']}>{shown.message.text}</p>}
       {shown?.editor === undefined ? null : (

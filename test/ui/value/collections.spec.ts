@@ -140,9 +140,7 @@ function toolbar(window: Page) {
 
 async function bothThemes(window: Page): Promise<void> {
   for (const theme of ['light', 'dark']) {
-    await window.evaluate((name) => {
-      document.documentElement.dataset['theme'] = name;
-    }, theme);
+    await window.emulateMedia({ colorScheme: theme as 'light' | 'dark' });
     await expectAccessible(window);
   }
 }

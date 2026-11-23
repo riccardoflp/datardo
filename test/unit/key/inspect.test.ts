@@ -40,6 +40,12 @@ describe('key.inspect', () => {
     expect(view(state).value).toEqual({ kind: 'value' });
   });
 
+  it('shows the name and the labels of the lines at once while the key is read, so that the island does not grow', () => {
+    const reading = loaded({ kind: 'loading' });
+    expect(view(reading).loading).toBe(true);
+    expect(values(reading)).toEqual({ Type: '', Expiry: '', Size: '', Encoding: '' });
+  });
+
   it('counts the time left again every second from the date read', () => {
     const key = { type: 'string', timeLeft: 7_500_000, size: 64 } as const;
     const state = loaded({ kind: 'loaded', key, readAt: noon });

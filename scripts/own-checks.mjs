@@ -19,6 +19,9 @@ export const allowedDependencies = [
   '@lezer/',
   '@tanstack/react-virtual',
   '@vscode/codicons',
+  // D66: the fonts of the interface and of code.
+  '@fontsource-variable/inter',
+  '@fontsource-variable/jetbrains-mono',
 ];
 
 function files(folder, extensions) {

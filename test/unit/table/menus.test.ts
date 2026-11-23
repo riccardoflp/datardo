@@ -285,6 +285,17 @@ describe('table.show', () => {
   it('dims the rows while the query runs again', () => {
     expect(shown({ phase: { kind: 'running' } }).body).toEqual({ kind: 'table', dimmed: true });
   });
+
+  it('keeps the message of an empty result while the query runs again', () => {
+    const again = {
+      phase: { kind: 'running' },
+      hasRows: false,
+      emptyQuery: false,
+      paging: { page: 1, pageSize: 50, skip: 0, received: 0, count: { kind: 'pending' } },
+    } as const;
+    expect(shown(again).body).toMatchObject({ kind: 'message', text: 'No documents match this query.' });
+    expect(shown({ ...again, phase: { kind: 'loading' } }).body).toMatchObject({ text: 'Loading documents…' });
+  });
 });
 
 describe('table.refresh', () => {

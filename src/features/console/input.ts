@@ -87,10 +87,14 @@ export interface InputButton {
 /** What the input shows. */
 export interface InputView {
   readonly label: string;
-  /** The prompt; none while a command runs, when a moving mark takes its place. */
-  readonly prompt?: string;
+  /** The prompt; while a command runs it keeps its place, and a moving mark is drawn over it. */
+  readonly prompt: string;
+  /** A command is running: the moving mark is shown in the prompt's place, and the button is **Stop**. */
+  readonly running: boolean;
   readonly placeholder: string;
   readonly button: InputButton;
+  /** Every text the button takes, **Run** and **Stop**: it is as wide as the widest, so that nothing moves. */
+  readonly buttonLabels: readonly string[];
   readonly tokens: readonly LineToken[];
   readonly hint?: ArgumentHint;
   /** The list of suggestions when it is open, its first 10 shown at a time, and the one selected. */
@@ -126,9 +130,11 @@ export function view(state: InputState): InputView {
     state.list === undefined ? undefined : suggestions(current.line, current.caret, state.docs, state.list.opening);
   return {
     label: text.input.label,
-    ...(running ? {} : { prompt: promptOf(state.console.session) }),
+    prompt: promptOf(state.console.session),
+    running,
     placeholder: state.console.status === 'connecting' ? text.show.connecting : text.input.placeholder,
     button: running ? stopButton : runButton,
+    buttonLabels: [runButton.label, stopButton.label],
     tokens: lineTokens(current.line),
     ...(hint === undefined ? {} : { hint }),
     ...(list === undefined || state.list === undefined

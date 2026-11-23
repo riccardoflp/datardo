@@ -3,6 +3,9 @@
  */
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+// The fonts of the interface and of code, shipped with Datardo (D66); then the tokens that name them.
+import '@fontsource-variable/inter';
+import '@fontsource-variable/jetbrains-mono';
 import './theme/tokens.css';
 import './theme/base.css';
 import { App } from './app';

@@ -127,7 +127,7 @@
 .input {
   min-width: 200px;
   padding: var(--space-1) var(--space-2);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-control-border);
   border-radius: var(--radius-small);
   background: var(--color-canvas);
   color: var(--color-text);
@@ -154,7 +154,7 @@
   width: 36px;
   height: 20px;
   padding: 0;
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-control-border);
   border-radius: var(--radius-round);
   background: var(--color-canvas);
   cursor: pointer;

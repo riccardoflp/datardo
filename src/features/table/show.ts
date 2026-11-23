@@ -126,7 +126,8 @@ function body(state: ShowState): ShowBody {
       buttons: [{ label: text.show.runAgain, element: 'query.run@query-bar' }, ...reconnect],
     };
   }
-  if (phase.kind === 'shown' && state.paging.received === 0) {
+  // An empty result keeps its message while the query runs again, until the new answer comes.
+  if ((phase.kind === 'shown' || phase.kind === 'running') && state.paging.received === 0) {
     return emptyBody(state);
   }
   return { kind: 'table', dimmed: phase.kind === 'running' || phase.kind === 'loading' };

@@ -302,8 +302,12 @@ export function ConsoleInput(props: {
   return (
     <div className={styles['input']}>
       <div className={styles['input-row']}>
-        <span className={styles['prompt']} aria-hidden={running ? true : undefined}>
-          {shown.prompt ?? <span className={styles['spinner']} role="status" aria-label={console.running} />}
+        {/* The prompt keeps its place while a command runs; the moving mark is drawn over it after a moment. */}
+        <span className={styles['prompt']} data-running={shown.running ? 'true' : undefined}>
+          <span className={styles['prompt-text']} aria-hidden={shown.running ? true : undefined}>
+            {shown.prompt}
+          </span>
+          {shown.running ? <span className={styles['spinner']} role="status" aria-label={console.running} /> : null}
         </span>
         <div ref={host} className={styles['editor']} data-invalid={hasUnclosedQuote(tab.typed) ? 'true' : undefined} />
         <button
@@ -318,7 +322,14 @@ export function ConsoleInput(props: {
             }
           }}
         >
-          {shown.button.label}
+          {/* Both texts share one cell, the other hidden, so that Run and Stop are as wide. */}
+          <span className={styles['button-labels']}>
+            {shown.buttonLabels.map((label) => (
+              <span key={label} aria-hidden={label === shown.button.label ? undefined : true}>
+                {label}
+              </span>
+            ))}
+          </span>
         </button>
       </div>
       <Suggestions shown={shown} tabId={tabId} />

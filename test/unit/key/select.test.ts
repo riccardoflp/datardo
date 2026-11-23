@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { KeySelection } from '../../../src/features/key/select';
-import { noSelection, selectedInOrder, selectionAfter, view } from '../../../src/features/key/select';
+import { noSelection, selectedInOrder, selectionAfter, selectionFound, view } from '../../../src/features/key/select';
 import { sortedKeys } from '../../../src/features/key/sort';
 import { name } from './context';
 
@@ -34,9 +34,21 @@ describe('key.select', () => {
     expect(view({ selection, rows: loaded, readOnly: false }).count).toBe(500);
   });
 
-  it('clears the selection on Refresh, as Esc does', () => {
+  it('keeps selected after Refresh the keys the first run finds, and a key deleted meanwhile leaves it', () => {
     const selection = clicked({ kind: 'click', key: name('k8') }, { kind: 'toggle', key: name('k2') });
     expect(selection.keys.size).toBe(2);
+    expect(selectionFound(selection, rows)).toBe(selection);
+    const found = selectionFound(
+      selection,
+      rows.filter((row) => text([row])[0] !== 'k8'),
+    );
+    expect(text(selectedInOrder(found, rows))).toEqual(['k2']);
+    expect(found.anchor).toBe(selection.anchor);
+    expect(selectionFound(selection, [])).toEqual(noSelection);
+  });
+
+  it('clears the selection with Esc', () => {
+    const selection = clicked({ kind: 'click', key: name('k8') }, { kind: 'toggle', key: name('k2') });
     expect(selectionAfter(selection, { kind: 'clear' }, rows)).toEqual(noSelection);
   });
 

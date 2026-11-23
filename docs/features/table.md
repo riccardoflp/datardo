@@ -67,8 +67,9 @@ shown, the total of the query and how long the server took for the documents.
 Its states:
 
 - *Loading, nothing shown yet*: **Loading documents…** in place of the rows.
-- *Running again*: the rows shown stay, dimmed, until the new ones arrive; nothing in them can be started meanwhile.
-  The window is not blocked: other tabs and the bar stay usable.
+- *Running again*: the rows shown stay, dimmed after 200 ms, until the new ones arrive; nothing in them can be started
+  meanwhile. The message of an empty result stays the same way. The window is not blocked: other tabs and the bar stay
+  usable.
 - *Documents*: the table.
 - *Empty collection*, when the query is empty and the collection has no document: **This collection is empty.**, with
   **Insert** (`document.insert`) on a collection that can be changed.
@@ -104,7 +105,8 @@ Acceptance:
       (`query.count`).
 - [ ] A query that fails on a tab that shows 50 documents leaves the 50 documents and shows the message under the bar;
       a first read that fails shows **The documents could not be read.** with **Run again**.
-- [ ] While a query runs again, the rows are dimmed and a double click on a cell does not open its editor.
+- [ ] While a query runs again, the rows are dimmed and a double click on a cell does not open its editor; a query
+      that found nothing keeps **No documents match this query.** while it runs again.
 - [ ] A click on a row shows its document in the inspector island (`document.inspect`).
 - [ ] The table is announced to a screen reader as a grid with its numbers of rows and columns, and each cell with the
       name of its column.
@@ -588,7 +590,7 @@ Acceptance:
 
 - [ ] Page 1 of 1,204 documents with page size 50 reads `1–50 of 1,204`; the last page reads `1,201–1,204 of 1,204`.
 - [ ] A result with no documents reads `0–0 of 0`; a total not known yet reads `1–50 of …`, and one that could not be
-      counted `1–50 of ?`.
+      counted `1–50 of ?`. While the total is counted again, the total counted before stays, dimmed.
 - [ ] **Previous page** is disabled on the first page. **Next page** is disabled when the last document shown is the
       last of the total; with the total unknown, when the page shown has fewer documents than the page size.
 - [ ] **Next page** runs the same query for the next page, as it was last run and not as the bar reads now, and does

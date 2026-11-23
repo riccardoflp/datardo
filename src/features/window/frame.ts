@@ -15,8 +15,8 @@ export const topBarHeight = 40;
 
 /** The colors of the frame in each theme: those of the tokens `--color-canvas` and `--color-text`. */
 export const frameColors: Readonly<Record<ThemeInUse, { readonly background: string; readonly symbols: string }>> = {
-  dark: { background: '#101216', symbols: '#e6e8ec' },
-  light: { background: '#eceef2', symbols: '#1b1e24' },
+  dark: { background: '#0b0d11', symbols: '#e7e9ee' },
+  light: { background: '#e8ebf0', symbols: '#161a21' },
 };
 
 /** Who draws the window's buttons. */

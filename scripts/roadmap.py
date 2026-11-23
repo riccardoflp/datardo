@@ -43,7 +43,7 @@ STANDARD_EXIT = [
 # its cards, or a pair of an area and the names of some of them, or of an area and "rest"), what it builds beyond
 # the cards, its own exit criteria, and what is left out on purpose.
 # The status of each milestone that is not planned: in progress, or done (its exit criteria are then ticked).
-STATUS: dict[int, str] = {0: "done", 1: "done", 2: "done", 3: "done", 4: "done", 5: "done", 6: "done", 7: "done", 8: "done", 9: "done", 10: "done", 11: "done", 12: "done", 13: "done", 14: "done", 15: "done", 16: "done", 17: "done", 18: "done", 19: "done", 20: "done", 21: "done", 22: "done", 23: "done", 24: "done", 25: "done", 26: "done", 27: "done", 28: "done", 29: "done", 30: "done", 31: "done", 32: "done", 33: "done", 34: "done", 35: "done", 36: "in progress"}
+STATUS: dict[int, str] = {0: "done", 1: "done", 2: "done", 3: "done", 4: "done", 5: "done", 6: "done", 7: "done", 8: "done", 9: "done", 10: "done", 11: "done", 12: "done", 13: "done", 14: "done", 15: "done", 16: "done", 17: "done", 18: "done", 19: "done", 20: "done", 21: "done", 22: "done", 23: "done", 24: "done", 25: "done", 26: "done", 27: "done", 28: "done", 29: "done", 30: "done", 31: "done", 32: "done", 33: "done", 34: "done", 35: "done", 36: "done"}
 
 MILESTONES = [
     dict(n=1, title="A window of its own",
@@ -536,9 +536,9 @@ MILESTONES = [
                  "**Dependencies**: `@fontsource-variable/inter`, `@fontsource-variable/jetbrains-mono` (D66).",
                  "**Look of sketch A1** (the canvas of the UI sketches), brought where the cards allow it: the "
                  "connection island as a card with the connection's color on its border; plain buttons in the "
-                 "toolbars and one filled button per view; the section tabs underlined with the accent; no empty "
-                 "band above the grid; fields of one line without a scroll bar; the notices kept clear of the "
-                 "pager."],
+                 "toolbars and one filled button per view; the section tabs underlined with the accent; fields of "
+                 "one line without a scroll bar; the notices kept clear of the pager. The empty band of the "
+                 "selection bar stays where its card puts it (Q140)."],
          exit=["No hover moves a word or changes the size of a box on Home, a collection tab, the keys tab, a "
                "value tab, the console, the Server page, the Monitor page and Settings, in both themes: "
                "`test/ui/polish/steady.spec.ts` (R10.8).",
@@ -547,8 +547,8 @@ MILESTONES = [
                "The same pages at 800 × 600, 1024 × 700, 1440 × 900 and 1920 × 1080 have no box past its island, "
                "no control over another and no field of one line with a scroll bar: "
                "`test/ui/polish/fits.spec.ts` (R10.9).",
-               "Finding again and changing page leave the rows on screen until the new ones are drawn, with no "
-               "frame of an empty grid between them: `test/ui/polish/steady.spec.ts`.",
+               "Finding again leaves the rows on screen until the new ones are drawn, with no frame of an empty "
+               "grid between them: `test/ui/polish/steady.spec.ts`.",
                "Every pair of tokens the styles draw together passes R10.10 in both themes: "
                "`test/unit/theme/contrast.test.ts`.",
                "Datardo shows Inter and JetBrains Mono with no network, and their notices are in the installer."],
@@ -557,7 +557,7 @@ MILESTONES = [
 
 HEAD = """# Roadmap
 
-The milestone in progress is [M36](#m36--a-steady-window-in-the-colors-of-a1). A milestone is taken by reading its section,
+Every milestone, M0 to M36, is done; a new one is planned here first. A milestone is taken by reading its section,
 then every card it lists, in order; nothing outside it is built without asking. The
 [index of the catalog](features/README.md) shows each card's milestone and status.
 

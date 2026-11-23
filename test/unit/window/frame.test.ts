@@ -38,7 +38,7 @@ describe('window.frame', () => {
   });
 
   it('starts with the background of the theme, never white', () => {
-    expect(frame('windows', 'dark').backgroundColor).toBe('#101216');
+    expect(frame('windows', 'dark').backgroundColor).toBe('#0b0d11');
   });
 
   it('keeps the colors of the frame those of the tokens of each theme', async () => {

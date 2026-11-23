@@ -132,9 +132,7 @@ test.describe('tab.strip', () => {
     await expect(tab(window, 'Log')).toBeFocused();
     await expect(tab(window, 'Settings')).toHaveAttribute('title', 'Settings');
     for (const theme of ['light', 'dark']) {
-      await window.evaluate((name) => {
-        document.documentElement.dataset['theme'] = name;
-      }, theme);
+      await window.emulateMedia({ colorScheme: theme as 'light' | 'dark' });
       await expectAccessible(window);
     }
   });

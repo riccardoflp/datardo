@@ -4,6 +4,7 @@
   flex-direction: column;
   min-width: 0;
   min-height: 0;
+  border: var(--border-width) solid var(--color-island-border);
   border-radius: var(--radius-island);
   background: var(--color-island);
 }

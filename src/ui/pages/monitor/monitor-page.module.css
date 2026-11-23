@@ -110,3 +110,19 @@
   border: var(--border-width) solid var(--color-accent);
   border-radius: var(--radius-small);
 }
+
+/* Reading… on the toolbar keeps its place: hidden while nothing is read, shown when a read has run 200 ms
+   (loadingSignDelayMs), so that a quick refresh shows nothing. */
+.reading {
+  visibility: hidden;
+}
+
+.reading[data-reading='true'] {
+  animation: show-reading 0s linear var(--delay-busy) forwards;
+}
+
+@keyframes show-reading {
+  to {
+    visibility: visible;
+  }
+}

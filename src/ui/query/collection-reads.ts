@@ -9,6 +9,7 @@ import type { FieldHint } from '../../features/query/field-hints';
 import { keptQuery, keptText } from '../../features/query/restore';
 import { cancelledLine, checkedQuery, failureLine, type RunResult } from '../../features/query/run';
 import type { ErrorLine, PageSize, QueryTexts } from '../../features/query/types';
+import { countAgain } from '../../features/table/paging';
 import { selectionAfter } from '../../features/table/selection';
 import { setting } from '../../features/settings/read';
 import type { IntentResult } from '../../shared/bridge';
@@ -16,7 +17,7 @@ import type { Json } from '../../shared/engine-request';
 import { featureId, type ConnectionId, type TabId, type WorkId } from '../../shared/ids';
 import { recordRecent } from '../pages/saved-query/queries-store';
 import { currentAppState } from '../state/store';
-import { changeCollection, collectionOf, textsRan, type CollectionTab } from './collection-store';
+import { changeCollection, collectionOf, shownBefore, textsRan, type CollectionTab } from './collection-store';
 
 /** The collection a tab shows, and the tab. */
 export interface CollectionRef {
@@ -206,7 +207,10 @@ function runArgs(ref: CollectionRef, collection: CollectionTab): Json {
   };
 }
 
-/** The tab as the run begins: the query that runs, its page, the error line emptied, the rows dimmed. */
+/**
+ * The tab as the run begins: the query that runs, its page, the error line emptied, the rows dimmed. What was shown
+ * stays until the answer comes: the rows, the message of an empty result, the total counted before.
+ */
 function beginning(before: CollectionTab, how: RunHow, texts: QueryTexts, now: number): CollectionTab {
   const checked = checkedQuery(texts, now);
   const skip = checked.ok ? checked.query.skip : 0;
@@ -224,12 +228,12 @@ function beginning(before: CollectionTab, how: RunHow, texts: QueryTexts, now: n
     ...before,
     started: true,
     query,
-    phase: before.hasRows ? { kind: 'running' } : { kind: 'loading' },
+    phase: shownBefore(before) ? { kind: 'running' } : { kind: 'loading' },
     ranAt: how.texts === 'bar' || how.refresh === true ? now : before.ranAt,
     ranSkip: skip,
     ...(limit === undefined ? { ranLimit: undefined } : { ranLimit: limit }),
     running: true,
-    ...(how.count ? { count: { kind: 'pending' } } : {}),
+    ...(how.count ? { count: countAgain(before.count) } : {}),
   } as CollectionTab;
 }
 
@@ -321,7 +325,7 @@ export async function countQuery(
     kind: ref.kind,
     exact: how === 'exact',
   };
-  changeCollection(ref.tab, (before) => ({ ...before, count: { kind: 'pending' } }));
+  changeCollection(ref.tab, (before) => ({ ...before, count: countAgain(before.count) }));
   const result = await start(ref, 'query.count', args, how === 'exact' ? place : undefined);
   if (runs.get(ref.tab) !== run) {
     return;

@@ -618,7 +618,7 @@ focus; islands of their own color on a darker canvas, each with a border that ca
 tell a key, a string, a number and an operator apart at a glance (green strings, orange operators, blue numbers). The
 steps between the canvas, an island, a raised surface, a hovered row and a selected row are wider than before, so
 that what is selected is never only a shade away. Every color stays a token (R10.2), and both themes keep text at
-4.5:1 and the borders of fields, buttons and the focus at 3:1 against what they are drawn on (R10.10). Buttons have three
+4.5:1 and the borders of fields and the focus at 3:1 against what they are drawn on (R10.10). Buttons have three
 weights: one primary per view, filled with the accent; secondary ones with a border; and plain ones, with no border
 until hovered, for the toolbars. Rejected: keeping the blue palette with more contrast (B), and indigo with amber (C),
 both shown to the author on 2026-11-21; Tailwind, weighed again on the same day and left out, since the faults seen
@@ -1537,3 +1537,8 @@ Raised while the catalog was written; each names the cards that hold the current
   the height of its rows and of its horizontal scroll bar, which hid the last row under the header. The filters and
   the choices of the sections change only the window or start the section's own reads and carry no element, as Q133
   says for M30 (`monitor.stats`, `monitor.replication`, `monitor.sharding`, `server.show`).
+- **Q140** — M36 keeps the place of the selection bar of a collection tab while no row is selected: an empty band
+  between the query bar and the table, so that selecting a second row does not push the table down (R10.8). The band
+  could instead be part of the pager row, which is always shown, and the table would gain its height. Should the
+  selection bar move to the pager row? Until the author answers, it stays where its card puts it
+  (`table.selection-bar`).

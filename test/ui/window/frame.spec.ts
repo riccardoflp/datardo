@@ -32,7 +32,7 @@ test('window.frame: the window has no menu bar, a minimum size and the backgroun
     expect(frame.menuBarVisible).toBe(false);
   }
   expect(frame.minimum).toEqual([640, 400]);
-  expect(frame.background).toBe(frame.dark ? '#101216' : '#eceef2');
+  expect(frame.background).toBe(frame.dark ? '#0b0d11' : '#e8ebf0');
 });
 
 test('window.title: the window is named Datardo while no tab is open', async () => {

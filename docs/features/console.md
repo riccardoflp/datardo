@@ -47,8 +47,9 @@ States:
 - **Connecting**: the input shows *Connecting…* and takes text; `Enter` waits for the connection.
 - **Empty**: the output shows *Type a Redis command and press Enter. Up and Down go through the commands you ran
   before.*
-- **Running**: the prompt is replaced by a moving mark, **Run** becomes **Stop** (`console.stop`), and the status
-  line shows the command as work in progress once it has run for 400 ms.
+- **Running**: after 200 ms the prompt is replaced by a moving mark in its place, **Run** becomes **Stop**
+  (`console.stop`) of the same width, so that nothing moves, and the status line shows the command as work in
+  progress once it has run for 400 ms.
 - **Connection closed**: the output gets the line *The console's connection closed.*; the next command opens it again
   (`console.connect`).
 - **Read-only**: the status line shows **Read-only** and the notice above is shown; nothing is disabled, since most

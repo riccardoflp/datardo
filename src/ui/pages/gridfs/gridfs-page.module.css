@@ -28,7 +28,7 @@
   min-width: 200px;
   max-width: 520px;
   padding: var(--space-1) var(--space-2);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-control-border);
   border-radius: var(--radius-small);
   background: var(--color-canvas);
   color: var(--color-text);
@@ -213,7 +213,7 @@
   margin: 0;
   padding: var(--space-2);
   overflow: auto;
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-control-border);
   border-radius: var(--radius-small);
   background: var(--color-canvas);
   font-family: var(--font-family-code);

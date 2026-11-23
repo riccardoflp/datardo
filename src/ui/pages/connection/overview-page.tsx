@@ -44,16 +44,31 @@ function Rows({ rows }: { readonly rows: readonly { readonly label: string; read
   );
 }
 
-function Server({ page, retry }: { readonly page: OverviewView; readonly retry: () => void }) {
+function Server({
+  page,
+  reading,
+  retry,
+}: {
+  readonly page: OverviewView;
+  readonly reading: boolean;
+  readonly retry: () => void;
+}) {
   const server = page.server;
   if (server === undefined) {
     return null;
   }
   const section = server.section;
   return (
-    <section className={styles['part']} aria-label={server.title}>
+    <section
+      className={styles['part']}
+      aria-label={server.title}
+      aria-busy={reading}
+      data-reading={reading && section.kind !== 'loading' ? 'true' : undefined}
+    >
       <h2 className={styles['partTitle']}>{server.title}</h2>
-      {section.kind === 'loading' ? <p className={styles['muted']}>{section.text}</p> : null}
+      {section.kind === 'loading' ? (
+        <p className={`${styles['muted'] ?? ''} ${styles['loading-sign'] ?? ''}`}>{section.text}</p>
+      ) : null}
       {section.kind === 'failed' ? (
         <p className={styles['error']} role="alert">
           {section.error}{' '}
@@ -122,16 +137,28 @@ function Header({
   );
 }
 
-/** What the page has read, and for which read: another read shows **Loading…** until it ends. */
+/** What the page has read, and for which read: another read keeps it shown until it ends. */
 interface Read {
   readonly asked: string;
   readonly server: Loaded<ServerInfo>;
 }
 
+/**
+ * What the page read last of each connection: the page of a tab coming back shows it while it reads again, as
+ * **Refresh** does, so that nothing is replaced by **Loading…** meanwhile.
+ */
+const lastRead = new Map<ConnectionId, Loaded<ServerInfo>>();
+
 /** Reads the server while connected: when the page opens, and each time `refresh` is called. */
-function useServer(read: Json | undefined): { readonly server?: Loaded<ServerInfo>; readonly refresh: () => void } {
+function useServer(
+  connection: ConnectionId,
+  read: Json | undefined,
+): { readonly server?: Loaded<ServerInfo>; readonly reading: boolean; readonly refresh: () => void } {
   const [times, setTimes] = useState(0);
-  const [done, setDone] = useState<Read | undefined>(undefined);
+  const [done, setDone] = useState<Read | undefined>(() => {
+    const kept = lastRead.get(connection);
+    return kept === undefined ? undefined : { asked: '', server: kept };
+  });
   const asked = read === undefined ? '' : `${String(times)} ${JSON.stringify(read)}`;
   useEffect(() => {
     if (asked === '') {
@@ -139,6 +166,7 @@ function useServer(read: Json | undefined): { readonly server?: Loaded<ServerInf
     }
     let shown = true;
     void readServer(JSON.parse(asked.slice(asked.indexOf(' ') + 1)) as Json).then((server) => {
+      lastRead.set(connection, server);
       if (shown) {
         setDone({ asked, server });
       }
@@ -146,14 +174,14 @@ function useServer(read: Json | undefined): { readonly server?: Loaded<ServerInf
     return () => {
       shown = false;
     };
-  }, [asked]);
+  }, [asked, connection]);
   const refresh = (): void => {
     setTimes((count) => count + 1);
   };
   if (asked === '') {
-    return { refresh };
+    return { reading: false, refresh };
   }
-  return { server: done?.asked === asked ? done.server : { kind: 'loading' }, refresh };
+  return { server: done?.server ?? { kind: 'loading' }, reading: done?.asked !== asked, refresh };
 }
 
 function OverviewTab({ connection }: { readonly connection: ConnectionId }): React.JSX.Element | null {
@@ -161,7 +189,7 @@ function OverviewTab({ connection }: { readonly connection: ConnectionId }): Rea
   const latency = state.nav.latency;
   const latencyMs = latency?.connection === connection ? latency.milliseconds : undefined;
   const connected = view({ connections: state.connections, connection });
-  const { server, refresh } = useServer(connected?.read);
+  const { server, reading, refresh } = useServer(connection, connected?.read);
   const page = view({
     connections: state.connections,
     connection,
@@ -189,7 +217,7 @@ function OverviewTab({ connection }: { readonly connection: ConnectionId }): Rea
           <p key={line}>{line}</p>
         ))}
       </section>
-      <Server page={page} retry={refresh} />
+      <Server page={page} reading={reading} retry={refresh} />
     </div>
   );
 }

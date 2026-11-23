@@ -60,7 +60,7 @@
 .select,
 .input {
   padding: var(--space-1) var(--space-2);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-control-border);
   border-radius: var(--radius-small);
   background: var(--color-canvas);
   color: var(--color-text);
@@ -89,13 +89,19 @@
 }
 
 .primary {
-  background: var(--color-selected);
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-accent-text);
 }
 
 .button:hover,
-.primary:hover,
 .chip:hover {
   background: var(--color-hover);
+}
+
+/* The primary action of the page, filled with the accent (D65). */
+.primary:hover {
+  background: var(--color-accent-hover);
 }
 
 .button[aria-disabled='true'],

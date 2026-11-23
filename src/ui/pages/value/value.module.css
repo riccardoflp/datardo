@@ -64,7 +64,7 @@
 .input {
   min-width: 200px;
   padding: var(--space-1) var(--space-2);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-control-border);
   border-radius: var(--radius-small);
   background: var(--color-canvas);
   color: var(--color-text);
@@ -105,7 +105,7 @@
   flex: 1;
   min-height: 120px;
   padding: var(--space-2);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-control-border);
   border-radius: var(--radius-small);
   background: var(--color-canvas);
   color: var(--color-text);
@@ -210,7 +210,7 @@
 
 .cell-input {
   padding: var(--space-1);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-control-border);
   background: var(--color-canvas);
   color: var(--color-text);
   font-family: var(--font-family-code);
@@ -222,7 +222,7 @@
   width: 100%;
   min-height: 240px;
   padding: var(--space-2);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-control-border);
   background: var(--color-canvas);
   color: var(--color-text);
   font-family: var(--font-family-code);
@@ -242,6 +242,12 @@
   flex-direction: column;
   gap: var(--space-2);
   padding: 0 var(--space-3) var(--space-3);
+}
+
+/* The value shown before stays while the next is read, dimmed once the read has lasted 300 ms (R10.8). */
+.compact[aria-busy='true'] {
+  opacity: 0.6;
+  transition: opacity var(--duration-short) linear var(--delay-busy);
 }
 
 .compact-text,
@@ -293,7 +299,7 @@
 .short-input {
   width: 120px;
   padding: var(--space-1) var(--space-2);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-control-border);
   border-radius: var(--radius-small);
   background: var(--color-canvas);
   color: var(--color-text);

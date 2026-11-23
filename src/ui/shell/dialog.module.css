@@ -76,7 +76,8 @@
 }
 
 .primary:hover:not(:disabled) {
-  background: var(--color-focus);
+  border-color: var(--color-accent-hover);
+  background: var(--color-accent-hover);
 }
 
 .danger {

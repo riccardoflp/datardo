@@ -64,8 +64,14 @@ function EmptyAction(props: { readonly control: PageControl; readonly onClick: (
   );
 }
 
-function InPlaceOfRows(props: { readonly tabId: string; readonly tab: KeysTab; readonly table: TableState }) {
+function InPlaceOfRows(props: {
+  readonly tabId: string;
+  readonly tab: KeysTab;
+  readonly table: TableState;
+  readonly busy: boolean;
+}) {
   const { tabId, tab, table } = props;
+  const busy = props.busy ? true : undefined;
   const start =
     (control: PageControl): (() => void) =>
     () => {
@@ -89,7 +95,7 @@ function InPlaceOfRows(props: { readonly tabId: string; readonly tab: KeysTab; r
       );
     case 'empty-database':
       return (
-        <div className={styles['empty']}>
+        <div className={styles['empty']} aria-busy={busy}>
           <p>{table.text}</p>
           {table.actions.map((control) => (
             <EmptyAction key={control.label} control={control} onClick={start(control)} />
@@ -97,10 +103,14 @@ function InPlaceOfRows(props: { readonly tabId: string; readonly tab: KeysTab; r
         </div>
       );
     case 'no-match':
-      return <p className={styles['empty']}>{table.text}</p>;
+      return (
+        <p className={styles['empty']} aria-busy={busy}>
+          {table.text}
+        </p>
+      );
     case 'none-yet':
       return (
-        <div className={styles['empty']}>
+        <div className={styles['empty']} aria-busy={busy}>
           <p>{table.text}</p>
           <EmptyAction
             control={table.scanMore}
@@ -183,7 +193,7 @@ function KeysTabPage(props: { readonly tabId: string; readonly shows: KeysShows;
           openRowMenu={openRowMenu}
         />
       ) : (
-        <InPlaceOfRows tabId={tabId} tab={tab} table={page.table} />
+        <InPlaceOfRows tabId={tabId} tab={tab} table={page.table} busy={page.busy} />
       )}
       <KeysMenu
         menu={menu}

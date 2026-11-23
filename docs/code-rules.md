@@ -175,17 +175,19 @@ A change that needs to break a rule changes this page first, in its own commit, 
   (`:hover`, `:focus`, `:focus-visible`, `:focus-within`, `:active`, `[data-highlighted]`) sets no property of the
   layout (`display`, sizes, margins, paddings, borders' widths, `font-weight`, `gap`, positions, `transform`), and a
   control shown on hover keeps its place while hidden (`visibility` or `opacity`). A read in progress leaves what was
-  shown in place until its answer comes, and says it is working only after 300 ms. *Source: WCAG 2.2, 3.2.1 (On
+  shown in place until its answer comes, and says it is working only after 200 ms (`loadingSignDelayMs`, the token
+  `--delay-busy`). *Source: WCAG 2.2, 3.2.1 (On
   Focus); project choice.* *Enforced: a stylelint rule of the repository (`datardo/state-keeps-layout`); the UI test
   `test/ui/polish/steady.spec.ts`, which hovers every control of the main pages and measures every word before and after.*
 - **R10.9** The window works from 800 × 600 up: no island, control or text goes past its island or over another, a
   text cut short ends with `…` and says itself whole on hover, and a field of one line shows no scroll bar. *Source:
   project choice.* *Enforced: the UI test `test/ui/polish/fits.spec.ts`, at 800 × 600, 1024 × 700, 1440 × 900 and 1920 × 1080, in
   both themes.*
-- **R10.10** Text is at least 4.5:1 against every surface it is drawn on, and the borders of fields and buttons and
-  the focus at least 3:1, in both themes; the border of an island, which marks no control, is drawn but not held to
-  a ratio. *Source: WCAG 2.2, 1.4.3 and 1.4.11.* *Enforced: a unit test
-  that reads the tokens and computes every pair that the styles put together.*
+- **R10.10** Text is at least 4.5:1 against every surface it is drawn on, and the border of a field (a box to type
+  in, a list to pick from, a switch) and the focus at least 3:1, in both themes. A button is told by its text and needs
+  no border of that contrast; the border of an island, which marks no control, is drawn but not held to a ratio.
+  *Source: WCAG 2.2, 1.4.3 and 1.4.11.* *Enforced: `test/unit/theme/contrast.test.ts`, which reads the tokens and
+  computes every pair.*
 
 ## R11 — Tests
 

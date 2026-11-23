@@ -8,7 +8,7 @@ import { detailsArgs, type DetailsRead } from '../../../features/key/details';
 import { type InspectedKey } from '../../../features/key/inspect';
 import { pattern } from '../../../features/key/pattern';
 import { afterPage, scanMore as scanMoreOf, scanStart, typesArgs, type ScanPage } from '../../../features/key/scan';
-import { selectionAfter, noSelection } from '../../../features/key/select';
+import { selectionAfter, selectionFound } from '../../../features/key/select';
 import { scanArgsOf, type ReadDetails } from '../../../features/key/show';
 import { bytesOfHex, hexOf, typeFilterOf, type KeyName, type KeyType } from '../../../features/key/types';
 import type { IntentResult } from '../../../shared/bridge';
@@ -28,6 +28,25 @@ async function read(state: KeysTab, feature: string, args: Json): Promise<Intent
 
 function messageOf(result: IntentResult): string | undefined {
   return result.kind === 'failed' || result.kind === 'refused' ? result.message : undefined;
+}
+
+/** What `key.details` read before a new scan: still shown, read again once on screen. */
+function staleDetails(details: ReadonlyMap<string, ReadDetails>): ReadonlyMap<string, ReadDetails> {
+  return new Map([...details].map(([key, read]) => [key, { ...read, stale: true }]));
+}
+
+/** The tab once a run ends: the selection and the details keep the keys the scan found. */
+function afterRun(state: KeysTab): KeysTab {
+  const rows = state.scan?.rows ?? [];
+  const found = new Set(rows.map((row) => hexOf(row.name)));
+  return {
+    ...state,
+    selection: selectionFound(
+      state.selection,
+      rows.map((row) => row.name),
+    ),
+    details: new Map([...state.details].filter(([key]) => found.has(key))),
+  };
 }
 
 async function typesOf(state: KeysTab, page: ScanPage): Promise<readonly KeyType[]> {
@@ -62,30 +81,49 @@ async function continueScan(tab: string, run: number): Promise<void> {
     if (page === undefined) {
       const error = messageOf(result);
       const unsupported = result.kind === 'refused' && result.code === 'key.scan/unsupported';
-      changeTab(tab, (now) => ({
-        ...now,
-        scanning: false,
-        ...(error === undefined || unsupported ? {} : { error }),
-        ...(unsupported ? { last: { ...now.last, type: 'all' as const } } : {}),
-      }));
+      changeTab(tab, (now) => {
+        const { previous: _previous, ...rest } = now;
+        return {
+          ...rest,
+          scanning: false,
+          ...(error === undefined || unsupported ? {} : { error }),
+          ...(unsupported ? { last: { ...now.last, type: 'all' as const } } : {}),
+        };
+      });
       return;
     }
     const scan = afterPage(state.scan ?? scanStart, page, types);
-    changeTab(tab, (now) => ({ ...now, scan, scanning: scan.ended === undefined }));
+    changeTab(tab, (now) => {
+      const { previous: _previous, ...rest } = now;
+      // The first page of a new scan takes the place of the scan before: what was read of each key is read again.
+      const first = now.scan === undefined ? { details: staleDetails(now.details) } : {};
+      const next = { ...rest, ...first, scan, scanning: scan.ended === undefined };
+      return scan.ended === undefined ? next : afterRun(next);
+    });
     if (scan.ended !== undefined) {
       return;
     }
   }
 }
 
-/** Starts a scan from cursor 0 with what the tab asks now: the rows, the details and the selection are dropped. */
+/**
+ * Starts a scan from cursor 0 with what the tab asks now. The rows of the scan before stay drawn until the first page
+ * comes; the selection keeps the keys the first run finds; the key of the inspector island is read again.
+ */
 export function scanAgain(tab: string, change: (state: KeysTab) => KeysTab = (state) => state): void {
   let run = 0;
   changeTab(tab, (before) => {
     const asked = change(before);
     run = before.run + 1;
-    const { scan: _scan, error: _error, inspected: _inspected, ...rest } = asked;
-    return { ...rest, run, scanning: true, details: new Map(), selection: noSelection };
+    const { scan, error: _error, previous: _previous, inspected, ...rest } = asked;
+    const previous = scan === undefined ? before.previous : { scan, last: before.last };
+    return {
+      ...rest,
+      run,
+      scanning: true,
+      ...(previous === undefined ? {} : { previous }),
+      ...(inspected === undefined ? {} : { inspected: { ...inspected, stale: true } }),
+    };
   });
   void continueScan(tab, run);
 }
@@ -115,12 +153,13 @@ export function scanMore(tab: string): void {
 
 /** **Cancel**: the run stops after the call in flight; the keys found and the cursor are kept. */
 export function stopScan(tab: string): void {
-  changeTab(tab, (state) => ({
-    ...state,
-    run: state.run + 1,
-    scanning: false,
-    ...(state.scan === undefined ? {} : { scan: { ...state.scan, ended: state.scan.ended ?? 'stopped' } }),
-  }));
+  changeTab(tab, (state) => {
+    const { previous: _previous, ...rest } = state;
+    const stopped = { ...rest, run: state.run + 1, scanning: false };
+    return state.scan === undefined
+      ? stopped
+      : afterRun({ ...stopped, scan: { ...state.scan, ended: state.scan.ended ?? 'stopped' } });
+  });
 }
 
 /** What `key.details` read, as the tab keeps it: the date of expiry from the time of the read. */
@@ -166,14 +205,16 @@ export async function readDetails(tab: string, names: readonly KeyName[]): Promi
   });
 }
 
-/** Reads what the inspector island shows of the one key selected: `TYPE`, `PTTL`, `MEMORY USAGE`, `OBJECT ENCODING`. */
+/**
+ * Reads what the inspector island shows of the one key selected: `TYPE`, `PTTL`, `MEMORY USAGE`, `OBJECT ENCODING`.
+ * What it showed stays until the read comes; a read of a key no longer selected is left.
+ */
 export async function readInspected(tab: string, keyHex: string): Promise<void> {
   const state = keysTabOf(tab);
   const name = bytesOfHex(keyHex);
   if (state === undefined || name === undefined) {
     return;
   }
-  changeTab(tab, (now) => ({ ...now, inspected: { key: keyHex, read: { kind: 'loading' } } }));
   const result = await read(state, 'key.inspect:read', {
     connection: state.where.connection,
     database: state.where.database,
@@ -181,7 +222,7 @@ export async function readInspected(tab: string, keyHex: string): Promise<void> 
   });
   const readAt = Date.now();
   changeTab(tab, (now) => {
-    if (now.inspected?.key !== keyHex) {
+    if (!now.selection.keys.has(keyHex)) {
       return now;
     }
     const key = result.kind === 'read' ? (result.result as InspectedKey | 'gone') : undefined;

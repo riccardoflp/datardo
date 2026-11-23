@@ -194,7 +194,9 @@ function parseObject(text: string): JsonObject | undefined {
 }
 
 function isMissing(error: unknown): boolean {
-  return typeof error === 'object' && error !== null && (error as { code?: unknown }).code === 'ENOENT';
+  // A file in place of one of its folders says ENOTDIR on Linux and macOS, ENOENT on Windows: either way it is not there.
+  const code = typeof error === 'object' && error !== null ? (error as { code?: unknown }).code : undefined;
+  return code === 'ENOENT' || code === 'ENOTDIR';
 }
 
 /** Writes beside, flushes, then renames over the old file (R15.4). */

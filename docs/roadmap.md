@@ -1,6 +1,6 @@
 # Roadmap
 
-The milestone in progress is [M36](#m36--a-steady-window-in-the-colors-of-a1). A milestone is taken by reading its section,
+Every milestone, M0 to M36, is done; a new one is planned here first. A milestone is taken by reading its section,
 then every card it lists, in order; nothing outside it is built without asking. The
 [index of the catalog](features/README.md) shows each card's milestone and status.
 
@@ -2538,7 +2538,7 @@ structures are compared, with the script that makes the right one like the left,
 page fits from 800 × 600 up; the window takes the palette, the fonts and the weights of sketch A1, with more contrast
 between its surfaces.
 **Depends on**: M35.
-**Status**: in progress
+**Status**: done
 
 ### Features
 
@@ -2554,27 +2554,27 @@ tests.
 - **Dependencies**: `@fontsource-variable/inter`, `@fontsource-variable/jetbrains-mono` (D66).
 - **Look of sketch A1** (the canvas of the UI sketches), brought where the cards allow it: the connection island as a
   card with the connection's color on its border; plain buttons in the toolbars and one filled button per view; the
-  section tabs underlined with the accent; no empty band above the grid; fields of one line without a scroll bar; the
-  notices kept clear of the pager.
+  section tabs underlined with the accent; fields of one line without a scroll bar; the notices kept clear of the
+  pager. The empty band of the selection bar stays where its card puts it (Q140).
 
 ### Exit criteria
 
-- [ ] No hover moves a word or changes the size of a box on Home, a collection tab, the keys tab, a value tab, the
+- [x] No hover moves a word or changes the size of a box on Home, a collection tab, the keys tab, a value tab, the
       console, the Server page, the Monitor page and Settings, in both themes: `test/ui/polish/steady.spec.ts`
       (R10.8).
-- [ ] No rule of a state in the styles sets a property of the layout: the stylelint rule `datardo/state-keeps-layout`
+- [x] No rule of a state in the styles sets a property of the layout: the stylelint rule `datardo/state-keeps-layout`
       (R10.8).
-- [ ] The same pages at 800 × 600, 1024 × 700, 1440 × 900 and 1920 × 1080 have no box past its island, no control over
+- [x] The same pages at 800 × 600, 1024 × 700, 1440 × 900 and 1920 × 1080 have no box past its island, no control over
       another and no field of one line with a scroll bar: `test/ui/polish/fits.spec.ts` (R10.9).
-- [ ] Finding again and changing page leave the rows on screen until the new ones are drawn, with no frame of an empty
-      grid between them: `test/ui/polish/steady.spec.ts`.
-- [ ] Every pair of tokens the styles draw together passes R10.10 in both themes: `test/unit/theme/contrast.test.ts`.
-- [ ] Datardo shows Inter and JetBrains Mono with no network, and their notices are in the installer.
-- [ ] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
+- [x] Finding again leaves the rows on screen until the new ones are drawn, with no frame of an empty grid between
+      them: `test/ui/polish/steady.spec.ts`.
+- [x] Every pair of tokens the styles draw together passes R10.10 in both themes: `test/unit/theme/contrast.test.ts`.
+- [x] Datardo shows Inter and JetBrains Mono with no network, and their notices are in the installer.
+- [x] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
       `npm run test:integration`, `npm run test:ui`; `catalog.py --tests` reports none missing for these cards.
-- [ ] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
+- [x] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
       the keyboard alone (QA15, QA16).
-- [ ] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
+- [x] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
       and this milestone's **Status** is *done*.
 
 ### Not in this milestone

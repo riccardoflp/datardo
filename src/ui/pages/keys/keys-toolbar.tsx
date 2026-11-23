@@ -1,7 +1,8 @@
 /**
  * The toolbar of a keys tab (`key.show`): the pattern field, whose text is sent only on `Enter` and put back by `Esc`,
- * the type filter, **Scan more**, **Cancel** while a run goes on, **Refresh** (`key.refresh`), **New key** (`key.new`)
- * and **More** (`key.delete-by-pattern`, `key.export`, `key.import`), then what a sort says of the keys loaded.
+ * the type filter, **Scan more**, **Cancel** while a run goes on (its place kept, unseen, otherwise), **Refresh**
+ * (`key.refresh`), **New key** (`key.new`) and **More** (`key.delete-by-pattern`, `key.export`, `key.import`), then
+ * what a sort says of the keys loaded.
  */
 import { useEffect, useRef, useState } from 'react';
 import type { KeysPageView, PageControl } from '../../../features/key/show';
@@ -76,12 +77,18 @@ function PatternField({ tabId, tab, toolbar }: ToolbarProps): React.JSX.Element 
   );
 }
 
-function Button(props: { readonly control: PageControl; readonly onClick: () => void }): React.JSX.Element {
+function Button(props: {
+  readonly control: PageControl;
+  readonly onClick: () => void;
+  /** Kept in its place but not seen, not reached by `Tab` and not read out: nothing beside it moves. */
+  readonly hidden?: boolean;
+}): React.JSX.Element {
   const { control } = props;
   return (
     <button
       type="button"
       className={styles['button']}
+      {...(props.hidden === true ? { style: { visibility: 'hidden' }, tabIndex: -1, 'aria-hidden': true } : {})}
       {...(control.element === undefined ? {} : { 'data-feature': control.element })}
       disabled={control.enabled === false}
       title={control.tooltip}
@@ -120,14 +127,13 @@ export function KeysToolbar(props: ToolbarProps & { readonly keys: readonly stri
           scanMore(tabId);
         }}
       />
-      {tab.scanning ? (
-        <Button
-          control={{ label: text.show.cancel, feature: 'key.scan' }}
-          onClick={() => {
-            stopScan(tabId);
-          }}
-        />
-      ) : null}
+      <Button
+        control={{ label: text.show.cancel, feature: 'key.scan' }}
+        hidden={!tab.scanning}
+        onClick={() => {
+          stopScan(tabId);
+        }}
+      />
       <Button
         control={toolbar.refresh}
         onClick={() => {

@@ -51,7 +51,7 @@
 
 .page-size select {
   min-height: var(--space-5);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--color-control-border);
   border-radius: var(--radius-small);
   background: var(--color-canvas);
   color: var(--color-text);
@@ -73,9 +73,21 @@
   font-size: var(--font-size-small);
 }
 
+/* A read in progress dims what it will replace only after 200 ms (loadingSignDelayMs), so that a quick refresh does
+   not flash: the animation lasts no time and only waits, then holds the dimmed opacity until the attribute goes. */
 .scroller[data-dimmed='true'] .body {
-  opacity: 0.55;
   pointer-events: none;
+  animation: dim-busy 0s linear var(--delay-busy) forwards;
+}
+
+.total-shown[data-counting='true'] {
+  animation: dim-busy 0s linear var(--delay-busy) forwards;
+}
+
+@keyframes dim-busy {
+  to {
+    opacity: 0.55;
+  }
 }
 
 .heading {

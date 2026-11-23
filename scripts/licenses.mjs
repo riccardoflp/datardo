@@ -2,7 +2,7 @@
 import { spawnSync } from 'node:child_process';
 import { join } from 'node:path';
 
-/** The licenses decisions D22 and D47 allow, as SPDX identifiers. */
+/** The licenses decisions D22, D47 and D66 allow, as SPDX identifiers. */
 export const allowedLicenses = [
   'MIT',
   'ISC',
@@ -15,6 +15,8 @@ export const allowedLicenses = [
   'CC-BY-4.0',
   // D47: tweetnacl, which ssh2 needs.
   'Unlicense',
+  // D66: the fonts of the interface and of code, Inter and JetBrains Mono.
+  'OFL-1.1',
 ];
 
 const root = join(import.meta.dirname, '..');

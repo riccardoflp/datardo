@@ -34,6 +34,8 @@ export interface ReadDetails {
   readonly expiresAt: number | null;
   readonly size?: number;
   readonly gone?: boolean;
+  /** Read before the scan started again: still shown, and read again once its row is on screen. */
+  readonly stale?: boolean;
 }
 
 /** The last scan: what was typed, the pattern it gave, and the type. */
@@ -41,6 +43,12 @@ export interface LastScan {
   readonly typed: string;
   readonly pattern: KeyPattern;
   readonly type: TypeFilter;
+}
+
+/** A scan as the table draws it: its rows and what it was asked with. */
+export interface ShownScan {
+  readonly scan: ScanState;
+  readonly last: LastScan;
 }
 
 /** What the page is drawn from. */
@@ -58,6 +66,8 @@ export interface KeysPageState {
   readonly last: LastScan;
   /** The scan so far; absent until the first reply. */
   readonly scan?: ScanState;
+  /** The scan before, still drawn while the new one has not given its first page: nothing blanks meanwhile. */
+  readonly previous?: ShownScan;
   /** The server's message when the scan failed. */
   readonly error?: string;
   /** What `key.details` read, by name in hexadecimal. */
@@ -114,6 +124,8 @@ export interface KeyRow {
   readonly size: string;
   readonly gone: boolean;
   readonly selected: boolean;
+  /** Whether `key.details` read it since the scan started: a row not read is read once it is on screen. */
+  readonly read: boolean;
 }
 
 /** What the table shows in place of rows, or `rows`. */
@@ -154,6 +166,8 @@ export interface KeysPageView {
   }[];
   readonly rows: readonly KeyRow[];
   readonly table: TableState;
+  /** A new scan has not given its first page yet: the table still shows the scan before. */
+  readonly busy: boolean;
   /** What the status line counts. */
   readonly count: string;
   /** The entries of the context menu of a row, for one key. */
@@ -219,7 +233,23 @@ function rowOf(state: KeysPageState, row: { name: KeyName; type?: KeyType; gone?
     size: gone || state.sizesRefused ? dash : read?.size === undefined ? '' : sizeText(read.size),
     gone,
     selected: !gone && state.selection.keys.has(id),
+    read: read !== undefined && read.stale !== true,
   };
+}
+
+/**
+ * The state the table and the count are drawn from: while a new scan has not given its first page, the scan before
+ * with what it was asked; the toolbar shows what is asked now.
+ */
+function drawnOf(state: KeysPageState): KeysPageState {
+  return state.scan === undefined && state.previous !== undefined
+    ? { ...state, scan: state.previous.scan, last: state.previous.last }
+    : state;
+}
+
+/** Whether a new scan has not given its first page yet, and the table still shows the scan before. */
+function busyOf(state: KeysPageState): boolean {
+  return state.scan === undefined && state.previous !== undefined && state.error === undefined;
 }
 
 function sortedRows(state: KeysPageState): readonly KeyRow[] {
@@ -237,7 +267,7 @@ function sortedRows(state: KeysPageState): readonly KeyRow[] {
   return sorted.map((row) => rowOf(state, row));
 }
 
-function tableState(state: KeysPageState, rows: number): TableState {
+function tableState(state: KeysPageState, rows: number, busy: boolean): TableState {
   if (!state.connection.connected) {
     return {
       kind: 'not-connected',
@@ -276,12 +306,15 @@ function tableState(state: KeysPageState, rows: number): TableState {
   return {
     kind: 'none-yet',
     text: text.show.noneYet(scannedAbout(scan), scan.total ?? 0),
-    scanMore: scanMoreControl(state, 'key.scan@empty-state'),
+    scanMore: busy
+      ? { ...scanMoreControl(state, 'key.scan@empty-state'), enabled: false }
+      : scanMoreControl(state, 'key.scan@empty-state'),
   };
 }
 
 /** What the status line counts: **500 of 1,204,331 keys**, **1,204 keys**, **37 keys found · about …**, **37 of …**. */
-export function countText(state: KeysPageState): string {
+export function countText(asked: KeysPageState): string {
+  const state = drawnOf(asked);
   const scan = state.scan;
   if (scan === undefined) {
     return '';
@@ -301,9 +334,11 @@ export function countText(state: KeysPageState): string {
 /** Feature: key.show — the toolbar, the table and what the status line counts, in each state of the page. */
 export function view(state: KeysPageState): KeysPageView {
   const readOnly = state.connection.readOnly;
-  const rows = sortedRows(state);
-  const loaded = state.scan?.rows.length ?? 0;
-  const notice = sortNotice(state.sort, loaded, state.scan?.ended === 'complete');
+  const drawn = drawnOf(state);
+  const busy = busyOf(state);
+  const rows = sortedRows(drawn);
+  const loaded = drawn.scan?.rows.length ?? 0;
+  const notice = sortNotice(state.sort, loaded, drawn.scan?.ended === 'complete');
   const sent = state.last.pattern.plain && state.field === state.last.typed ? state.last.pattern.pattern : undefined;
   const columns: readonly SortColumn[] = ['key', 'type', 'expiry', 'size'];
   return {
@@ -342,7 +377,8 @@ export function view(state: KeysPageState): KeysPageView {
       };
     }),
     rows,
-    table: tableState(state, rows.length),
+    table: tableState(drawn, rows.length, busy),
+    busy,
     count: countText(state),
     rowMenu: rowMenu(readOnly, true),
   };
@@ -352,7 +388,7 @@ export function view(state: KeysPageState): KeysPageView {
 export function selectedKeys(state: KeysPageState): readonly KeyName[] {
   return selectedInOrder(
     state.selection,
-    sortedRows(state).map((row) => row.name),
+    sortedRows(drawnOf(state)).map((row) => row.name),
   );
 }
 

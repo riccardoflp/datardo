@@ -202,7 +202,19 @@ describe('console.input', () => {
       docs: builtinCommands,
     });
     expect(running.button).toEqual({ label: 'Stop', feature: 'console.stop', element: 'console.stop@editor' });
-    expect(running.prompt).toBeUndefined();
+    expect(running.running).toBe(true);
+    expect(ready.running).toBe(false);
+  });
+
+  it('keeps the prompt in its place while a command runs, and gives Run and Stop one width', () => {
+    const running = inputView({
+      console: consoleOn(cacheLocal, { status: 'running', running: 'BLPOP' }),
+      typed: '',
+      caret: 0,
+      docs: builtinCommands,
+    });
+    expect(running.prompt).toBe('db0>');
+    expect(running.buttonLabels).toEqual(['Run', 'Stop']);
   });
 
   it('colors the command, quoted text, numbers, escapes and a quote never closed', () => {

@@ -26,7 +26,41 @@ function failed(tab: string, error: string): void {
   setGroups(tab, (groups) => ({ ...groups, status: 'error', error }));
 }
 
-/** Reads the stream and its groups; the group selected before is read again when it is still there. */
+/** What the section shows of the selected group: its consumers, and the pending entries of the group or consumer. */
+type GroupParts = Pick<GroupsState, 'consumers' | 'consumer' | 'pending' | 'pendingCount'>;
+
+/** Reads the group's consumers and pending entries, and those of `consumer` when the group still has it. */
+async function readGroupParts(
+  tab: string,
+  group: string,
+  consumer: string | undefined,
+): Promise<GroupParts | { readonly error: string }> {
+  const found = await read(tab, { part: 'group', group });
+  if ('error' in found || found.part !== 'group') {
+    return { error: 'error' in found ? found.error : '' };
+  }
+  const parts = { consumers: found.consumers, pending: found.pending, pendingCount: found.pendingCount };
+  const still = found.consumers.find((each) => each.name === consumer);
+  if (consumer === undefined || still === undefined) {
+    return parts;
+  }
+  const own = await read(tab, { part: 'consumer', group, consumer });
+  if ('error' in own || own.part !== 'pending') {
+    return { error: 'error' in own ? own.error : '' };
+  }
+  return { ...parts, consumer, pending: own.pending, pendingCount: still.pending };
+}
+
+/** The section with the parts of a group read in place of those shown. */
+function withParts(groups: GroupsState, parts: GroupParts): GroupsState {
+  const { consumer: _consumer, ...rest } = groups;
+  return { ...rest, ...parts };
+}
+
+/**
+ * Reads the stream and its groups; the group selected before is read again when it is still there, with the consumer
+ * selected. What was shown stays until all of it has come.
+ */
 export async function loadGroups(tab: string): Promise<void> {
   setGroups(tab, (groups) => ({ ...groups, status: groups.status === 'ready' ? 'ready' : 'loading' }));
   const found = await read(tab, { part: 'groups' });
@@ -34,30 +68,44 @@ export async function loadGroups(tab: string): Promise<void> {
     failed(tab, 'error' in found ? found.error : '');
     return;
   }
-  const selected = valueTabOf(tab)?.groups?.group;
-  const still = found.groups.some((group) => group.name === selected);
-  setGroups(tab, () => ({ status: 'ready', stream: found.stream, groups: found.groups }));
-  if (selected !== undefined && still) {
-    await selectGroup(tab, selected);
+  const before = valueTabOf(tab)?.groups;
+  const selected = found.groups.some((group) => group.name === before?.group) ? before?.group : undefined;
+  const parts = selected === undefined ? undefined : await readGroupParts(tab, selected, before?.consumer);
+  if (parts !== undefined && 'error' in parts) {
+    failed(tab, parts.error);
+    return;
   }
+  setGroups(tab, (now) => {
+    const fresh = { status: 'ready' as const, stream: found.stream, groups: found.groups };
+    if (now.group === selected) {
+      return parts === undefined ? { ...now, ...fresh } : { ...withParts(now, parts), ...fresh };
+    }
+    if (now.group !== before?.group) {
+      // Another group was selected meanwhile: its own read sets its tables.
+      return { ...now, ...fresh };
+    }
+    const {
+      group: _group,
+      consumer: _consumer,
+      consumers: _consumers,
+      pending: _pending,
+      pendingCount: _count,
+      ...rest
+    } = now;
+    return { ...rest, ...fresh };
+  });
 }
 
 /** Selects a group: its consumers, how many entries it has pending, and the first page of them. */
 export async function selectGroup(tab: string, group: string): Promise<void> {
-  setGroups(tab, ({ consumer: _consumer, consumers: _consumers, pending: _pending, ...groups }) => ({
-    ...groups,
-    group,
-  }));
-  const found = await read(tab, { part: 'group', group });
-  if ('error' in found || found.part !== 'group') {
-    failed(tab, 'error' in found ? found.error : '');
+  // The tables of the group shown before stay until those of this one come.
+  setGroups(tab, ({ consumer: _consumer, ...groups }) => ({ ...groups, group }));
+  const parts = await readGroupParts(tab, group, undefined);
+  if ('error' in parts) {
+    failed(tab, parts.error);
     return;
   }
-  setGroups(tab, (groups) =>
-    groups.group === group
-      ? { ...groups, consumers: found.consumers, pending: found.pending, pendingCount: found.pendingCount }
-      : groups,
-  );
+  setGroups(tab, (groups) => (groups.group === group ? withParts(groups, parts) : groups));
 }
 
 /** Selects a consumer of the group, or none (the group's pending entries again): its pending entries. */
@@ -72,13 +120,14 @@ export async function selectConsumer(tab: string, consumer: string | undefined):
     return;
   }
   const count = groups?.consumers?.find((each) => each.name === consumer)?.pending ?? 0;
-  setGroups(tab, ({ pending: _pending, ...now }) => ({ ...now, consumer, pendingCount: count }));
+  // The entries shown stay until the consumer's come.
+  setGroups(tab, (now) => ({ ...now, consumer }));
   const found = await read(tab, { part: 'consumer', group, consumer });
   if ('error' in found || found.part !== 'pending') {
     failed(tab, 'error' in found ? found.error : '');
     return;
   }
-  setGroups(tab, (now) => (now.consumer === consumer ? { ...now, pending: found.pending } : now));
+  setGroups(tab, (now) => (now.consumer === consumer ? { ...now, pending: found.pending, pendingCount: count } : now));
 }
 
 /** **Load more** of the pending entries: the next page, after the last ID shown. */
