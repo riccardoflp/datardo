@@ -43,7 +43,7 @@ STANDARD_EXIT = [
 # its cards, or a pair of an area and the names of some of them, or of an area and "rest"), what it builds beyond
 # the cards, its own exit criteria, and what is left out on purpose.
 # The status of each milestone that is not planned: in progress, or done (its exit criteria are then ticked).
-STATUS: dict[int, str] = {0: "done", 1: "done", 2: "done", 3: "done", 4: "done", 5: "done", 6: "done", 7: "done", 8: "done", 9: "done", 10: "done", 11: "done", 12: "done", 13: "done", 14: "done", 15: "done", 16: "done", 17: "done", 18: "done", 19: "done", 20: "done", 21: "done", 22: "done", 23: "done", 24: "done", 25: "done", 26: "done", 27: "done", 28: "done", 29: "done", 30: "done", 31: "done", 32: "done", 33: "done", 34: "done", 35: "done"}
+STATUS: dict[int, str] = {0: "done", 1: "done", 2: "done", 3: "done", 4: "done", 5: "done", 6: "done", 7: "done", 8: "done", 9: "done", 10: "done", 11: "done", 12: "done", 13: "done", 14: "done", 15: "done", 16: "done", 17: "done", 18: "done", 19: "done", 20: "done", 21: "done", 22: "done", 23: "done", 24: "done", 25: "done", 26: "done", 27: "done", 28: "done", 29: "done", 30: "done", 31: "done", 32: "done", 33: "done", 34: "done", 35: "done", 36: "in progress"}
 
 MILESTONES = [
     dict(n=1, title="A window of its own",
@@ -524,17 +524,47 @@ MILESTONES = [
                "**Apply** with a drop asks to type the collection's name; a step that fails stops its own "
                "difference and the others are applied."],
          notin=[]),
+    dict(n=36, title="A steady window in the colors of A1",
+         goal="Nothing in the window moves, grows or flashes when the pointer passes over it or a read comes back; "
+              "every page fits from 800 × 600 up; the window takes the palette, the fonts and the weights of sketch "
+              "A1, with more contrast between its surfaces.",
+         depends=[35], cards=[],
+         beyond=["**Modules**: `src/ui/theme` (the tokens of D65, the fonts of D66), the CSS modules of every area, "
+                 "`scripts/stylelint` (the rule `datardo/state-keeps-layout`).",
+                 "**Code rules checked from now**: R10.8, R10.9, R10.10.",
+                 "**Decisions**: D65, D66; relies on D3, D22, D23.",
+                 "**Dependencies**: `@fontsource-variable/inter`, `@fontsource-variable/jetbrains-mono` (D66).",
+                 "**Look of sketch A1** (the canvas of the UI sketches), brought where the cards allow it: the "
+                 "connection island as a card with the connection's color on its border; plain buttons in the "
+                 "toolbars and one filled button per view; the section tabs underlined with the accent; no empty "
+                 "band above the grid; fields of one line without a scroll bar; the notices kept clear of the "
+                 "pager."],
+         exit=["No hover moves a word or changes the size of a box on Home, a collection tab, the keys tab, a "
+               "value tab, the console, the Server page, the Monitor page and Settings, in both themes: "
+               "`test/ui/polish/steady.spec.ts` (R10.8).",
+               "No rule of a state in the styles sets a property of the layout: the stylelint rule "
+               "`datardo/state-keeps-layout` (R10.8).",
+               "The same pages at 800 × 600, 1024 × 700, 1440 × 900 and 1920 × 1080 have no box past its island, "
+               "no control over another and no field of one line with a scroll bar: "
+               "`test/ui/polish/fits.spec.ts` (R10.9).",
+               "Finding again and changing page leave the rows on screen until the new ones are drawn, with no "
+               "frame of an empty grid between them: `test/ui/polish/steady.spec.ts`.",
+               "Every pair of tokens the styles draw together passes R10.10 in both themes: "
+               "`test/unit/theme/contrast.test.ts`.",
+               "Datardo shows Inter and JetBrains Mono with no network, and their notices are in the installer."],
+         notin=[]),
 ]
 
 HEAD = """# Roadmap
 
-No milestone is in progress: the next one is [M0](#m0--the-workshop). A milestone is taken by reading its section,
+The milestone in progress is [M36](#m36--a-steady-window-in-the-colors-of-a1). A milestone is taken by reading its section,
 then every card it lists, in order; nothing outside it is built without asking. The
 [index of the catalog](features/README.md) shows each card's milestone and status.
 
 The milestones come in three stages. **M0 to M12** make a MongoDB client that browses, queries and edits documents
 safely. **M13 to M18** add Redis: keys, values, the console, the server, Pub/Sub. **M19 to M35** bring the rest of
-what Mongoster does, by how often it is used. Each milestone ends with something that runs.
+what Mongoster does, by how often it is used; **M36** makes the window steady and gives it the colors of the sketch.
+Each milestone ends with something that runs.
 
 In each list of **Features** the cards are in the order to build them: what a card uses inside the milestone comes
 before it. A card often names a feature of a later milestone (a menu entry, a button that opens another page): build
@@ -698,8 +728,12 @@ def main() -> int:
         out.append(f"**Depends on**: {depends}.")
         out.append(f"**Status**: {STATUS.get(number, 'planned')}\n")
         out.append("### Features\n")
-        out.append(f"{len(done)} cards, in the order to build them; each card's acceptance lines are this "
-                   "milestone's tests.\n")
+        if not done:
+            out.append(wrap("No card: this milestone changes how the window looks and behaves, not what a feature "
+                            "does; its exit criteria are its tests.", "", ""))
+        else:
+            out.append(f"{len(done)} cards, in the order to build them; each card's acceptance lines are this "
+                       "milestone's tests.\n")
         for position, identifier in enumerate(done, start=1):
             card = by_id[identifier]
             link = f"[`{identifier}`](features/{card['file']}#{catalog.anchor(card['heading'])})"

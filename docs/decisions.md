@@ -609,6 +609,34 @@ Monitor page a dialog where its card asks for one confirmation, or the advisor a
 one rule for read-only, which would change the cards of both pages.
 *Built in M30 on 2026-11-21 as Q30 describes; answers Q30 unless the author decides otherwise.*
 
+## D65 — The colors of sketch A1, with more contrast between the surfaces
+
+The window takes the palette of sketch A1 (the canvas of the UI sketches), which the first milestones had left for a
+neutral blue: a teal accent (`#4FD1B5` in the dark theme) for the primary action of a view, the selected tab and the
+focus; islands of their own color on a darker canvas, each with a border that can be seen; the color of a connection
+(`connection.set-color`) on the border of the connection island and on the dot of its tabs; and syntax colors that
+tell a key, a string, a number and an operator apart at a glance (green strings, orange operators, blue numbers). The
+steps between the canvas, an island, a raised surface, a hovered row and a selected row are wider than before, so
+that what is selected is never only a shade away. Every color stays a token (R10.2), and both themes keep text at
+4.5:1 and the borders of fields, buttons and the focus at 3:1 against what they are drawn on (R10.10). Buttons have three
+weights: one primary per view, filled with the accent; secondary ones with a border; and plain ones, with no border
+until hovered, for the toolbars. Rejected: keeping the blue palette with more contrast (B), and indigo with amber (C),
+both shown to the author on 2026-11-21; Tailwind, weighed again on the same day and left out, since the faults seen
+come from the tokens and from a few rules, not from how styles are written: [D3](#d3--react-for-the-window-styles-from-tokens-no-component-library)
+stands.
+*Decided by the author on 2026-11-21, for M36.*
+
+## D66 — Inter and JetBrains Mono, shipped with Datardo
+
+The text of the interface is set in Inter and code in JetBrains Mono, the fonts of sketch A1, shipped inside the
+application (`@fontsource-variable/inter`, `@fontsource-variable/jetbrains-mono`) so that Datardo looks the same on
+Windows, macOS and Linux and never fetches a font from the network. Their license, the SIL Open Font License 1.1,
+joins the licenses allowed for what Datardo bundles, and their notices ship with the others. This adds to the list of
+[D22](#d22--dependencies-from-a-list-with-their-licenses-checked), which is otherwise unchanged. The system fonts stay
+as the fallbacks. Rejected: the system fonts alone (Segoe UI, San Francisco and the Linux defaults differ in width,
+which moves every layout from one system to another); fetching them from a font service (Datardo works offline).
+*Decided by the author on 2026-11-21, for M36.*
+
 ## Open questions
 
 - **Q1** — *Answered on 2026-11-18 by [D7](#d7--home-is-the-first-page)*: the last active tab when tabs are restored,

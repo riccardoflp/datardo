@@ -171,6 +171,21 @@ A change that needs to break a rule changes this page first, in its own commit, 
   runs in it. *Source: product promise.* *Enforced: ESLint forbids `ipcRenderer.sendSync`; review.*
 - **R10.7** A component draws what its View function returned and sends intents; it decides nothing about the
   product. *Source: the feature contract.* *Review.*
+- **R10.8** A hover, a focus or a press changes colors, never where or how large anything is: a rule of a state
+  (`:hover`, `:focus`, `:focus-visible`, `:focus-within`, `:active`, `[data-highlighted]`) sets no property of the
+  layout (`display`, sizes, margins, paddings, borders' widths, `font-weight`, `gap`, positions, `transform`), and a
+  control shown on hover keeps its place while hidden (`visibility` or `opacity`). A read in progress leaves what was
+  shown in place until its answer comes, and says it is working only after 300 ms. *Source: WCAG 2.2, 3.2.1 (On
+  Focus); project choice.* *Enforced: a stylelint rule of the repository (`datardo/state-keeps-layout`); the UI test
+  `test/ui/polish/steady.spec.ts`, which hovers every control of the main pages and measures every word before and after.*
+- **R10.9** The window works from 800 × 600 up: no island, control or text goes past its island or over another, a
+  text cut short ends with `…` and says itself whole on hover, and a field of one line shows no scroll bar. *Source:
+  project choice.* *Enforced: the UI test `test/ui/polish/fits.spec.ts`, at 800 × 600, 1024 × 700, 1440 × 900 and 1920 × 1080, in
+  both themes.*
+- **R10.10** Text is at least 4.5:1 against every surface it is drawn on, and the borders of fields and buttons and
+  the focus at least 3:1, in both themes; the border of an island, which marks no control, is drawn but not held to
+  a ratio. *Source: WCAG 2.2, 1.4.3 and 1.4.11.* *Enforced: a unit test
+  that reads the tokens and computes every pair that the styles put together.*
 
 ## R11 — Tests
 
@@ -271,15 +286,15 @@ Each rule serves [data.md](data.md).
 | --- | --- |
 | `tsc --noEmit` | R6.5, R12.1 |
 | ESLint | R1.5, R3.1, R4.6, R6.1, R6.2, R6.4 partly, R8.1 partly, R9.1, R10.6, R12.2, R14.5, R14.6 partly, R15.4 partly |
-| stylelint | R10.2 |
+| stylelint | R10.2, R10.8 (`datardo/state-keeps-layout`) |
 | Prettier | R12.3, R12.4 |
 | dependency-cruiser | R1.3, R1.4, R2.2, R5.1, R15.4 |
 | license-checker | R1.2 |
 | `scripts/check.mjs` | R1.1, R2.1, R8.2 |
 | `python scripts/check_catalog.py docs` (catalog.py with `--sources`, `--tests`, `--commands`, `--settings`, for the cards built) | R2.3, R4.2, R7.2 for the documents, R8.4, R10.3, R11.1 |
-| Unit tests (`npm test`) | R4.3 to R4.5, R5.2 to R5.5, R14.1 to R14.3, R15.1 to R15.3, and the acceptance lines of the cards |
+| Unit tests (`npm test`) | R4.3 to R4.5, R5.2 to R5.5, R10.10, R14.1 to R14.3, R15.1 to R15.3, and the acceptance lines of the cards |
 | Integration tests (`npm run test:integration`) | R5.5, R5.6, R9.3, R14.7, R14.8, and the acceptance lines that reach a server |
-| UI tests (`npm run test:ui`) | R10.4 partly, R10.5, R14.6, and the acceptance lines that are seen |
+| UI tests (`npm run test:ui`) | R10.4 partly, R10.5, R10.8 (`test/ui/polish/steady.spec.ts`), R10.9 (`test/ui/polish/fits.spec.ts`), R14.6, and the acceptance lines that are seen |
 
 The checks start in the first milestone; a rule's check is listed in the [roadmap](roadmap.md) under the milestone
 that turns it on.
