@@ -10,6 +10,8 @@ import type { AppAction } from '../../runner/ports';
 import type { Json } from '../../shared/engine-request';
 import { jsonFields } from '../../features/connection/types';
 import type { MainServices } from '../services';
+import { exportText } from '../../features/transfer/text';
+import { openedAs } from '../opened-files';
 import { listFolder, listNames, readArchiveList, readImportFile, readMetadata, textArgOf } from '../transfer-files';
 
 /** The folder last chosen in each area, until Datardo quits. */
@@ -79,13 +81,30 @@ function choosePath(services: MainServices, area: string): AppAction {
   };
 }
 
-/** `transfer.open-path` `{ path }`: the file in the system's application for it. */
-const openPath: AppAction = async (args) => {
-  const failed = await shell.openPath(textArgOf(args, 'path'));
-  if (failed !== '') {
-    throw new Error(failed);
+/** The extensions an export's file is opened with: its formats' own (`transfer.export`). */
+const exportedTypes: ReadonlySet<string> = new Set(['json', 'jsonl', 'csv']);
+
+/**
+ * `transfer.open-path` `{ path }`: the file of an export in the system's application for it, only when an export of
+ * this session wrote it, and only when its extension is its format's own; a file the user named otherwise
+ * (`orders.html`) is shown in its folder instead, and any other path is refused (R14.10, T24).
+ */
+export const openPath: AppAction = async (args) => {
+  const path = textArgOf(args, 'path');
+  switch (openedAs(path, { writers: ['transfer.export'], opens: exportedTypes })) {
+    case 'refuse':
+      throw new Error(exportText.notWritten(path));
+    case 'show':
+      shell.showItemInFolder(path);
+      return null;
+    case 'open': {
+      const failed = await shell.openPath(path);
+      if (failed !== '') {
+        throw new Error(failed);
+      }
+      return null;
+    }
   }
-  return null;
 };
 
 /** `transfer.reveal-path` `{ path }`: the file or the folder in the system's file manager. */

@@ -9,6 +9,7 @@ import type { Json } from '../../shared/engine-request';
 import { folderNotOpenedError } from '../../features/window/open-data-folder';
 import { isWebLink } from '../../features/window/open-link';
 import { placementOf } from '../../features/window/remember';
+import type { MainServices } from '../services';
 import { windowHost } from '../window-host';
 
 function field(args: Json, name: string): Json | undefined {
@@ -35,15 +36,20 @@ const savePlacement: AppAction = async (args) => {
   }
 };
 
-const openFolder: AppAction = async (args) => {
-  const folder = field(args, 'folder');
-  const path = typeof folder === 'string' ? folder : '';
-  const failure = path === '' ? 'no folder' : await shell.openPath(path);
-  if (failure !== '') {
-    const { code, message } = folderNotOpenedError(path);
-    throw Object.assign(new Error(message), { code });
-  }
-};
+/**
+ * `window.open-folder`: the data folder in the system's file manager. The folder is the main process's own, never a
+ * path the window gives (T24, R14.10).
+ */
+function openFolder(services: MainServices): AppAction {
+  return async () => {
+    const path = services.dataFolder;
+    const failure = path === '' ? 'no folder' : await shell.openPath(path);
+    if (failure !== '') {
+      const { code, message } = folderNotOpenedError(path);
+      throw Object.assign(new Error(message), { code });
+    }
+  };
+}
 
 const openLink: AppAction = async (args) => {
   const address = field(args, 'address');
@@ -60,7 +66,7 @@ const quit: AppAction = async (args) => {
 };
 
 /** The actions of this area, by name. */
-export const actions: AreaActions = () => ({
+export const actions: AreaActions = (services) => ({
   'window.save-placement': savePlacement,
   'window.minimize': onTheWindow((window) => {
     window.minimize();
@@ -92,6 +98,6 @@ export const actions: AreaActions = () => ({
     return Promise.resolve();
   },
   'window.quit': quit,
-  'window.open-folder': openFolder,
+  'window.open-folder': openFolder(services),
   'window.open-link': openLink,
 });

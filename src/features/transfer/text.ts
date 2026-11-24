@@ -142,6 +142,8 @@ export const exportText = {
   done: (documents: number, file: string): string => `Exported ${counted(documents, 'document')} to ${file}.`,
   open: 'Open',
   reveal: 'Reveal',
+  /** What **Open** says of a path no export of this session wrote (R14.10). */
+  notWritten: (path: string): string => `Datardo opens only a file it has just written: ${path}`,
   cancelled: 'Export cancelled.',
   failed: (error: string): string => `Export failed: ${error}`,
 } as const;

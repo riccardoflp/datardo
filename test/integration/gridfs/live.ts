@@ -13,7 +13,9 @@ import { join } from 'node:path';
 import { createEngines, newObjectId, type EngineService } from '../../../src/engines';
 import { bucketRequest } from '../../../src/features/gridfs/types';
 import { runnableFeatures } from '../../../src/features/registry';
-import { gridFsActions, writeDownload } from '../../../src/main/gridfs';
+import { copiesFolder, gridFsActions, isCopy, writeDownload } from '../../../src/main/gridfs';
+import { openedExtensions } from '../../../src/features/gridfs/open';
+import { openedAs, recordWritten } from '../../../src/main/opened-files';
 import { cancelLatest } from '../../../src/runner/cancel';
 import type { AppAction, RunnerPorts, StepProgress } from '../../../src/runner/ports';
 import { start } from '../../../src/runner/start';
@@ -105,13 +107,27 @@ export async function digestOf(path: string): Promise<string> {
 function dialogActions(live: LiveGridFs): Readonly<Record<string, AppAction>> {
   return {
     'gridfs.choose-file': () => Promise.resolve(live.dialogs.shift() ?? null),
-    'gridfs.temporary-folder': () => Promise.resolve(live.folder),
+    'gridfs.temporary-folder': () => copiesFolder(live.folder),
     'gridfs.open-copy': (args) => {
       const path = (args as { path?: string } | null)?.path ?? '';
+      if (openPath(path) !== path) {
+        return Promise.reject(new Error(`${path} would not be opened.`));
+      }
       live.opened.push(path);
       return Promise.resolve(null);
     },
   };
+}
+
+/**
+ * What `gridfs.open-copy` of the main process does with a path before it asks the system: the path when it would hand
+ * it to the system (a copy of this run's folder, written by a step of this session, of a type of the list), else
+ * undefined. The tests record the copy rather than open it.
+ */
+export function openPath(path: string): string | undefined {
+  return isCopy(path) && openedAs(path, { writers: ['gridfs.download'], opens: openedExtensions }) === 'open'
+    ? path
+    : undefined;
 }
 
 /** What a long step says, given to the test before the runner. */
@@ -204,6 +220,7 @@ export async function liveGridFs(name: string): Promise<LiveGridFs> {
         signal,
         progress: heard(live, progress),
       });
+      recordWritten(step.path, content.writer);
     },
     dialogs: {
       ask: () => Promise.resolve(live.answers.shift()),

@@ -1,20 +1,21 @@
 /**
  * The actions of the GridFS area: the system's dialogs of an upload and of a download (`gridfs.choose-file`), the
- * system's temporary folder (`gridfs.temporary-folder`), the opening of a copy with the system's application
- * (`gridfs.open-copy`), and those of `src/main/gridfs.ts` (`gridfs.check-files`, `gridfs.write-chunks`).
+ * private folder of the copies in the system's temporary folder (`gridfs.temporary-folder`), the opening of a copy
+ * with the system's application (`gridfs.open-copy`), and those of `src/main/gridfs.ts` (`gridfs.check-files`,
+ * `gridfs.write-chunks`).
  */
 import { app, dialog, shell, type OpenDialogOptions, type SaveDialogOptions } from 'electron';
 import { stat } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
 import { basename, join } from 'node:path';
 import type { AreaActions } from '.';
 import { newObjectId } from '../../engines';
-import { isOpened } from '../../features/gridfs/open';
+import { openedExtensions } from '../../features/gridfs/open';
 import { text } from '../../features/gridfs/text';
 import { isRecord, textOf } from '../../features/gridfs/types';
 import type { AppAction } from '../../runner/ports';
 import { connectionEngines, connectionName, isReadOnly } from '../connections';
-import { gridFsActions } from '../gridfs';
+import { copiesFolder, gridFsActions, isCopy } from '../gridfs';
+import { openedAs } from '../opened-files';
 import type { MainServices } from '../services';
 
 /** The save dialog of a download: the path chosen, or null. */
@@ -62,11 +63,13 @@ function chooseFile(services: MainServices): AppAction {
 
 /**
  * `gridfs.open-copy` `{ path }`: the copy opened with the system's application. Its type is checked once more here,
- * whatever the plan says (D42, T20): a file of another type is never handed to the system.
+ * whatever the plan says (D42, T20): only a copy of this run's folder that a step of this session wrote, of a type of
+ * the list, is handed to the system (R14.10); any other path is refused.
  */
-const openCopy: AppAction = async (args) => {
+export const openCopy: AppAction = async (args) => {
   const path = isRecord(args) ? (textOf(args, 'path') ?? '') : '';
-  if (!isOpened(basename(path))) {
+  const opened = openedAs(path, { writers: ['gridfs.download'], opens: openedExtensions });
+  if (!isCopy(path) || opened !== 'open') {
     throw new Error(text.open.type);
   }
   const failed = await shell.openPath(path);
@@ -80,6 +83,6 @@ const openCopy: AppAction = async (args) => {
 export const actions: AreaActions = (services) => ({
   ...gridFsActions({ engines: connectionEngines, isReadOnly, connectionName }),
   'gridfs.choose-file': chooseFile(services),
-  'gridfs.temporary-folder': () => Promise.resolve(tmpdir()),
+  'gridfs.temporary-folder': () => copiesFolder(),
   'gridfs.open-copy': openCopy,
 });

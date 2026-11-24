@@ -610,8 +610,6 @@ Saves the diagram as a picture, with the boxes where they are on the page.
   its folder from Mongoster 0.9.0 (`src/shared/openable.ts › opensAsData`, which leaves `.svg` out). The button is
   named **Reveal**, as Datardo's other notifications name showing a file in its folder *(Datardo's choice; Mongoster
   keeps the name Open)*.
-- **Differs**: (M37) the notification's button is **Open**, which opens the file with the system's program for it,
-  and the main process opens whatever path the window gives it (`src/main/actions/relation.ts › openFile`).
 
 The picture:
 
@@ -629,9 +627,9 @@ Acceptance:
 
 - [ ] **Save SVG…** on the diagram of `shop` proposes `shop-diagram.svg`; saving writes the file and the notification
   says *Saved the diagram of shop to <path>.* with **Reveal**, which shows the file selected in the system's file
-  manager and opens it in no other program. (differs)
+  manager and opens it in no other program.
 - [ ] Asked by the window to show a path that no **Save SVG…** of this session wrote, the main process shows nothing
-  and opens nothing. (differs)
+  and opens nothing.
 - [ ] Closing the dialog writes nothing and says nothing.
 - [ ] The file opens in a browser and shows the same boxes at the same places relative to each other as the page,
   with a box that was dragged where it was dragged.

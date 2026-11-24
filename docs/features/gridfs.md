@@ -631,19 +631,16 @@ of files that are safe to hand to the system.
 - **Ported from**: `src/gridfs.ts` (`open`, `save`); the folder of the copies that only the user can read, with a
   name of its own, is Mongoster 0.9.0's (`src/gridfs.ts › folderForOpening`, `openedFileName`). The list of types and
   the removal of the copies at the next start are *New in Datardo*.
-- **Differs**: (M37) the copies go in the fixed folder `datardo-gridfs` of the system's temporary folder, which every
-  user of the machine can know in advance, with the default modes; control characters are kept in the copy's name.
 
 Acceptance:
 
 - [ ] **Open** on `report.pdf` writes a copy named `report.pdf` under a folder `datardo-gridfs-` and six characters
-  in the temporary folder, and asks the system to open it. (differs)
-- [ ] On macOS and Linux that folder and the folder of the file have the mode `0700`, and the copy `0600`. (differs)
+  in the temporary folder, and asks the system to open it.
+- [ ] On macOS and Linux that folder and the folder of the file have the mode `0700`, and the copy `0600`.
 - [ ] Two runs of Datardo use two folders with different names; a folder of that name made beforehand by another
-  user, or a link of that name, is never written to. (differs)
+  user, or a link of that name, is never written to.
 - [ ] When the folder of the copies was deleted during the run, the next **Open** makes a new one with another name.
-  (differs)
-- [ ] A file named `a\u0007b.pdf` (with the control character 7) is copied as `a_b.pdf`. (differs)
+- [ ] A file named `a\u0007b.pdf` (with the control character 7) is copied as `a_b.pdf`.
 - [ ] Opening the same file twice writes to the same path; two files named `report.pdf` with different `_id` get
   different folders.
 - [ ] A file named `reports/2026/q1.pdf` is copied as `reports_2026_q1.pdf`.
@@ -652,9 +649,9 @@ Acceptance:
   opened.
 - [ ] **Cancel** leaves no copy and opens nothing.
 - [ ] It works on a read-only connection.
-- [ ] After Datardo quits, the folder of the copies is gone. (differs)
+- [ ] After Datardo quits, the folder of the copies is gone.
 - [ ] At the next start, a folder of copies a quit could not delete is deleted, and so is an old `datardo-gridfs`;
-  a folder `datardo-gridfs-` of another user, or a link of that name, is left alone. (differs)
+  a folder `datardo-gridfs-` of another user, or a link of that name, is left alone.
 
 ### `gridfs.rename` — Rename a file
 

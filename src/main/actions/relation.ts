@@ -2,11 +2,13 @@
  * The actions of the relation area the runner carries out for its app steps and app reads: the sample of a
  * Relationship diagram (`relation.sample`), selecting a box of an open diagram (`relation.select-box`), the references
  * the MCP tool `describe_relations` asks for (`relation.detect`), the system's
- * save dialog of **Save SVG…** (`relation.choose-file`) and **Open** of its notification (`relation.open-file`).
+ * save dialog of **Save SVG…** (`relation.choose-file`) and **Reveal** of its notification (`relation.reveal-file`).
  */
 import { join } from 'node:path';
 import { app, dialog, shell, type SaveDialogOptions } from 'electron';
+import { svgWriter } from '../../features/relation/export-svg';
 import { text } from '../../features/relation/text';
+import { openedAs } from '../opened-files';
 import type { AppAction } from '../../runner/ports';
 import type { Json } from '../../shared/engine-request';
 import { relationActions } from '../relations';
@@ -42,18 +44,23 @@ function chooseFile(services: MainServices): AppAction {
   };
 }
 
-/** `relation.open-file` `{ path }`: the file opened with the system's program for it. */
-const openFile: AppAction = async (args) => {
-  const path = fields(args)['path'];
-  const failure = typeof path === 'string' && path !== '' ? await shell.openPath(path) : 'no file';
-  if (failure !== '') {
-    throw new Error(failure);
+/**
+ * `relation.reveal-file` `{ path }`: the diagram shown in its folder, never opened: a browser would run the scripts an
+ * SVG may hold. Only a file **Save SVG…** wrote in this session is shown (R14.10, T24).
+ */
+export const revealFile: AppAction = (args) => {
+  const given = fields(args)['path'];
+  const path = typeof given === 'string' ? given : '';
+  if (openedAs(path, { writers: [svgWriter], opens: new Set() }) === 'refuse') {
+    return Promise.reject(new Error(text.svg.notWritten(path)));
   }
+  shell.showItemInFolder(path);
+  return Promise.resolve(null);
 };
 
 /** The actions of the relation area. */
 export const actions: AreaActions = (services) => ({
   ...relationActions(services),
   'relation.choose-file': chooseFile(services),
-  'relation.open-file': openFile,
+  'relation.reveal-file': revealFile,
 });

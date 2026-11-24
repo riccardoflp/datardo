@@ -64,9 +64,6 @@ file, to read elsewhere or to import again.
   `writeExport`, `FileWriter`), `src/queries.ts` (`buildPipeline`), `src/shared/csv.ts`, `src/shared/columns.ts`; the
   check of what **Open** hands to the system follows Mongoster 0.9.0's (`src/shared/openable.ts › opensAsData`); the
   check that the path is the file just written is *New in Datardo*.
-- **Differs**: (M37) **Open** starts the feature again with the path the window gives, and the main process opens
-  any path with any extension (`src/features/transfer/export.ts › shownFile`,
-  `src/main/actions/transfer.ts › openPath`).
 
 Acceptance:
 
@@ -87,9 +84,8 @@ Acceptance:
 - [ ] **Cancel** removes the partial file and says *Export cancelled.*
 - [ ] **Open** after a JSON export to `orders.json` opens it with the system's application for `.json`; after an
   export the user saved as `orders.html`, **Open** shows the file selected in the system's file manager and opens it
-  in no program. (differs)
+  in no program.
 - [ ] Asked by the window to open a path that no export of this session wrote, the main process opens nothing.
-  (differs)
 - [ ] With the pipeline shown up to a `$merge` stage, nothing is asked and the message names `$merge`.
 - [ ] The export works on a read-only connection.
 

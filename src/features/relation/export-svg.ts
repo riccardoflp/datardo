@@ -4,8 +4,9 @@
  * Saves the diagram as a picture, with the boxes where they are on the page. Started from the page with
  * `{ connection, database, graph, boxes, keysOnly }`; asks where to save with the system's dialog (the app read
  * `relation.export-svg:file`, which answers the path, or null when the dialog was closed), then writes the file.
- * **Open** in the notification starts the feature again with `{ open: <path> }`, which opens the file with the
- * system's program for it.
+ * **Reveal** in the notification starts the feature again with `{ reveal: <path> }`, which shows the file in its
+ * folder: a browser would run the scripts an SVG may hold, and the diagram's text comes from the database (T24). The
+ * main process shows only the file this feature wrote in this session.
  */
 import type { Json } from '../../shared/engine-request';
 import {
@@ -30,8 +31,8 @@ export const fileReadId = 'relation.export-svg:file';
 /** The app action of the main process that shows the system's save dialog and answers the path chosen. */
 export const chooseFileAction = 'relation.choose-file';
 
-/** The app action that opens a file with the system's program for it. */
-export const openFileAction = 'relation.open-file';
+/** The app action that shows a file this feature wrote in its folder, in the system's file manager. */
+export const revealFileAction = 'relation.reveal-file';
 
 /** The writer of the main process that writes the text given (`FileStep.content`). */
 export const svgWriter = 'relation.svg';
@@ -48,8 +49,8 @@ export function dialogArgs(database: string): Json {
   };
 }
 
-function openPlan(path: string): Outcome {
-  return run(appPlan(text.svg.openTitle, [appStep(text.svg.openStep(path), openFileAction, { path })]));
+function revealPlan(path: string): Outcome {
+  return run(appPlan(text.svg.revealTitle, [appStep(text.svg.revealStep(path), revealFileAction, { path })]));
 }
 
 function savePlan(database: string, path: string, svg: string): Outcome {
@@ -74,10 +75,10 @@ function savePlan(database: string, path: string, svg: string): Outcome {
         text: text.svg.saved(database, path),
         actions: [
           {
-            label: text.svg.open,
+            label: text.svg.reveal,
             feature: featureId('relation.export-svg'),
             target: { kind: 'app' },
-            args: { open: path },
+            args: { reveal: path },
           },
         ],
       },
@@ -87,9 +88,9 @@ function savePlan(database: string, path: string, svg: string): Outcome {
 
 /** Feature: relation.export-svg — asks where, then `write C:\Users\ada\shop-diagram.svg`; nothing when closed. */
 export function plan(context: Context, answers: Answers): Outcome {
-  const opened = startArgs(answers)['open'];
-  if (typeof opened === 'string') {
-    return openPlan(opened);
+  const revealed = startArgs(answers)['reveal'];
+  if (typeof revealed === 'string') {
+    return revealPlan(revealed);
   }
   const { args, place } = requiredStart(context, answers);
   const graph = graphArg(args);

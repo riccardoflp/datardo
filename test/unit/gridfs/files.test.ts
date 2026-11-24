@@ -179,7 +179,7 @@ describe('gridfs.download', () => {
 
 describe('gridfs.open', () => {
   const report = gridFile({ filename: 'report.pdf' });
-  const temporary = 'C:\\Users\\ada\\AppData\\Local\\Temp';
+  const temporary = 'C:\\Users\\ada\\AppData\\Local\\Temp\\datardo-gridfs-Ab12Cd';
 
   function openPlan(file = report, connection = local) {
     return planOf(
@@ -191,12 +191,12 @@ describe('gridfs.open', () => {
     );
   }
 
-  it('writes a copy named report.pdf under datardo-gridfs in the temporary folder and opens it', () => {
+  it('writes a copy named report.pdf in the folder of the copies the main process gives, and opens it', () => {
     const plan = openPlan();
     const [write, show] = plan.steps;
     expect(write).toMatchObject({ kind: 'file', action: 'write', content: { writer: 'gridfs.download' } });
     expect(write?.kind === 'file' ? write.path : '').toMatch(
-      /^C:\\Users\\ada\\AppData\\Local\\Temp\\datardo-gridfs\\[\w-]{1,48}\\report\.pdf$/u,
+      /^C:\\Users\\ada\\AppData\\Local\\Temp\\datardo-gridfs-Ab12Cd\\[\w-]{1,48}\\report\.pdf$/u,
     );
     expect(show).toMatchObject({
       kind: 'app',
@@ -219,6 +219,8 @@ describe('gridfs.open', () => {
 
   it('copies reports/2026/q1.pdf as reports_2026_q1.pdf', () => {
     expect(open.copyName('reports/2026/q1.pdf')).toBe('reports_2026_q1.pdf');
+    expect(open.copyName('a\u0007b.pdf')).toBe('a_b.pdf');
+    expect(open.copyName('tab\there\u001f.txt')).toBe('tab_here_.txt');
     expect(open.copyName('..')).toBe('file');
     expect(open.copyName('')).toBe('file');
   });

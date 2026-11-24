@@ -76,6 +76,37 @@ test.describe('transfer.export', () => {
     expect(written[0]?.['score']).toEqual({ $numberInt: '42' });
   });
 
+  test('Open hands a .json export to its program, and only shows one saved as orders.html in its folder', async () => {
+    test.setTimeout(120_000);
+    const { window, app } = await startOnPeople(mongo, running);
+    await app.evaluate(({ shell }) => {
+      const stubbed = shell as unknown as Record<string, unknown>;
+      const calls: string[] = [];
+      (globalThis as unknown as { shellCalls: string[] }).shellCalls = calls;
+      stubbed['showItemInFolder'] = (shown: string) => calls.push(`show ${shown}`);
+      stubbed['openPath'] = (opened: string) => {
+        calls.push(`open ${opened}`);
+        return Promise.resolve('');
+      };
+    });
+    const calls = (): Promise<string[]> =>
+      app.evaluate(() => (globalThis as unknown as { shellCalls: string[] }).shellCalls);
+    for (const [name, call] of [
+      ['orders.json', 'open'],
+      ['orders.html', 'show'],
+    ] as const) {
+      const file = join(folder, name);
+      await answerDialogs(app, { save: file });
+      await documentsOf(window).locator('[data-feature="transfer.export@toolbar"]').click();
+      await pick(window, 'Export people', /^JSON(?! Lines)/u);
+      await pick(window, 'Export people as JSON', /^All results/u);
+      await expect(window.getByText(`Exported 3 documents to ${name}.`, { exact: true })).toBeVisible();
+      await window.getByRole('button', { name: 'Open', exact: true }).click();
+      await expect.poll(calls).toContain(`${call} ${file}`);
+    }
+    expect(await calls()).toEqual([`open ${join(folder, 'orders.json')}`, `show ${join(folder, 'orders.html')}`]);
+  });
+
   test('Export 2 documents… of the selection bar writes the selected rows only, with the columns shown', async () => {
     test.setTimeout(120_000);
     const { window, app } = await startOnPeople(mongo, running);
