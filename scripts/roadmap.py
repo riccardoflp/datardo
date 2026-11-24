@@ -43,7 +43,7 @@ STANDARD_EXIT = [
 # its cards, or a pair of an area and the names of some of them, or of an area and "rest"), what it builds beyond
 # the cards, its own exit criteria, and what is left out on purpose.
 # The status of each milestone that is not planned: in progress, or done (its exit criteria are then ticked).
-STATUS: dict[int, str] = {0: "done", 1: "done", 2: "done", 3: "done", 4: "done", 5: "done", 6: "done", 7: "done", 8: "done", 9: "done", 10: "done", 11: "done", 12: "done", 13: "done", 14: "done", 15: "done", 16: "done", 17: "done", 18: "done", 19: "done", 20: "done", 21: "done", 22: "done", 23: "done", 24: "done", 25: "done", 26: "done", 27: "done", 28: "done", 29: "done", 30: "done", 31: "done", 32: "done", 33: "done", 34: "done", 35: "done", 36: "done", 37: "done", 40: "done"}
+STATUS: dict[int, str] = {0: "done", 1: "done", 2: "done", 3: "done", 4: "done", 5: "done", 6: "done", 7: "done", 8: "done", 9: "done", 10: "done", 11: "done", 12: "done", 13: "done", 14: "done", 15: "done", 16: "done", 17: "done", 18: "done", 19: "done", 20: "done", 21: "done", 22: "done", 23: "done", 24: "done", 25: "done", 26: "done", 27: "done", 28: "done", 29: "done", 30: "done", 31: "done", 32: "done", 33: "done", 34: "done", 35: "done", 36: "done", 37: "done", 38: "done", 40: "done"}
 
 MILESTONES = [
     dict(n=1, title="A window of its own",
@@ -609,7 +609,9 @@ MILESTONES = [
          exit=["Each of the eleven presets passes R10.10 against the canvas, an island, a raised surface, a hovered "
                "row and a selected row, in both themes: `test/unit/theme/contrast.test.ts`.",
                "A connections file exported by Mongoster 0.10.0 with colored databases and collections is imported "
-               "with every color; exported again by Datardo and read by Mongoster 0.10.0, it keeps them."],
+               "with every color; exported again by Datardo, each connection carries the same name, URI, color and "
+               "colors of databases and collections as Mongoster's file (Mongoster reads only its own file type, so "
+               "this is checked field by field)."],
          notin=[]),
     dict(n=39, title="Exclude from searches, and several nodes selected",
          goal="A connection, a database, a collection, a view or a bucket can be left out of searches: it stays in "

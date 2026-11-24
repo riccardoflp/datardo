@@ -30,7 +30,7 @@ Shows what the current connection holds, in three parts, and follows the active 
   `src/extension.ts`). One connection at a time, **Pinned** and **Pages of** are new in Datardo. The colors of
   databases and collections and several nodes selected: Mongoster 0.9.0 and 0.10.0 (tree.set-collection-color,
   tree.set-database-color, tree.exclude; `src/tree.ts`, `src/standalone/shell/tree.ts`).
-- **Differs**: (M38) no node takes a color; (M39) one node at a time is selected, and nothing is shown excluded.
+- **Differs**: (M39) one node at a time is selected, and nothing is shown excluded.
 
 What it shows, in this order:
 
@@ -56,7 +56,7 @@ Acceptance:
 - [ ] While it connects, **Databases** shows **Connecting…**; when it cannot, the reason and **Retry**.
 - [ ] While the connection is reconnecting, the nodes already loaded stay, dimmed, and nothing is read.
 - [ ] The nodes do not take the connection's color: the color is on the connection island. A node's icon takes a
-      color only when its database, collection, view or bucket has one of its own (`tree.color-of`). (differs)
+      color only when its database, collection, view or bucket has one of its own (`tree.color-of`).
 - [ ] The island has the role `tree`; each node says its name, its kind, its count when it has one and whether it is
       expanded.
 - [ ] When a tab becomes active, its node is selected alone: nodes selected together before are not any more
@@ -77,7 +77,6 @@ The items of the connection the user pinned, at the top of the tree island.
   that query, as the saved queries' own area says. The context menu has **Open** and **Unpin** (`nav.pin`).
 - **Uses**: `nav.pin`, `table.show`, `key.show`, `key.open`, `tab.open`, `tree.color-of`.
 - **Ported from**: *New in Datardo*.
-- **Differs**: (M38) the icons of the items take no color.
 
 Acceptance:
 
@@ -86,7 +85,7 @@ Acceptance:
       collection; a page with nothing.
 - [ ] The icon of a pinned collection, view, namespace or key takes the color its node in **Databases** takes (that
       of its collection, or of its database), and a saved query that of its collection (`tree.color-of`); a page
-      takes none. (differs)
+      takes none.
 - [ ] With no pinned item the part is not shown, heading included.
 - [ ] Pins belong to one connection: another connection's tree shows its own.
 - [ ] The filter of the tree does not hide pinned items.
@@ -157,7 +156,7 @@ collections.
   `collections`), `src/shared/gridfs.ts › bucketNames`. The time series node and the document counts are new in
   Datardo. The colored icons and the excluded nodes: Mongoster 0.9.0 and 0.10.0 (`src/tree.ts › connectionIcon`,
   `markExcluded`).
-- **Differs**: (M38) every icon is drawn in the usual color; (M39) no node is dimmed or marked **excluded**.
+- **Differs**: (M39) no node is dimmed or marked **excluded**.
 
 What each node shows:
 
@@ -195,7 +194,7 @@ Acceptance:
       collections stays, and says what its page says.
 - [ ] With `databaseColors: { shop: "teal" }` and `collectionColors: { "shop.orders": "#1e90ff", "shop.logs": "none"
       }` on a red connection, the icon of `shop` is teal, of `orders` `#1e90ff`, of `users` teal, of `logs` plain, and
-      every node of `crm` plain; no name changes color. (differs)
+      every node of `crm` plain; no name changes color.
 - [ ] With `exclusions: ["archive", "shop.logs"]`, `archive` shows `excluded · 3.2 MB` after its name, its
       collections **excluded with its database**, `logs` `excluded · 120`, and all of them are dimmed; `shop` and
       its other collections are not. (differs)
@@ -294,7 +293,6 @@ The databases of a Redis connection and, under each, the namespaces of its keys.
 - **Settings**: `datardo.key.separator`, the text key names are split at, `:` by default.
 - **Ported from**: *New in Datardo*. The color of a database: Mongoster 0.10.0, for its MongoDB
   databases (tree.set-database-color).
-- **Differs**: (M38) every icon is drawn in the usual color.
 
 What each node shows:
 
@@ -326,7 +324,7 @@ Acceptance:
 - [ ] A database with no key shows **No keys** when expanded; one whose keys form no namespace shows **No
       namespaces**.
 - [ ] With `databaseColors: { "3": "green" }` on a red connection, the icon of `db3` and of every namespace under it
-      is green, and `db0` and its namespaces are plain. (differs)
+      is green, and `db0` and its namespaces are plain.
 
 ### `tree.redis-databases` — List the Redis databases
 
@@ -810,7 +808,7 @@ Acceptance:
 - [ ] **None** removes the entry, and the last entry removes `databaseColors`; an entry `"none"` read from a file of
       Mongoster is kept, shows as no color, and **None** is described **current**.
 - [ ] Dismissing the list changes nothing.
-- [ ] With no color on `shop`, **Set color…** on `orders` offers **Database's color** described **none**.
+- [ ] With **None** on `shop`, **Set color…** on `orders` offers **Database's color** described **none**.
 - [ ] On a read-only connection the entry is offered and the color is set; nothing is sent to the server.
 
 ### `tree.color-of` — Which color something of a database or a collection takes
@@ -874,9 +872,10 @@ left empty:
 
 - `withColor(colors, key, color)`: the entry set to the color, or removed when the color is to follow what is above.
 - `renamedColors(colors, database, from, to)`: the entry of `database.from` moved to `database.to`.
-- `droppedColors(connection, database, collection)`: without the entry of the dropped collection or view; of a
-  dropped bucket, the entries of its `.files` and `.chunks` collections; of a dropped database (no collection), its
-  entry in `databaseColors` and every entry of `collectionColors` that starts with `database.`.
+- `droppedColors(connection, dropped)`, `dropped` a collection or view, a bucket or a database: without the entry of
+  the dropped collection or view; of a dropped bucket, the entries of its `.files` and `.chunks` collections; of a
+  dropped database, its entry in `databaseColors` and every entry of `collectionColors` that starts with
+  `database.`.
 - They are used by `manage.rename-collection`, `manage.drop-collection`, `manage.drop-database` and
   `gridfs.drop-bucket`, after the server's step succeeded. A collection renamed or dropped elsewhere (mongosh, a
   restore that drops, a copy that replaces) keeps its entry, which applies again to a collection of the same name;
@@ -1072,8 +1071,8 @@ GridFS bucket. Each entry starts a feature of another area, which says when it i
   **Pin**, **Refresh** on every node and the menu of the heading are new in Datardo. **Set color…**, **Exclude from
   searches** and **Include in searches** (the `.excluded` forms, the group `4_organize`): Mongoster 0.9.0 and
   0.10.0.
-- **Differs**: (M38) no node has **Set color…**; (M39) no node has **Exclude from searches** or **Include in
-  searches**, and the menu always acts on the node it was opened on.
+- **Differs**: (M39) no node has **Exclude from searches** or **Include in searches**, and the menu always acts on the
+  node it was opened on.
 
 What it shows, with a line between the groups. In brackets, the feature behind an entry.
 
@@ -1123,7 +1122,7 @@ Acceptance:
 - [ ] The menu opens at the node with `Shift+F10`, closes with `Escape`, and gives the focus back to the node.
 - [ ] A menu opened on a node that is not selected does not change the selection or the active tab.
 - [ ] A database, a collection, a view, a time series collection and a bucket have **Set color…**, also on a
-      read-only connection. (differs)
+      read-only connection.
 - [ ] A node with an exclusion of its own has **Include in searches** in place of **Exclude from searches**; a
       collection of an excluded database has **Exclude from searches**; both stay on a read-only connection. (differs)
 - [ ] With `orders`, `users` and `logs` selected, the menu opened on `users` has only **Exclude from searches**, and
@@ -1142,7 +1141,6 @@ area, which says when it is offered and what it does.
 - **Uses**: `key.show`, `console.show`, `nav.pin`, `tree.refresh`, `tree.namespaces`, `tree.set-database-color`.
 - **Ported from**: *New in Datardo*. **Set color…** on a database: Mongoster 0.10.0, for its MongoDB
   databases.
-- **Differs**: (M38) a database has no **Set color…**.
 
 What it shows, with a line between the groups. In brackets, the feature behind an entry.
 
@@ -1165,4 +1163,4 @@ Acceptance:
 - [ ] **Pin** reads **Unpin** on a namespace that is pinned.
 - [ ] The menu opens at the node with `Shift+F10`, closes with `Escape`, and gives the focus back to the node.
 - [ ] A database has **Set color…**, also on a read-only connection; a namespace has none, and neither has **Exclude
-      from searches**. (differs)
+      from searches**.

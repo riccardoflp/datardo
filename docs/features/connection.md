@@ -107,8 +107,6 @@ MongoDB, its redis-oplog link, then tested and saved.
   `media/connectionEditor.css`, `src/shared/messages.ts`). The fields of Redis, **Password** of the connection
   string, **Folder**, **Color**, **Read-only**, **Queries folder** and **Save and connect** are new in Datardo. The
   eleven presets and **Custom color…** of **Color** follow connection.set-color of Mongoster 0.9.0.
-- **Differs**: (M38) **Color** offers **None** and six colors; it has no **Pink**, **Teal**, **Indigo**, **Brown**,
-  **Gray** and no **Custom color…**.
 
 What it shows, in this order:
 
@@ -188,7 +186,7 @@ Acceptance:
 - [ ] **Color** lists **None**, **Red**, **Orange**, **Yellow**, **Green**, **Blue**, **Purple**, **Pink**, **Teal**,
       **Indigo**, **Brown**, **Gray** and **Custom color…**; choosing **Custom color…** and applying `#1e90ff` in
       **Choose a color** shows `#1e90ff` in **Color**, and **Save** saves that color; **Cancel** in the dialog leaves
-      **Color** as it was. (differs)
+      **Color** as it was.
 
 ### `connection.read-form` — What the form says, checked
 
@@ -517,8 +515,7 @@ Saves a copy of a connection, with everything it has, under a new name.
 - **Uses**: `connection.secrets`, `connection.edit`, `connection.menu`, `runner.notify`, `tree.color-of`,
   `tree.excluded`.
 - **Ported from**: *New in Datardo*.
-- **Differs**: (M38) the copy has no colors of databases and collections, since a connection keeps none; (M39) nor
-  what is excluded from searches.
+- **Differs**: (M39) the copy has nothing excluded from searches.
 
 Acceptance:
 
@@ -1008,26 +1005,24 @@ Marks everything of a connection with one of eleven preset colors or a custom on
   0001, revision 2; `src/shared/colors.ts › PRESET_COLORS`, `colorChoices`, `src/extension.ts › askColor`).
   Mongoster shows a custom color as its nearest preset where VS Code takes only theme colors; Datardo draws every
   color itself, so a custom color is exact everywhere.
-- **Differs**: (M38) the list offers six colors and **None**: no **Pink**, **Teal**, **Indigo**, **Brown**, **Gray**
-  and no **Custom color…**.
 
 Acceptance:
 
 - [ ] Dismissing the list changes nothing; dismissing the dialog **Choose a color** of **Custom color…** changes
-      nothing either. (differs)
+      nothing either.
 - [ ] Choosing **Red** for Local shows red on the connection island while Local is current, on the heading of its
       group of tabs, on its card and on its line in the connection switcher, without reopening anything.
 - [ ] The list shows the eleven presets in the order **Red**, **Orange**, **Yellow**, **Green**, **Blue**,
       **Purple**, **Pink**, **Teal**, **Indigo**, **Brown**, **Gray**, then **None** and **Custom color…**; on a
-      connection colored `#1e90ff`, **Custom color…** is described `#1e90ff · current`. (differs)
+      connection colored `#1e90ff`, **Custom color…** is described `#1e90ff · current`.
 - [ ] Applying `#1e90ff` in **Choose a color** colors Local with exactly `#1e90ff` on the connection island, the dot
       and the line of its group of tabs, its card and its line in the connection switcher, in the dark and in the
-      light theme. (differs)
+      light theme.
 - [ ] Every open tab of the connection, whatever its kind, takes the color at once, a playground tab included: the
       dot and the line of its group are the connection's color (`tab.groups`).
 - [ ] The icon of a tab takes a color only from its database's or its collection's own color (`tree.color-of`): the
       tab of `shop.orders`, whose database is teal, stays teal when Local's color changes, and the tab of
-      `crm.users`, with no color of its own, keeps its icon as it is. (differs)
+      `crm.users`, with no color of its own, keeps its icon as it is.
 - [ ] **None** removes the color everywhere; a connection without a color has the neutral mark of the theme.
 - [ ] A preset is drawn with the theme's token of that name (`connection.color-presets`), so it is readable in the
       dark and in the light theme; it is never the only sign of anything: the name is always beside it.
@@ -1486,8 +1481,7 @@ and cannot go.
   `src/standalone/vscode/storage.ts`). The colors of databases and collections and the exclusions from searches
   are kept on the connection as Mongoster 0.9.0 keeps them (`src/shared/collectionColors.ts`,
   `src/shared/exclusions.ts`).
-- **Differs**: (M38) the saved connections keep no colors of databases and collections, and the color is one of six;
-  (M39) they keep nothing excluded from searches.
+- **Differs**: (M39) the saved connections keep nothing excluded from searches.
 
 What is kept where:
 
@@ -1583,9 +1577,7 @@ either engine, from a file or the clipboard.
   (`src/shared/connectionsFile.ts › securityNotes`, `urlHost`; `src/connectionsTransfer.ts › summary`, and the
   **Replace** of `importConnections`). The queries folder in the detail is new in Datardo, which keeps one per
   connection.
-- **Differs**: (M38) the detail of an item does not count the colors of databases and collections, a custom color is
-  not read, and **Replace** carries no such color; (M39) it says nothing of the exclusions from searches, and
-  **Replace** carries none.
+- **Differs**: (M39) it says nothing of the exclusions from searches, and **Replace** carries none.
 
 Acceptance:
 
@@ -1679,8 +1671,7 @@ without their passwords.
   Mongoster's. The colors of databases and collections, the custom colors and the exclusions from searches, with
   their notes, come from connection.export of Mongoster 0.9.0 (`src/connectionsTransfer.ts › portable`,
   `src/shared/connectionsFile.ts › serializeConnections`).
-- **Differs**: (M38) Datardo's format writes no colors of databases and collections and the notes say nothing of
-  them; (M39) it writes no exclusions from searches, and no note says that the other formats left them out.
+- **Differs**: (M39) it writes no exclusions from searches, and no note says that the other formats left them out.
 
 Acceptance:
 
@@ -1729,8 +1720,7 @@ Tells the format of the text to import, and reads Datardo's and Mongoster's own 
   from connection.read-file of Mongoster 0.9.0 (`src/shared/connectionsFile.ts › fromMongoster`,
   `src/shared/collectionColors.ts › readDatabaseColors`, `readCollectionColors`, `src/shared/exclusions.ts ›
   readExclusions`); the colors of Redis databases are new in Datardo.
-- **Differs**: (M38) a custom color `#rrggbb` of a Datardo or Mongoster entry is taken to the nearest of six colors,
-  and `databaseColors` and `collectionColors` are not read; (M39) `excluded` and `exclusions` are not read.
+- **Differs**: (M39) `excluded` and `exclusions` are not read.
 
 Rules:
 
@@ -1817,7 +1807,6 @@ Reads a text with one connection string per line, of either engine, with or with
 - **Ported from**: connection.read-list (`src/shared/connectionsFile.ts › parseList`, `isConnectionString`,
   `hostOf`, `tlsFromUri`, `missingSecrets`). The Redis lines are new in Datardo. The name taken from the `//`
   comment above a line comes from connection.read-list of Mongoster 0.9.0 (`parseList`).
-- **Differs**: (M38) a line with no name of its own is named after its host, also under a `// name` comment.
 
 Rules:
 
@@ -1851,10 +1840,9 @@ Examples:
 - `rediss://ada@cache.example.com:6380` → Redis, name `cache.example.com:6380`, TLS on, note **no password**.
 - `redis://cache/orders` → skipped (1).
 - `// Production` then `mongodb+srv://ada@cluster0.x.mongodb.net/shop` on the next line → name `Production`.
-  (differs)
-- `// Sessions` then `rediss://cache.example.com:6380/2` → Redis, name `Sessions`. (differs)
+- `// Sessions` then `rediss://cache.example.com:6380/2` → Redis, name `Sessions`.
 - `// Reports` then `Main = mongodb://r1/db` → `Main`; `// Old`, an empty line, then `mongodb://h1/db` → `h1`;
-  `//` alone then `mongodb://h2/db` → `h2`; `// A`, `// B`, then `mongodb://h3/db` → `B`. (differs)
+  `//` alone then `mongodb://h2/db` → `h2`; `// A`, `// B`, then `mongodb://h3/db` → `B`.
 
 ### `connection.read-compass` — Read a MongoDB Compass export
 
@@ -1868,8 +1856,6 @@ Reads the connections of the file Compass writes with **Export saved connections
 - **Ported from**: connection.read-compass (`src/shared/connectionsFile.ts › fromCompass`, `decryptSecrets`,
   `withPassword`, `setUriParams`, `tlsFromUri`, `colorFrom`, `missingSecrets`); the eleven presets from
   connection.color-from-compass of Mongoster 0.9.0.
-- **Differs**: (M38) the color is the closest of six: Compass's teal, iris, pink and gray become green, blue, purple
-  and no color.
 
 Rules:
 
@@ -1924,9 +1910,7 @@ Gives the text of an exported file, in Datardo's format, in Compass's, or as a l
   taking every secret out of the connection string is new. The custom colors, `databaseColors`,
   `collectionColors`, `excluded`, `exclusions` and their notes come from connection.write-file of Mongoster 0.9.0
   (`serializeConnections`).
-- **Differs**: (M38) Datardo's format writes no `databaseColors` and `collectionColors` and the color is one of six;
-  the other formats write no note about the colors of databases and collections; (M39) Datardo's format writes no
-  `excluded` and `exclusions`, and the other formats no note about them.
+- **Differs**: (M39) Datardo's format writes no `excluded` and `exclusions`, and the other formats no note about them.
 
 Rules:
 
@@ -2078,8 +2062,6 @@ and Mongoster's own formats, and turns a color back into Compass's codes.
 - **Uses**: `connection.color-presets`.
 - **Ported from**: connection.color-from-compass (`src/shared/connectionsFile.ts › colorFrom`, `TO_COMPASS`), as
   Mongoster 0.9.0 has it (proposal 0001, revision 2; `FROM_COMPASS`, `TO_COMPASS`, `compassColor`).
-- **Differs**: (M38) only six colors: `color2` and `teal` give green, `color4` and `iris` blue, `color7` and `pink`
-  purple, `color10` none; a hex color is always taken to the closest of the six, and export writes only six codes.
 
 Rules:
 
@@ -2098,7 +2080,7 @@ Rules:
 Examples:
 
 - `color3` → blue; `color2` → teal; `iris` → indigo; `color7` → pink; `color10` → gray; `' Blue '` → blue; `#ff0000`
-  → red; `#00f` → blue; `ffa500` → orange; `#808080` → gray; `#xyz` → none; `3` → none. (differs)
-- With `keepCustom`: `#12ABEF` → `#12abef`; `color4` → indigo. (differs)
-- Export: teal → `color2`; brown → `color8`; `#12abef` → `color3`; `#5c6bc0` → `color4`. (differs)
+  → red; `#00f` → blue; `ffa500` → orange; `#808080` → gray; `#xyz` → none; `3` → none.
+- With `keepCustom`: `#12ABEF` → `#12abef`; `color4` → indigo.
+- Export: teal → `color2`; brown → `color8`; `#12abef` → `color3`; `#5c6bc0` → `color4`.
 - Every preset but brown written to Compass and read back is itself; brown comes back orange.

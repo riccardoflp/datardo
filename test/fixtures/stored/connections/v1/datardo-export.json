@@ -1,0 +1,41 @@
+{
+  "type": "Datardo Connections",
+  "version": 1,
+  "secrets": "removed",
+  "connections": [
+    {
+      "id": "c-1",
+      "name": "Shop",
+      "engine": "mongodb",
+      "uri": "mongodb://ada@db1:27017/shop",
+      "folder": "Work",
+      "color": "#1e90ff",
+      "databaseColors": {
+        "shop": "teal",
+        "archive": "none"
+      },
+      "collectionColors": {
+        "shop.orders": "none",
+        "shop.logs": "#12abef",
+        "media.fs.files": "pink"
+      },
+      "readOnly": true
+    },
+    {
+      "id": "c-2",
+      "name": "Reports",
+      "engine": "mongodb",
+      "uri": "mongodb://reports.example.com:27017/",
+      "color": "indigo",
+      "databaseColors": {
+        "sales": "brown"
+      }
+    },
+    {
+      "id": "c-3",
+      "name": "Plain",
+      "engine": "mongodb",
+      "uri": "mongodb://localhost:27017/"
+    }
+  ]
+}

@@ -37,7 +37,6 @@ Lists the files of a bucket, a page at a time, and starts everything that is don
 - **Ported from**: the GridFS tab, which has no card in Mongoster; `src/gridfs.ts` (`GridFSPanel`),
   `src/webview/gridfs.ts`, `src/extension.ts` (the command that opens a bucket). The tab in the bucket's color:
   Mongoster 0.9.0 (`src/gridfs.ts › GridFSPanel.color`).
-- **Differs**: (M38) the icon of the tab is drawn in the usual color.
 
 The page opens in a tab of its own (`tab.open`), one per bucket, named after the bucket: asking for a bucket whose
 tab is open shows that tab. The icon of the tab takes the bucket's color, which is that of its `.files` collection,
@@ -101,7 +100,7 @@ Acceptance:
   **Rename…** or **Delete**.
 - [ ] With `collectionColors: { "shop.fs.files": "pink" }`, the icon of the tab of `fs` is pink; with no entry for
   it and `databaseColors: { shop: "teal" }`, teal; with neither, in the usual color, whatever the connection's color.
-  Setting the color of the bucket while its tab is open changes the icon at once. (differs)
+  Setting the color of the bucket while its tab is open changes the icon at once.
 
 ### `gridfs.buckets` — The buckets of a database
 
@@ -787,8 +786,7 @@ Drops the two collections of a bucket, with every file in it.
 - **Ported from**: `src/gridfs.ts` (`dropBucket`); `src/extension.ts` (the command that drops a bucket). The color and
   the exclusion that go: Mongoster 0.9.0 (tree.collection-color-follows, tree.exclusion-follows; the
   `mongoster.dropGridFSBucket` handler). The formatting rules that go are Datardo's choice.
-- **Differs**: (M38) the plan has the two drops only: a bucket has no color to forget; (M39) nor an exclusion from
-  searches; (M41) nor formatting rules.
+- **Differs**: (M39) the plan forgets no exclusion from searches; (M41) nor formatting rules.
 
 Acceptance:
 

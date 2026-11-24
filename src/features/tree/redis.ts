@@ -9,6 +9,7 @@ import type { ConnectionView } from '../../shared/connection';
 import { activeTabOf, type TabShows } from '../../shared/state/tabs';
 import { isRedisStringProblem, redisFromString } from '../connection/redis-string';
 import { setting } from '../settings/read';
+import { iconColored } from './color-of';
 import { countText, withSeparators } from './count';
 import { appliedFilter, filterNamespaces } from './filter';
 import { matches } from './match';
@@ -122,6 +123,7 @@ function namespaceItems(
     ref,
     name: namespace.name,
     icon: 'symbol-namespace',
+    ...iconColored(built.connection, { kind: 'database', database: parent.database }),
     after: namespace.countText,
     hover: namespace.pattern,
     dimmed: false,
@@ -209,6 +211,7 @@ function databaseItems(built: Built, database: RedisDatabase, level: number): re
     ref: { kind: 'redis-database', database: database.number },
     name,
     icon: 'database',
+    ...iconColored(built.connection, { kind: 'database', database: database.number }),
     after: keys,
     hover: text.redis.databaseHover(name, withSeparators(database.keys), withSeparators(database.expires)),
     dimmed: false,

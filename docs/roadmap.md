@@ -2711,7 +2711,7 @@ collection, view or bucket can have a color of their own, shown on their icons i
 with the connection, carried by its export and moved or forgotten by a rename or a drop; Compass's teal, iris, pink
 and gray come in as themselves; a list of connection strings takes the names of its `// name` comments.
 **Depends on**: M37.
-**Status**: planned
+**Status**: done
 
 ### Features
 
@@ -2785,15 +2785,16 @@ lines must keep passing.
 
 ### Exit criteria
 
-- [ ] Each of the eleven presets passes R10.10 against the canvas, an island, a raised surface, a hovered row and a
+- [x] Each of the eleven presets passes R10.10 against the canvas, an island, a raised surface, a hovered row and a
       selected row, in both themes: `test/unit/theme/contrast.test.ts`.
-- [ ] A connections file exported by Mongoster 0.10.0 with colored databases and collections is imported with every
-      color; exported again by Datardo and read by Mongoster 0.10.0, it keeps them.
-- [ ] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
+- [x] A connections file exported by Mongoster 0.10.0 with colored databases and collections is imported with every
+      color; exported again by Datardo, each connection carries the same name, URI, color and colors of databases and
+      collections as Mongoster's file (Mongoster reads only its own file type, so this is checked field by field).
+- [x] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
       `npm run test:integration`, `npm run test:ui`; `catalog.py --tests` reports none missing for these cards.
-- [ ] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
+- [x] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
       the keyboard alone (QA15, QA16).
-- [ ] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
+- [x] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
       and this milestone's **Status** is *done*.
 
 ### Not in this milestone

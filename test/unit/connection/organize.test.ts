@@ -97,7 +97,7 @@ describe('connection.set-color', () => {
     expect(field?.kind === 'pick-one' && field.choices.find((each) => each.value === 'red')?.description).toBe(
       'current',
     );
-    expect(choicesOf(setColor.plan(context, {})).at(-1)).toBe('None');
+    expect(choicesOf(setColor.plan(context, {})).slice(-2)).toEqual(['None', 'Custom color…']);
   });
 
   it('sets the color chosen, and None removes it', () => {
@@ -114,6 +114,50 @@ describe('connection.set-color', () => {
 
   it('changes nothing for the color it has', () => {
     expect(planOf(setColor.plan(context, { color: 'none' })).steps).toEqual([]);
+  });
+
+  it('lists the eleven presets in their order, then None and Custom color…, each preset with its swatch', () => {
+    expect(choicesOf(setColor.plan(context, {}))).toEqual([
+      'Red',
+      'Orange',
+      'Yellow',
+      'Green',
+      'Blue',
+      'Purple',
+      'Pink',
+      'Teal',
+      'Indigo',
+      'Brown',
+      'Gray',
+      'None',
+      'Custom color…',
+    ]);
+    const field = questionOf(setColor.plan(context, {})).fields[0];
+    expect(field?.kind === 'pick-one' ? field.choices.find((each) => each.value === 'teal')?.color : '').toBe('teal');
+  });
+
+  it('describes Custom color… with the custom color of a connection colored #1e90ff, and current', () => {
+    const custom = mongoConnection({ color: '#1e90ff' });
+    const field = questionOf(setColor.plan(on2([custom], 'connection.set-color', custom), {})).fields[0];
+    const last = field?.kind === 'pick-one' ? field.choices.at(-1) : undefined;
+    expect(last).toMatchObject({ label: 'Custom color…', description: '#1e90ff · current', color: '#1e90ff' });
+    expect(field?.kind === 'pick-one' ? field.default : '').toBe('custom');
+  });
+
+  it('opens Choose a color on the color in use for Custom color…, and sets the color applied', () => {
+    const red = mongoConnection({ color: 'red' });
+    const redContext = on2([red], 'connection.set-color', red);
+    const dialog = questionOf(setColor.plan(redContext, { color: 'custom' }));
+    expect(dialog).toMatchObject({ title: 'Choose a color', text: 'Color of Local', button: 'Apply' });
+    expect(dialog.about).toEqual({ name: 'Local', start: 'red' });
+    expect(questionOf(setColor.plan(context, { color: 'custom' })).about).toEqual({ name: 'Local', start: 'blue' });
+    expect(planOf(setColor.plan(redContext, { color: 'custom', customColor: '#1E90FF' })).steps[0]).toMatchObject({
+      args: { connection: 'c-local', color: '#1e90ff' },
+      text: 'set the color of Local to #1e90ff',
+    });
+    expect(planOf(setColor.plan(redContext, { color: 'custom', customColor: '#abc' })).steps[0]).toMatchObject({
+      args: { color: '#aabbcc' },
+    });
   });
 });
 

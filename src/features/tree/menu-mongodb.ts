@@ -68,6 +68,23 @@ function backups(built: Built, restore: 'with-restore' | 'without-restore'): rea
   ];
 }
 
+/**
+ * The group that organizes a node: **Set color…** (`tree.set-database-color` on a database,
+ * `tree.set-collection-color` on a collection, a view or a bucket); it writes only Datardo's own file, so it stays on a
+ * read-only connection.
+ */
+function organize(built: Built, of: 'database' | 'collection'): readonly Control[] {
+  return of === 'database'
+    ? entry(built, text.menu.setColor, {
+        element: 'tree.set-database-color@tree-menu',
+        feature: 'tree.set-database-color',
+      })
+    : entry(built, text.menu.setColor, {
+        element: 'tree.set-collection-color@tree-menu',
+        feature: 'tree.set-collection-color',
+      });
+}
+
 function headingMenu(built: Built): readonly MenuEntry[] {
   return menuOf([
     [
@@ -95,6 +112,7 @@ function databaseMenu(built: Built, database: string): readonly MenuEntry[] {
       ),
       ...entry(built, text.menu.newPlayground, { element: 'playground.open@tree-menu', feature: 'playground.open' }),
     ],
+    organize(built, 'database'),
     [
       ...entry(built, text.menu.searchDocuments, { element: 'search.show@tree-menu', feature: 'search.show' }),
       ...entry(built, text.menu.relationshipDiagram, {
@@ -184,6 +202,7 @@ const drop = { element: 'manage.drop-collection@tree-menu', feature: 'manage.dro
 function viewMenu(built: Built, node: Entry): readonly MenuEntry[] {
   return menuOf([
     openAndPin(built, node),
+    organize(built, 'collection'),
     entry(built, text.menu.newPlayground, { element: 'playground.open@tree-menu', feature: 'playground.open' }),
     [
       ...entry(built, text.menu.searchDocuments, { element: 'search.show@tree-menu', feature: 'search.show' }),
@@ -202,6 +221,7 @@ function collectionMenu(built: Built, node: Entry): readonly MenuEntry[] {
   const allowsAll = node.collectionKind === 'collection';
   return menuOf([
     openAndPin(built, node),
+    organize(built, 'collection'),
     [
       ...entry(
         built,
@@ -252,6 +272,7 @@ function bucketMenu(built: Built, database: string, bucket: string): readonly Me
     : [];
   return menuOf([
     open,
+    organize(built, 'collection'),
     entry(built, text.menu.uploadFiles, { element: 'gridfs.upload@tree-menu', feature: 'gridfs.upload' }, 'writes'),
     entry(
       built,

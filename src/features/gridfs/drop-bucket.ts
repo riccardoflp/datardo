@@ -3,14 +3,16 @@
  *
  * Drops the two collections of a bucket, with every file in it: `db.fs.files.estimatedDocumentCount()` is read
  * first, for the number of files the confirmation shows, then two steps, `db.fs.files.drop()` and
- * `db.fs.chunks.drop()`. Destructive: the name of the bucket is typed to confirm. The tabs of the bucket are closed
- * and the tree is read again. Started with `{ connection, database, bucket }`. Ported from Mongoster's `dropBucket`.
+ * `db.fs.chunks.drop()`, then, only when the connection keeps a color for the bucket or its `.chunks`, the step that
+ * forgets it. Destructive: the name of the bucket is typed to confirm. The tabs of the bucket are closed and the tree
+ * is read again. Started with `{ connection, database, bucket }`. Ported from Mongoster's `dropBucket`.
  */
 import type { Json } from '../../shared/engine-request';
 import {
   needRead,
   run,
   type Answers,
+  type AppStep,
   type Context,
   type OperationFeature,
   type Outcome,
@@ -18,10 +20,20 @@ import {
   type ReadRequest,
 } from '../../shared/feature';
 import { featureId } from '../../shared/ids';
+import { savedConnection } from '../../shared/state/connections';
 import { numberOf } from '../document/write/values';
 import { listArgs } from './list';
 import { text } from './text';
-import { bucketArgs, bucketPlace, bucketRequest, bucketStep, refusedReadOnly, whereText } from './types';
+import { forgetStep } from '../tree/parts/forget-step';
+import {
+  bucketArgs,
+  bucketPlace,
+  bucketRequest,
+  bucketStep,
+  refusedReadOnly,
+  whereText,
+  type BucketPlace,
+} from './types';
 import { closeBucketTabs, notifySuccess, refreshAfter, writePlan } from './write/plan';
 
 /** The identifier of the read of the number of files. */
@@ -46,7 +58,18 @@ export const countRead: ReadFeature = {
   parse: (replies) => numberOf(replies[0] as Json) ?? 0,
 };
 
-/** Feature: gridfs.drop-bucket — the number of files, then the destructive plan of the two drops. */
+/** The step that forgets the color of the bucket and of its `.chunks`, when the connection keeps one (`tree.color-of`). */
+function forgetOfBucket(context: Context, place: BucketPlace): readonly AppStep[] {
+  const connection = savedConnection(context.state.connections, place.connection);
+  return connection === undefined
+    ? []
+    : forgetStep(connection, { kind: 'bucket', database: place.database, bucket: place.bucket });
+}
+
+/**
+ * Feature: gridfs.drop-bucket — the number of files, then the destructive plan of the two drops, and of forgetting
+ * the color of the bucket once both succeeded.
+ */
 export function plan(context: Context, answers: Answers): Outcome {
   const place = bucketPlace(context, answers);
   const readOnly = refusedReadOnly(place, 'gridfs.drop-bucket/read-only', text.readOnlyBucket(place.connectionName));
@@ -64,6 +87,7 @@ export function plan(context: Context, answers: Answers): Outcome {
       steps: [
         bucketStep(place, bucketRequest(place, 'files', { method: 'drop', arguments: [] })),
         bucketStep(place, bucketRequest(place, 'chunks', { method: 'drop', arguments: [] })),
+        ...forgetOfBucket(context, place),
       ],
       danger: {
         kind: 'destructive',

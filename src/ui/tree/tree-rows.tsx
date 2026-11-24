@@ -6,6 +6,7 @@
 import type { TreeRow } from '../components/tree';
 import { text } from '../../features/tree/text';
 import type { Control, PartName, TreeItem } from '../../features/tree/types';
+import { colorAttributes } from '../components/color';
 import styles from './tree-island.module.css';
 
 /** A line of the tree island, as the tree component draws it. */
@@ -196,7 +197,13 @@ export function RowContent({
   return (
     <>
       <Twisty expanded={row.expanded} />
-      {item.kind === 'node' ? <span className={`codicon codicon-${item.icon}`} aria-hidden="true" /> : null}
+      {item.kind === 'node' ? (
+        <span
+          className={`codicon codicon-${item.icon} ${styles['icon'] ?? ''}`}
+          {...colorAttributes(item.color)}
+          aria-hidden="true"
+        />
+      ) : null}
       <span
         className={item.kind === 'heading' ? styles['heading'] : styles['name']}
         title={item.kind === 'node' ? item.hover : undefined}

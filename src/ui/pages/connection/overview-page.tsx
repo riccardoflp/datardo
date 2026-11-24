@@ -12,6 +12,7 @@ import { activeTabOf } from '../../../shared/state/tabs';
 import { startFeature } from '../../shell/intent';
 import { useAppState } from '../../state/store';
 import styles from './connection-pages.module.css';
+import { colorAttributes } from '../../components/color';
 
 async function readServer(args: Json): Promise<Loaded<ServerInfo>> {
   const result = await window.datardo.start({
@@ -113,7 +114,7 @@ function Header({
   return (
     <header className={styles['header']}>
       <h1 className={styles['heading']}>
-        <span className={styles['dot']} data-color={page.color} aria-hidden="true" />
+        <span className={styles['dot']} {...colorAttributes(page.color)} aria-hidden="true" />
         {page.name} <span className={styles['engine']}>{page.engine}</span>
       </h1>
       <span className={styles['muted']}>{page.state}</span>

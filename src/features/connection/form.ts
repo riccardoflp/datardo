@@ -6,7 +6,9 @@
  * which secrets are saved. An empty password field keeps the saved one (`connection.read-form`).
  */
 import type { ConnectionForm, ConnectionView, FormField } from '../../shared/connection';
-import { connectionColors } from '../../shared/connection';
+import { isHexColor, presetColors, type ConnectionColor } from '../../shared/color';
+import { customValue } from './parts/color-question';
+import { colorText, presetLabels } from './parts/color-text';
 import type { EngineName, Json } from '../../shared/engine-request';
 import type { Context, ReadRequest } from '../../shared/feature';
 import type { ConnectionId } from '../../shared/ids';
@@ -139,6 +141,10 @@ export interface FieldView {
 export interface ChoiceView {
   readonly value: string;
   readonly label: string;
+  /** The swatch drawn beside it, for **Color**. */
+  readonly color?: ConnectionColor;
+  /** The control's identifier, when it starts another feature: **Custom color…**. */
+  readonly element?: string;
 }
 
 /** A button of the form. */
@@ -331,14 +337,24 @@ function buttons(busy: FormState['busy']): FormView['buttons'] {
 
 type Lists = Pick<FormView, 'folders' | 'colors' | 'authentications' | 'redisConnections'>;
 
-function lists(connections: ConnectionsState): Lists {
+/**
+ * **Color**: **None**, the eleven presets, the custom color in use when there is one, then **Custom color…**, which
+ * opens the dialog **Choose a color** (`connection.custom-color`).
+ */
+function colorChoices(color: ConnectionForm['color']): readonly ChoiceView[] {
+  return [
+    { value: '', label: text.noColor },
+    ...presetColors.map((preset) => ({ value: preset, label: presetLabels[preset], color: preset })),
+    ...(isHexColor(color) ? [{ value: color, label: color, color }] : []),
+    { value: customValue, label: colorText.custom, element: 'connection.custom-color@form' },
+  ];
+}
+
+function lists(connections: ConnectionsState, color: ConnectionForm['color']): Lists {
   const folders = new Set(connections.saved.flatMap((each) => (each.folder === undefined ? [] : [each.folder])));
   return {
     folders: [...folders].sort((a, b) => a.localeCompare(b)),
-    colors: [
-      { value: '', label: text.noColor },
-      ...connectionColors.map((color) => ({ value: color, label: text.colors[color] })),
-    ],
+    colors: colorChoices(color),
     authentications: (['password', 'private-key', 'agent'] as const).map((value) => ({
       value,
       label: text.authentications[value],
@@ -379,7 +395,7 @@ export function view(state: FormState): FormView {
     focus: firstFocus(state),
     fields: marked(fields, state.result?.field),
     ...(mongo ? {} : { redisModes }),
-    ...lists(connections),
+    ...lists(connections, form.color),
     sections: {
       tls: { label: text.tls, hint: mongo ? text.tlsHintMongo : text.tlsHintRedis },
       ssh: { label: text.ssh, hint: mongo ? text.sshHintMongo : text.sshHintRedis },

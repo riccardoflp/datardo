@@ -3,6 +3,7 @@
  * export, a list of connection strings) and reads Datardo's and Mongoster's own exports. The text comes from outside:
  * its size and its depth are bounded (R14.4), and nothing in it is run.
  */
+import { colorMapOf } from '../../shared/color';
 import type { EngineName, Json } from '../../shared/engine-request';
 import { colorFrom } from './color-from-compass';
 import { decrypter, type FileCrypto, type Decrypter } from './encryption';
@@ -197,6 +198,21 @@ function stringSecrets(secrets: EntrySecrets): EntrySecrets {
   return others;
 }
 
+/**
+ * The colors of an entry: its own color, a custom one kept (`connection.color-from-compass`), and the valid entries
+ * of `databaseColors` and, on a MongoDB entry, `collectionColors` (`tree.color-of`).
+ */
+function colorsOf(fields: Readonly<Record<string, unknown>>, engine: EngineName): Partial<FileConnection> {
+  const color = colorFrom(fields['color'], 'keep-custom');
+  const databaseColors = colorMapOf(fields['databaseColors'], 'databases');
+  const collectionColors = engine === 'mongodb' ? colorMapOf(fields['collectionColors'], 'collections') : undefined;
+  return {
+    ...(color === undefined ? {} : { color }),
+    ...(databaseColors === undefined ? {} : { databaseColors }),
+    ...(collectionColors === undefined ? {} : { collectionColors }),
+  };
+}
+
 /** One entry of a Datardo or Mongoster file, before its redis-oplog link is checked. */
 async function exportedConnection(
   entry: unknown,
@@ -219,7 +235,6 @@ async function exportedConnection(
   const ssh = sshOf(fields, secrets);
   const oplog = engine === 'mongodb' ? oplogOf(fields, format, secrets) : undefined;
   const folder = textOf(fields['folder'])?.trim();
-  const color = colorFrom(fields['color']);
   const queriesFolder = textOf(fields['queriesFolder']);
   const id = textOf(fields['id']);
   const connection = {
@@ -228,7 +243,7 @@ async function exportedConnection(
     engine,
     connectionString,
     ...(folder === undefined || folder === '' ? {} : { folder }),
-    ...(color === undefined ? {} : { color }),
+    ...colorsOf(fields, engine),
     ...(fields['readOnly'] === true ? { readOnly: true } : {}),
     ...(fields['noHistory'] === true ? { noHistory: true } : {}),
     ...(queriesFolder === undefined ? {} : { queriesFolder }),

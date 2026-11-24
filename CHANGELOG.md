@@ -244,6 +244,15 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
   the query** in Settings; the place and the width are remembered, and a tab too narrow keeps the query above and says
   why. In the pane the stages of a pipeline are laid one under the other, moved with **Move up** and **Move down**.
 - A cell dragged from the table can be dropped on **Sort** and **Project** too.
+- Connections can take eleven preset colors (red, orange, yellow, green, blue, purple, pink, teal, indigo, brown,
+  gray) or a custom color chosen in the new dialog **Choose a color**, from **Set color…** or the connection form.
+- **Set color…** on a database (MongoDB or Redis) or on a collection, view or GridFS bucket gives it a color of its own,
+  shown on its icon in the tree, on pinned items and on the icons of its tabs; Go to has **Set database color…** and
+  **Set collection color…**. A collection's color follows its rename, and dropping a collection, a bucket or a
+  database from Datardo forgets their colors.
+- Connection files keep custom colors and the colors of databases and collections: Datardo's format writes them,
+  files of Mongoster 0.9 and 0.10 and of Datardo are imported with them, and the list of an import counts them; a
+  Compass export notes that they were left out.
 
 ### Changed
 
@@ -258,6 +267,8 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
 - **Explain**, **Code**, **Update many…** and **Delete many…** moved from the table's toolbar into the query bar. The
   buttons of the query bar, the builder, the pipeline and the table's toolbar have icons, and in a narrow tab some show
   their icon alone.
+- Compass colors are read as their own presets (teal, indigo, pink, gray) instead of the closest of six.
+- In a list of connection strings, a `// name` comment names only the line right below it.
 
 ### Fixed
 

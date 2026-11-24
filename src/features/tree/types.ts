@@ -2,7 +2,7 @@
  * What the features of the tree area share: what their reads give, what the window keeps of the tree island of each
  * connection, the nodes and lines the views return with the controls they carry, and the identifiers of the nodes.
  */
-import type { ConnectionView } from '../../shared/connection';
+import type { ConnectionColor, ConnectionView } from '../../shared/connection';
 import type { Json } from '../../shared/engine-request';
 import type { ConnectionId } from '../../shared/ids';
 import type { AppState } from '../../shared/state';
@@ -224,6 +224,8 @@ export interface TreeNode {
   readonly name: string;
   /** The Codicon drawn for it. */
   readonly icon: string;
+  /** The color its icon is drawn in: that of its collection or database, their own (`tree.color-of`). */
+  readonly color?: ConnectionColor;
   /** What comes after the name: a count, a size, **GridFS**, where a pinned item is. */
   readonly after?: string;
   readonly hover?: string;

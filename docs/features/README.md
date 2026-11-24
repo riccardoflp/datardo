@@ -146,7 +146,7 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | --- | --- | --- | --- | --- |
 | [`connection.add`](connection.md#connectionadd--add-a-connection) | Add a connection | Operation | M6 | Built |
 | [`connection.edit`](connection.md#connectionedit--edit-a-connection) | Edit a connection | Operation | M6 | Built |
-| [`connection.form`](connection.md#connectionform--the-connection-form) | The connection form | View | M6, M38 (changed) | Differs |
+| [`connection.form`](connection.md#connectionform--the-connection-form) | The connection form | View | M6, M38 (changed) | Built |
 | [`connection.read-form`](connection.md#connectionread-form--what-the-form-says-checked) | What the form says, checked | Derivation | M6 | Built |
 | [`connection.redis-string`](connection.md#connectionredis-string--a-redis-connection-string-read-and-written) | A Redis connection string, read and written | Derivation | M6 | Built |
 | [`connection.string-secrets`](connection.md#connectionstring-secrets--the-secrets-in-and-out-of-a-connection-string) | The secrets in and out of a connection string | Derivation | M6 | Built |
@@ -164,9 +164,9 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [`connection.overview`](connection.md#connectionoverview--the-overview-page-of-a-connection) | The Overview page of a connection | View | M6 | Built |
 | [`connection.menu`](connection.md#connectionmenu--the-menu-of-a-connection) | The menu of a connection | View | M6, M39 (changed) | Differs |
 | [`connection.folder-menu`](connection.md#connectionfolder-menu--the-menu-of-a-folder) | The menu of a folder | View | M7 | Built |
-| [`connection.set-color`](connection.md#connectionset-color--set-the-color-of-a-connection) | Set the color of a connection | Operation | M7, M38 (changed) | Differs |
-| [`connection.color-presets`](connection.md#connectioncolor-presets--the-preset-colors-and-custom-colors) | The preset colors and custom colors | Derivation | M38 | Specified |
-| [`connection.custom-color`](connection.md#connectioncustom-color--choose-a-custom-color) | Choose a custom color | View | M38 | Specified |
+| [`connection.set-color`](connection.md#connectionset-color--set-the-color-of-a-connection) | Set the color of a connection | Operation | M7, M38 (changed) | Built |
+| [`connection.color-presets`](connection.md#connectioncolor-presets--the-preset-colors-and-custom-colors) | The preset colors and custom colors | Derivation | M38 | Built |
+| [`connection.custom-color`](connection.md#connectioncustom-color--choose-a-custom-color) | Choose a custom color | View | M38 | Built |
 | [`connection.move-to-folder`](connection.md#connectionmove-to-folder--move-a-connection-to-a-folder) | Move a connection to a folder | Operation | M7 | Built |
 | [`connection.rename-folder`](connection.md#connectionrename-folder--rename-a-folder) | Rename a folder | Operation | M7 | Built |
 | [`connection.remove-folder`](connection.md#connectionremove-folder--remove-a-folder-keeping-its-connections) | Remove a folder, keeping its connections | Operation | M7 | Built |
@@ -179,12 +179,12 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [`connection.import`](connection.md#connectionimport--import-connections) | Import connections | Operation | M7, M37 (changed), M38 (changed), M39 (changed) | Differs |
 | [`connection.export`](connection.md#connectionexport--export-connections) | Export connections | Operation | M7, M38 (changed), M39 (changed) | Differs |
 | [`connection.read-file`](connection.md#connectionread-file--read-a-connections-file) | Read a connections file | Derivation | M7, M38 (changed), M39 (changed) | Differs |
-| [`connection.read-list`](connection.md#connectionread-list--read-a-list-of-connection-strings) | Read a list of connection strings | Derivation | M7, M38 (changed) | Differs |
-| [`connection.read-compass`](connection.md#connectionread-compass--read-a-mongodb-compass-export) | Read a MongoDB Compass export | Derivation | M7, M38 (changed) | Differs |
+| [`connection.read-list`](connection.md#connectionread-list--read-a-list-of-connection-strings) | Read a list of connection strings | Derivation | M7, M38 (changed) | Built |
+| [`connection.read-compass`](connection.md#connectionread-compass--read-a-mongodb-compass-export) | Read a MongoDB Compass export | Derivation | M7, M38 (changed) | Built |
 | [`connection.write-file`](connection.md#connectionwrite-file--write-a-connections-file) | Write a connections file | Derivation | M7, M38 (changed), M39 (changed) | Differs |
 | [`connection.encryption`](connection.md#connectionencryption--encrypt-the-passwords-of-a-file-as-compass-does) | Encrypt the passwords of a file as Compass does | Derivation | M7 | Built |
 | [`connection.tls-in-uri`](connection.md#connectiontls-in-uri--tls-settings-in-and-out-of-a-mongodb-connection-string) | TLS settings in and out of a MongoDB connection string | Derivation | M6 | Built |
-| [`connection.color-from-compass`](connection.md#connectioncolor-from-compass--the-closest-color-of-a-compass-connection) | The closest color of a Compass connection | Derivation | M7, M38 (changed) | Differs |
+| [`connection.color-from-compass`](connection.md#connectioncolor-from-compass--the-closest-color-of-a-compass-connection) | The closest color of a Compass connection | Derivation | M7, M38 (changed) | Built |
 
 ## Console
 
@@ -264,7 +264,7 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`gridfs.show`](gridfs.md#gridfsshow--the-page-of-a-bucket) | The page of a bucket | View | M33, M38 (changed) | Differs |
+| [`gridfs.show`](gridfs.md#gridfsshow--the-page-of-a-bucket) | The page of a bucket | View | M33, M38 (changed) | Built |
 | [`gridfs.buckets`](gridfs.md#gridfsbuckets--the-buckets-of-a-database) | The buckets of a database | Derivation | M33 | Built |
 | [`gridfs.list`](gridfs.md#gridfslist--a-page-of-the-files-of-a-bucket) | A page of the files of a bucket | Read | M33 | Built |
 | [`gridfs.filter`](gridfs.md#gridfsfilter--the-filter-of-the-files) | The filter of the files | Derivation | M33 | Built |
@@ -465,7 +465,7 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [`nav.inspector`](nav.md#navinspector--the-inspector-island) | The inspector island | View | M2, M41 (changed) | Differs |
 | [`nav.toggle-inspector`](nav.md#navtoggle-inspector--show-or-hide-the-inspector-island) | Show or hide the inspector island | Operation | M2, M41 (changed) | Differs |
 | [`nav.status-line`](nav.md#navstatus-line--the-status-line) | The status line | View | M2 | Built |
-| [`nav.dialog`](nav.md#navdialog--how-every-dialog-behaves) | How every dialog behaves | View | M2, M38 (changed) | Differs |
+| [`nav.dialog`](nav.md#navdialog--how-every-dialog-behaves) | How every dialog behaves | View | M2, M38 (changed) | Built |
 | [`nav.empty`](nav.md#navempty--the-window-with-no-connection) | The window with no connection | View | M2 | Built |
 
 ## redis-oplog
@@ -689,9 +689,9 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`tab.strip`](tab.md#tabstrip--the-tab-strip) | The tab strip | View | M4, M38 (changed) | Differs |
+| [`tab.strip`](tab.md#tabstrip--the-tab-strip) | The tab strip | View | M4, M38 (changed) | Built |
 | [`tab.title`](tab.md#tabtitle--the-title-of-a-tab) | The title of a tab | Derivation | M4 | Built |
-| [`tab.groups`](tab.md#tabgroups--the-groups-of-the-strip) | The groups of the strip | Derivation | M4, M38 (changed) | Differs |
+| [`tab.groups`](tab.md#tabgroups--the-groups-of-the-strip) | The groups of the strip | Derivation | M4, M38 (changed) | Built |
 | [`tab.collapse-group`](tab.md#tabcollapse-group--collapse-or-expand-a-group) | Collapse or expand a group | Operation | M4 | Built |
 | [`tab.fit`](tab.md#tabfit--how-the-tabs-share-the-strip) | How the tabs share the strip | Derivation | M4 | Built |
 | [`tab.menu`](tab.md#tabmenu--the-context-menu-of-a-tab) | The context menu of a tab | View | M4 | Built |
@@ -783,13 +783,13 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
 | [`tree.show`](tree.md#treeshow--the-tree-island) | The tree island | View | M8, M38 (changed), M39 (changed) | Differs |
-| [`tree.pinned`](tree.md#treepinned--pinned-items) | Pinned items | View | M8, M38 (changed) | Differs |
+| [`tree.pinned`](tree.md#treepinned--pinned-items) | Pinned items | View | M8, M38 (changed) | Built |
 | [`tree.pages`](tree.md#treepages--pages-of-the-connection) | Pages of the connection | View | M8 | Built |
 | [`tree.mongodb`](tree.md#treemongodb--the-mongodb-nodes) | The MongoDB nodes | View | M8, M38 (changed), M39 (changed) | Differs |
 | [`tree.list-databases`](tree.md#treelist-databases--list-the-databases) | List the databases | Read | M8 | Built |
 | [`tree.list-collections`](tree.md#treelist-collections--list-the-collections-of-a-database) | List the collections of a database | Read | M8 | Built |
 | [`tree.count`](tree.md#treecount--counts-and-sizes-beside-the-nodes) | Counts and sizes beside the nodes | Read | M8 | Built |
-| [`tree.redis`](tree.md#treeredis--the-redis-nodes) | The Redis nodes | View | M8, M38 (changed) | Differs |
+| [`tree.redis`](tree.md#treeredis--the-redis-nodes) | The Redis nodes | View | M8, M38 (changed) | Built |
 | [`tree.redis-databases`](tree.md#treeredis-databases--list-the-redis-databases) | List the Redis databases | Read | M8 | Built |
 | [`tree.scan-namespaces`](tree.md#treescan-namespaces--scan-the-keys-of-a-database-for-its-namespaces) | Scan the keys of a database for its namespaces | Read | M8 | Built |
 | [`tree.namespaces`](tree.md#treenamespaces--namespaces-from-key-names) | Namespaces from key names | Derivation | M8 | Built |
@@ -799,13 +799,13 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [`tree.keyboard`](tree.md#treekeyboard--moving-in-the-tree-with-the-keyboard) | Moving in the tree with the keyboard | View | M8, M39 (changed) | Differs |
 | [`tree.select`](tree.md#treeselect--several-nodes-selected) | Several nodes selected | View | M39 | Specified |
 | [`tree.node-states`](tree.md#treenode-states--loading-empty-and-failed-nodes) | Loading, empty and failed nodes | View | M8 | Built |
-| [`tree.set-collection-color`](tree.md#treeset-collection-color--set-the-color-of-a-collection-a-view-or-a-bucket) | Set the color of a collection, a view or a bucket | Operation | M38 | Specified |
-| [`tree.set-database-color`](tree.md#treeset-database-color--set-the-color-of-a-database) | Set the color of a database | Operation | M38 | Specified |
-| [`tree.color-of`](tree.md#treecolor-of--which-color-something-of-a-database-or-a-collection-takes) | Which color something of a database or a collection takes | Derivation | M38 | Specified |
+| [`tree.set-collection-color`](tree.md#treeset-collection-color--set-the-color-of-a-collection-a-view-or-a-bucket) | Set the color of a collection, a view or a bucket | Operation | M38 | Built |
+| [`tree.set-database-color`](tree.md#treeset-database-color--set-the-color-of-a-database) | Set the color of a database | Operation | M38 | Built |
+| [`tree.color-of`](tree.md#treecolor-of--which-color-something-of-a-database-or-a-collection-takes) | Which color something of a database or a collection takes | Derivation | M38 | Built |
 | [`tree.exclude-from-searches`](tree.md#treeexclude-from-searches--exclude-from-searches-or-include-again) | Exclude from searches, or include again | Operation | M39 | Specified |
 | [`tree.excluded`](tree.md#treeexcluded--what-searches-leave-out) | What searches leave out | Derivation | M39 | Specified |
 | [`tree.menu-mongodb`](tree.md#treemenu-mongodb--the-context-menu-of-a-mongodb-node) | The context menu of a MongoDB node | View | M8, M38 (changed), M39 (changed) | Differs |
-| [`tree.menu-redis`](tree.md#treemenu-redis--the-context-menu-of-a-redis-node) | The context menu of a Redis node | View | M8, M38 (changed) | Differs |
+| [`tree.menu-redis`](tree.md#treemenu-redis--the-context-menu-of-a-redis-node) | The context menu of a Redis node | View | M8, M38 (changed) | Built |
 
 ## Undo history
 
@@ -917,7 +917,7 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [`window.size`](window.md#windowsize--minimize-maximize-and-restore-the-window) | Minimize, maximize and restore the window | Operation | M1 | Built |
 | [`window.remember`](window.md#windowremember--remember-the-size-the-place-and-the-maximized-state) | Remember the size, the place and the maximized state | Operation | M1 | Built |
 | [`window.placement`](window.md#windowplacement--where-the-window-opens) | Where the window opens | Derivation | M1 | Built |
-| [`window.theme`](window.md#windowtheme--choose-the-theme) | Choose the theme | Operation | M1, M38 (changed) | Differs |
+| [`window.theme`](window.md#windowtheme--choose-the-theme) | Choose the theme | Operation | M1, M38 (changed) | Built |
 | [`window.zoom`](window.md#windowzoom--zoom-in-zoom-out-reset-the-zoom) | Zoom in, zoom out, reset the zoom | Operation | M1 | Built |
 | [`window.full-screen`](window.md#windowfull-screen--full-screen) | Full screen | Operation | M1 | Built |
 | [`window.single-instance`](window.md#windowsingle-instance--one-instance-one-window) | One instance, one window | Operation | M1 | Built |

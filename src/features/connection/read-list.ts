@@ -65,7 +65,7 @@ export function missingNotes(connection: Omit<FileConnection, 'notes'>): readonl
 
 const schemes = /(mongodb(\+srv)?|rediss?):\/\//i;
 
-function connectionOfLine(line: string): FileConnection | undefined {
+function connectionOfLine(line: string, comment: string | undefined): FileConnection | undefined {
   const at = line.search(schemes);
   if (at < 0) {
     return undefined;
@@ -80,7 +80,7 @@ function connectionOfLine(line: string): FileConnection | undefined {
     .replace(/[\s=:,;|"'`]+$/, '')
     .replace(/^["'`]+/, '')
     .trim();
-  const name = named === '' ? hostOf(engine, written) : named;
+  const name = named === '' ? (comment ?? hostOf(engine, written)) : named;
   if (engine === 'redis') {
     const connection = { name, engine, connectionString: written, ...(/^rediss:/i.test(written) ? { tls: {} } : {}) };
     return { ...connection, notes: missingNotes(connection) };
@@ -90,16 +90,28 @@ function connectionOfLine(line: string): FileConnection | undefined {
   return { ...connection, notes: missingNotes(connection) };
 }
 
-/** Feature: connection.read-list — the connections of the lines, and how many lines were not one. */
+/** The name a `//` comment gives the line right below it: its text, trimmed; none when it is empty. */
+function commentName(line: string): string | undefined {
+  const named = line.slice(2).trim();
+  return named === '' ? undefined : named;
+}
+
+/**
+ * Feature: connection.read-list — the connections of the lines, and how many lines were not one. A `//` comment
+ * names the line right below it when that line has no name of its own; anything else in between forgets it.
+ */
 export function connectionsFromList(text: string): FileConnections {
   const connections: FileConnection[] = [];
   let skipped = 0;
+  let comment: string | undefined;
   for (const raw of text.replace(/^\uFEFF/, '').split(/\r?\n/)) {
     const line = raw.trim();
+    const above = comment;
+    comment = line.startsWith('//') ? commentName(line) : undefined;
     if (line === '' || line.startsWith('#') || line.startsWith('//')) {
       continue;
     }
-    const connection = connectionOfLine(line);
+    const connection = connectionOfLine(line, above);
     if (connection === undefined) {
       skipped += 1;
     } else {

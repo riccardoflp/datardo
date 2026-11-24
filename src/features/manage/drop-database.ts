@@ -1,8 +1,9 @@
 /**
  * Feature: manage.drop-database
  *
- * Drops a database with all its collections, after the user types its name. Started with `{ connection, database }`;
- * from Go to, for the database of the active tab, or after picking one.
+ * Drops a database with all its collections, after the user types its name; then, only when the connection keeps a
+ * color for the database or one of its collections, the step that forgets them (`tree.color-of`). Started with
+ * `{ connection, database }`; from Go to, for the database of the active tab, or after picking one.
  */
 import {
   refuse,
@@ -15,6 +16,7 @@ import {
 } from '../../shared/feature';
 import { featureId } from '../../shared/ids';
 import { appTarget } from '../../shared/target';
+import { forgetStep } from '../tree/parts/forget-step';
 import { text } from './text';
 import {
   bucketTabs,
@@ -72,7 +74,10 @@ export function plan(context: Context, answers: Answers): Outcome {
   }
   return run({
     title: text.dropDatabase.title(place.database),
-    steps: [writeStep(place, mongoRequest({ database: place.database }, 'dropDatabase', []), connectionTarget(place))],
+    steps: [
+      writeStep(place, mongoRequest({ database: place.database }, 'dropDatabase', []), connectionTarget(place)),
+      ...forgetStep(place.connection, { kind: 'database', database: place.database }),
+    ],
     danger: {
       kind: 'destructive',
       text: text.dropDatabase.deletes(collectionCount(answers)),

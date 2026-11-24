@@ -1,0 +1,35 @@
+{
+  "type": "Mongoster Connections",
+  "version": 1,
+  "secrets": "removed",
+  "connections": [
+    {
+      "name": "Shop",
+      "uri": "mongodb://ada@db1:27017/shop",
+      "folder": "Work",
+      "color": "#1e90ff",
+      "databaseColors": {
+        "shop": "teal",
+        "archive": "none"
+      },
+      "collectionColors": {
+        "shop.orders": "none",
+        "shop.logs": "#12abef",
+        "media.fs.files": "pink"
+      },
+      "readOnly": true
+    },
+    {
+      "name": "Reports",
+      "uri": "mongodb://reports.example.com:27017/",
+      "color": "indigo",
+      "databaseColors": {
+        "sales": "brown"
+      }
+    },
+    {
+      "name": "Plain",
+      "uri": "mongodb://localhost:27017/"
+    }
+  ]
+}

@@ -18,6 +18,7 @@ import { useTabDrag } from './tab-strip/use-drag';
 import { useFit } from './tab-strip/use-fit';
 import { openGoTo } from '../palette/go-to-store';
 import styles from './tab-strip/tab-strip.module.css';
+import { colorAttributes } from '../components/color';
 
 /** What the tabs of the strip share: the state, the widths, the drag and the focus. */
 interface StripContext {
@@ -120,7 +121,7 @@ function GroupTabs({
 function Group({ group, context }: { readonly group: StripGroup; readonly context: StripContext }): React.JSX.Element {
   const { label, connection } = group;
   return (
-    <div className={styles['group']} data-group data-color={label?.color}>
+    <div className={styles['group']} data-group {...colorAttributes(label?.color)}>
       {label === undefined || connection === undefined ? null : (
         <StripMenu
           entries={() => labelMenu(context.state, connectionId(connection))}

@@ -143,8 +143,7 @@ color, its exclusion from searches and its formatting rules follow the new name.
   (`moveCollectionState`), `src/queryHistory.ts`. The color, the exclusion and the formatting rules that follow:
   Mongoster 0.9.0 (tree.collection-color-follows, tree.exclusion-follows; `src/extension.ts`, the
   `mongoster.renameCollection` handler; `src/collectionPanel.ts › moveCollectionState`, `formattingStateKey`).
-- **Differs**: (M38) the collection's color does not move, since collections have none; (M39) nor does its exclusion
-  from searches; (M41) nor do its formatting rules.
+- **Differs**: (M39) the collection's exclusion from searches does not move; (M41) nor do its formatting rules.
 
 Acceptance:
 
@@ -159,7 +158,7 @@ Acceptance:
   cannot be renamed.*
 - [ ] When MongoDB refuses the rename, nothing Datardo keeps is moved.
 - [ ] After renaming the teal `shop.orders` to `orders_2024`, the connection has `"shop.orders_2024": "teal"` and no
-  `shop.orders` in `collectionColors`, and the reopened tab's icon is teal. (differs)
+  `shop.orders` in `collectionColors`, and the reopened tab's icon is teal.
 - [ ] After renaming the excluded `shop.logs` to `logs_old`, `exclusions` holds `shop.logs_old` and not `shop.logs`.
   (differs)
 - [ ] After a rename, the collection tab under the new name colors its rows by the formatting rules the old name had;
@@ -204,8 +203,7 @@ confirmation.
 - **Ported from**: manage.drop-collection; `src/manage.ts`, `src/extension.ts`. The color and the exclusion that go:
   Mongoster 0.9.0 (tree.collection-color-follows, tree.exclusion-follows; the `mongoster.dropCollection` handler).
   The formatting rules that go are Datardo's choice: Mongoster keeps them.
-- **Differs**: (M38) the plan has one step: collections have no color to forget; (M39) nor an exclusion from
-  searches; (M41) nor formatting rules.
+- **Differs**: (M39) the plan forgets no exclusion from searches; (M41) nor formatting rules.
 
 Acceptance:
 
@@ -266,8 +264,8 @@ Drops a database with all its collections, after the user types its name.
 - **Ported from**: manage.drop-database; `src/manage.ts`, `src/extension.ts`. The colors and the exclusions that go:
   Mongoster 0.9.0 and 0.10.0 (tree.collection-color-follows, tree.exclusion-follows; the `mongoster.dropDatabase`
   handler). The formatting rules that go are Datardo's choice.
-- **Differs**: (M38) the plan has one step: databases and collections have no color to forget; (M39) nor exclusions
-  from searches; (M41) nor formatting rules of collections; (M42) nor formatting rules of a database.
+- **Differs**: (M39) the plan forgets no exclusions from searches; (M41) nor formatting rules of collections; (M42) nor
+  formatting rules of a database.
 
 Acceptance:
 

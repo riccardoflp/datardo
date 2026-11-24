@@ -16,6 +16,7 @@ import { newFolderQuestion } from './move-to-folder';
 import { isEncrypted } from './read-file';
 import { securityNotes } from './importing/notes';
 import { fileText, organizeText, planText, transferText } from './text';
+import { colorCountsOf } from './parts/color-text';
 import type { FileConnection, FileConnections } from './types';
 import {
   appStep,
@@ -163,6 +164,7 @@ export function describe(
     ...(exists ? [same ? transferText.same : transferText.exists] : []),
     ...(connection.folder === undefined ? [] : [connection.folder]),
     ...(connection.color === undefined ? [] : [connection.color]),
+    ...colorCountsOf(connection),
     ...(connection.readOnly === true ? ['read-only'] : []),
     ...securityNotes(connection, among.all),
     ...connection.notes,

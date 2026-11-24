@@ -1,8 +1,8 @@
 /**
  * What the runner shows above every island: its dialogs one at a time (`nav.dialog`, `runner.ask`,
  * `runner.confirm`), a question drawn by its feature's own dialog (the insert dialog and the form of **Update many**
- * of the document area, the form of an entry of a stream, the dialogs of users and roles, the index dialog and the
- * search index dialog, which stay drawn while their plan runs), its notifications (`runner.notify`), and the list of
+ * of the document area, the form of an entry of a stream, the dialogs of users and roles, **Choose a color**, the
+ * index dialog and the search index dialog, which stay drawn while their plan runs), its notifications (`runner.notify`), and the list of
  * work in progress (`runner.progress`).
  */
 import { useEffect } from 'react';
@@ -10,6 +10,8 @@ import { view as dialogView } from '../../features/nav/dialog';
 import type { Answers } from '../../shared/feature';
 import type { QuestionId } from '../../shared/ids';
 import { dialogAboutOf, searchDialogAboutOf } from '../../features/index/parts/dialog-question';
+import { customColorAboutOf } from '../../features/connection/parts/color-question';
+import { CustomColorDialog } from '../connection/custom-color-dialog';
 import { InsertDialog } from '../pages/document/insert-dialog';
 import { useAnswered } from '../pages/index/dialog-memory';
 import { AnsweredIndexDialog, IndexQuestionDialog } from '../pages/index/index-dialog';
@@ -61,6 +63,22 @@ function RunnerDialog(): React.JSX.Element | null {
     const indexAbout = dialogAboutOf(dialog.question);
     if (indexAbout !== undefined) {
       return <IndexQuestionDialog key={dialog.id} about={indexAbout} onAnswer={onAnswer} />;
+    }
+    const colorAbout = customColorAboutOf(dialog.question);
+    if (colorAbout !== undefined) {
+      return (
+        <CustomColorDialog
+          key={dialog.id}
+          name={colorAbout.name}
+          start={colorAbout.start}
+          onApply={(color) => {
+            onAnswer({ customColor: color });
+          }}
+          onCancel={() => {
+            onAnswer(undefined);
+          }}
+        />
+      );
     }
     const searchAbout = searchDialogAboutOf(dialog.question);
     if (searchAbout !== undefined) {

@@ -19,6 +19,7 @@ import {
 } from '../../shared/feature';
 import { featureId } from '../../shared/ids';
 import { appTarget } from '../../shared/target';
+import { forgetStep } from '../tree/parts/forget-step';
 import { indexNamesRead } from './reads/index-names';
 import { text } from './text';
 import {
@@ -101,7 +102,10 @@ export function afterDrop(context: Context, place: KnownPlace): readonly After[]
   ];
 }
 
-/** Feature: manage.drop-collection — `db.orders.drop()`, after typing `orders`, or after a confirmation for a view. */
+/**
+ * Feature: manage.drop-collection — `db.orders.drop()`, after typing `orders`, or after a confirmation for a view;
+ * then, only when the connection keeps a color for it, the step that forgets it (`tree.color-of`).
+ */
 export function plan(context: Context, answers: Answers): Outcome {
   const started = placeOf(context, answers);
   if (started === undefined) {
@@ -130,7 +134,10 @@ export function plan(context: Context, answers: Answers): Outcome {
   const namespace = namespaceOf(place.database, place.collection);
   return run({
     title: view ? text.dropCollection.viewTitle(namespace) : text.dropCollection.title(namespace),
-    steps: [writeStep(place, mongoRequest(place, 'drop', []), databaseTarget(place, place.database))],
+    steps: [
+      writeStep(place, mongoRequest(place, 'drop', []), databaseTarget(place, place.database)),
+      ...forgetStep(place.connection, { kind: 'collection', database: place.database, collection: place.collection }),
+    ],
     danger: dangerOf(place, view, answers),
     undo: { cannot: text.dropCollection.cannotUndo },
     publishes: false,

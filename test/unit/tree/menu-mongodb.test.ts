@@ -54,6 +54,8 @@ describe('tree.menu-mongodb', () => {
       'Create collection…',
       'New playground',
       '—',
+      'Set color…',
+      '—',
       'Search documents…',
       'Relationship diagram',
       '—',
@@ -78,6 +80,8 @@ describe('tree.menu-mongodb', () => {
     expect(labels(menu(orders))).toEqual([
       'Open',
       'Pin',
+      '—',
+      'Set color…',
       '—',
       'Insert document',
       'New playground',
@@ -149,6 +153,8 @@ describe('tree.menu-mongodb', () => {
       'Open',
       'Pin',
       '—',
+      'Set color…',
+      '—',
       'New playground',
       '—',
       'Search documents…',
@@ -187,10 +193,44 @@ describe('tree.menu-mongodb', () => {
     expect(labels(menu({ kind: 'bucket', database: 'shop', name: 'fs' }))).toEqual([
       'Open GridFS bucket',
       '—',
+      'Set color…',
+      '—',
       'Upload files to GridFS…',
       '—',
       'Delete GridFS bucket…',
     ]);
+  });
+
+  it('a database, a collection, a view, a time series collection and a bucket have Set color…, also on a read-only connection', () => {
+    const readOnly = { connections: [mongoConnection({ readOnly: true })] };
+    const nodes: readonly NodeRef[] = [
+      { kind: 'database', database: 'shop' },
+      orders,
+      active,
+      weather,
+      { kind: 'bucket', database: 'shop', name: 'fs' },
+    ];
+    for (const node of nodes) {
+      expect(labels(menu(node, readOnly)), node.kind).toContain('Set color…');
+    }
+    const setColor = (node: NodeRef): unknown => {
+      const found = menu(node).find((entry) => entry.kind === 'item' && entry.control.label === 'Set color…');
+      return found?.kind === 'item' ? found.control : undefined;
+    };
+    expect(setColor({ kind: 'database', database: 'shop' })).toMatchObject({
+      element: 'tree.set-database-color@tree-menu',
+      feature: 'tree.set-database-color',
+      args: { connection: 'c-local', database: 'shop' },
+    });
+    expect(setColor(orders)).toMatchObject({
+      element: 'tree.set-collection-color@tree-menu',
+      feature: 'tree.set-collection-color',
+      args: { connection: 'c-local', database: 'shop', collection: 'orders' },
+    });
+    expect(setColor({ kind: 'bucket', database: 'shop', name: 'fs' })).toMatchObject({
+      feature: 'tree.set-collection-color',
+      args: { connection: 'c-local', database: 'shop', bucket: 'fs' },
+    });
   });
 
   it('an entry is shown only when its feature is built', () => {

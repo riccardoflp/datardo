@@ -1,0 +1,117 @@
+/* connection.custom-color: the dialog Choose a color. The color shown is --connection-color (theme/base.css). */
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.line {
+  margin: 0;
+}
+
+.row {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-3);
+}
+
+.picker {
+  flex: none;
+  width: var(--space-6);
+  height: var(--space-6);
+  padding: 0;
+  border: var(--border-width) solid var(--color-control-border);
+  border-radius: var(--radius-small);
+  background: var(--color-canvas);
+  cursor: pointer;
+}
+
+.field {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.input {
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-width) solid var(--color-control-border);
+  border-radius: var(--radius-small);
+  background: var(--color-canvas);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.input[aria-invalid='true'] {
+  border-color: var(--color-danger);
+}
+
+.problem {
+  margin: 0;
+  color: var(--color-danger);
+  font-size: var(--font-size-small);
+}
+
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.swatch {
+  width: var(--space-5);
+  height: var(--space-5);
+  padding: 0;
+  border: var(--border-width) solid var(--color-control-border);
+  border-radius: var(--radius-round);
+  background: var(--connection-color);
+  cursor: pointer;
+}
+
+.swatch[aria-checked='true'] {
+  outline: var(--focus-width) solid var(--color-text);
+  outline-offset: var(--focus-width);
+}
+
+.swatch:focus-visible {
+  outline: var(--focus-width) solid var(--color-focus);
+  outline-offset: var(--focus-width);
+}
+
+.preview {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-medium);
+  background: var(--color-island);
+}
+
+.band {
+  align-self: stretch;
+  width: var(--space-1);
+  min-height: var(--space-5);
+  border-radius: var(--radius-small);
+  background: var(--connection-color, var(--color-border));
+}
+
+.dot {
+  width: var(--space-2);
+  height: var(--space-2);
+  border-radius: var(--radius-round);
+  background: var(--connection-color, var(--color-border));
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-small) var(--radius-small) 0 0;
+  background: var(--color-raised);
+}
+
+.tab-icon {
+  color: var(--connection-color, var(--color-text-muted));
+}
