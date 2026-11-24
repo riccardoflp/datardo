@@ -50,6 +50,8 @@ read-only connection', …) })`. `catalog.py --tests test` reports a card with n
 - **mongodump and mongorestore** (the MongoDB Database Tools, installed apart from the server) are needed by the tests
   that restore Datardo's archives with `mongorestore` and Mongo's with `backup.restore`; they are skipped unless
   `DATARDO_TEST_MONGO_TOOLS` names the folder that holds both.
+- **The packaged application** (its fuses, R14.12): `test/integration/packaged/` reads the binary that
+  `DATARDO_TEST_PACKAGED` names, else the one `npm run package` left in `release/`, and is skipped without one.
 - Each test file uses a database (or a key prefix) named after itself and drops it at the end, so files run in
   parallel.
 

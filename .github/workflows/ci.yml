@@ -41,6 +41,13 @@ jobs:
         if: runner.os == 'Linux'
         run: xvfb-run --auto-servernum npm run test:ui
       - run: npm run package
+      # The fuses of the packaged application, read from its binary and tried (platform.md, R14.12).
+      - name: The packaged application's fuses
+        if: runner.os != 'Linux'
+        run: npx vitest run --project integration test/integration/packaged
+      - name: The packaged application's fuses (Linux, with a display)
+        if: runner.os == 'Linux'
+        run: xvfb-run --auto-servernum npx vitest run --project integration test/integration/packaged
       - uses: actions/upload-artifact@v4
         with:
           name: installers-${{ matrix.os }}

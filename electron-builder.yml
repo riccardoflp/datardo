@@ -25,6 +25,17 @@ extraResources:
   - from: LICENSE
     to: LICENSE.txt
 npmRebuild: false
+# The fuses of Electron's binary (platform.md, "The packaged application"; R14.12, T23): the installed Datardo cannot
+# be started as a plain Node.js, with NODE_OPTIONS or a debugger, or with an `app` folder beside app.asar. The
+# integrity of app.asar is not validated while nothing is signed (D45); the window is loaded from file:// (R14.6).
+electronFuses:
+  runAsNode: false
+  enableNodeOptionsEnvironmentVariable: false
+  enableNodeCliInspectArguments: false
+  onlyLoadAppFromAsar: true
+  enableCookieEncryption: true
+  enableEmbeddedAsarIntegrityValidation: false
+  grantFileProtocolExtraPrivileges: true
 
 win:
   target: nsis
