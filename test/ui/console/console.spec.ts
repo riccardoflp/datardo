@@ -146,6 +146,7 @@ test.describe('console.input', () => {
     await expect(input(window)).toHaveText('BLPOP queue 0');
     await window.keyboard.press('Control+l');
     await expect(window.getByText('Type a Redis command and press Enter.', { exact: false })).toBeVisible();
-    await expect(window.locator('[data-feature="console.run@editor"]')).toHaveText('Run');
+    // Run and Stop share one cell (M36), the other hidden: the name says which one is shown.
+    await expect(window.locator('[data-feature="console.run@editor"]')).toHaveAccessibleName('Run');
   });
 });

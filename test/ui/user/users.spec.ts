@@ -9,7 +9,7 @@
  */
 import { expect, test, type Page } from '@playwright/test';
 import { randomBytes } from 'node:crypto';
-import { readdir, readFile, stat } from 'node:fs/promises';
+import { lstat, readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { MongoClient } from 'mongodb';
 import { MongoMemoryServer } from 'mongodb-memory-server-core';
@@ -242,7 +242,8 @@ async function textsOf(folder: string): Promise<string> {
     if (name.split(/[\\/]/u)[0] === 'chromium') {
       continue;
     }
-    if ((await stat(path)).isFile()) {
+    // lstat: on Linux, Chromium leaves symbolic links (SingletonLock, SingletonCookie) whose target is no file.
+    if ((await lstat(path)).isFile()) {
       texts.push(await readFile(path, 'latin1'));
     }
   }

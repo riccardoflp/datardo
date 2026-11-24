@@ -78,7 +78,9 @@ test.describe('the window stays still under the pointer (R10.8)', () => {
 
   test('on a collection tab and the Monitor page', async () => {
     test.skip(!withMongo, 'No MongoDB server could be started.');
-    test.setTimeout(600_000);
+    // Every control of a table of 50 rows and of the Monitor page, in both themes: close to 10 minutes where the
+    // window is drawn without a GPU (Xvfb on Linux).
+    test.setTimeout(900_000);
     const window = await launch();
     await addMongo(window, mongo.uri());
     await openPeople(window);
@@ -123,7 +125,7 @@ test.describe('a read in progress leaves what was shown (R10.8)', () => {
       new MutationObserver(check).observe(document.body, { subtree: true, childList: true });
     });
     for (let again = 0; again < 3; again += 1) {
-      await barOf(window).getByRole('button', { name: 'Find', exact: true }).click();
+      await barOf(window).getByRole('button', { name: 'Run query' }).click();
       await expect(gridOf(window).locator('td[data-pos="c:2:0:0"]')).toBeVisible();
     }
     const emptyFrames = await window.evaluate(() => (globalThis as unknown as { emptyFrames: number }).emptyFrames);

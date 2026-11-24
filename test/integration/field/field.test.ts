@@ -54,6 +54,28 @@ async function receivedAtLeast(wanted: number): Promise<void> {
   }
 }
 
+/**
+ * Waits for every message published so far: Redis delivers them in order, so once a message published now has come,
+ * the events of the writes before it (an undo of the test before) can no longer arrive in the next test.
+ */
+async function drained(): Promise<void> {
+  if (subscriber === undefined) {
+    return;
+  }
+  const channel = `drained-${String(Date.now())}`;
+  const publisher = subscriber.duplicate();
+  await publisher.connect();
+  try {
+    await publisher.publish(`${runner.prefix}${channel}`, '{}');
+    const until = Date.now() + 5000;
+    while (!received.some((each) => each.channel === channel) && Date.now() < until) {
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    }
+  } finally {
+    publisher.destroy();
+  }
+}
+
 beforeAll(async () => {
   runner = await live();
   Object.assign(runner.ports.dialogs, {
@@ -103,6 +125,7 @@ beforeEach(async () => {
     ],
   ]);
   await runner.published();
+  await drained();
   received.length = 0;
 });
 

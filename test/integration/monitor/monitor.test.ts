@@ -65,9 +65,15 @@ function sleeping(milliseconds: number): Promise<unknown> {
     .catch((error: unknown) => error);
 }
 
+/**
+ * The sleeping find once it runs on its collection: under load `currentOp` can list it a moment earlier on
+ * `<database>.$cmd`, while the command is still being parsed.
+ */
 async function sleepingOperation(): Promise<ServerOperation> {
   for (let attempt = 0; attempt < 50; attempt += 1) {
-    const found = (await operations()).find((each) => each.command.includes('sleep('));
+    const found = (await operations()).find(
+      (each) => each.command.includes('sleep(') && each.namespace === `${database}.orders`,
+    );
     if (found !== undefined) {
       return found;
     }

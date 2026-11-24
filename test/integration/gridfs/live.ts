@@ -213,7 +213,7 @@ export async function liveGridFs(name: string): Promise<LiveGridFs> {
       },
     },
     state: holder,
-    platform: 'windows',
+    platform: process.platform === 'win32' ? 'windows' : process.platform === 'darwin' ? 'macos' : 'linux',
     isReadOnly,
     isConnected: (id) => engines.isConnected(id),
     connectionName,
