@@ -254,7 +254,7 @@ test.describe('document.update-many', () => {
   test('Update many… opens the form with the count; Continue and the confirmation update the documents', async () => {
     test.setTimeout(120_000);
     const { window } = await startOnPeople(mongo, running);
-    await documentsOf(window).getByRole('toolbar').getByRole('button', { name: 'Update many…' }).click();
+    await documentsOf(window).getByRole('search').getByRole('button', { name: 'Update many…' }).click();
     const form = window.getByRole('dialog', { name: 'Update many · people' });
     await expect(form).toContainText('3 documents match the filter.');
     await bothThemes(window);

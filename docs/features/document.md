@@ -848,13 +848,11 @@ Applies update operators or an update pipeline to every document matching the fi
 - **Ported from**: document.update-many; `src/collectionPanel.ts` (`bulkApply`, `writeMany`, `confirmEmptyFilter`),
   `src/webview/bulk.ts`, `src/webview/main.ts` (`openBulk`), `src/queries.ts` (`toUpdate`, `toBson`). Its place in the
   query bar is Mongoster 0.9.0's (commit 98c0cb5).
-- **Differs**: (M40) **Update many…** is in the toolbar of the Documents section (`@toolbar`), as text without an
-  icon.
 
 Acceptance:
 
 - [ ] **Update many…** is at the right end of the query bar's row of tools, apart from **Builder**, **Explain** and
-      **Code**, and follows the query into the query pane when it is at the right (`query.position`). (differs)
+      **Code**, and follows the query into the query pane when it is at the right (`query.position`).
 - [ ] With the filter `{ status: "new" }` matching 12 documents, the form says *12 documents match the filter.*
 - [ ] `{ $set: { status: "archived" } }` and **Continue** show the confirmation with
   `db.orders.updateMany({ status: "new" }, { $set: { status: "archived" } })` and the button **Update 12 documents**;
@@ -932,13 +930,11 @@ Deletes every document matching the filter of the query bar.
 - **Ported from**: document.delete-many; `src/collectionPanel.ts` (`bulkApply`, `writeMany`, `confirmEmptyFilter`),
   `src/webview/bulk.ts`, `src/webview/main.ts` (`openBulk`). Its place in the query bar is Mongoster 0.9.0's (commit
   98c0cb5).
-- **Differs**: (M40) **Delete many…** is in the toolbar of the Documents section (`@toolbar`), as text without an
-  icon.
 
 Acceptance:
 
 - [ ] **Delete many…** is at the right end of the query bar's row of tools, after **Update many…**, and follows the
-      query into the query pane when it is at the right (`query.position`). (differs)
+      query into the query pane when it is at the right (`query.position`).
 - [ ] With the filter `{ status: "draft" }` matching 4 documents, the confirmation shows
   `db.orders.deleteMany({ status: "draft" })` and *4 documents match the filter.*; **Delete 4 documents** deletes
   them and says *Deleted 4 documents from orders.*

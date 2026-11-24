@@ -2,7 +2,7 @@
  * The five fields of the query bar (`query.bar`): **Filter**, **Sort** and **Project** are Datardo's editor of mongosh
  * text (`query.highlight`, `query.autocomplete`); **Skip** and **Limit** take digits only. `Ctrl+Enter` runs the
  * query from any of them, `Enter` from all but **Filter**. While something of the table is dragged, the zones of
- * `query.drag` cover **Filter**, **Sort** and **Project**.
+ * `query.drag` cover **Filter**, **Sort** and **Project**; in the query pane those over **Filter** go two by two.
  */
 import { filterMostHeight, type BarField } from '../../features/query/bar';
 import type { DragView, Dragged } from '../../features/query/drag';
@@ -98,7 +98,10 @@ function zonesOf(field: BarField, dragged: FieldsInput['dragged']) {
   return field.field === 'filter' ? dragged.zones.filter : zones;
 }
 
-/** The five fields, each in its box, with the zones over it while something is dragged. */
+/**
+ * The fields, each in its box, with the zones over it while something is dragged. Its label, which a screen reader
+ * already has from the box, is shown above the box in the query pane only.
+ */
 export function BarFields({ input }: { readonly input: FieldsInput }): React.JSX.Element {
   return (
     <>
@@ -106,10 +109,19 @@ export function BarFields({ input }: { readonly input: FieldsInput }): React.JSX
         const zones = zonesOf(field, input.dragged);
         return (
           <div key={field.field} className={styles['field']} data-field={field.field}>
-            {field.digitsOnly ? <DigitsField field={field} input={input} /> : <TextField field={field} input={input} />}
-            {zones === undefined || input.dragged === undefined ? null : (
-              <DropZones zones={zones} dragged={input.dragged.what} collectionRef={input.collectionRef} />
-            )}
+            <span className={styles['label']} aria-hidden="true">
+              {field.label}
+            </span>
+            <div className={styles['box']}>
+              {field.digitsOnly ? (
+                <DigitsField field={field} input={input} />
+              ) : (
+                <TextField field={field} input={input} />
+              )}
+              {zones === undefined || input.dragged === undefined ? null : (
+                <DropZones zones={zones} dragged={input.dragged.what} collectionRef={input.collectionRef} />
+              )}
+            </div>
           </div>
         );
       })}

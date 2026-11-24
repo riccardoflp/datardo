@@ -4,7 +4,8 @@
  * `nav.resize`), which the window area's store keeps. It imports nothing of Electron, so that the tests read it.
  */
 import type { Json } from '../shared/engine-request';
-import type { NavState, Pin } from '../shared/state/nav';
+import { defaultQueryPaneWidth, type NavState, type Pin } from '../shared/state/nav';
+import { queryPaneMaximum, queryPaneMinimum } from '../features/query/position';
 import { Store, type JsonObject, type StoredFile } from '../storage/store';
 import type { MainServices } from './services';
 
@@ -106,14 +107,25 @@ export const pinsFile: StoredFile<PinsByConnection> = {
   }),
 };
 
-/** The fields of `window.json` that remember the islands, from the nav state. */
+/** The fields of `window.json` that remember the islands, and the width of the query pane (`query.position`). */
 export function islandFields(nav: NavState): Record<string, Json> {
   return {
     explorerWidth: nav.widths.explorer,
     inspectorWidth: nav.widths.inspector,
     explorerHidden: nav.explorerHidden,
     inspectorHidden: nav.inspectorHidden,
+    queryPaneWidth: nav.queryPaneWidth,
   };
+}
+
+/**
+ * The width of the query pane `window.json` holds (`query.position`): one that is not a number counts as 380 px, and
+ * one outside 260 to 900 px is brought to the nearest of the two.
+ */
+export function queryPaneWidthOf(stored: Json | undefined): number {
+  return typeof stored === 'number' && Number.isFinite(stored)
+    ? Math.round(Math.min(queryPaneMaximum, Math.max(queryPaneMinimum, stored)))
+    : defaultQueryPaneWidth;
 }
 
 /** What the fields of `window.json` say of the islands; a field missing or of the wrong type is left at its default. */
@@ -133,6 +145,7 @@ export function islandsOf(fields: Readonly<Record<string, Json>>, nav: NavState)
     },
     explorerHidden: flag('explorerHidden', nav.explorerHidden),
     inspectorHidden: flag('inspectorHidden', nav.inspectorHidden),
+    queryPaneWidth: queryPaneWidthOf(fields['queryPaneWidth']),
   };
 }
 

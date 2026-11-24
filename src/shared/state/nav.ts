@@ -15,6 +15,9 @@ export interface IslandWidths {
 /** The widths before the user changes them: 280 and 360 px (`nav.resize`, Datardo's choice). */
 export const defaultIslandWidths: IslandWidths = { explorer: 280, inspector: 360 };
 
+/** The width of the query pane before the user changes it, in px (`query.position`, Mongoster's). */
+export const defaultQueryPaneWidth = 380;
+
 /**
  * A place visited (`nav.back`): what a tab shows and which of its sections, not the tab itself. Until tabs exist (M4)
  * the places are the pages of the app shown in the main island.
@@ -74,6 +77,8 @@ export interface NavState {
   /** Whether the user hid the inspector island (`nav.toggle-inspector`). */
   readonly inspectorHidden: boolean;
   readonly widths: IslandWidths;
+  /** The width the user gave the query pane at the right of the table, in px (`query.position`). */
+  readonly queryPaneWidth: number;
   /** The page of the app the main island shows, until the tabs of M4 take its place: `home`, `settings`, `log`. */
   readonly page: string;
   readonly history: NavHistory;
@@ -93,6 +98,7 @@ export const initialNavState: NavState = {
   explorerHidden: false,
   inspectorHidden: false,
   widths: defaultIslandWidths,
+  queryPaneWidth: defaultQueryPaneWidth,
   page: 'home',
   history: { places: [homePlace], index: 0 },
   pins: {},

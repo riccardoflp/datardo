@@ -12,4 +12,6 @@ export const commands: readonly Command[] = [
   command('query.mode:find', text.commands.find),
   command('query.mode:aggregate', text.commands.aggregate),
   command('query.builder', text.commands.builder),
+  command('query.position:right', text.commands.positionRight),
+  command('query.position:top', text.commands.positionTop),
 ];

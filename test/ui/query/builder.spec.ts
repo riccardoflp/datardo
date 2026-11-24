@@ -111,7 +111,7 @@ test.describe('query.builder', () => {
     await expect(
       builder.getByText('The filter has a syntax error: fix it in the box above to edit it here.'),
     ).toBeVisible();
-    await expect(builder.getByRole('button', { name: '+ Condition' })).toBeDisabled();
+    await expect(builder.getByRole('button', { name: 'Add a condition' })).toBeDisabled();
     const elemMatch = '{ items: { $elemMatch: { sku: "A1" } } }';
     await setEditor(window, 'Filter', elemMatch);
     await expect(builder.getByText(/This filter uses operators the rows can't show/u)).toBeVisible();

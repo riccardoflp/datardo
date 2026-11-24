@@ -43,6 +43,8 @@ export interface SettingRow {
   /** Its value differs from its default: a dot before the title, and **Reset** beside the control. */
   readonly changed: boolean;
   readonly choices?: readonly string[];
+  /** The name the menu shows for each choice, in the same order. */
+  readonly choiceTitles?: readonly string[];
 }
 
 /** One group of settings, under its heading. */
@@ -111,6 +113,7 @@ function row(
     default: declaration.default,
     changed: value !== declaration.default,
     ...(declaration.enum === undefined ? {} : { choices: declaration.enum }),
+    ...(declaration['x-enumTitles'] === undefined ? {} : { choiceTitles: declaration['x-enumTitles'] }),
   };
 }
 

@@ -48,10 +48,8 @@ The first section of a collection tab: the documents of a collection or of a vie
   0.9.0 (commits 98c0cb5, 0240a8c). The **Formatting** button: Mongoster 0.9.0 and 0.10.0 (query.format-rules,
   proposals 0002 and 0003; `src/webview/formatting.ts › FormattingPaneUi`, the `formattingBtn` of
   `src/collectionPanel.ts`).
-- **Differs**: (M40) the toolbar holds **Update many…**, **Delete many…**, **Explain** and **Code**, as text without
-  icons, and the query bar is always above the table; (M41) the toolbar has no **Formatting** button and the rows are
-  drawn without colors; (M42) the button's count is that of the collection's own rules, not of the four formatting
-  scopes.
+- **Differs**: (M41) the toolbar has no **Formatting** button and the rows are drawn without colors; (M42) the
+  button's count is that of the collection's own rules, not of the four formatting scopes.
 
 What it shows, from the top:
 
@@ -116,9 +114,8 @@ Acceptance:
       and the header row is not shown.
 - [ ] On a view the toolbar shows **view** and not **Insert**, and the query bar has neither **Update many…** nor
       **Delete many…**; **Export** and **Columns** are in the toolbar, **Explain** and **Code** in the query bar.
-      (differs)
 - [ ] In a main island 800 pixels wide, **Insert**, **Export** and **Watch** show their icon alone, and a screen reader
-      says their names (differs).
+      says their names.
 - [ ] On a time series collection the toolbar shows **time series**, and the total of an empty query is exact
       (`query.count`).
 - [ ] A query that fails on a tab that shows 50 documents leaves the 50 documents and shows the message under the bar;

@@ -127,25 +127,28 @@ function projectZones(field: string, label: string, projectText: string): Zone[]
  * Feature: query.drag
  *
  * The zones a dragged cell or header can be dropped on: for a cell, the conditions of its value over **Filter**; for a
- * header, **exists**, **missing** and **is null** over **Filter**, the directions over **Sort** and include or exclude
- * over **Project**, with **✕ remove** when the field is already there.
+ * header, **exists**, **missing** and **is null** over **Filter**; for both, the directions over **Sort** and include
+ * or exclude over **Project**, with **✕ remove** when the field is already there.
  */
 export function view(state: DragState): DragView {
   const { dragged } = state;
-  if (dragged.kind === 'cell') {
-    return { filter: cellZones(dragged), sort: [], project: [] };
-  }
   const { field } = dragged;
   const label = fieldLabel(field, dragged.within);
-  // A header sorts and projects by the dotted path, also for a field of the elements of an array.
+  // A cell and a header sort and project by the dotted path of their field, also for a field of the elements of an
+  // array; a cell's value plays no part there.
+  const sort = sortZones(field, label, state.texts.sort);
+  const project = projectZones(field, label, state.texts.project);
+  if (dragged.kind === 'cell') {
+    return { filter: cellZones(dragged), sort, project };
+  }
   return {
     filter: [
       filterZone(dragged, text.drag.exists, text.drag.existsTip(field), { $exists: true }),
       filterZone(dragged, text.drag.missing, text.drag.missingTip(field), { $exists: false }),
       filterZone(dragged, text.drag.isNull, text.drag.isNullTip(field), null),
     ],
-    sort: sortZones(field, label, state.texts.sort),
-    project: projectZones(field, label, state.texts.project),
+    sort,
+    project,
   };
 }
 

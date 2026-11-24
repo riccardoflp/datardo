@@ -348,6 +348,10 @@ export function QueriesButton(props: {
   readonly spoken: string;
   readonly tip?: string;
   readonly className: string;
+  /** The Codicon before its name (`query.bar`). */
+  readonly icon?: string;
+  /** Its icon alone, its name staying its tooltip and the name a screen reader says. */
+  readonly iconAlone?: boolean;
 }): React.JSX.Element {
   const ref = props.collectionRef;
   const open = useOpenList() === ref.tab;
@@ -371,7 +375,8 @@ export function QueriesButton(props: {
           setOpenList(open ? undefined : ref.tab);
         }}
       >
-        {props.label}
+        {props.icon === undefined ? null : <span className={`codicon codicon-${props.icon}`} aria-hidden="true" />}
+        {props.iconAlone === true ? null : <span>{props.label}</span>}
       </button>
       {open ? <QueriesList collectionRef={ref} onClose={close} /> : null}
     </span>

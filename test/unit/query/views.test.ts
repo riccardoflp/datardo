@@ -9,13 +9,17 @@ import { suggestions } from '../../../src/features/query/suggestions';
 import { emptyTexts, initialQuery, type QueryTexts } from '../../../src/features/query/types';
 
 describe('query.bar', () => {
+  const shownBar = (changes: Partial<bar.BarState> = {}) =>
+    bar.view({ query: initialQuery, running: false, writable: true, ...changes });
+  const labels = (buttons: readonly bar.BarButton[]) => buttons.map((button) => button.label);
+
   it('shows Find, the five fields empty with their placeholders, the builder closed and no error line', () => {
-    const shown = bar.view({ query: initialQuery, running: false });
+    const shown = shownBar();
     expect(shown.mode.label).toBe('Find');
     expect(shown.fields.map((field) => [field.label, field.text, field.placeholder])).toEqual([
       ['Filter', '', '{ field: "value" }  —  or drag a cell / column here'],
-      ['Sort', '', '{ field: -1 }  —  or drag a column here'],
-      ['Project', '', '{ field: 1 }  —  or drag a column here'],
+      ['Sort', '', '{ field: -1 }  —  or drag a column or a cell here'],
+      ['Project', '', '{ field: 1 }  —  or drag a column or a cell here'],
       ['Skip', '', '0'],
       ['Limit', '', 'no limit'],
     ]);
@@ -23,8 +27,55 @@ describe('query.bar', () => {
     expect(shown.errorLine).toBeUndefined();
   });
 
+  it('has Find and Reset with the toggle on the top row, the tools and the writes apart on the second', () => {
+    const shown = shownBar();
+    expect([...labels(shown.run), shown.toggle.element]).toEqual(['Find', 'Reset', 'query.position@query-bar']);
+    expect(labels(shown.tools)).toEqual(['Builder', 'Queries', 'Explain', 'Code']);
+    expect(labels(shown.writes)).toEqual(['Update many…', 'Delete many…']);
+    expect(shown.fields.filter((field) => field.field !== 'filter').map((field) => field.label)).toEqual([
+      'Sort',
+      'Project',
+      'Skip',
+      'Limit',
+    ]);
+  });
+
+  it('gives each button its icon, none to the mode switch, and the toggle its icon and no text', () => {
+    const shown = shownBar();
+    const icons = [...shown.run, ...shown.tools, ...shown.writes].map((button) => [button.label, button.icon]);
+    expect(icons).toEqual([
+      ['Find', 'play'],
+      ['Reset', 'discard'],
+      ['Builder', 'list-filter'],
+      ['Queries', 'history'],
+      ['Explain', 'telescope'],
+      ['Code', 'code'],
+      ['Update many…', 'edit'],
+      ['Delete many…', 'trash'],
+    ]);
+    expect('icon' in shown.mode).toBe(false);
+    expect([shown.toggle.icon, shown.toggle.label]).toEqual(['layout-sidebar-right', '']);
+  });
+
+  it('has Explain and Code that show their sections, and the writes, with their tooltips', () => {
+    const shown = shownBar();
+    expect([...shown.tools, ...shown.writes].map((button) => [button.element, button.tip])).toEqual([
+      ['query.builder@query-bar', 'Build the filter from fields, operators and values'],
+      ['saved-query.show@query-bar', 'Recent and saved queries'],
+      ['explain.show@query-bar', 'Show how MongoDB runs this query: index used, documents examined'],
+      ['codegen.show@query-bar', 'The query as code for mongosh, Node.js, Python, Java, C# or Go'],
+      ['document.update-many@query-bar', 'Update every document matching the filter'],
+      ['document.delete-many@query-bar', 'Delete every document matching the filter'],
+    ]);
+  });
+
+  it('lets Queries show its icon alone in a narrow main island, keeping its name', () => {
+    const queries = shownBar().tools.find((button) => button.element === 'saved-query.show@query-bar');
+    expect(queries).toMatchObject({ name: 'Queries', tip: 'Recent and saved queries', iconAloneWhenNarrow: true });
+  });
+
   it('makes Filter, Sort and Project editors and Skip and Limit digits only', () => {
-    const shown = bar.view({ query: initialQuery, running: false });
+    const shown = shownBar();
     expect(shown.fields.map((field) => field.digitsOnly)).toEqual([false, false, false, true, true]);
     expect(shown.fields.map((field) => field.multiline)).toEqual([true, false, false, false, false]);
     expect(bar.typedIn('skip', '1a2')).toBe('12');
@@ -38,17 +89,21 @@ describe('query.bar', () => {
     expect(bar.enterIn('sort', true)).toBe('insert-suggestion');
   });
 
-  it('reads Cancel on the run button while a query runs', () => {
-    const run = (running: boolean) => bar.view({ query: initialQuery, running }).buttons.at(-1);
-    expect(run(true)).toMatchObject({ label: 'Cancel', element: 'runner.cancel@list' });
-    expect(run(false)).toMatchObject({ label: 'Find', name: 'Run query', element: 'query.run@query-bar' });
+  it('reads Cancel on the run button while a query runs, in its place, with the icon debug-stop', () => {
+    const run = (running: boolean) => shownBar({ running }).run[0];
+    expect(run(true)).toMatchObject({ label: 'Cancel', element: 'runner.cancel@list', icon: 'debug-stop' });
+    expect(run(false)).toMatchObject({
+      label: 'Find',
+      name: 'Run query',
+      element: 'query.run@query-bar',
+      icon: 'play',
+    });
   });
 
   it('outlines a field at fault until its text is edited', () => {
     const invalid = { ...initialQuery, invalid: ['filter', 'sort'] as const };
     expect(
-      bar
-        .view({ query: invalid, running: false })
+      shownBar({ query: invalid })
         .fields.filter((field) => field.invalid)
         .map((field) => field.field),
     ).toEqual(['filter', 'sort']);
@@ -57,32 +112,59 @@ describe('query.bar', () => {
 
   it('shows the last message of the error line, with Details and Run again for the server', () => {
     const error = { message: 'unknown operator: $foo', details: 'unknown operator: $foo', runAgain: true };
-    expect(bar.view({ query: { ...initialQuery, error }, running: false }).errorLine).toEqual(error);
+    expect(shownBar({ query: { ...initialQuery, error } }).errorLine).toEqual(error);
   });
 
-  it('gives way to the pipeline editor in Aggregate', () => {
-    const shown = bar.view({ query: { ...initialQuery, mode: 'aggregate', builderOpen: true }, running: false });
-    expect([shown.fields, shown.pipeline, shown.builderOpen]).toEqual([[], true, false]);
-    expect(shown.buttons.map((button) => button.label)).toEqual(['Queries']);
+  it('gives way to the pipeline editor in Aggregate, keeping Queries and the toggle', () => {
+    const shown = shownBar({ query: { ...initialQuery, mode: 'aggregate', builderOpen: true } });
+    expect([shown.fields, shown.run, shown.writes, shown.pipeline, shown.builderOpen]).toEqual([
+      [],
+      [],
+      [],
+      true,
+      false,
+    ]);
+    expect(labels(shown.tools)).toEqual(['Queries']);
+    expect(shown.toggle.element).toBe('query.position@query-bar');
+  });
+
+  it('has neither Update many… nor Delete many… on a read-only connection or a view, the rest the same', () => {
+    const shown = shownBar({ writable: false });
+    expect(shown.writes).toEqual([]);
+    expect(labels(shown.tools)).toEqual(['Builder', 'Queries', 'Explain', 'Code']);
+  });
+
+  it('has neither Explain, Code nor the writes in the Schema and Chart sections', () => {
+    for (const section of ['schema', 'chart'] as const) {
+      const shown = shownBar({ section });
+      expect([labels(shown.tools), shown.writes]).toEqual([['Builder', 'Queries'], []]);
+    }
   });
 
   it('names every control in the order of Tab', () => {
-    const shown = bar.view({ query: initialQuery, running: false });
+    const shown = shownBar();
+    const [filter, ...options] = shown.fields;
     expect([
       shown.mode.name,
-      ...shown.fields.map((field) => field.label),
-      ...shown.buttons.map((button) => button.name),
+      filter?.label,
+      ...[...shown.run, shown.toggle, ...shown.tools, ...shown.writes].map((button) => button.name),
+      ...options.map((field) => field.label),
     ]).toEqual([
       'Query mode',
       'Filter',
+      'Run query',
+      'Reset',
+      'Query at the right of the results',
+      'Builder',
+      'Queries',
+      'Explain',
+      'Code',
+      'Update many…',
+      'Delete many…',
       'Sort',
       'Project',
       'Skip',
       'Limit',
-      'Builder',
-      'Queries',
-      'Reset',
-      'Run query',
     ]);
   });
 });
@@ -119,7 +201,7 @@ describe('query.builder', () => {
     expect(rowText(rows.rows)).toEqual(['age gte 20', 'age lte 30', 'name eq']);
   });
 
-  it('shows no rows and a note for a syntax error, with + Condition and the choice disabled', () => {
+  it('shows no rows and a note for a syntax error, with Condition and the choice disabled', () => {
     const rows = builder.rowsOfText('{ status: ', []);
     const shown = builder.view({ rows, fields: [] });
     expect([shown.rows, shown.note, shown.head.add.disabled, shown.head.disabled]).toEqual([
@@ -160,6 +242,12 @@ describe('query.builder', () => {
     expect(builder.textOfRows([{ field: 'tags', operator: 'size', value: 'x' }], 'all')).toEqual({
       note: 'tags: size needs a whole number',
     });
+  });
+
+  it('gives Condition the icon add and the name Add a condition, and Clear the icon clear-all', () => {
+    const { head } = builder.view({ rows: builder.rowsOfText('', []), fields: [] });
+    expect([head.add.label, head.add.icon, head.add.name]).toEqual(['Condition', 'add', 'Add a condition']);
+    expect([head.clear.label, head.clear.icon]).toEqual(['Clear', 'clear-all']);
   });
 
   it('names every control of a row', () => {
@@ -311,6 +399,44 @@ describe('query.drag', () => {
       '▼ descending',
       '✕ remove',
     ]);
+  });
+
+  it('offers ascending and descending over Sort and include and exclude over Project for the cell total 42', () => {
+    const dragged: drag.Dragged = { kind: 'cell', field: 'total', value: 42 };
+    const zones = drag.view({ dragged, texts });
+    expect([labels(zones.sort), labels(zones.project)]).toEqual([
+      ['▲ ascending', '▼ descending'],
+      ['include', 'exclude'],
+    ]);
+    expect([...zones.sort, ...zones.project].every((zone) => zone.field === 'total')).toBe(true);
+    const sorted = { ...texts, sort: '{ status: 1 }' };
+    const descending = drag.view({ dragged, texts: sorted }).sort[1];
+    expect(descending && drag.dropped(descending, dragged, sorted)).toEqual({
+      field: 'sort',
+      text: '{ status: 1, total: -1 }',
+    });
+  });
+
+  it('offers remove over Project for a cell of a field in the projection, and empties it', () => {
+    const dragged: drag.Dragged = { kind: 'cell', field: 'total', value: 42 };
+    const projected = { ...texts, project: '{ total: 1 }' };
+    const zones = drag.view({ dragged, texts: projected }).project;
+    expect(labels(zones)).toEqual(['include', 'exclude', '✕ remove']);
+    const [, , remove] = zones;
+    expect(remove && drag.dropped(remove, dragged, projected)).toEqual({ field: 'project', text: '' });
+  });
+
+  it('sorts a cell of an expanded array by its dotted path', () => {
+    const dragged: drag.Dragged = { kind: 'cell', field: 'items.qty', value: 3, within: 'items' };
+    const descending = drag.view({ dragged, texts }).sort[1];
+    expect([descending?.field, descending?.tip]).toEqual([
+      'items[].qty',
+      'items.qty: -1 (after the fields already in the sort)',
+    ]);
+    expect(descending && drag.dropped(descending, dragged, texts)).toEqual({
+      field: 'sort',
+      text: '{ "items.qty": -1 }',
+    });
   });
 
   it('changes nothing and says why when the text of the field cannot be read', () => {

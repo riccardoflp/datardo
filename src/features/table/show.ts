@@ -42,7 +42,12 @@ export interface ToolbarButton {
   readonly label: string;
   readonly element: string;
   readonly tip?: string;
+  /** The Codicon before its name; a button with one shows it alone while the main island is under 900 px. */
+  readonly icon?: string;
 }
+
+/** Under this width of the main island, in px, the buttons with an icon show it alone (Mongoster's). */
+export const iconsAloneUnder = 900;
 
 /** A mark at the right end of the toolbar. */
 export interface ToolbarMark {
@@ -75,16 +80,12 @@ function toolbarButtons(state: ShowState): readonly ToolbarButton[] {
     { label: text.show.refresh, element: 'table.refresh@toolbar' },
     columns,
     ...(writes
-      ? [
-          { label: text.show.insert, tip: text.show.insertTip, element: 'document.insert@toolbar' },
-          { label: text.show.updateMany, element: 'document.update-many@toolbar' },
-          { label: text.show.deleteMany, element: 'document.delete-many@toolbar' },
-        ]
+      ? [{ label: text.show.insert, tip: text.show.insertTip, element: 'document.insert@toolbar', icon: 'add' }]
       : []),
-    { label: text.show.export, tip: text.show.exportTip, element: 'transfer.export@toolbar' },
-    { label: text.show.explain, element: 'explain.show@query-bar' },
-    { label: text.show.code, element: 'codegen.show@query-bar' },
-    ...(state.target.view ? [] : [{ label: text.show.watch, tip: text.show.watchTip, element: 'watch.show@toolbar' }]),
+    { label: text.show.export, tip: text.show.exportTip, element: 'transfer.export@toolbar', icon: 'export' },
+    ...(state.target.view
+      ? []
+      : [{ label: text.show.watch, tip: text.show.watchTip, element: 'watch.show@toolbar', icon: 'pulse' }]),
   ];
 }
 
@@ -136,9 +137,10 @@ function body(state: ShowState): ShowBody {
 /**
  * Feature: table.show
  *
- * The toolbar (**Refresh**, **Columns**, the buttons of other areas, those that write only on a collection that can
- * be changed, and the marks **view**, **time series**, **read-only**), the selection bar, the table or the message of
- * its state, the paging row, and the status line `50 of 1,204 documents · 38 ms`.
+ * The toolbar (**Refresh**, **Columns**, then **Insert** on a collection that can be changed, **Export** and **Watch**
+ * with their icons, and the marks **view**, **time series**, **read-only**), the selection bar, the table or the
+ * message of its state, the paging row, and the status line `50 of 1,204 documents · 38 ms`. **Explain**, **Code**,
+ * **Update many…** and **Delete many…** are in the query bar (`query.bar`), which follows the query to its pane.
  */
 export function view(state: ShowState): ShowView {
   const shown = body(state);

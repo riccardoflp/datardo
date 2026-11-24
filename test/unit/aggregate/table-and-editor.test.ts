@@ -176,12 +176,40 @@ describe('aggregate.show', () => {
     expect(elements(true)).not.toContain('aggregate.save-as-view@toolbar');
     expect(elements(true)).toEqual([
       'aggregate.run@toolbar',
+      'aggregate.edit-as-text@toolbar',
       'aggregate.clear@toolbar',
       'explain.show@query-bar',
-      'aggregate.edit-as-text@toolbar',
-      'aggregate.copy@toolbar',
       'codegen.show@query-bar',
+      'aggregate.copy@toolbar',
     ]);
+  });
+
+  it('has a toolbar in two groups, each button with its icon', () => {
+    const shown = view({ editor: editorOf([stage('$match', '{}')]), readOnly: false });
+    expect(shown.toolbarGroups.map((group) => group.map((control) => [control.label, control.icon]))).toEqual([
+      [
+        ['Run', 'play'],
+        ['Edit as text', 'json'],
+        ['Clear', 'clear-all'],
+      ],
+      [
+        ['Explain', 'telescope'],
+        ['Code', 'code'],
+        ['Copy', 'copy'],
+        ['Save as view…', 'save-as'],
+      ],
+    ]);
+    const asText = view({ editor: { ...editorOf([stage('$match', '{}')]), text: { value: '[]' } }, readOnly: false });
+    expect(asText.toolbar[1]).toMatchObject({ label: 'Edit as stages', icon: 'json' });
+    expect(shown.add).toMatchObject({ label: 'Add a stage at the end', icon: 'add' });
+  });
+
+  it('lays the cards one under the other in the query pane, the toolbar groups each on its line', () => {
+    const editor = editorOf([stage('$match', '{}'), stage('$group', '{}'), stage('$sort', '{}')]);
+    const shown = view({ editor, readOnly: false, side: true });
+    expect([shown.side, shown.cards.length, shown.add?.label]).toEqual([true, 3, 'Add a stage at the end']);
+    expect(shown.toolbarGroups.map((group) => group.length)).toEqual([3, 4]);
+    expect(view({ editor, readOnly: false }).side).toBe(false);
   });
 
   it('gives each control a name a screen reader says, and sizes the cards', () => {

@@ -51,6 +51,15 @@
       "x-group": "Queries",
       "description": "How long the server may work on one query before it is stopped."
     },
+    "datardo.query.position": {
+      "type": "string",
+      "enum": ["top", "right"],
+      "x-enumTitles": ["Above the results", "At the right of the results"],
+      "default": "top",
+      "title": "Place of the query",
+      "x-group": "Queries",
+      "description": "Where a collection tab puts its query: above the table, or in the query pane at its right. One place for every collection tab."
+    },
     "datardo.relation.detect": {
       "type": "boolean",
       "default": true,

@@ -30,7 +30,7 @@ export interface BuilderRows {
   readonly rows: readonly BuilderRow[];
   /** The rows say the filter; when not, the builder shows no rows and this note. */
   readonly note?: string;
-  /** **+ Condition** and the choice of *all* or *any* are disabled. */
+  /** **Condition** and the choice of *all* or *any* are disabled. */
   readonly locked: boolean;
 }
 
@@ -118,13 +118,17 @@ export interface BuilderView {
     readonly combine: Combine;
     readonly choices: readonly { readonly combine: Combine; readonly label: string }[];
     readonly ofThese: string;
+    /** **Condition**, with the icon `add` and the name *Add a condition*. */
     readonly add: {
       readonly label: string;
+      readonly name: string;
       readonly tip: string;
+      readonly icon: string;
       readonly disabled: boolean;
       readonly element: string;
     };
-    readonly clear: { readonly label: string; readonly tip: string; readonly element: string };
+    /** **Clear**, with the icon `clear-all`. */
+    readonly clear: { readonly label: string; readonly tip: string; readonly icon: string; readonly element: string };
     readonly disabled: boolean;
   };
   readonly rows: readonly RowView[];
@@ -198,7 +202,7 @@ function rowView(row: BuilderRow, index: number, fields: readonly FieldHint[]): 
 /**
  * Feature: query.builder
  *
- * The head (**Match** *all* or *any* **of these conditions**, **+ Condition**, **Clear**), one row per condition with its
+ * The head (**Match** *all* or *any* **of these conditions**, **Condition**, **Clear**, with their icons), one row per condition with its
  * field, operator and value, and the note when there is something to say.
  */
 export function view(state: BuilderState): BuilderView {
@@ -216,11 +220,18 @@ export function view(state: BuilderState): BuilderView {
       ofThese: text.builder.ofThese,
       add: {
         label: text.builder.addCondition,
+        name: text.builder.addConditionTip,
         tip: text.builder.addConditionTip,
+        icon: 'add',
         disabled: rows.locked,
         element: 'query.builder@query-bar',
       },
-      clear: { label: text.builder.clear, tip: text.builder.clearTip, element: 'query.builder@query-bar' },
+      clear: {
+        label: text.builder.clear,
+        tip: text.builder.clearTip,
+        icon: 'clear-all',
+        element: 'query.builder@query-bar',
+      },
       disabled: rows.locked,
     },
     rows: rows.rows.map((row, index) => rowView(row, index, state.fields)),

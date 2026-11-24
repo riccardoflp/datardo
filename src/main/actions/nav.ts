@@ -8,6 +8,7 @@ import { connectionId } from '../../shared/ids';
 import type { NavState, Pin } from '../../shared/state/nav';
 import { targetKey } from '../../features/tab/same-target';
 import { withPin, withPinMoved, withoutPin } from '../../features/nav/pin';
+import { queryPaneWidthOf } from '../nav';
 import type { MainServices } from '../services';
 import type { AreaActions } from '.';
 import { activateTab, openTab } from './tab';
@@ -87,15 +88,18 @@ function goToPlace(services: MainServices, args: Json): Promise<void> {
   return Promise.resolve();
 }
 
+/** The widths of the islands (`nav.resize`), and of the query pane (`queryPane`, `query.position`). */
 function widths(services: MainServices, args: Json): Promise<void> {
   const now = services.state.get().nav.widths;
   const explorer = field(args, 'explorer');
   const inspector = field(args, 'inspector');
+  const queryPane = field(args, 'queryPane');
   return change(services, {
     widths: {
       explorer: typeof explorer === 'number' ? explorer : now.explorer,
       inspector: typeof inspector === 'number' ? inspector : now.inspector,
     },
+    ...(typeof queryPane === 'number' ? { queryPaneWidth: queryPaneWidthOf(queryPane) } : {}),
   });
 }
 

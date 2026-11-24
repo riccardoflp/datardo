@@ -36,9 +36,6 @@ query bar. The table under it shows the output.
   pane, are Mongoster 0.9.0's: `src/queryBarHtml.ts` (the `pipeline-actions` row), `src/webview/pipeline.ts`
   (`setTextMode`, the `stage-add` button), `media/webview.css` (`body.query-side .stages`, `.stage`, `.stage-arrow`,
   `.pipeline-text`, `.pipeline-actions`); CHANGELOG 0.9.0, **Query above or beside the results**.
-- **Differs**: (M40) The toolbar is one row of text buttons without icons, **Run**, **Clear**, **Explain**, **Save as
-  view…**, **Edit as text**, **Copy**, **Code**; **+** is a text button; the cards are always left to right, above
-  the table.
 
 What it shows, top to bottom:
 
@@ -97,14 +94,14 @@ Acceptance:
       says: the number of stage 2 is **Show the output up to this stage**.
 - [ ] The toolbar reads, from the left, **Run**, **Edit as text**, **Clear**, then apart **Explain**, **Code**,
       **Copy**, **Save as view…**, with the icons `play`, `json`, `clear-all`, `telescope`, `code`, `copy`, `save-as`;
-      **Edit as text** keeps the icon `json` when it reads **Edit as stages**. (differs)
+      **Edit as text** keeps the icon `json` when it reads **Edit as stages**.
 - [ ] With the query in a pane 380 px wide, the three stages `$match`, `$group`, `$sort` are three cards one under the
       other, each as wide as the pane, with an arrow pointing down between two of them and **+** under the third; a
-      `$match` whose body is one short line is as wide as a `$lookup` of four lines. (differs)
+      `$match` whose body is one short line is as wide as a `$lookup` of four lines.
 - [ ] In the query pane, **Edit as text** shows the text as wide as the pane and at least 240 px high; a pipeline of
-      60 lines shows all its lines, and the pane scrolls. (differs)
+      60 lines shows all its lines, and the pane scrolls.
 - [ ] In the query pane, **Run**, **Edit as text** and **Clear** are on one line, and **Explain**, **Code**, **Copy**
-      and **Save as view…** on the next. (differs)
+      and **Save as view…** on the next.
 
 ### `aggregate.add-stage` — Add a stage
 
@@ -250,7 +247,6 @@ Changes the place of a stage among the others.
   focus.
 - **Ported from**: `src/webview/pipeline.ts` (`move` in `card`). Mongoster 0.9.0 keeps **Move left** and **Move
   right** in its query pane too; the names **Move up** and **Move down** there are *New in Datardo*.
-- **Differs**: (M40) The buttons always read **Move left** and **Move right**: there is no query pane.
 
 Acceptance:
 
@@ -258,7 +254,7 @@ Acceptance:
 - [ ] With the query in the query pane, the buttons of a card and the entries of its menu read **Move up** and **Move
       down**, and **Move down** on stage 1 of `$match`, `$sort`, `$limit` gives `$sort`, `$match`, `$limit`; the
       commands `aggregate.move-stage:left` and `aggregate.move-stage:right` move the stage the same way in both
-      places. (differs)
+      places.
 - [ ] **Move left** on stage 1 and **Move right** on the last stage are disabled.
 - [ ] Moving a stage while stage 2 is shown ends that: the line reads *3 of 3 stages enabled*.
 - [ ] Moving `$search` from place 1 to place 2 shows **must be first** on its card; moving it back removes the mark.
