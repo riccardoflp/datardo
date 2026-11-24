@@ -9,7 +9,8 @@
 import type { Json } from '../../shared/engine-request';
 import type { Context, FileStep, Step } from '../../shared/feature';
 import type { ConnectionId } from '../../shared/ids';
-import { freeName, safeFileName } from '../task/file-names';
+import { sha1 } from '../compare/pairing/sha1';
+import { freeName } from '../task/file-names';
 import { pathIn } from '../task/run';
 import { compareNames, isObject } from '../tree/types';
 import {
@@ -45,19 +46,114 @@ export function metadataText(metadata: JsonDocument): string {
   return JSON.stringify(metadata);
 }
 
-/** The names of a collection's two files in the folder of its database, compressed or not. */
+/** The longest encoded name: with `.metadata.json.gz` after it a file's name stays within 255 bytes (mongodump's). */
+const longestName = 238;
+/** How much of a longer name is kept, before `%24` and the 27 characters of its hash (mongodump's numbers). */
+const keptOfLongName = 208;
+/** The names Windows gives to devices, whatever follows their first dot: `con.bson` is the console there. */
+const reservedName = /^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\.|$)/iu;
+const keptCharacter = /^[A-Za-z0-9_.-]$/u;
+
+function escaped(byte: number): string {
+  return `%${byte.toString(16).toUpperCase().padStart(2, '0')}`;
+}
+
+/** The SHA-1 of a name's UTF-8 bytes in base64url without padding, as mongodump ends a name too long for a file. */
+function nameHash(name: string): string {
+  const hex = sha1(name);
+  const bytes = Array.from({ length: hex.length / 2 }, (_, index) =>
+    String.fromCharCode(parseInt(hex.slice(index * 2, index * 2 + 2), 16)),
+  );
+  return btoa(bytes.join('')).replace(/\+/gu, '-').replace(/\//gu, '_').replace(/=+$/u, '');
+}
+
+/**
+ * The name of a collection or of a database as a file's or a folder's name: letters, digits, `_`, `-` and `.` are kept,
+ * every other byte of its UTF-8 is `%XX` (`%` itself too, so that decoding gives the name back); a dot at either end
+ * is `%2E`, and the first letter of a name Windows reserves for a device is encoded. A result longer than 238
+ * characters is cut to its first 208, never inside a `%XX`, and ends with `%24` and the hash of the name, as mongodump
+ * does. So no name leaves its folder or names a device, and `mongorestore` decodes them.
+ */
+export function backupFileName(name: string): string {
+  let out = '';
+  for (const byte of new TextEncoder().encode(name)) {
+    const character = String.fromCharCode(byte);
+    out += keptCharacter.test(character) ? character : escaped(byte);
+  }
+  if (out.startsWith('.')) {
+    out = `%2E${out.slice(1)}`;
+  }
+  if (out.endsWith('.')) {
+    out = `${out.slice(0, -1)}%2E`;
+  }
+  if (reservedName.test(out)) {
+    out = escaped(out.charCodeAt(0)) + out.slice(1);
+  }
+  if (out.length <= longestName) {
+    return out;
+  }
+  const cut = out[keptOfLongName - 1] === '%' ? 1 : out[keptOfLongName - 2] === '%' ? 2 : 0;
+  return `${out.slice(0, keptOfLongName - cut)}%24${nameHash(name)}`;
+}
+
+/** A file's name percent-decoded; undefined when it is not percent-encoded text. */
+function percentDecoded(fileName: string): string | undefined {
+  try {
+    return decodeURIComponent(fileName);
+  } catch {
+    // Not percent-encoded: the caller keeps the name as it is.
+    return undefined;
+  }
+}
+
+/**
+ * The collection a backup's files are for, from their name without the extension and the `collectionName` of their
+ * metadata, when they have one. A name without `%` is the collection's, also in a backup written before the names were
+ * encoded. With a `%`, the metadata tells an encoded name (Datardo's, mongodump's, or cut with the name's hash) from a
+ * name that has a `%` of its own; without metadata the name is decoded, as `mongorestore` does, or kept.
+ */
+export function backupCollectionName(fileName: string, metadataName?: string): string {
+  if (!fileName.includes('%')) {
+    return fileName;
+  }
+  const plain = percentDecoded(fileName);
+  if (metadataName !== undefined) {
+    const same = fileName === metadataName || plain === metadataName || backupFileName(metadataName) === fileName;
+    if (same || fileName.endsWith(`%24${nameHash(metadataName)}`)) {
+      return metadataName;
+    }
+  }
+  return plain ?? fileName;
+}
+
+/**
+ * The database a backup's folder is for. A folder has no metadata, so its name is decoded only when it is exactly what
+ * `backupFileName` writes for the decoded name: any other folder (mongodump's, an earlier backup's) keeps its name.
+ */
+export function backupDatabaseName(folderName: string): string {
+  if (!folderName.includes('%')) {
+    return folderName;
+  }
+  const plain = percentDecoded(folderName);
+  return plain !== undefined && backupFileName(plain) === folderName ? plain : folderName;
+}
+
+/** The names of a collection's two files in the folder of its database, compressed or not, the name encoded. */
 export function collectionFileNames(
   collection: string,
   format: Exclude<BackupFormat, 'archive'>,
 ): { readonly documents: string; readonly metadata: string } {
   const gzip = format === 'gzip' ? '.gz' : '';
-  return { documents: `${collection}.bson${gzip}`, metadata: `${collection}.metadata.json${gzip}` };
+  const name = backupFileName(collection);
+  return { documents: `${name}.bson${gzip}`, metadata: `${name}.metadata.json${gzip}` };
 }
 
 /** A file of a folder, with its size in bytes. */
 export interface FileEntry {
   readonly name: string;
   readonly size: number;
+  /** For a metadata file whose name has a `%`: the `collectionName` it holds, which tells how to read the name. */
+  readonly collectionName?: string;
 }
 
 /** What the main process lists of a folder: its files and, one level down, its subfolders and their files. */
@@ -70,34 +166,43 @@ export interface FolderListing {
 
 const backupFile = /^(.+)\.(bson|metadata\.json)(\.gz)?$/u;
 
-/** The collections whose files a folder holds, `system.*` left out, sorted by name. */
+/** The collections whose files a folder holds, by the name of their files: `system.*` left out, sorted by name. */
 export function scanDatabase(files: readonly FileEntry[]): readonly BackupCollection[] {
-  const found = new Map<string, BackupCollection>();
+  const found = new Map<string, BackupCollection & { collectionName?: string }>();
   for (const file of files) {
     const match = backupFile.exec(file.name);
     const name = match?.[1];
-    if (match !== null && name !== undefined && !name.startsWith('system.')) {
+    if (match !== null && name !== undefined) {
       const known = found.get(name) ?? { name, size: 0 };
-      found.set(
-        name,
-        match[2] === 'bson' ? { ...known, bson: file.name, size: file.size } : { ...known, metadata: file.name },
-      );
+      const metadata = {
+        metadata: file.name,
+        ...(file.collectionName === undefined ? {} : { collectionName: file.collectionName }),
+      };
+      found.set(name, match[2] === 'bson' ? { ...known, bson: file.name, size: file.size } : { ...known, ...metadata });
     }
   }
-  return [...found.values()].sort((one, other) => compareNames(one.name, other.name));
+  return [...found.values()]
+    .map(({ collectionName, ...each }) => ({ ...each, name: backupCollectionName(each.name, collectionName) }))
+    .filter((each) => !each.name.startsWith('system.'))
+    .sort((one, other) => compareNames(one.name, other.name));
 }
 
 /**
  * The databases of a backup folder: the folder itself, named after it, when it holds backup files; otherwise each of
- * its subfolders that does, sorted by name. None when no such files are found at either level.
+ * its subfolders that does, sorted by name. None when no such files are found at either level. A folder's name is
+ * decoded when Datardo or mongodump encoded it (`backupDatabaseName`).
  */
 export function scanBackup(listing: FolderListing): readonly BackupDatabase[] {
   const own = scanDatabase(listing.files);
   if (own.length > 0) {
-    return [{ name: listing.name, folder: listing.path, collections: own }];
+    return [{ name: backupDatabaseName(listing.name), folder: listing.path, collections: own }];
   }
   return listing.folders
-    .map((folder) => ({ name: folder.name, folder: folder.path, collections: scanDatabase(folder.files) }))
+    .map((folder) => ({
+      name: backupDatabaseName(folder.name),
+      folder: folder.path,
+      collections: scanDatabase(folder.files),
+    }))
     .filter((database) => database.collections.length > 0)
     .sort((one, other) => compareNames(one.name, other.name));
 }
@@ -176,7 +281,7 @@ export function folderSteps(
   return [
     folder(root),
     ...choice.flatMap((each) => {
-      const databaseFolder = pathIn(root, safeFileName(each.database), context.platform);
+      const databaseFolder = pathIn(root, backupFileName(each.database), context.platform);
       return [
         folder(databaseFolder),
         ...each.collections.flatMap((info): FileStep[] => {

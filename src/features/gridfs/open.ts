@@ -2,8 +2,9 @@
  * Feature: gridfs.open
  *
  * Opens a file with the application the system uses for its type, from a temporary copy: one file step, `write
- * <the system's temporary folder>\datardo-gridfs\<folder>\logo.png`, whose writer is that of `gridfs.download`, then
- * one app step, `open the copy with the system's application`. Only the types of a list are handed to the system
+ * <the folder of the copies>\<folder>\logo.png`, whose writer is that of `gridfs.download`, then one app step, `open
+ * the copy with the system's application`. The folder of the copies is the main process's own, private to the user
+ * (`datardo-gridfs-` and six random characters in the system's temporary folder, T20). Only the types of a list are handed to the system
  * (D42, T20): any other is refused before anything is read. Changes made to the copy are not written back. Allowed on
  * a read-only connection. Started with `{ connection, database, bucket, id, filename }`, the name as the row shows it,
  * which is checked again once the files document is read. Ported from Mongoster's `open` and `save`.
@@ -58,9 +59,14 @@ export function isOpened(filename: string): boolean {
   return extension !== undefined && openedExtensions.has(extension);
 }
 
-/** The name of the copy: each of `\ / : * ? " < > |` replaced by `_`, or `file` when that leaves nothing or dots. */
+/**
+ * The name of the copy: each of `\ / : * ? " < > |` and each control character (codes 0 to 31) replaced by `_`, or
+ * `file` when that leaves nothing or dots.
+ */
 export function copyName(filename: string): string {
-  const name = filename.replace(/[\\/:*?"<>|]/gu, '_');
+  const name = Array.from(filename, (character) =>
+    character.charCodeAt(0) < 32 || '\\/:*?"<>|'.includes(character) ? '_' : character,
+  ).join('');
   return /^\.*$/u.test(name) ? 'file' : name;
 }
 
@@ -105,7 +111,7 @@ export function copyFolder(place: BucketRef, id: Json): string {
   return whole.length <= folderLength ? whole : `${whole.slice(0, folderLength - 32)}${digitsOf(key)}`;
 }
 
-/** The path of the copy in the temporary folder, with the separator of the system. */
+/** The path of the copy in the folder of the copies, with the separator of the system. */
 export function copyPath(
   folder: string,
   platform: Context['platform'],
@@ -113,7 +119,7 @@ export function copyPath(
 ): string {
   const separator = platform === 'windows' ? '\\' : '/';
   const base = folder.endsWith(separator) ? folder.slice(0, -1) : folder;
-  return [base, 'datardo-gridfs', copy.folder, copy.name].join(separator);
+  return [base, copy.folder, copy.name].join(separator);
 }
 
 /** Feature: gridfs.open — the type checked, the file read, the temporary folder, then the copy written and opened. */

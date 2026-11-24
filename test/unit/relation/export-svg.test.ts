@@ -3,8 +3,8 @@ import {
   dialogArgs,
   fileRead,
   fileReadId,
-  openFileAction,
   plan,
+  revealFileAction,
   svgWriter,
 } from '../../../src/features/relation/export-svg';
 import { layout } from '../../../src/features/relation/layout';
@@ -35,7 +35,7 @@ describe('relation.export-svg', () => {
     });
   });
 
-  it('writes the file and says where, with Open', () => {
+  it('writes the file and says where, with Reveal', () => {
     const saved = planOf(start({}, { file: path }));
     const [step] = saved.steps as readonly FileStep[];
     expect(step).toMatchObject({ kind: 'file', text: `write ${path}`, path });
@@ -47,10 +47,10 @@ describe('relation.export-svg', () => {
         text: `Saved the diagram of shop to ${path}.`,
         actions: [
           {
-            label: 'Open',
+            label: 'Reveal',
             feature: 'relation.export-svg',
             target: { kind: 'app' },
-            args: { open: path },
+            args: { reveal: path },
           },
         ],
       },
@@ -58,10 +58,10 @@ describe('relation.export-svg', () => {
     expect(saved.undo).toEqual({ cannot: 'Nothing is written to a deployment; the file can be deleted.' });
   });
 
-  it('opens the file saved with the system’s program from Open', () => {
-    const opened = planOf(plan(contextOn('relation.export-svg'), { args: { open: path } }));
-    expect(opened.steps).toEqual([
-      { kind: 'app', text: `open ${path} with the system's program`, action: openFileAction, args: { path } },
+  it('shows the file saved in its folder from Reveal, and opens it in no program', () => {
+    const shown = planOf(plan(contextOn('relation.export-svg'), { args: { reveal: path } }));
+    expect(shown.steps).toEqual([
+      { kind: 'app', text: `show ${path} in its folder`, action: revealFileAction, args: { path } },
     ]);
   });
 

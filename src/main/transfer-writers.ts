@@ -13,14 +13,13 @@ import { createGzip, type Gzip } from 'node:zlib';
 import { documentOfBytes, type EngineService } from '../engines';
 import { archivePrelude, Crc64, namespaceHeader, terminator } from '../features/backup/archive-write';
 import type { BackupWriterArgs } from '../features/backup/create';
-import { collectionFileNames, metadataText } from '../features/backup/folder-layout';
+import { backupFileName, collectionFileNames, metadataText } from '../features/backup/folder-layout';
 import { createText } from '../features/backup/text';
 import { batchDocuments, type ArchiveCollection, type JsonDocument } from '../features/backup/types';
 import { csvTable, plainColumns, toCsv, type CsvColumn } from '../features/transfer/csv-write';
 import { exportEnd, exportPieces, exportRequest, relaxed, type ExportWriterArgs } from '../features/transfer/export';
 import { exportText } from '../features/transfer/text';
 import { isPlainObject } from '../features/transfer/types';
-import { safeFileName } from '../features/task/file-names';
 import type { Json, MongoRequest } from '../shared/engine-request';
 import type { ConnectionId } from '../shared/ids';
 import { Cancelled } from '../runner/cancel';
@@ -310,7 +309,7 @@ async function writeFolder(run: WriteRun, root: string, args: ChosenBackup): Pro
   const gzip = format === 'gzip';
   const counted = { documents: 0, bytes: 0 };
   for (const collection of args.plan.collections) {
-    const folder = join(root, safeFileName(collection.database));
+    const folder = join(root, backupFileName(collection.database));
     await mkdir(folder, { recursive: true });
     const names = collectionFileNames(collection.collection, format);
     const metadata = new Sink(join(folder, names.metadata), gzip);

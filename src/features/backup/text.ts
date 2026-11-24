@@ -124,6 +124,17 @@ export const restoreText = {
   databasePrompt: (connection: string, database: string): string =>
     `Database on ${connection} to restore ${database} into`,
   databaseNeeded: 'Enter a database name',
+  ownNameNotProposed: (why: string): string => ` (its own name isn't proposed: ${why})`,
+  systemDatabase: 'a system database',
+  invalidDatabase: 'not a valid database name',
+  notOffered: (list: readonly string[]): string => `Not offered: ${list.join(', ')}`,
+  nothingUnderItsNames: (file: string, list: readonly string[]): string =>
+    `Nothing of ${file} is restored under the names it gives: ${list.join(', ')}. ` +
+    'To restore one of them, use Restore from backup… on the database to restore it into.',
+  viewsReplace: (namespaces: readonly string[]): string =>
+    `The backup has a view in place of ${namespaces.length === 1 ? 'this collection, which is dropped with its' : 'these collections, which are dropped with their'} documents: ${namespaces.join(', ')}.`,
+  ttlKeptOff: (index: string): string =>
+    `Index not created — ${index}: a TTL index (expireAfterSeconds) would make the server delete documents that were already in the collection; create it from the Indexes section if it's wanted`,
   collectionsStep: (database: string): string => `collections of ${database}`,
   metadataOnly: 'view or metadata only',
   bsonStep: 'BSON file or archive',

@@ -108,6 +108,20 @@ test.describe('relation.export-svg', () => {
     const written = await readFile(path, 'utf8');
     expect(written).toContain('<svg');
     expect(written).toContain('customers');
+    await app.evaluate(({ shell }) => {
+      const stubbed = shell as unknown as Record<string, unknown>;
+      const calls: string[] = [];
+      (globalThis as unknown as { shellCalls: string[] }).shellCalls = calls;
+      stubbed['showItemInFolder'] = (shown: string) => calls.push(`show ${shown}`);
+      stubbed['openPath'] = (opened: string) => {
+        calls.push(`open ${opened}`);
+        return Promise.resolve('');
+      };
+    });
+    await window.getByRole('button', { name: 'Reveal', exact: true }).click();
+    await expect
+      .poll(() => app.evaluate(() => (globalThis as unknown as { shellCalls: string[] }).shellCalls))
+      .toEqual([`show ${path}`]);
   });
 });
 

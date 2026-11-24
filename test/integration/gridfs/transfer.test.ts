@@ -2,12 +2,13 @@
  * Uploads, downloads and opens files of GridFS buckets through the runner, against the throwaway MongoDB: every byte
  * survives the round trip, a cancel leaves nothing half written, and the bytes are never whole in memory.
  */
-import { mkdir, open, readFile, rm, stat, writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { lstat, mkdir, open, readFile, readdir, rm, stat, symlink, writeFile } from 'node:fs/promises';
+import { basename, dirname, join, relative, sep } from 'node:path';
 import { setFlagsFromString } from 'node:v8';
 import { runInNewContext } from 'node:vm';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { removeCopies } from '../../../src/main/gridfs';
+import { removeCopies, removeLeftCopies } from '../../../src/main/gridfs';
+import { openPath } from './live';
 import type { Json } from '../../../src/shared/engine-request';
 import { digestOf, liveGridFs, productionId, type Chosen, type LiveGridFs } from './live';
 
@@ -367,19 +368,51 @@ describe('gridfs.download', () => {
 });
 
 describe('gridfs.open', () => {
-  it('writes a copy named report.pdf under datardo-gridfs in the temporary folder and hands it to the system', async () => {
-    const report = await stored('opens', 'report.pdf', 50_000);
+  const linux = process.platform !== 'win32';
+
+  async function openOf(file: Chosen, connection = 'c-m33-local'): Promise<string> {
     await live.start('gridfs.open', {
-      connection: 'c-m33-local',
+      connection,
       database: live.database,
       bucket: 'opens',
-      id: report.id,
-      filename: 'report.pdf',
+      id: file.id,
+      filename: basename(file.path),
     });
-    const path = live.opened.at(-1) ?? '';
-    expect(path.startsWith(join(live.folder, 'datardo-gridfs'))).toBe(true);
-    expect(path.endsWith('\\report.pdf') || path.endsWith('/report.pdf')).toBe(true);
+    return live.opened.at(-1) ?? '';
+  }
+
+  function modeOf(path: string): Promise<number> {
+    return lstat(path).then((found) => found.mode & 0o777);
+  }
+
+  it('writes a copy named report.pdf under a folder datardo-gridfs- and six characters, and hands it to the system', async () => {
+    const report = await stored('opens', 'report.pdf', 50_000);
+    const path = await openOf(report);
+    expect(relative(live.folder, path).split(sep)[0]).toMatch(/^datardo-gridfs-[A-Za-z0-9]{6}$/u);
+    expect(path.endsWith(`${sep}report.pdf`)).toBe(true);
     expect(await digestOf(path)).toBe(await digestOf(report.path));
+    expect(openPath(path)).toBe(path);
+  });
+
+  it.skipIf(!linux)('makes the folder of the copies and the folder of the file 0700, and the copy 0600', async () => {
+    const notes = await stored('opens', 'notes.txt', 1000);
+    const path = await openOf(notes);
+    expect(await modeOf(path)).toBe(0o600);
+    expect(await modeOf(dirname(path))).toBe(0o700);
+    expect(await modeOf(dirname(dirname(path)))).toBe(0o700);
+  });
+
+  it('makes a folder with another name when the one of the copies was deleted, and in another run', async () => {
+    const notes = await stored('opens', 'again.txt', 1000);
+    const first = relative(live.folder, await openOf(notes)).split(sep)[0] ?? '';
+    await rm(join(live.folder, first), { recursive: true, force: true });
+    const second = relative(live.folder, await openOf(notes)).split(sep)[0] ?? '';
+    expect(second).toMatch(/^datardo-gridfs-[A-Za-z0-9]{6}$/u);
+    expect(second).not.toBe(first);
+    await removeCopies();
+    expect(await exists(join(live.folder, second))).toBe(false);
+    const third = relative(live.folder, await openOf(notes)).split(sep)[0] ?? '';
+    expect(third).not.toBe(second);
   });
 
   it('refuses run.exe and picture.svg before anything is written, and hands nothing to the system', async () => {
@@ -414,11 +447,29 @@ describe('gridfs.open', () => {
       live.onProgress = undefined;
     }
     expect(live.opened).toHaveLength(before);
-    const copies = join(live.folder, 'datardo-gridfs');
-    expect(await exists(copies)).toBe(true);
-    await removeCopies(copies);
-    expect(await exists(copies)).toBe(false);
+    const copies = (await readdir(live.folder)).filter((name) => name.startsWith('datardo-gridfs-'));
+    expect(copies).toHaveLength(1);
+    await removeCopies();
+    expect(await exists(join(live.folder, copies[0] ?? ''))).toBe(false);
   });
+
+  it.skipIf(!linux)(
+    'deletes at start the folders of copies a quit left and the old datardo-gridfs, not a link',
+    async () => {
+      const elsewhere = join(live.folder, 'elsewhere');
+      await mkdir(join(elsewhere, 'kept'), { recursive: true });
+      await mkdir(join(live.folder, 'datardo-gridfs', 'x'), { recursive: true });
+      await mkdir(join(live.folder, 'datardo-gridfs-Ab12Cd'), { recursive: true });
+      await symlink(elsewhere, join(live.folder, 'datardo-gridfs-Linked'));
+      await mkdir(join(live.folder, 'datardo-gridfs-other-name'), { recursive: true });
+      await removeLeftCopies(live.folder);
+      expect(await exists(join(live.folder, 'datardo-gridfs'))).toBe(false);
+      expect(await exists(join(live.folder, 'datardo-gridfs-Ab12Cd'))).toBe(false);
+      expect((await lstat(join(live.folder, 'datardo-gridfs-Linked'))).isSymbolicLink()).toBe(true);
+      expect(await exists(join(elsewhere, 'kept'))).toBe(true);
+      expect(await exists(join(live.folder, 'datardo-gridfs-other-name'))).toBe(true);
+    },
+  );
 });
 
 describe('gridfs.upload and gridfs.download', () => {

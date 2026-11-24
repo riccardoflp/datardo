@@ -33,6 +33,7 @@ import { messagesFile } from './pubsub-commands';
 import { carryOutTaskStep } from './task-writer';
 import { taskHost } from './tasks';
 import { writePicture } from './chart';
+import { recordWritten } from './opened-files';
 
 const formats: readonly ExportFormat[] = ['datardo', 'compass', 'list'];
 const modes: readonly ExportSecrets[] = ['remove', 'include', 'encrypt'];
@@ -153,7 +154,7 @@ const transferServices: TransferStepServices = {
 };
 
 /** Carries out a file step: writes, deletes or creates the folder at its path. */
-export const fileWriter: FileWriter = async (step: FileStep, signal: AbortSignal, progress?: ProgressReport) => {
+const carryOut: FileWriter = async (step: FileStep, signal: AbortSignal, progress?: ProgressReport) => {
   if (step.content?.writer === queryFileWriter) {
     await queryFile(step, step.content.args);
     return;
@@ -212,5 +213,16 @@ export const fileWriter: FileWriter = async (step: FileStep, signal: AbortSignal
       const written = await writer(content.args);
       await writeFile(content.writer, step.path, written);
     }
+  }
+};
+
+/**
+ * Carries out a file step, and records the file a write wrote: the main process opens with the system's program only
+ * a file a step of this session wrote (R14.10).
+ */
+export const fileWriter: FileWriter = async (step: FileStep, signal: AbortSignal, progress?: ProgressReport) => {
+  await carryOut(step, signal, progress);
+  if (step.action === 'write') {
+    recordWritten(step.path, step.content?.writer ?? '');
   }
 };

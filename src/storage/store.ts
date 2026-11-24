@@ -3,7 +3,7 @@
  * atomically by one writer a moment after its last change. What happens with a file that is missing, older, newer or
  * damaged is the table of data.md, "Versions" (R15.1 to R15.4).
  */
-import { mkdir, readFile, rename, writeFile, open, copyFile } from 'node:fs/promises';
+import { chmod, mkdir, readFile, rename, writeFile, open, copyFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import type { Json } from '../shared/engine-request';
 
@@ -43,6 +43,12 @@ export const writeDelayMs = 300;
 
 /** How long a rename is tried again when another program holds the file on Windows. */
 const renameRetryMs = 1000;
+
+/**
+ * The modes of what Datardo writes in its data folder on macOS and Linux: readable only by the user, whatever the
+ * `umask` (platform.md, "Per system"; R14.11). Windows keeps the profile folder's permissions.
+ */
+export const privateModes = process.platform === 'win32' ? undefined : { folder: 0o700, file: 0o600 };
 
 /** A stored file opened from a data folder: its content, kept in memory, and written back when it changes. */
 export class Store<T> {
@@ -173,7 +179,7 @@ export class Store<T> {
   private queueWrite(): Promise<void> {
     const content = `${JSON.stringify({ version: this.kind.version, ...this.kind.write(this.value) }, null, 2)}\n`;
     this.writing = this.writing
-      .then(() => writeAtomically(this.fullPath, content))
+      .then(() => writeAtomically(this.fullPath, content, { private: true }))
       .then(() => {
         if (this.found.kind !== 'newer') {
           this.found = { kind: 'current' };
@@ -199,12 +205,20 @@ function isMissing(error: unknown): boolean {
   return code === 'ENOENT' || code === 'ENOTDIR';
 }
 
-/** Writes beside, flushes, then renames over the old file (R15.4). */
-export async function writeAtomically(path: string, content: string): Promise<void> {
-  await mkdir(dirname(path), { recursive: true });
+/**
+ * Writes beside, flushes, then renames over the old file (R15.4). A file of the data folder is `private`: on macOS and
+ * Linux it is written `0600` in folders made `0700`; a file the user picked keeps the modes of the user's `umask`.
+ */
+export async function writeAtomically(path: string, content: string, as: { private?: boolean } = {}): Promise<void> {
+  const modes = as.private === true ? privateModes : undefined;
+  await mkdir(dirname(path), { recursive: true, ...(modes === undefined ? {} : { mode: modes.folder }) });
   const temporary = `${path}.tmp`;
-  const handle = await open(temporary, 'w');
+  const handle = await open(temporary, 'w', modes?.file);
   try {
+    if (modes !== undefined) {
+      // A file left beside by a write that did not end keeps the mode it was made with: set it again.
+      await handle.chmod(modes.file);
+    }
     await handle.writeFile(content, 'utf8');
     await handle.sync();
   } finally {
@@ -232,7 +246,13 @@ async function renameWithRetry(from: string, to: string): Promise<void> {
 /** Writes a file of the data folder at once, for a file written once (an operation of the undo history). */
 export async function writeOnce(folder: string, path: string, content: string | Uint8Array): Promise<void> {
   const fullPath = join(folder, ...path.split('/'));
-  await mkdir(dirname(fullPath), { recursive: true });
-  await writeFile(`${fullPath}.tmp`, content);
+  await mkdir(dirname(fullPath), {
+    recursive: true,
+    ...(privateModes === undefined ? {} : { mode: privateModes.folder }),
+  });
+  await writeFile(`${fullPath}.tmp`, content, privateModes === undefined ? {} : { mode: privateModes.file });
+  if (privateModes !== undefined) {
+    await chmod(`${fullPath}.tmp`, privateModes.file);
+  }
   await renameWithRetry(`${fullPath}.tmp`, fullPath);
 }

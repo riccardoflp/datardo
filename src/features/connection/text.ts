@@ -376,6 +376,13 @@ export const transferText = {
     `${format}: ${plural(count, 'connection', 'connections')}${skipped}. Choose those to import`,
   exists: '✓ already exists',
   same: '✓ already exists (same connection string)',
+  tls: 'TLS',
+  invalidAllowed: (what: 'certificates' | 'host names'): string => `invalid ${what} allowed`,
+  proxy: (host: string): string => `proxy ${host}`,
+  ssh: (user: string, host: string): string => `SSH ${user}@${host}`,
+  redisOplog: (host: string | undefined): string => `redis-oplog → ${host ?? 'a host that could not be read'}`,
+  noUndoHistory: 'no undo history',
+  queriesFolder: (path: string): string => `queries folder ${path}`,
   oneTaken: (name: string): string => `A connection named ${name} already exists.`,
   manyTaken: (count: number): string => `${String(count)} connections with the same name already exist.`,
   takenDetail:

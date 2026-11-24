@@ -7,6 +7,7 @@ import { featureId } from '../../shared/ids';
 import * as create from './create';
 import * as restore from './restore';
 import { pathDialog } from './restoring/choose';
+import { indexesRead } from './restoring/guards';
 
 /** The features of this area the runner can start. */
 export const features: readonly RunnableFeature[] = [
@@ -21,4 +22,5 @@ export const features: readonly RunnableFeature[] = [
   restore.folderListRead,
   restore.metadataRead,
   restore.existingRead,
+  indexesRead,
 ];

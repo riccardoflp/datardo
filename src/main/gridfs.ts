@@ -10,12 +10,13 @@
  * - `gridfs.write-chunks`: the chunks of one file, read from the disk 255 KB at a time and inserted one after the
  *   other; a cancel or a failure deletes the chunks it wrote.
  *
- * Each says how far it is at most every 200 ms (`runner.progress`). The copies of `gridfs.open` are kept under
- * `datardo-gridfs` in the system's temporary folder, deleted when Datardo quits.
+ * Each says how far it is at most every 200 ms (`runner.progress`). The copies of `gridfs.open` are kept in a folder
+ * of this run's own in the system's temporary folder, `datardo-gridfs-` and six random characters, readable by the
+ * user alone, made at the first **Open** and deleted when Datardo quits (T20, R14.11).
  */
-import { mkdir, open, rename, rm, stat } from 'node:fs/promises';
+import { lstat, mkdir, mkdtemp, open, readdir, rename, rm, stat } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { dirname, join } from 'node:path';
+import { dirname, join, resolve, sep } from 'node:path';
 import type { EngineService } from '../engines';
 import { sizeText } from '../features/gridfs/size-text';
 import { text } from '../features/gridfs/text';
@@ -42,22 +43,78 @@ export const progressEveryMs = 200;
 /** How long the insert of a chunk, and the deletion of the chunks of an upload that stopped, may take, in ms. */
 const cleanUpMs = 30_000;
 
-/** The folder of the copies `gridfs.open` writes, in the system's temporary folder. */
-export function copiesFolder(): string {
-  return join(tmpdir(), 'datardo-gridfs');
-}
+/** The start of the name of the folders of the copies; the older versions wrote `datardo-gridfs` alone. */
+const copiesPrefix = 'datardo-gridfs-';
+/** The folders of copies a quit could not delete, and the one of the older versions: `datardo-gridfs[-xxxxxx]`. */
+const leftCopies = /^datardo-gridfs(?:-[A-Za-z0-9]{6})?$/u;
 
-/** Deletes the copies `gridfs.open` wrote: when Datardo quits, and when it starts after a quit that could not. */
-export async function removeCopies(folder: string = copiesFolder()): Promise<void> {
-  await rm(folder, { recursive: true, force: true });
+/** The folder of the copies of this run, once made. */
+let copies: string | undefined;
+
+/** Whether a path is a folder of the user's own, not a link, that nobody else may read or write (on macOS and Linux). */
+async function isOwnFolder(path: string): Promise<boolean> {
+  try {
+    const found = await lstat(path);
+    const uid = process.getuid?.();
+    const own = uid === undefined || (found.uid === uid && (found.mode & 0o077) === 0);
+    return found.isDirectory() && !found.isSymbolicLink() && own;
+  } catch {
+    // Gone, during the run (a cleanup of the temporary folder): a new one is made.
+    return false;
+  }
 }
 
 /**
- * At start, the copies a quit could not delete are deleted, without waiting; when Datardo quits, those of this time.
+ * The folder of the copies `gridfs.open` writes: made at the first **Open** of this run in the system's temporary
+ * folder with a name nobody can know in advance, `datardo-gridfs-` and six random characters, with the mode `0700`;
+ * made again, with a new name, when it has gone during the run. A folder another user made, or a link, is never used.
+ */
+export async function copiesFolder(base: string = tmpdir()): Promise<string> {
+  if (copies !== undefined && (await isOwnFolder(copies))) {
+    return copies;
+  }
+  // `mkdtemp` makes a new folder with six random characters and the mode 0700, and fails rather than reuse one.
+  copies = await mkdtemp(join(base, copiesPrefix));
+  return copies;
+}
+
+/** Whether a path is inside the folder of the copies of this run. */
+export function isCopy(path: string): boolean {
+  return copies !== undefined && resolve(path).startsWith(`${resolve(copies)}${sep}`);
+}
+
+/** Deletes the copies `gridfs.open` wrote in this run: when Datardo quits. */
+export async function removeCopies(): Promise<void> {
+  const folder = copies;
+  copies = undefined;
+  if (folder !== undefined) {
+    await rm(folder, { recursive: true, force: true });
+  }
+}
+
+/**
+ * Deletes what a quit could not (a copy still open in its application): the folders of the temporary folder named
+ * `datardo-gridfs-` and six characters, and the `datardo-gridfs` of the older versions, when they are folders of the
+ * user's own and not links. A folder of another user, or a link of that name, is left alone.
+ */
+export async function removeLeftCopies(base: string = tmpdir()): Promise<void> {
+  const names = await readdir(base).catch(() => [] as string[]);
+  for (const name of names.filter((each) => leftCopies.test(each))) {
+    const path = join(base, name);
+    const found = await lstat(path).catch(() => undefined);
+    const uid = process.getuid?.();
+    if (found?.isDirectory() === true && !found.isSymbolicLink() && (uid === undefined || found.uid === uid)) {
+      await rm(path, { recursive: true, force: true });
+    }
+  }
+}
+
+/**
+ * At start, the copies a quit could not delete are deleted, without waiting; when Datardo quits, those of this run.
  * A copy the system's application still holds open stays until the next start.
  */
 export function start(services: MainServices): Promise<void> {
-  void removeCopies().catch(() => undefined);
+  void removeLeftCopies().catch(() => undefined);
   services.onQuit(() => removeCopies().catch(() => undefined));
   return Promise.resolve();
 }
@@ -129,11 +186,12 @@ function downloadOf(args: Json): Download {
 /** Reads the chunks of the download kept as `download` into the file, in order. */
 async function copyChunks(
   send: Send,
-  asked: { readonly download: Download; readonly handle: string; readonly path: string },
+  asked: { readonly download: Download; readonly handle: string; readonly path: string; readonly private: boolean },
   signal: AbortSignal,
   say: (detail: string, last?: 'last') => void,
 ): Promise<void> {
-  const file = await open(asked.path, 'w');
+  // A copy of `gridfs.open` is readable by the user alone (T20); a download keeps the modes of the user's folder.
+  const file = await open(asked.path, 'w', asked.private ? 0o600 : 0o666);
   try {
     let done = 0;
     const total = sizeText(asked.download.length);
@@ -177,9 +235,11 @@ export async function writeDownload(
   }
   const part = `${path}.part`;
   try {
-    // The folder of a copy of `gridfs.open` is made the first time; that of a download was chosen in a dialog.
-    await mkdir(dirname(path), { recursive: true });
-    await copyChunks(send, { download, handle, path: part }, more.signal, throttled(more.progress));
+    // The folder of a copy of `gridfs.open` is made the first time, readable by the user alone; that of a download was
+    // chosen in a dialog.
+    const copy = isCopy(path);
+    await mkdir(dirname(path), { recursive: true, ...(copy ? { mode: 0o700 } : {}) });
+    await copyChunks(send, { download, handle, path: part, private: copy }, more.signal, throttled(more.progress));
     // A cancel that came with the last chunk leaves no file either.
     more.signal.throwIfAborted();
     await rename(part, path);
