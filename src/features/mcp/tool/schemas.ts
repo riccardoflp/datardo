@@ -41,7 +41,7 @@ export const projectionProp: PropertySchema = {
 export const pipelineProp: PropertySchema = {
   type: 'string',
   description:
-    'Aggregation pipeline in mongosh syntax, e.g. [ { $match: { status: "active" } }, { $group: { _id: "$city", n: { $sum: 1 } } } ]. $out and $merge are refused.',
+    'Aggregation pipeline in mongosh syntax, e.g. [ { $match: { status: "active" } }, { $group: { _id: "$city", n: { $sum: 1 } } } ]. $out, $merge, $changeStream, $currentOp, $listSessions, $queryStats, $listSampledQueries, $planCacheStats and reading a system.* collection are refused, also in nested pipelines.',
 };
 
 /** `database` of Redis: the index. */

@@ -8,7 +8,7 @@
 import type { ConnectionView } from '../../../shared/connection';
 import { savedConnection } from '../../../shared/state/connections';
 import { withoutSecrets } from '../../runner/error';
-import { boolArg, stringArg, toolConnection } from '../arguments';
+import { boolArg, refuseSystemCollection, stringArg, toolConnection } from '../arguments';
 import { isFailed } from '../types';
 import { listOf, recordOf, textIn } from './mongo';
 import type { ToolSession } from './program';
@@ -89,6 +89,11 @@ function checkLine(session: ToolSession, linked: ConnectionView): string {
 
 /** `redis_oplog_status`. */
 export function redisOplogStatus(session: ToolSession): string {
+  const database = stringArg(session.args, 'database');
+  const collection = stringArg(session.args, 'collection');
+  if (database !== undefined && collection !== undefined) {
+    refuseSystemCollection(database, collection);
+  }
   const connection = toolConnection(session, 'mongodb');
   const options = oplogOptions(connection);
   const readOnly = connection.readOnly

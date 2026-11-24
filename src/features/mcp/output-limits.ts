@@ -2,8 +2,9 @@
  * Feature: mcp.output-limits
  *
  * What bounds every tool of the MCP server: how much text it returns (`MAX_OUTPUT`), how long a query or a command may
- * run (`MAX_TIME_MS`), where counts stop (`COUNT_CAP`), and the tools' own bounds on items and values, so that a
- * result never floods the model's context and a tool never runs for long on the user's server.
+ * run (`MAX_TIME_MS`), where counts stop (`COUNT_CAP`), the largest `skip` (`SKIP_MAX`), the messages of one batch
+ * (`MAX_BATCH`), and the tools' own bounds on items and values, so that a result never floods the model's context and a
+ * tool never runs for long on the user's server.
  */
 import { groupThousands } from '../../shared/text-units';
 
@@ -15,6 +16,12 @@ export const MAX_TIME_MS = 30_000;
 
 /** Counts stop here unless `exact` is asked. */
 export const COUNT_CAP = 100_000;
+
+/** The largest `skip` of `find_documents`, so that a call cannot make the server walk a collection for nothing. */
+export const SKIP_MAX = 1_000_000;
+
+/** The messages of one JSON-RPC batch, each of which may run a command for {@link MAX_TIME_MS} (`mcp.server`). */
+export const MAX_BATCH = 20;
 
 /** The characters `watch_changes`, `write_history` and `redis_scan_keys` keep for their head and foot. */
 export const HEAD_AND_FOOT = 2000;

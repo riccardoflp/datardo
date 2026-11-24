@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { MongoRequest } from '../../../src/shared/engine-request';
 import { spanText } from '../../../src/features/mcp/tool/changes';
 import { keptKeyLine, type UndoEntry } from '../../../src/features/mcp/tool/undo-writes';
+import { historyFilter, isSystemWrite } from '../../../src/features/mcp/debugging-tools';
 import {
   answerOf,
   cache,
@@ -206,6 +207,51 @@ describe('mcp.debugging-tools', () => {
     expect(driven.sent.every((each) => ['runCommand', 'find'].includes((each.request as MongoRequest).method))).toBe(
       true,
     );
+  });
+
+  it('never shows a write to a system.* collection, nor counts it', () => {
+    expect(isSystemWrite({ op: 'i', ns: 'admin.system.users', o: { _id: 'shop.ada', user: 'ada' } })).toBe(true);
+    expect(isSystemWrite({ op: 'c', ns: 'shop.$cmd', o: { drop: 'system.profile' } })).toBe(true);
+    expect(isSystemWrite({ op: 'c', ns: 'shop.$cmd', o: { create: 'orders' } })).toBe(false);
+    expect(isSystemWrite({ op: 'i', ns: 'shop.orders', o: { _id: 1 } })).toBe(false);
+    const filter = JSON.stringify(historyFilter({ operations: [], limit: 20 }));
+    expect(filter).toContain('"ns":{"$not":{"$regularExpression":{"pattern":"^[^.]*\\\\.system\\\\.","options":""}}}');
+    const entries = [
+      {
+        op: 'i',
+        ns: 'admin.system.users',
+        ts: timestamp(1_767_225_900),
+        wall: date(at + 300_000),
+        o: { _id: 'shop.ada', user: 'ada', credentials: { 'SCRAM-SHA-256': { storedKey: 'secret-key' } } },
+      },
+      {
+        op: 'c',
+        ns: 'admin.$cmd',
+        ts: timestamp(1_767_225_800),
+        wall: date(at + 200_000),
+        o: { applyOps: [{ op: 'i', ns: 'admin.system.users', o: { _id: 'shop.bob', user: 'bob' } }] },
+      },
+      { op: 'i', ns: 'shop.orders', ts: timestamp(1_767_225_600), wall: date(at), o: { _id: 'w1', total: 10 } },
+    ];
+    const text = answerOf(
+      drive(
+        'write_history',
+        { connection: 'Local' },
+        {
+          mongo: withDeployment('primary', (request) => {
+            if (request.method !== 'find') {
+              return undefined;
+            }
+            const options = request.arguments[1] as { projection?: unknown };
+            return options.projection === undefined ? entries : [{ ts: timestamp(1_767_225_600), wall: date(at) }];
+          }),
+        },
+      ),
+    );
+    expect(text.split('\n')[0]).toMatch(/newest first: 1 operation\.$/u);
+    for (const hidden of ['system.users', 'ada', 'bob', 'secret-key', 'transaction']) {
+      expect(text).not.toContain(hidden);
+    }
   });
 
   it('refuses the oplog of a mongos, a standalone server, without the role, and times out', () => {

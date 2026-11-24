@@ -1,13 +1,15 @@
 /**
  * The HTTP side of the MCP server (`mcp.server`, R14.7): Node's own `http` module, listening on `127.0.0.1` only. Each
  * request is checked by the pure `checkRequest` before its body is read (host, origin, path, token, method, size);
- * the body, at most 1 MB, is read as JSON and each of its messages answered; every answer is plain JSON with
+ * the body, at most 1 MB, is read as JSON and each of its messages answered, a batch of more than 20 messages being
+ * refused whole before any runs; every answer is plain JSON with
  * `Connection: close` (the Streamable HTTP transport without server-sent events or sessions).
  */
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
 import type { RpcResponse } from '../../features/mcp/protocol';
 import { batchBody } from '../../features/mcp/protocol';
 import {
+  batchRefusal,
   bodyAnswer,
   checkRequest,
   listenHost,
@@ -68,6 +70,10 @@ async function answerBody(ports: HttpPorts, text: string): Promise<HttpAnswer> {
   } catch {
     // Not JSON: the protocol's own answer, -32700.
     return parseErrorAnswer;
+  }
+  const refused = batchRefusal(parsed);
+  if (refused !== undefined) {
+    return refused;
   }
   const wasArray = Array.isArray(parsed);
   const messages: readonly unknown[] = wasArray ? (parsed as readonly unknown[]) : [parsed];

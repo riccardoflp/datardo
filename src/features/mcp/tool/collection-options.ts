@@ -1,8 +1,11 @@
 /**
  * The text of `collection_options` (`mcp.data-model-tools`): a collection's definition from its entry of
- * `listCollections`, and its shard key from `config.collections` when it is sharded.
+ * `listCollections`, and its shard key from `config.collections` when it is sharded. With `datardo.mcp.readData` off,
+ * the validator is given as field names and types and a view's pipeline as its shape (`mcp.read-data`).
  */
+import type { Json } from '../../../shared/engine-request';
 import { counted } from '../output-limits';
+import { pipelineShape, validatorShape } from '../read-data';
 import { numberIn, recordOf, shellText, textIn } from './mongo';
 
 const levels: Readonly<Record<string, string>> = {
@@ -41,7 +44,11 @@ function kindOf(entry: Readonly<Record<string, unknown>>, options: Readonly<Reco
   return `a${capped}${clustered} collection`;
 }
 
-function validatorLines(options: Readonly<Record<string, unknown>>, view: boolean): readonly string[] {
+function validatorLines(
+  options: Readonly<Record<string, unknown>>,
+  view: boolean,
+  readData: boolean,
+): readonly string[] {
   const validator = recordOf(options['validator']);
   const keys = Object.keys(validator);
   if (keys.length === 0) {
@@ -50,7 +57,9 @@ function validatorLines(options: Readonly<Record<string, unknown>>, view: boolea
   const what = keys.includes('$jsonSchema') ? (keys.length > 1 ? '$jsonSchema and query' : '$jsonSchema') : 'query';
   return [
     '',
-    `Validator (${what}): ${shellText(validator)}`,
+    readData
+      ? `Validator (${what}): ${shellText(validator)}`
+      : `Validator (${what}; field names and types only, datardo.mcp.readData is off): ${validatorShape(validator as Json)}`,
     ...validationLines(textIn(options['validationLevel']), textIn(options['validationAction'])),
   ];
 }
@@ -100,15 +109,29 @@ function otherLines(options: Readonly<Record<string, unknown>>): readonly string
   return lines;
 }
 
-/** The text of `collection_options`, from the entry of `listCollections` and the document of `config.collections`. */
-export function optionsText(name: string, entry: Readonly<Record<string, unknown>>, sharded: unknown): string {
+function pipelineLine(pipeline: unknown, readData: boolean): string {
+  return readData
+    ? `Pipeline: ${shellText(pipeline)}`
+    : `Pipeline (values replaced by ?, datardo.mcp.readData is off): ${pipelineShape(pipeline as Json)}`;
+}
+
+/**
+ * The text of `collection_options`, from the entry of `listCollections` and the document of `config.collections`;
+ * without `readData` the validator and the view's pipeline are given without their values.
+ */
+export function optionsText(
+  name: string,
+  entry: Readonly<Record<string, unknown>>,
+  sharded: unknown,
+  readData: boolean,
+): string {
   const options = recordOf(entry['options']);
   const view = entry['type'] === 'view';
   const lines = [`${name} is ${kindOf(entry, options)}.`];
   if (view) {
-    lines.push(`View on: ${textIn(options['viewOn']) ?? '?'}`, `Pipeline: ${shellText(options['pipeline'] ?? [])}`);
+    lines.push(`View on: ${textIn(options['viewOn']) ?? '?'}`, pipelineLine(options['pipeline'] ?? [], readData));
   }
-  lines.push(...validatorLines(options, view), ...otherLines(options));
+  lines.push(...validatorLines(options, view, readData), ...otherLines(options));
   const key = recordOf(sharded)['key'];
   if (key !== undefined) {
     lines.push('', `Sharded, shard key ${shellText(key)}${recordOf(sharded)['unique'] === true ? ' (unique)' : ''}.`);

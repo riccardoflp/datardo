@@ -6,7 +6,7 @@ import { clusterOf } from '../../../src/features/monitor/read-sharding';
 import { parse as eventsOf } from '../../../src/features/monitor/read-sharding-events';
 import { now } from '../monitor/context';
 import { changelog, clusterReplies } from '../monitor/sharding-replies';
-import { answerOf, drive, failed, hello, nameOf } from './harness';
+import { answerOf, drive, failed, failureOf, hello, mcpState, nameOf } from './harness';
 
 type Kind = 'primary' | 'standalone' | 'mongos';
 
@@ -112,6 +112,49 @@ describe('mcp.deployment-tools', () => {
     expect(driven.apps).toEqual([{ action: 'monitor.sharding', args: { connection: 'c-local', events: 20 } }]);
     expect(answerOf(driven)).toContain('Shards (1)');
     wroteNothing(driven.sent);
+  });
+
+  it("leaves out the events' details and the server's texts with datardo.mcp.readData off", () => {
+    const reply: ShardingReply = {
+      shards: [{ name: 'shard0', replSet: 'rs-a', members: ['a:27018'], zones: [], primaryOf: ['shop'] }],
+      zones: [],
+      collections: [],
+      balancer: { enabled: true, running: false },
+      events: [
+        {
+          time: '2026-01-01T00:00:00Z',
+          what: 'moveChunk.commit',
+          ns: 'shop.orders',
+          shard: 'shard0',
+          summary: 'min { customerId: "ada@example.com" }',
+          failed: false,
+        },
+      ],
+      errors: ['config.settings: not authorized on config to execute command { find: "settings" }'],
+    };
+    const sharding = (readData: boolean, answer: unknown) =>
+      drive(
+        'sharding_status',
+        { connection: 'Local' },
+        { mongo: server('mongos'), app: () => answer },
+        mcpState({ settings: { 'datardo.mcp.readData': readData } }),
+      );
+    const off = answerOf(sharding(false, reply));
+    expect(off).not.toContain('ada@example.com');
+    expect(off).not.toContain('not authorized');
+    expect(off).toContain(
+      "(the events' details are left out: they quote shard key values and datardo.mcp.readData is off)",
+    );
+    expect(off).toContain('- config.settings');
+    const on = answerOf(sharding(true, reply));
+    expect(on).toContain('ada@example.com');
+    expect(on).toContain('not authorized on config');
+    expect(answerOf(sharding(false, { ...reply, events: undefined, eventsError: 'refused at ada' }))).not.toContain(
+      'ada',
+    );
+    expect(
+      failureOf(sharding(false, { kind: 'error', message: 'secret text', code: 13, codeName: 'Unauthorized' })),
+    ).toBe('The sharded cluster could not be read: its text is left out because datardo.mcp.readData is off.');
   });
 
   it('answers monitor.sharding with the shards, the collections and the newest events of the cluster', () => {

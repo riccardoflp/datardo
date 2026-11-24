@@ -9,6 +9,7 @@
 import type { Context } from '../../shared/feature';
 import { intArg, stringArg, toolConnection } from './arguments';
 import { counted } from './output-limits';
+import { mcpSettings } from './read-data';
 import { deploymentOf, notAuthorized } from './tool/deployment';
 import { listOf, mongoCall, mongoCommand, numberIn, recordOf, textIn, type MongoPlace } from './tool/mongo';
 import { replyOrProblem, ToolProblem, type ToolSession } from './tool/program';
@@ -228,8 +229,16 @@ function shardingStatus(session: ToolSession): string {
       : `${me} is a config server of a sharded cluster, not a mongos: connect to a mongos to see the shards, the sharded collections and the balancer.`;
   }
   const reply = session.app(shardingAction, { connection: connection.id, events });
+  const readData = mcpSettings(session.context.state.settings).readData;
+  if (isFailed(reply) && !readData) {
+    // The server's text of what it could not read may quote shard key values: only what failed is said.
+    throw new ToolProblem(
+      'The sharded cluster could not be read: its text is left out because datardo.mcp.readData is off.',
+    );
+  }
   return shardingText(
     recordOf(replyOrProblem(reply, 'The sharded cluster could not be read: ')) as unknown as ShardingReply,
+    readData,
   );
 }
 

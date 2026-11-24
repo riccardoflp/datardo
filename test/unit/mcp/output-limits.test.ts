@@ -4,8 +4,10 @@ import {
   clippedValue,
   COUNT_CAP,
   fittedItems,
+  MAX_BATCH,
   MAX_OUTPUT,
   MAX_TIME_MS,
+  SKIP_MAX,
   truncated,
   truncationLine,
 } from '../../../src/features/mcp/output-limits';
@@ -84,5 +86,27 @@ describe('mcp.output-limits', () => {
     expect(failureOf(silent)).toBe(`${cache.name} did not answer within 30 s.`);
     const next = drive('list_connections', {});
     expect(answerOf(next)).toContain(local.name);
+  });
+
+  it('reads a skip up to 1,000,000 and refuses one beyond before anything is sent', () => {
+    expect([SKIP_MAX, MAX_BATCH]).toEqual([1_000_000, 20]);
+    const orders = { connection: 'Local', database: 'shop', collection: 'orders' };
+    const replies = {
+      mongo: (request: MongoRequest): unknown =>
+        request.method === 'listCollections'
+          ? [{ name: 'orders', type: 'collection' }]
+          : request.method === 'countDocuments'
+            ? 0
+            : [],
+    };
+    const most = drive('find_documents', { ...orders, skip: 1_000_000 }, replies);
+    expect(answerOf(most)).toContain('shop.orders');
+    const find = most.sent.find((each) => nameOf(each.request as MongoRequest) === 'find');
+    expect(JSON.stringify(find?.request)).toContain('1000000');
+    for (const skip of [1_000_001, -1]) {
+      const refused = drive('find_documents', { ...orders, skip }, replies);
+      expect(failureOf(refused)).toBe('skip must be between 0 and 1000000.');
+      expect(refused.sent).toEqual([]);
+    }
   });
 });

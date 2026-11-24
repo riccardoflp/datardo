@@ -78,4 +78,19 @@ describe('mcp.log', () => {
     );
     expect(refused?.status).toBe(401);
   });
+
+  it('writes an error of 1,000 characters on three lines on one line, cut at 300 with …', () => {
+    const message = `${'a'.repeat(400)}\n  ${'b'.repeat(300)}\r\n${'c'.repeat(296)}`;
+    const line = logLine({ kind: 'call', tool: 'count_documents', arguments: {}, outcome: { kind: 'error', message } });
+    expect(line).toBe(`count_documents {} → error: ${'a'.repeat(300)}…`);
+    expect(line).not.toMatch(/[\r\n\u2028\u2029]/u);
+    const short = logLine({
+      kind: 'call',
+      tool: 'count_documents',
+      arguments: {},
+      outcome: { kind: 'error', message: 'first\nsecond\u2028third' },
+    });
+    expect(short).toBe('count_documents {} → error: first second third');
+    expect(logLine({ kind: 'not-started', why: 'Port 37018\nis taken' })).toBe('Not started: Port 37018 is taken');
+  });
 });

@@ -2,7 +2,8 @@
  * Feature: mcp.log
  *
  * What the MCP server writes in the Log, under the source **MCP**, for the user to check: one line for each call of a
- * known tool, with its arguments and its outcome, and one line each time the server's state changes. Nothing is
+ * known tool, with its arguments and its outcome (an error on one line, cut at 300 characters), and one line each
+ * time the server's state changes: no line the server writes has a line break. Nothing is
  * written for `initialize`, `tools/list`, `ping`, a call of an unknown or hidden tool, or a request the HTTP checks
  * refused; the access token is never written.
  */
@@ -35,8 +36,25 @@ export type McpLogEvent =
 
 /** The arguments of a call as JSON on one line, cut at 300 characters with `…`. */
 export function argumentsText(args: ToolArguments): string {
-  const text = JSON.stringify(args);
+  return cutText(JSON.stringify(args));
+}
+
+/** A text cut at 300 characters with `…`. */
+function cutText(text: string): string {
   return text.length > longestArguments ? `${text.slice(0, longestArguments)}…` : text;
+}
+
+/** A text on one line: its line breaks, and the spaces around them, become one space. */
+function oneLine(text: string): string {
+  return text.replace(/\s*[\r\n\u2028\u2029]\s*/gu, ' ');
+}
+
+/**
+ * The message of an error on one line, cut at 300 characters with `…`, so that a long or many-line error of the
+ * server neither floods the Log nor passes for other lines.
+ */
+export function errorLogText(message: string): string {
+  return cutText(oneLine(message));
 }
 
 function outcomeText(outcome: CallOutcome): string {
@@ -44,7 +62,7 @@ function outcomeText(outcome: CallOutcome): string {
     case 'ok':
       return 'ok';
     case 'error':
-      return `error: ${outcome.message}`;
+      return `error: ${errorLogText(outcome.message)}`;
     case 'missing':
       return `missing ${outcome.keys.join(', ')}`;
   }
@@ -64,7 +82,7 @@ export function logLine(event: McpLogEvent): string {
     case 'stopped':
       return 'Stopped';
     case 'not-started':
-      return `Not started: ${event.why}`;
+      return `Not started: ${oneLine(event.why)}`;
     case 'new-token':
       return 'New access token: the old one no longer works';
   }

@@ -141,7 +141,12 @@ function balancerLine(reply: ShardingReply): readonly string[] {
   return [`${parts.join(', ')}.`];
 }
 
-function eventLines(reply: ShardingReply): readonly string[] {
+function eventLine(event: ShardingEvent, readData: boolean): string {
+  const details = event.summary === undefined || !readData ? '' : `: ${event.summary}`;
+  return `- ${event.time} ${event.failed ? 'FAILED ' : ''}${event.what}${event.ns === undefined ? '' : ` ${event.ns}`}${event.shard === undefined ? '' : ` on ${event.shard}`}${details}`;
+}
+
+function eventLines(reply: ShardingReply, readData: boolean): readonly string[] {
   if (reply.events === undefined && reply.eventsError === undefined) {
     return [];
   }
@@ -149,20 +154,32 @@ function eventLines(reply: ShardingReply): readonly string[] {
     (one, other) => Number(other.failed) - Number(one.failed) || other.time.localeCompare(one.time),
   );
   const failed = sorted.filter((each) => each.failed).length;
+  const hidden =
+    !readData && sorted.length > 0
+      ? " (the events' details are left out: they quote shard key values and datardo.mcp.readData is off)"
+      : '';
   return [
     '',
-    `Recent events (config.changelog and balancer rounds), failures first${failed > 0 ? ` (${String(failed)} failed)` : ''}:`,
-    ...(reply.eventsError === undefined ? [] : [`- could not be read: ${reply.eventsError}`]),
+    `Recent events (config.changelog and balancer rounds), failures first${failed > 0 ? ` (${String(failed)} failed)` : ''}${hidden}:`,
+    ...(reply.eventsError === undefined
+      ? []
+      : [readData ? `- could not be read: ${reply.eventsError}` : '- could not be read']),
     ...(reply.eventsError === undefined && sorted.length === 0 ? ['- none'] : []),
-    ...sorted.map(
-      (each) =>
-        `- ${each.time} ${each.failed ? 'FAILED ' : ''}${each.what}${each.ns === undefined ? '' : ` ${each.ns}`}${each.shard === undefined ? '' : ` on ${each.shard}`}${each.summary === undefined ? '' : `: ${each.summary}`}`,
-    ),
+    ...sorted.map((each) => eventLine(each, readData)),
   ];
 }
 
-/** The text of `sharding_status` on a mongos. */
-export function shardingText(reply: ShardingReply): string {
+/** What could not be read, `<what>: <the server's text>`; without `readData` only what it was. */
+function errorLine(error: string, readData: boolean): string {
+  const colon = error.indexOf(': ');
+  return `- ${readData || colon < 0 ? error : error.slice(0, colon)}`;
+}
+
+/**
+ * The text of `sharding_status` on a mongos. Without `readData` the details of the recent events, which quote chunk
+ * ranges (shard key values), and the server's text of what could not be read are left out; the zones stay as names.
+ */
+export function shardingText(reply: ShardingReply, readData: boolean): string {
   const routers = reply.routers;
   return [
     `Sharded cluster${reply.version === undefined ? '' : ` (mongos ${reply.version})`}${reply.configServer === undefined ? '' : `, config servers ${reply.configServer}`}${routers === undefined ? '' : `, ${String(routers.active)} of ${counted(routers.total, 'mongos router')} active in the last minute`}.`,
@@ -178,9 +195,13 @@ export function shardingText(reply: ShardingReply): string {
     '',
     `Sharded collections (${String(reply.collections.length)}):`,
     ...(reply.collections.length === 0 ? ['- none'] : reply.collections.map(collectionLine)),
-    ...eventLines(reply),
+    ...eventLines(reply, readData),
     ...(reply.errors.length === 0
       ? []
-      : ['', 'Could not be read (missing roles, usually clusterMonitor):', ...reply.errors.map((each) => `- ${each}`)]),
+      : [
+          '',
+          'Could not be read (missing roles, usually clusterMonitor):',
+          ...reply.errors.map((each) => errorLine(each, readData)),
+        ]),
   ].join('\n');
 }

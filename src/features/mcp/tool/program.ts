@@ -11,6 +11,7 @@ import type { ConnectionRequest, Json } from '../../../shared/engine-request';
 import type { Context } from '../../../shared/feature';
 import { withoutSecrets } from '../../runner/error';
 import { truncated } from '../output-limits';
+import { errorText, mcpSettings } from '../read-data';
 import type { ToolArguments, ToolCall, ToolStep } from '../types';
 import { isFailed } from '../types';
 
@@ -53,10 +54,14 @@ function sessionOf(context: Context, call: ToolCall): ToolSession {
     }
     return replies;
   };
+  const settings = mcpSettings(context.state.settings);
+  const told = (reply: unknown): unknown =>
+    isFailed(reply) ? { ...reply, message: errorText(reply, settings) } : reply;
   return {
     context,
     args: call.arguments,
-    send: (requests) => (requests.length === 0 ? [] : next({ kind: 'send', requests })),
+    // A server's error quotes the values it failed on: with `datardo.mcp.readData` off, every tool reads only its code.
+    send: (requests) => (requests.length === 0 ? [] : next({ kind: 'send', requests }).map(told)),
     app: (action, args) => next({ kind: 'app', action, args })[0],
   };
 }

@@ -34,7 +34,7 @@ import {
   writesFilter,
 } from './tool/changes';
 import { codeOf, deploymentOf, notAuthorized } from './tool/deployment';
-import { listOf, mongoCall, recordOf, type MongoPlace } from './tool/mongo';
+import { listOf, mongoCall, recordOf, textIn, type MongoPlace } from './tool/mongo';
 import { replyOrProblem, ToolProblem, type ToolSession } from './tool/program';
 import { mongoshObject } from './tool/query';
 import { booleanProp, connectionProp, endOf, groupOf, integerProp, filterProp } from './tool/schemas';
@@ -46,6 +46,7 @@ import {
   type UndoHistoryReply,
   type UndoWriteReply,
 } from './tool/undo-writes';
+import { isSystemCollection } from './tool/system-collections';
 import { scopeText, watchChanges } from './tool/watch';
 import { isFailed, mcpActions, type ToolCall, type ToolEnd, type ToolStep } from './types';
 
@@ -84,7 +85,10 @@ function historyArgs(session: ToolSession): HistoryArgs {
   };
 }
 
-/** The filter of `write_history`, with its times. */
+/** A namespace of a `system.*` collection, in any database. */
+const systemNamespace = '^[^.]*\\.system\\.';
+
+/** The filter of `write_history`, with its times, without the writes to the `system.*` collections. */
 export function historyFilter(asked: HistoryArgs): Json {
   const codes = (asked.operations.length === 0 ? Object.keys(oplogOperations) : asked.operations).map(
     (each) => oplogOperations[each] ?? each,
@@ -100,17 +104,38 @@ export function historyFilter(asked: HistoryArgs): Json {
     ...(asked.since === undefined ? {} : { $gte: { $timestamp: { t: Math.floor(asked.since / 1000), i: 0 } } }),
     ...(asked.until === undefined ? {} : { $lt: { $timestamp: { t: Math.floor(asked.until / 1000) + 1, i: 0 } } }),
   };
-  return Object.keys(ts).length === 0 ? filter : { ...filter, ts };
+  // The writes to the system.* collections (users with their credentials, views…) are never read.
+  const withoutSystem = { ...filter, ns: { $not: { $regularExpression: { pattern: systemNamespace, options: '' } } } };
+  return Object.keys(ts).length === 0 ? withoutSystem : { ...withoutSystem, ts };
 }
 
-/** The rows of the entries: each operation, those of a transaction under the heading of their entry. */
+/**
+ * Whether an operation of the oplog writes to a `system.*` collection: its namespace (`admin.system.users`), or the
+ * collection a command names (`{ drop: "system.profile" }`).
+ */
+export function isSystemWrite(entry: Readonly<Record<string, unknown>>): boolean {
+  const ns = textIn(entry['ns']) ?? '';
+  const [target] = Object.values(recordOf(entry['o']));
+  return (
+    isSystemCollection(ns.slice(ns.indexOf('.') + 1)) ||
+    (entry['op'] === 'c' && typeof target === 'string' && isSystemCollection(target))
+  );
+}
+
+/**
+ * The rows of the entries: each operation, those of a transaction under the heading of their entry; the writes to a
+ * `system.*` collection are left out, and a transaction with nothing else left goes with them.
+ */
 export function oplogRows(entries: readonly Readonly<Record<string, unknown>>[]): readonly string[] {
   const rows: string[] = [];
-  for (const entry of entries) {
-    const inner = listOf(recordOf(entry['o'])['applyOps']).map(recordOf);
-    if (entry['op'] === 'c' && inner.length > 0) {
+  for (const entry of entries.filter((each) => !isSystemWrite(each))) {
+    const all = listOf(recordOf(entry['o'])['applyOps']).map(recordOf);
+    const inner = all.filter((each) => !isSystemWrite(each));
+    if (entry['op'] === 'c' && all.length > 0) {
       const lines = inner.map((each) => oplogRowText({ ...each, ts: entry['ts'], wall: entry['wall'] }, true));
-      rows.push(`${timeOf(entry['wall'], entry['ts'])} ${transactionHeading(entry)}:\n${lines.join('\n')}`);
+      if (lines.length > 0) {
+        rows.push(`${timeOf(entry['wall'], entry['ts'])} ${transactionHeading(entry)}:\n${lines.join('\n')}`);
+      }
     } else {
       rows.push(oplogRowText(entry, false));
     }
