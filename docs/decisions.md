@@ -637,6 +637,20 @@ as the fallbacks. Rejected: the system fonts alone (Segoe UI, San Francisco and 
 which moves every layout from one system to another); fetching them from a font service (Datardo works offline).
 *Decided by the author on 2026-11-21, for M36.*
 
+## D67 — The tools of the build take the fixed `glob` and `minimatch`
+
+`npm audit` reported 24 moderate advisories, all in the tools of the build and none in what Datardo bundles: `glob`
+from 9.0.0 to 14.0.1 (GHSA-3g3m-2fjr-6pw4) and `minimatch` from 7.0.0 to 11.0.0 (GHSA-g3hv-75wg-m249), reached through
+`electron-builder` (`app-builder-lib`, `@electron/universal`) and `license-checker-rseidelsohn` (`@npmcli/arborist`).
+The latest versions of those two tools still ask for them. The `overrides` of `package.json` give them `glob` 14 in
+place of 13 and `minimatch` 11 in place of 9 and 10, whose interface they use unchanged; the older majors that other
+tools ask for, outside the advisories' ranges, are left as they are. No dependency is added, and the list of
+[D22](#d22--dependencies-from-a-list-with-their-licenses-checked) is unchanged. Each override is removed once the tool
+that needed it asks for a fixed version itself. Rejected: `npm audit fix --force` (it would go back to
+`electron-builder` 25.1.0 and `license-checker-rseidelsohn` 4.4.2, older majors); leaving the advisories (they are not
+in the product, but `npm audit` would keep hiding a real one among them).
+*Decided on 2026-11-24, when the author asked for the advisories to be fixed: to confirm.*
+
 ## Open questions
 
 - **Q1** — *Answered on 2026-11-18 by [D7](#d7--home-is-the-first-page)*: the last active tab when tabs are restored,
