@@ -30,7 +30,7 @@ function proxyOf(connection: FileConnection): string | undefined {
     : `${host}${port === undefined || port === '' ? '' : `:${port}`}`;
 }
 
-/** The Redis server the writes of a MongoDB connection would be published to, as `<host>:<port>`. */
+/** The Redis server the writes of a MongoDB connection would be published to, as `<host>:<port>`; undefined when unread. */
 function oplogHost(connection: FileConnection, all: readonly FileConnection[]): string | undefined {
   const oplog = connection.oplog;
   if (oplog === undefined) {
@@ -40,7 +40,7 @@ function oplogHost(connection: FileConnection, all: readonly FileConnection[]): 
   const address = linked?.connectionString ?? oplog.url;
   const fields = address === undefined ? undefined : redisFromString(address);
   return fields === undefined || isRedisStringProblem(fields) || fields.host === ''
-    ? transferText.unreadableHost
+    ? undefined
     : `${fields.host}:${String(fields.port)}`;
 }
 
@@ -61,8 +61,8 @@ export function securityNotes(connection: FileConnection, all: readonly FileConn
   const oplog = oplogHost(connection, all);
   return [
     ...(connection.tls === undefined ? [] : [transferText.tls]),
-    ...(certificates ? [transferText.invalidCertificates] : []),
-    ...(hostNames ? [transferText.invalidHostNames] : []),
+    ...(certificates ? [transferText.invalidAllowed('certificates')] : []),
+    ...(hostNames ? [transferText.invalidAllowed('host names')] : []),
     ...(proxy === undefined ? [] : [transferText.proxy(proxy)]),
     ...(ssh === undefined
       ? []
@@ -72,7 +72,7 @@ export function securityNotes(connection: FileConnection, all: readonly FileConn
             `${ssh.host}${ssh.port === undefined || ssh.port === 22 ? '' : `:${String(ssh.port)}`}`,
           ),
         ]),
-    ...(oplog === undefined ? [] : [transferText.redisOplog(oplog)]),
+    ...(connection.oplog === undefined ? [] : [transferText.redisOplog(oplog)]),
     ...(connection.noHistory === true ? [transferText.noUndoHistory] : []),
     ...(connection.queriesFolder === undefined ? [] : [transferText.queriesFolder(connection.queriesFolder)]),
   ];
