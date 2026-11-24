@@ -153,7 +153,7 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [`connection.test`](connection.md#connectiontest--test-the-connection) | Test the connection | Read | M6 | Built |
 | [`connection.save`](connection.md#connectionsave--save-the-connection-form) | Save the connection form | Operation | M6 | Built |
 | [`connection.copy-string`](connection.md#connectioncopy-string--copy-the-connection-string) | Copy the connection string | Read | M7 | Built |
-| [`connection.duplicate`](connection.md#connectionduplicate--duplicate-a-connection) | Duplicate a connection | Operation | M7, M38 (changed), M39 (changed) | Differs |
+| [`connection.duplicate`](connection.md#connectionduplicate--duplicate-a-connection) | Duplicate a connection | Operation | M7, M38 (changed), M39 (changed) | Built |
 | [`connection.connect`](connection.md#connectionconnect--connect-a-connection) | Connect a connection | Operation | M6 | Built |
 | [`connection.server-info`](connection.md#connectionserver-info--what-the-server-is) | What the server is | Read | M6 | Built |
 | [`connection.disconnect`](connection.md#connectiondisconnect--disconnect) | Disconnect | Operation | M6 | Built |
@@ -162,7 +162,7 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [`connection.ssh-tunnel-target`](connection.md#connectionssh-tunnel-target--where-the-ssh-tunnel-leads) | Where the SSH tunnel leads | Derivation | M7 | Built |
 | [`connection.trust-host-key`](connection.md#connectiontrust-host-key--confirm-the-host-key-of-an-ssh-server) | Confirm the host key of an SSH server | Operation | M7 | Built |
 | [`connection.overview`](connection.md#connectionoverview--the-overview-page-of-a-connection) | The Overview page of a connection | View | M6 | Built |
-| [`connection.menu`](connection.md#connectionmenu--the-menu-of-a-connection) | The menu of a connection | View | M6, M39 (changed) | Differs |
+| [`connection.menu`](connection.md#connectionmenu--the-menu-of-a-connection) | The menu of a connection | View | M6, M39 (changed) | Built |
 | [`connection.folder-menu`](connection.md#connectionfolder-menu--the-menu-of-a-folder) | The menu of a folder | View | M7 | Built |
 | [`connection.set-color`](connection.md#connectionset-color--set-the-color-of-a-connection) | Set the color of a connection | Operation | M7, M38 (changed) | Built |
 | [`connection.color-presets`](connection.md#connectioncolor-presets--the-preset-colors-and-custom-colors) | The preset colors and custom colors | Derivation | M38 | Built |
@@ -175,13 +175,13 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [`connection.allow-changes`](connection.md#connectionallow-changes--allow-changes-through-a-read-only-connection) | Allow changes through a read-only connection | Operation | M6 | Built |
 | [`connection.link-redis`](connection.md#connectionlink-redis--link-a-redis-connection-to-a-mongodb-connection) | Link a Redis connection to a MongoDB connection | Operation | M7 | Built |
 | [`connection.unlink-redis`](connection.md#connectionunlink-redis--remove-the-link-to-a-redis-connection) | Remove the link to a Redis connection | Operation | M7 | Built |
-| [`connection.secrets`](connection.md#connectionsecrets--keep-the-secrets-of-a-connection) | Keep the secrets of a connection | Operation | M6, M38 (changed), M39 (changed) | Differs |
-| [`connection.import`](connection.md#connectionimport--import-connections) | Import connections | Operation | M7, M37 (changed), M38 (changed), M39 (changed) | Differs |
-| [`connection.export`](connection.md#connectionexport--export-connections) | Export connections | Operation | M7, M38 (changed), M39 (changed) | Differs |
-| [`connection.read-file`](connection.md#connectionread-file--read-a-connections-file) | Read a connections file | Derivation | M7, M38 (changed), M39 (changed) | Differs |
+| [`connection.secrets`](connection.md#connectionsecrets--keep-the-secrets-of-a-connection) | Keep the secrets of a connection | Operation | M6, M38 (changed), M39 (changed) | Built |
+| [`connection.import`](connection.md#connectionimport--import-connections) | Import connections | Operation | M7, M37 (changed), M38 (changed), M39 (changed) | Built |
+| [`connection.export`](connection.md#connectionexport--export-connections) | Export connections | Operation | M7, M38 (changed), M39 (changed) | Built |
+| [`connection.read-file`](connection.md#connectionread-file--read-a-connections-file) | Read a connections file | Derivation | M7, M38 (changed), M39 (changed) | Built |
 | [`connection.read-list`](connection.md#connectionread-list--read-a-list-of-connection-strings) | Read a list of connection strings | Derivation | M7, M38 (changed) | Built |
 | [`connection.read-compass`](connection.md#connectionread-compass--read-a-mongodb-compass-export) | Read a MongoDB Compass export | Derivation | M7, M38 (changed) | Built |
-| [`connection.write-file`](connection.md#connectionwrite-file--write-a-connections-file) | Write a connections file | Derivation | M7, M38 (changed), M39 (changed) | Differs |
+| [`connection.write-file`](connection.md#connectionwrite-file--write-a-connections-file) | Write a connections file | Derivation | M7, M38 (changed), M39 (changed) | Built |
 | [`connection.encryption`](connection.md#connectionencryption--encrypt-the-passwords-of-a-file-as-compass-does) | Encrypt the passwords of a file as Compass does | Derivation | M7 | Built |
 | [`connection.tls-in-uri`](connection.md#connectiontls-in-uri--tls-settings-in-and-out-of-a-mongodb-connection-string) | TLS settings in and out of a MongoDB connection string | Derivation | M6 | Built |
 | [`connection.color-from-compass`](connection.md#connectioncolor-from-compass--the-closest-color-of-a-compass-connection) | The closest color of a Compass connection | Derivation | M7, M38 (changed) | Built |
@@ -305,7 +305,7 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [`home.jump-back-in`](home.md#homejump-back-in--jump-back-in) | Jump back in | View | M5 | Built |
 | [`home.forget-recent`](home.md#homeforget-recent--remove-a-recent-place) | Remove a recent place | Operation | M5 | Built |
 | [`home.connections`](home.md#homeconnections--the-connection-cards-by-folder) | The connection cards, by folder | View | M5 | Built |
-| [`home.card`](home.md#homecard--a-connection-card) | A connection card | View | M5, M38 (changed), M39 (changed) | Differs |
+| [`home.card`](home.md#homecard--a-connection-card) | A connection card | View | M5, M38 (changed), M39 (changed) | Built |
 | [`home.address`](home.md#homeaddress--the-address-of-a-connection-without-credentials) | The address of a connection, without credentials | Derivation | M5 | Built |
 | [`home.filter`](home.md#homefilter--filter-the-cards-by-text-and-by-engine) | Filter the cards by text and by engine | Derivation | M5 | Built |
 | [`home.card-menu`](home.md#homecard-menu--the-menu-of-a-connection) | The menu of a connection | View | M5 | Built |
@@ -398,7 +398,7 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [`mcp.output-limits`](mcp.md#mcpoutput-limits--bound-what-a-tool-returns-and-how-long-it-runs) | Bound what a tool returns and how long it runs | Derivation | M29, M37 (changed) | Built |
 | [`mcp.refuse-write-stages`](mcp.md#mcprefuse-write-stages--refuse-pipelines-that-write-are-not-a-plain-read-or-read-a-system-collection) | Refuse pipelines that write, are not a plain read, or read a system collection | Derivation | M29, M37 (changed) | Built |
 | [`mcp.log`](mcp.md#mcplog--the-mcp-server-in-the-log) | The MCP server in the Log | Derivation | M29, M37 (changed) | Built |
-| [`mcp.data-tools`](mcp.md#mcpdata-tools--explore-the-connections-and-read-documents) | Explore the connections and read documents | Read | M29, M37 (changed), M39 (changed) | Differs |
+| [`mcp.data-tools`](mcp.md#mcpdata-tools--explore-the-connections-and-read-documents) | Explore the connections and read documents | Read | M29, M37 (changed), M39 (changed) | Built |
 | [`mcp.debugging-tools`](mcp.md#mcpdebugging-tools--follow-what-an-application-writes) | Follow what an application writes | Read | M29, M37 (changed) | Built |
 | [`mcp.performance-tools`](mcp.md#mcpperformance-tools--find-what-makes-a-database-slow) | Find what makes a database slow | Read | M29, M37 (changed) | Built |
 | [`mcp.deployment-tools`](mcp.md#mcpdeployment-tools--read-the-state-of-the-deployment) | Read the state of the deployment | Read | M29, M37 (changed) | Built |
@@ -633,8 +633,8 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`search.show`](search.md#searchshow--the-search-documents-page) | The Search documents page | View | M34, M39 (changed) | Differs |
-| [`search.collections`](search.md#searchcollections--read-the-collections-a-search-reads) | Read the collections a search reads | Read | M34, M39 (changed) | Differs |
+| [`search.show`](search.md#searchshow--the-search-documents-page) | The Search documents page | View | M34, M39 (changed) | Built |
+| [`search.collections`](search.md#searchcollections--read-the-collections-a-search-reads) | Read the collections a search reads | Read | M34, M39 (changed) | Built |
 | [`search.scan`](search.md#searchscan--read-the-documents-of-the-collections-and-find-the-matches) | Read the documents of the collections and find the matches | Read | M34 | Built |
 | [`search.text`](search.md#searchtext--what-the-typed-text-looks-for) | What the typed text looks for | Derivation | M34 | Built |
 | [`search.match`](search.md#searchmatch--the-values-of-a-document-that-match) | The values of a document that match | Derivation | M34 | Built |
@@ -782,10 +782,10 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`tree.show`](tree.md#treeshow--the-tree-island) | The tree island | View | M8, M38 (changed), M39 (changed) | Differs |
+| [`tree.show`](tree.md#treeshow--the-tree-island) | The tree island | View | M8, M38 (changed), M39 (changed) | Built |
 | [`tree.pinned`](tree.md#treepinned--pinned-items) | Pinned items | View | M8, M38 (changed) | Built |
 | [`tree.pages`](tree.md#treepages--pages-of-the-connection) | Pages of the connection | View | M8 | Built |
-| [`tree.mongodb`](tree.md#treemongodb--the-mongodb-nodes) | The MongoDB nodes | View | M8, M38 (changed), M39 (changed) | Differs |
+| [`tree.mongodb`](tree.md#treemongodb--the-mongodb-nodes) | The MongoDB nodes | View | M8, M38 (changed), M39 (changed) | Built |
 | [`tree.list-databases`](tree.md#treelist-databases--list-the-databases) | List the databases | Read | M8 | Built |
 | [`tree.list-collections`](tree.md#treelist-collections--list-the-collections-of-a-database) | List the collections of a database | Read | M8 | Built |
 | [`tree.count`](tree.md#treecount--counts-and-sizes-beside-the-nodes) | Counts and sizes beside the nodes | Read | M8 | Built |
@@ -794,17 +794,17 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [`tree.scan-namespaces`](tree.md#treescan-namespaces--scan-the-keys-of-a-database-for-its-namespaces) | Scan the keys of a database for its namespaces | Read | M8 | Built |
 | [`tree.namespaces`](tree.md#treenamespaces--namespaces-from-key-names) | Namespaces from key names | Derivation | M8 | Built |
 | [`tree.refresh`](tree.md#treerefresh--refresh-the-tree) | Refresh the tree | Read | M8 | Built |
-| [`tree.filter`](tree.md#treefilter--filter-the-tree) | Filter the tree | View | M8, M39 (changed) | Differs |
-| [`tree.match`](tree.md#treematch--whether-a-node-matches-the-filter) | Whether a node matches the filter | Derivation | M8, M39 (changed) | Differs |
-| [`tree.keyboard`](tree.md#treekeyboard--moving-in-the-tree-with-the-keyboard) | Moving in the tree with the keyboard | View | M8, M39 (changed) | Differs |
-| [`tree.select`](tree.md#treeselect--several-nodes-selected) | Several nodes selected | View | M39 | Specified |
+| [`tree.filter`](tree.md#treefilter--filter-the-tree) | Filter the tree | View | M8, M39 (changed) | Built |
+| [`tree.match`](tree.md#treematch--whether-a-node-matches-the-filter) | Whether a node matches the filter | Derivation | M8, M39 (changed) | Built |
+| [`tree.keyboard`](tree.md#treekeyboard--moving-in-the-tree-with-the-keyboard) | Moving in the tree with the keyboard | View | M8, M39 (changed) | Built |
+| [`tree.select`](tree.md#treeselect--several-nodes-selected) | Several nodes selected | View | M39 | Built |
 | [`tree.node-states`](tree.md#treenode-states--loading-empty-and-failed-nodes) | Loading, empty and failed nodes | View | M8 | Built |
 | [`tree.set-collection-color`](tree.md#treeset-collection-color--set-the-color-of-a-collection-a-view-or-a-bucket) | Set the color of a collection, a view or a bucket | Operation | M38 | Built |
 | [`tree.set-database-color`](tree.md#treeset-database-color--set-the-color-of-a-database) | Set the color of a database | Operation | M38 | Built |
 | [`tree.color-of`](tree.md#treecolor-of--which-color-something-of-a-database-or-a-collection-takes) | Which color something of a database or a collection takes | Derivation | M38 | Built |
-| [`tree.exclude-from-searches`](tree.md#treeexclude-from-searches--exclude-from-searches-or-include-again) | Exclude from searches, or include again | Operation | M39 | Specified |
-| [`tree.excluded`](tree.md#treeexcluded--what-searches-leave-out) | What searches leave out | Derivation | M39 | Specified |
-| [`tree.menu-mongodb`](tree.md#treemenu-mongodb--the-context-menu-of-a-mongodb-node) | The context menu of a MongoDB node | View | M8, M38 (changed), M39 (changed) | Differs |
+| [`tree.exclude-from-searches`](tree.md#treeexclude-from-searches--exclude-from-searches-or-include-again) | Exclude from searches, or include again | Operation | M39 | Built |
+| [`tree.excluded`](tree.md#treeexcluded--what-searches-leave-out) | What searches leave out | Derivation | M39 | Built |
+| [`tree.menu-mongodb`](tree.md#treemenu-mongodb--the-context-menu-of-a-mongodb-node) | The context menu of a MongoDB node | View | M8, M38 (changed), M39 (changed) | Built |
 | [`tree.menu-redis`](tree.md#treemenu-redis--the-context-menu-of-a-redis-node) | The context menu of a Redis node | View | M8, M38 (changed) | Built |
 
 ## Undo history

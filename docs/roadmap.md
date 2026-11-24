@@ -2810,7 +2810,7 @@ tree, dimmed, and the tree's filter, Search documents and the lists of the MCP s
 finds it; several nodes of the tree are selected with `Ctrl`, `Shift` and the arrows to exclude or include them
 together.
 **Depends on**: M38.
-**Status**: planned
+**Status**: done
 
 ### Features
 
@@ -2871,13 +2871,13 @@ lines must keep passing.
 
 ### Exit criteria
 
-- [ ] Search documents on a connection of 40 databases, 3 of them excluded, reads the other 37 and says *3 excluded*;
+- [x] Search documents on a connection of 40 databases, 3 of them excluded, reads the other 37 and says *3 excluded*;
       `list_databases` of the MCP server leaves the 3 out, and `find_documents` on one of them still answers.
-- [ ] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
+- [x] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
       `npm run test:integration`, `npm run test:ui`; `catalog.py --tests` reports none missing for these cards.
-- [ ] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
+- [x] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
       the keyboard alone (QA15, QA16).
-- [ ] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
+- [x] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
       and this milestone's **Status** is *done*.
 
 ### Not in this milestone

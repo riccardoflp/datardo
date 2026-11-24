@@ -253,6 +253,16 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
 - Connection files keep custom colors and the colors of databases and collections: Datardo's format writes them,
   files of Mongoster 0.9 and 0.10 and of Datardo are imported with them, and the list of an import counts them; a
   Compass export notes that they were left out.
+- **Exclude from searches** on a database, a collection, a view or a GridFS bucket in the tree, or on a connection,
+  leaves it out of the tree's filter, Search documents and the MCP server's lists of connections, databases and
+  collections; it stays in the tree, dimmed and marked **excluded**, naming it still finds it, and **Include in
+  searches** puts it back. The summary of a search says how many it left out, and the Home card of an excluded
+  connection says **Excluded from searches**.
+- Several databases, collections and buckets of the tree can be selected with `Ctrl+click`, `Shift+click`,
+  `Shift+Down` and `Shift+Up`, to exclude or include them together; `Escape` keeps only the focused one.
+- Renaming or dropping a collection, a database or a bucket from Datardo moves or forgets its exclusion with its
+  color, and Datardo's connection files carry the exclusions; imports from Compass files and lists say they were
+  left out.
 
 ### Changed
 
