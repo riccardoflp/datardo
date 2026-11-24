@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
+  backupCollectionName,
+  backupDatabaseName,
+  backupFileName,
+  collectionFileNames,
   collectionMetadata,
   folderSteps,
   metadataText,
@@ -112,6 +116,125 @@ describe('backup.folder-layout', () => {
       'write D:\\b\\Local_1\\shop\\orders.metadata.json.gz',
       'write D:\\b\\Local_1\\shop\\orders.bson.gz',
       'write D:\\b\\Local_1\\shop\\recent.metadata.json.gz',
+    ]);
+  });
+
+  it('encodes every name that is not plain letters, digits, _, - and . into a file name', () => {
+    expect(['a/b', '../x', 'con', 'nul.txt', '%2e%2e', 'été'].map(backupFileName)).toEqual([
+      'a%2Fb',
+      '%2E.%2Fx',
+      '%63on',
+      '%6Eul.txt',
+      '%252e%252e',
+      '%C3%A9t%C3%A9',
+    ]);
+    expect(collectionFileNames('a/b', 'plain')).toEqual({ documents: 'a%2Fb.bson', metadata: 'a%2Fb.metadata.json' });
+  });
+
+  it('keeps the names that need nothing as they are', () => {
+    expect(['console', 'fs.files', 'orders_2026-01'].map(backupFileName)).toEqual([
+      'console',
+      'fs.files',
+      'orders_2026-01',
+    ]);
+  });
+
+  it('cuts a name longer than 238 characters and ends it with the hash of the name, as mongodump does', () => {
+    const long = backupFileName('a'.repeat(300));
+    expect(long).toHaveLength(238);
+    expect(long).toMatch(/^a{208}%24[A-Za-z0-9_-]{27}$/u);
+    const cut = backupFileName(`${'a'.repeat(207)}/${'b'.repeat(100)}`);
+    expect(cut.slice(0, 207)).toBe('a'.repeat(207));
+    expect(cut.slice(207, 210)).toBe('%24');
+  });
+
+  it('never gives a path, a device or the same file for two names', () => {
+    const names = [
+      'a/b',
+      'a\\b',
+      'a:b',
+      'con',
+      'CON.x',
+      'lpt9',
+      'up/../../../escaped',
+      '..',
+      '.',
+      'a\u0007b',
+      '%',
+      '%25',
+    ];
+    const files = names.map(backupFileName);
+    for (const file of files) {
+      expect(file).not.toMatch(/[/\\:]/u);
+      expect(Array.from(file, (character) => character.charCodeAt(0)).every((code) => code >= 32)).toBe(true);
+      expect(file).not.toMatch(/^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\.|$)/iu);
+      expect(file).not.toMatch(/^\.|\.$/u);
+    }
+    expect(new Set(files).size).toBe(names.length);
+  });
+
+  it('reads the collection of a file from its metadata, and decodes a name without metadata', () => {
+    expect(backupCollectionName('a%2Fb', 'a/b')).toBe('a/b');
+    expect(backupCollectionName('a%2Fb', 'a%2Fb')).toBe('a%2Fb');
+    expect(backupCollectionName('a%2Fb')).toBe('a/b');
+    expect(backupCollectionName('100%')).toBe('100%');
+    expect(backupCollectionName('a:b')).toBe('a:b');
+    const long = 'z'.repeat(300);
+    expect(backupCollectionName(backupFileName(long), long)).toBe(long);
+  });
+
+  it('leaves out the system collections whatever their file is called', () => {
+    expect(names(folder('shop', ['system.views.bson', 'system%2Eviews.bson', 'orders.bson']))).toEqual([
+      ['shop', ['orders']],
+    ]);
+  });
+
+  it('decodes a database folder only when Datardo or mongodump encoded it', () => {
+    expect(backupDatabaseName('%6Eul')).toBe('nul');
+    expect(backupDatabaseName('50%')).toBe('50%');
+    expect(backupDatabaseName('shop')).toBe('shop');
+  });
+
+  it('reads a folder of encoded names, of names written as they are, and of mongodump', () => {
+    const dump: FolderListing = {
+      name: 'dump',
+      path: 'dump',
+      files: [],
+      folders: [
+        {
+          name: 'shop',
+          path: 'dump/shop',
+          files: [
+            { name: 'a%2Fb.bson', size: 10 },
+            { name: 'a%2Fb.metadata.json', size: 10, collectionName: 'a/b' },
+            { name: '%63on.bson', size: 10 },
+            { name: '%63on.metadata.json', size: 10, collectionName: 'con' },
+            { name: 'a:b.bson', size: 10 },
+            { name: 'p%2Fq.bson', size: 10 },
+            { name: 'p%2Fq.metadata.json', size: 10, collectionName: 'p%2Fq' },
+          ],
+          folders: [],
+        },
+      ],
+    };
+    expect(names(dump)).toEqual([['shop', ['a:b', 'a/b', 'con', 'p%2Fq']]]);
+    const [shop] = scanBackup(dump);
+    expect(shop?.collections.find((each) => each.name === 'a/b')).toEqual({
+      name: 'a/b',
+      bson: 'a%2Fb.bson',
+      metadata: 'a%2Fb.metadata.json',
+      size: 10,
+    });
+  });
+
+  it('writes the folder of a database and the files of a collection with encoded names', () => {
+    const choice = [{ database: 'shop', collections: [{ name: 'up/../x', type: 'collection' }] }];
+    const context = { platform: 'linux', connection: connectionId('c-local'), format: 'plain' } as const;
+    expect(folderSteps('/b/L', choice, { indexes: {}, counts: {} }, context).map((step) => step.text)).toEqual([
+      'create folder /b/L',
+      'create folder /b/L/shop',
+      'write /b/L/shop/up%2F..%2Fx.metadata.json',
+      'write /b/L/shop/up%2F..%2Fx.bson',
     ]);
   });
 });

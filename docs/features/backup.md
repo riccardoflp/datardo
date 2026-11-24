@@ -64,9 +64,6 @@ folder, which `mongorestore` and **Restore from backup…** read back.
   `backupDatabases`, `backupCollections`, `leaveOutUnsupported`, `backupTotals`, `archiveOf`, `dumpCollection`,
   `rawDocuments`, `collectionMetadata`, `mongorestoreCommand`, `uniquePath`), `src/archive.ts`; the encoded names of
   Mongoster 0.9.0 (`src/backupNames.ts › backupFileName`).
-- **Differs**: (M37) a folder backup names each file and database folder with the name as it is, so a collection
-  named `a/b` or `../x` makes the backup fail or write outside its folder, and one named `con` cannot be written on
-  Windows (`src/features/backup/folder-layout.ts`).
 
 Acceptance:
 
@@ -80,7 +77,7 @@ Acceptance:
 - [ ] A folder backup of a database with the collections `a/b`, `a\b`, `a:b`, `con` and `up/../../../escaped` writes
   two files per collection, all directly in the database's subfolder (`a%2Fb.bson`, `a%5Cb.bson`, `a%3Ab.bson`,
   `%63on.bson`, `up%2F..%2F..%2F..%2Fescaped.bson`), and nothing outside the backup's folder, on Windows as on the
-  other systems; `mongorestore --dir` restores them under their names. (differs)
+  other systems; `mongorestore --dir` restores them under their names.
 - [ ] A view gets only its metadata file, in a folder; in an archive it is listed and ended, without documents.
 - [ ] A time series collection is left out, and the result is a warning naming it.
 - [ ] The status line's **Backing up \<what\>** says *\<database\>.\<collection\>: \<n\> documents* every 1,000
@@ -198,11 +195,6 @@ or a collection.
   (`COPIED_OPTIONS`), `src/history.ts`; the databases left out, the TTL indexes kept off and the collections a view
   replaces from Mongoster 0.9.0 (`src/backup.ts › refusedDatabase`, `collectionsReplacedByViews`,
   `CollectionRestore`; `src/backupNames.ts`).
-- **Differs**: (M37) on a connection every database of a backup is offered and restored under its own name, `admin`,
-  `local` and `config` included; with **Add documents** every index of the backup is created, TTL indexes included,
-  on a collection that was already there; the confirmation of **Drop and restore** does not name the collections a
-  view of the backup replaces; a folder's file names are taken as the collections' names as they are
-  (`src/features/backup/restore.ts`, `src/features/backup/restoring/choose.ts`).
 
 Acceptance:
 
@@ -229,26 +221,25 @@ Acceptance:
   read-only: nothing can be restored into it.*
 - [ ] A folder backup whose collections are called `a/b`, `con` and `up/../../../escaped` lists them under those names
   and restores them into collections of those names; a folder written before the names were encoded, with
-  `a:b.bson`, restores `a:b`. (differs)
+  `a:b.bson`, restores `a:b`.
 - [ ] With **Add documents**, a backup whose metadata has a TTL index `at_ttl` for the existing collection `orders`
   creates its other indexes, keeps the documents that were there, and ends with the warning *Index not created —
   orders.at_ttl: a TTL index (expireAfterSeconds) would make the server delete documents that were already in the
-  collection; create it from the Indexes section if it's wanted*. (differs)
+  collection; create it from the Indexes section if it's wanted*.
 - [ ] The same backup creates `at_ttl` on a collection that did not exist, with **Drop and restore**, and, without a
   warning, when `orders` already has a TTL index on the same key with the same delay.
 - [ ] On a connection, a backup with the databases `admin`, `shop` and `logs` offers `logs` and `shop` with *Not
   offered: admin (a system database)*; the confirmation and the result say *Not restored: admin (a system database)*.
-  (differs)
 - [ ] On a connection, a backup with the databases `admin` and `shop` does not ask which: it asks for the
   **database** with `shop`, and says *Not restored: admin (a system database)*; a backup with `Config` and `local`
   only is refused with *Nothing of \<file\> is restored under the names it gives: Config (a system database), local
-  (a system database). …* and asks nothing more. (differs)
+  (a system database). …* and asks nothing more.
 - [ ] On a connection, a backup of the only database `admin` asks for the **database** with an empty field and
-  *(its own name isn't proposed: a system database)*: nothing is restored until a name is typed. (differs)
+  *(its own name isn't proposed: a system database)*: nothing is restored until a name is typed.
 - [ ] **Restore from backup…** on the database `scratch` restores the `admin` database of a backup into `scratch`.
 - [ ] With **Drop and restore**, a backup with the view `orders` on a database where `orders` is a collection says in
   the confirmation *The backup has a view in place of this collection, which is dropped with its documents:
-  shop.orders.*, and asks to type the name. (differs)
+  shop.orders.*, and asks to type the name.
 - [ ] With the undo history off for the connection and **Add documents**, the confirmation says *The undo history is
   off for this connection: this can't be undone.*
 - [ ] On a connection that publishes for redis-oplog, a restore sends no event.
@@ -404,8 +395,6 @@ What a backup folder holds and how a folder is recognized as one, the same as `m
   `scanDatabase`, `mongorestoreCommand`, `uniquePath`), `test/integration/scheduledTasks.test.ts`,
   `test/integration/backup.test.ts`; the encoded names of Mongoster 0.9.0 (`src/backupNames.ts › backupFileName`,
   `backupCollectionName`, `backupDatabaseName`; `test/unit/backupNames.test.ts`).
-- **Differs**: (M37) names are written and read as they are: the file of the collection `a/b` is `a/b.bson`, in a
-  folder `a`, and a file name is always taken as the collection's name (`src/features/backup/folder-layout.ts`).
 
 Examples:
 
@@ -435,6 +424,5 @@ Acceptance:
 - [ ] The metadata of a collection without options has no `options` key.
 - [ ] No name of a collection or a database gives a file or a folder outside the backup's folder, a name with `/`,
   `\`, `:` or a control character, or a name Windows reserves; two different names never give the same file.
-  (differs)
 - [ ] A folder written by mongodump with collections whose names hold `/` or `%`, and a folder written by Datardo
-  before the names were encoded, are read with the collections' own names. (differs)
+  before the names were encoded, are read with the collections' own names.

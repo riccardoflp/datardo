@@ -6,10 +6,9 @@
  * the documents as stored, batch by batch from a feed, and the indexes. The creations come first and the indexes
  * last, so that the documents of an archive are read in one pass, also when its collections alternate.
  */
-import type { Json, MongoRequest } from '../../shared/engine-request';
-import type { Answers, Context, Outcome, Plan, ReadFeature, ReadRequest, Step, Undo } from '../../shared/feature';
+import type { MongoRequest } from '../../shared/engine-request';
+import type { Answers, Context, Outcome, Plan, Step, Undo } from '../../shared/feature';
 import { needRead, refuse, run } from '../../shared/feature';
-import { connectionId, featureId } from '../../shared/ids';
 import { savedConnection } from '../../shared/state/connections';
 import { pathIn } from '../task/run';
 import { nothingToDo } from '../task/types';
@@ -23,36 +22,21 @@ import {
   viewOptions,
   type Namespace,
 } from '../transfer/types';
-import { argsOf, failureOf, isObject, textArg } from '../tree/types';
-import { archiveDatabases } from './archive-read';
-import { scanBackup, type FolderListing } from './folder-layout';
+import { sentences } from '../transfer/ends/totals';
 import {
   chooseBackup,
   chooseMode,
   chooseRestored,
   splitPath,
+  databasesLeftOut,
   type BackupListing,
   type ChosenBackup,
   type RestoredDatabase,
 } from './restoring/choose';
+import { hasSameTtl, isTtlIndex, type OwnIndexes } from './restoring/guards';
+import type { Existing, Metadata } from './restoring/reads';
 import { restoreText as text } from './text';
-import {
-  batchBytes,
-  batchDocuments,
-  deepestMetadata,
-  isJsonDocument,
-  nesting,
-  textsOf,
-  typeOf,
-  type ArchiveCollection,
-  type JsonDocument,
-} from './types';
-
-/** The collections of each database restored into, with their kind, by database. */
-type Existing = Readonly<Record<string, readonly { readonly name: string; readonly kind: string }[]>>;
-
-/** The metadata of a folder's collections, by path; `null` for a file that is not there. */
-type Metadata = Readonly<Record<string, JsonDocument | null>>;
+import { batchBytes, batchDocuments, isJsonDocument, typeOf, type JsonDocument } from './types';
 
 /** What the plan is made of: where it goes, from what, how. */
 interface Restore {
@@ -63,6 +47,10 @@ interface Restore {
   readonly metadata: Metadata;
   readonly mode: 'add' | 'drop';
   readonly where: string;
+  /** The indexes of the existing collections whose backup has a TTL index, with **Add documents**. */
+  readonly own: OwnIndexes;
+  /** The databases of the backup left out, with why. */
+  readonly leftOut: readonly string[];
 }
 
 /** Where a restore goes, as its titles say it: `<connection>`, `<connection> › <database>`, or with the collection. */
@@ -112,10 +100,34 @@ interface CollectionSteps {
   readonly left: string[];
   readonly titles: string[];
   readonly drops: string[];
+  /** The collections a view of the backup replaces, `<database>.<collection>`. */
+  readonly replaced: string[];
+  /** The TTL indexes kept off a collection that was already there, as their warning says them. */
+  readonly keptOff: string[];
+}
+
+/**
+ * The indexes of a collection's metadata to create: on a collection that was already there and is not dropped, not a
+ * TTL index, unless it already has the same one; the others are said in the result.
+ */
+function indexesOf(meta: JsonDocument, kept: { exists: boolean; own: readonly JsonDocument[] | undefined }) {
+  const indexes = Array.isArray(meta['indexes']) ? meta['indexes'].filter(isJsonDocument) : [];
+  const keptOff = (index: JsonDocument): boolean =>
+    kept.exists && isTtlIndex(index) && !hasSameTtl(index, kept.own ?? []);
+  return { created: indexes.filter((index) => !keptOff(index)), keptOff: indexes.filter(keptOff) };
 }
 
 function collectionSteps(context: Context, how: Restore): CollectionSteps {
-  const all: CollectionSteps = { before: [], documents: [], indexes: [], left: [], titles: [], drops: [] };
+  const all: CollectionSteps = {
+    before: [],
+    documents: [],
+    indexes: [],
+    left: [],
+    titles: [],
+    drops: [],
+    replaced: [],
+    keptOff: [],
+  };
   for (const database of how.restored) {
     database.collections.forEach((each, index) => {
       const on = { connection: how.connection.id, database: database.database, collection: each.name };
@@ -133,10 +145,16 @@ function collectionSteps(context: Context, how: Restore): CollectionSteps {
       all.before.push(...(drop ? [dropStep(on, context.target)] : []));
       all.before.push(...(drop || exists === undefined ? [createCollectionStep(on, created, context.target)] : []));
       all.drops.push(...(drop ? [name] : []));
+      all.replaced.push(...(drop && type === 'view' && exists.kind !== 'view' ? [name] : []));
       if (type !== 'view') {
         all.documents.push(documentsStep(context, how, { on, database, from: each.from.name, bson: each.from.bson }));
-        const indexes = Array.isArray(meta['indexes']) ? meta['indexes'].filter(isJsonDocument) : [];
-        all.indexes.push(...indexSteps(on, indexes, context.target));
+        const indexes = indexesOf(meta, { exists: exists !== undefined && !drop, own: how.own[name] });
+        all.indexes.push(...indexSteps(on, indexes.created, context.target));
+        all.keptOff.push(
+          ...indexes.keptOff.map((index) =>
+            text.ttlKeptOff(`${each.name}.${typeof index['name'] === 'string' ? index['name'] : ''}`),
+          ),
+        );
         all.titles.push(
           how.backup.kind === 'archive'
             ? text.undoTitleArchive(each.name, splitPath(how.backup.path).name)
@@ -200,8 +218,12 @@ function restorePlan(context: Context, how: Restore): Plan {
     text.confirm(count, how.connection.name, databases.join(', ')),
     text.from(how.backup.path),
     how.mode === 'drop' ? text.dropped : text.added,
+    ...(steps.replaced.length > 0 ? [text.viewsReplace(steps.replaced)] : []),
+    ...(how.leftOut.length > 0 ? [`${text.notRestored(how.leftOut)}.`] : []),
     ...(how.mode === 'add' ? [text.undoable] : []),
   ];
+  const notRestored = [...steps.left, ...how.leftOut];
+  const notes = [...steps.keptOff, ...(notRestored.length > 0 ? [text.notRestored(notRestored)] : [])];
   const target = context.target;
   const name =
     target.kind === 'collection'
@@ -218,11 +240,25 @@ function restorePlan(context: Context, how: Restore): Plan {
     publishes: false,
     after: [
       { kind: 'refresh', connection: how.connection.id },
-      ...(steps.left.length > 0
-        ? [{ kind: 'notify', level: 'warning', text: text.notRestored(steps.left) } as const]
+      ...(notes.length > 0
+        ? [{ kind: 'notify', level: 'warning', text: sentences(notes[0] ?? '', notes.slice(1)) } as const]
         : []),
     ],
   };
+}
+
+/** The existing collections, not views, whose backup has a TTL index: their own indexes are read (`backup.restore`). */
+function withTtlIndexes(context: Context, how: Restore): readonly { database: string; collection: string }[] {
+  return how.restored.flatMap((database) =>
+    database.collections.flatMap((each, index) => {
+      const meta = metaOf(context, how, database, index);
+      const indexes = Array.isArray(meta['indexes']) ? meta['indexes'].filter(isJsonDocument) : [];
+      const exists = existsIn(how.existing, database.database, each.name);
+      return exists?.kind === 'collection' && indexes.some(isTtlIndex)
+        ? [{ database: database.database, collection: each.name }]
+        : [];
+    }),
+  );
 }
 
 /** The paths of the metadata files of a folder's chosen collections. */
@@ -290,131 +326,24 @@ export function plan(context: Context, answers: Answers): Outcome {
   if (typeof mode !== 'string') {
     return mode;
   }
-  const paths = chosen.kind === 'archive' ? [] : metadataPaths(context, restored);
+  const connectionOf = { id: connection.id, name: connection.name };
+  return planned(context, answers, { connection: connectionOf, backup: chosen, restored, existing, mode, where });
+}
+
+/** Once everything is chosen: the metadata of a folder's collections and the indexes TTL needs, read; then the plan. */
+function planned(context: Context, answers: Answers, chosen: Omit<Restore, 'metadata' | 'own' | 'leftOut'>): Outcome {
+  const paths = chosen.backup.kind === 'archive' ? [] : metadataPaths(context, chosen.restored);
   const metadata = answers['metadata'] as Metadata | undefined;
   if (metadata === undefined && paths.length > 0) {
     return needRead('metadata', 'backup.restore:metadata', { paths });
   }
-  const how = {
-    connection: { id: connection.id, name: connection.name },
-    backup: chosen,
-    restored,
-    existing,
-    metadata: metadata ?? {},
-    mode,
-    where,
-  };
-  return run(restorePlan(context, how));
-}
-
-function errorOf(reply: unknown): string | undefined {
-  return failureOf(reply) ?? (isObject(reply) && typeof reply['error'] === 'string' ? reply['error'] : undefined);
-}
-
-/** `backup.restore:archive`: the list of collections at the start of an archive (`backup.archive-read`). */
-export const archiveListRead: ReadFeature = {
-  kind: 'read',
-  id: featureId('backup.restore:archive'),
-  request: (_context: Context, args: Json): ReadRequest => ({
-    kind: 'app',
-    action: 'backup.read-archive-list',
-    args: { path: textArg(args, 'path') },
-  }),
-  parse: (replies: readonly unknown[]): BackupListing => {
-    const [reply] = replies;
-    const error = errorOf(reply);
-    return error === undefined
-      ? { databases: archiveDatabases(Array.isArray(reply) ? (reply as ArchiveCollection[]) : []) }
-      : { error };
-  },
-};
-
-/** `backup.restore:folder`: the files of a folder and of its subfolders (`backup.folder-layout`). */
-export const folderListRead: ReadFeature = {
-  kind: 'read',
-  id: featureId('backup.restore:folder'),
-  request: (_context: Context, args: Json): ReadRequest => ({
-    kind: 'app',
-    action: 'backup.list-folder',
-    args: { path: textArg(args, 'path') },
-  }),
-  parse: (replies: readonly unknown[]): BackupListing => {
-    const [reply] = replies;
-    const error = errorOf(reply);
-    return error === undefined && isObject(reply)
-      ? { databases: scanBackup(reply as unknown as FolderListing) }
-      : { error: error ?? '' };
-  },
-};
-
-/** A metadata file's text as a document, refused when it is not one or nests too deep (R14.4). */
-export function parseMetadata(source: string): JsonDocument | null {
-  try {
-    const value = JSON.parse(source) as Json;
-    return isJsonDocument(value) && nesting(value, deepestMetadata) <= deepestMetadata ? value : null;
-  } catch {
-    return null;
+  const how = { ...chosen, metadata: metadata ?? {}, own: {}, leftOut: databasesLeftOut(context, chosen.backup) };
+  const ttl = how.mode === 'add' ? withTtlIndexes(context, how) : [];
+  const own = answers['own-indexes'] as OwnIndexes | undefined;
+  if (own === undefined && ttl.length > 0) {
+    return needRead('own-indexes', 'backup.restore:indexes', { connection: how.connection.id, namespaces: ttl });
   }
+  return run(restorePlan(context, { ...how, own: own ?? {} }));
 }
 
-/** `backup.restore:metadata`: the texts of metadata files (gunzipped by the main process), parsed. */
-export const metadataRead: ReadFeature = {
-  kind: 'read',
-  id: featureId('backup.restore:metadata'),
-  request: (_context: Context, args: Json): ReadRequest => ({
-    kind: 'app',
-    action: 'backup.read-metadata',
-    args: { paths: [...(textsOf(argsOf(args)['paths']) ?? [])] },
-  }),
-  parse: (replies: readonly unknown[], args: Json): Metadata => {
-    const texts: readonly unknown[] = Array.isArray(replies[0]) ? replies[0] : [];
-    const paths = textsOf(argsOf(args)['paths']) ?? [];
-    return Object.fromEntries(
-      paths.map((path, index) => {
-        const source = texts[index];
-        return [path, typeof source === 'string' ? parseMetadata(source) : null];
-      }),
-    );
-  },
-};
-
-/** `backup.restore:existing`: `listCollections` of each database restored into, names and kinds. */
-export const existingRead: ReadFeature = {
-  kind: 'read',
-  id: featureId('backup.restore:existing'),
-  request: (_context: Context, args: Json): ReadRequest => {
-    const connection = connectionId(textArg(args, 'connection'));
-    const databases = textsOf(argsOf(args)['databases']) ?? [];
-    const requests = databases.map((database) => ({
-      connection,
-      request: {
-        engine: 'mongodb',
-        database,
-        method: 'listCollections',
-        arguments: [{}, { nameOnly: true, authorizedCollections: true }],
-        timeLimitMs: 30_000,
-      } as const,
-    }));
-    return { kind: 'engine', requests };
-  },
-  parse: (replies: readonly unknown[], args: Json): Existing => {
-    const databases = textsOf(argsOf(args)['databases']) ?? [];
-    return Object.fromEntries(
-      databases.map((database, index) => {
-        const reply = replies[index];
-        const failure = failureOf(reply);
-        if (failure !== undefined) {
-          throw new Error(failure);
-        }
-        const entries = (Array.isArray(reply) ? (reply as unknown[]) : []).filter(isObject);
-        return [
-          database,
-          entries.map((entry) => ({
-            name: String(entry['name']),
-            kind: typeof entry['type'] === 'string' ? entry['type'] : 'collection',
-          })),
-        ];
-      }),
-    );
-  },
-};
+export { archiveListRead, existingRead, folderListRead, metadataRead, parseMetadata } from './restoring/reads';

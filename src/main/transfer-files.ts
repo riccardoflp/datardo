@@ -7,6 +7,7 @@ import { readFile, readdir, stat } from 'node:fs/promises';
 import { basename, join } from 'node:path';
 import { gunzipSync } from 'node:zlib';
 import { readArchiveCollections } from '../features/backup/archive-read';
+import { parseMetadata } from '../features/backup/restore';
 import type { FileEntry, FolderListing } from '../features/backup/folder-layout';
 import type { ArchiveCollection } from '../features/backup/types';
 import { importText } from '../features/transfer/text';
@@ -49,15 +50,32 @@ export async function readArchiveList(
   }
 }
 
+const encodedMetadataFile = /%.*\.metadata\.json(\.gz)?$/u;
+
+/**
+ * The `collectionName` of a metadata file whose name has a `%`: it tells an encoded name from one with a `%` of its
+ * own (`backup.folder-layout`). The metadata of the other files is read only when they are restored.
+ */
+async function collectionNameOf(path: string, name: string): Promise<{ readonly collectionName?: string }> {
+  if (!encodedMetadataFile.test(name)) {
+    return {};
+  }
+  const [text] = await readMetadata([path]);
+  const metadata = text === null || text === undefined ? null : parseMetadata(text);
+  const collectionName = metadata?.['collectionName'];
+  return typeof collectionName === 'string' ? { collectionName } : {};
+}
+
 async function filesOf(path: string): Promise<{ files: FileEntry[]; folders: string[] }> {
   const entries = await readdir(path, { withFileTypes: true });
   const files: FileEntry[] = [];
   const folders: string[] = [];
   for (const entry of entries) {
+    const file = join(path, entry.name);
     if (entry.isDirectory()) {
       folders.push(entry.name);
     } else if (entry.isFile()) {
-      files.push({ name: entry.name, size: (await stat(join(path, entry.name))).size });
+      files.push({ name: entry.name, size: (await stat(file)).size, ...(await collectionNameOf(file, entry.name)) });
     }
   }
   return { files, folders };
