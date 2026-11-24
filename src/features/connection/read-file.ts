@@ -5,6 +5,7 @@
  */
 import { colorMapOf } from '../../shared/color';
 import type { EngineName, Json } from '../../shared/engine-request';
+import { exclusionFields, exclusionsOf } from '../../shared/exclusion';
 import { colorFrom } from './color-from-compass';
 import { decrypter, type FileCrypto, type Decrypter } from './encryption';
 import { connectionsFromCompass, entrySecrets, mergedSecrets, secretOf, type EntrySecrets } from './read-compass';
@@ -244,6 +245,10 @@ async function exportedConnection(
     connectionString,
     ...(folder === undefined || folder === '' ? {} : { folder }),
     ...colorsOf(fields, engine),
+    ...exclusionFields(
+      { excluded: fields['excluded'] === true, exclusions: exclusionsOf(fields['exclusions']) },
+      engine,
+    ),
     ...(fields['readOnly'] === true ? { readOnly: true } : {}),
     ...(fields['noHistory'] === true ? { noHistory: true } : {}),
     ...(queriesFolder === undefined ? {} : { queriesFolder }),

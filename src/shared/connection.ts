@@ -5,6 +5,7 @@
  */
 import type { ColorMap, ConnectionColor } from './color';
 import type { EngineName, Json } from './engine-request';
+import type { Exclusions } from './exclusion';
 import type { ConnectionId } from './ids';
 
 export type { ConnectionColor } from './color';
@@ -42,6 +43,10 @@ export type SavedConnection = {
   readonly databaseColors?: ColorMap;
   /** The own colors of its collections, views and buckets, by `<database>.<collection>`; MongoDB only. */
   readonly collectionColors?: ColorMap;
+  /** Whether the whole connection is excluded from searches (`tree.excluded`); absent when it is not. */
+  readonly excluded?: true;
+  /** Its databases and collections excluded from searches, by their keys; MongoDB only (`tree.excluded`). */
+  readonly exclusions?: Exclusions;
   readonly readOnly: boolean;
   /** Whether the undo history is kept for writes through it (`undo.record`). */
   readonly keepsUndo: boolean;

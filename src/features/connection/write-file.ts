@@ -3,8 +3,10 @@
  * strings, with the secrets removed, included as they are, or encrypted with a passphrase.
  */
 import type { Json } from '../../shared/engine-request';
+import { exclusionFields } from '../../shared/exclusion';
 import { compassColor } from './color-from-compass';
 import { encryptSecrets, type FileCrypto } from './encryption';
+import { exclusionText, hasExclusions } from './parts/exclusion-text';
 import { decoded, withoutSecrets, type StringSecrets } from './string-secrets';
 import { fileText } from './text';
 import { tlsIntoUri } from './tls-in-uri';
@@ -77,6 +79,7 @@ function datardoEntry(connection: FileConnection, secrets: ExportSecrets): { ent
     ...(connection.folder === undefined ? {} : { folder: connection.folder }),
     ...(connection.color === undefined ? {} : { color: connection.color }),
     ...colorMapsOf(connection),
+    ...exclusionFields(connection, connection.engine),
     ...(connection.readOnly === true ? { readOnly: true } : {}),
     ...(connection.noHistory === true ? { noHistory: true } : {}),
     ...(connection.queriesFolder === undefined ? {} : { queriesFolder: connection.queriesFolder }),
@@ -167,6 +170,7 @@ export function exportNotes(connections: readonly FileConnection[], format: Expo
         ? [fileText.compassLeftOut]
         : []),
       ...(mongo.some(hasColorMaps) ? [fileText.colorsLeftOut] : []),
+      ...(mongo.some(hasExclusions) ? [exclusionText.compassLeftOut] : []),
       ...(redis > 0 ? [fileText.redisLeftOut(redis)] : []),
     ];
   }
@@ -186,6 +190,7 @@ export function exportNotes(connections: readonly FileConnection[], format: Expo
     )
       ? [fileText.listLeftOut]
       : []),
+    ...(connections.some(hasExclusions) ? [exclusionText.listLeftOut] : []),
     ...(files > 0 ? [fileText.redisFilesLeftOut(files)] : []),
   ];
 }

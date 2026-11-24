@@ -3,9 +3,11 @@
  * not know is kept and written back, on each connection and at the top of the file. The color is a preset's name or a
  * custom `#rrggbb`, and `databaseColors` and `collectionColors` keep only their valid entries (`tree.color-of`): all
  * three are optional fields of version 1, absent when empty, so a file of an earlier Datardo reads as nothing colored.
+ * So are `excluded` and `exclusions` (`tree.excluded`): a file without them reads as nothing excluded from searches.
  */
 import { colorMapOf, colorOfText } from '../shared/color';
 import type { SavedConnection, SshSettings, TlsSettings } from '../shared/connection';
+import { exclusionFields, exclusionsOf } from '../shared/exclusion';
 import type { Json } from '../shared/engine-request';
 import type { ConnectionId } from '../shared/ids';
 import type { JsonObject, StoredFile } from './store';
@@ -31,6 +33,8 @@ const knownFields = new Set([
   'color',
   'databaseColors',
   'collectionColors',
+  'excluded',
+  'exclusions',
   'readOnly',
   'keepsUndo',
   'tls',
@@ -115,6 +119,10 @@ export function connectionOf(object: JsonObject): SavedConnection {
     ...optional('color', colorOfText(object['color'])),
     ...optional('databaseColors', colorMapOf(object['databaseColors'], 'databases')),
     ...optional('collectionColors', colorMapOf(object['collectionColors'], 'collections')),
+    ...exclusionFields(
+      { excluded: object['excluded'] === true, exclusions: exclusionsOf(object['exclusions']) },
+      engine,
+    ),
     ...optional('tls', tlsOf(object['tls'])),
     ...optional('ssh', sshOf(object['ssh'])),
     ...optional('queriesFolder', text(object, 'queriesFolder')),

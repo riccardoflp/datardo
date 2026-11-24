@@ -115,6 +115,11 @@ describe('the connections file', () => {
       collectionColors: { 'shop.orders': 'none', 'shop.logs': '#12abef', 'media.fs.files': 'pink' },
     });
     expect(cache).toMatchObject({ color: 'gray', databaseColors: { '3': 'green' } });
+    expect(local?.exclusions).toEqual(['archive', 'media.fs.files', 'shop.logs']);
+    expect(local?.excluded).toBeUndefined();
+    expect(cache?.excluded).toBe(true);
+    expect(plain?.excluded).toBeUndefined();
+    expect(plain?.exclusions).toBeUndefined();
     expect(plain?.databaseColors).toBeUndefined();
     expect(plain?.collectionColors).toBeUndefined();
     store.set(withConnections(store.get(), store.get().connections));
@@ -140,5 +145,35 @@ describe('the connections file', () => {
     expect(read?.color).toBeUndefined();
     expect(read?.databaseColors).toBeUndefined();
     expect(read?.collectionColors).toEqual({ 'shop.orders': '#aabbcc' });
+  });
+});
+
+describe('connection.secrets', () => {
+  it('keeps whether a connection is excluded from searches and which of its databases and collections are', async () => {
+    const excluded: SavedConnection = { ...local, excluded: true, exclusions: ['archive', 'shop.logs'] };
+    const store = new Store(folder, connectionsFile);
+    await store.load();
+    store.set(withConnections(store.get(), [excluded]));
+    await store.flush();
+    const again = new Store(folder, connectionsFile);
+    await again.load();
+    expect(again.get().connections[0]).toMatchObject({ excluded: true, exclusions: ['archive', 'shop.logs'] });
+  });
+
+  it('reads only true for excluded, and only the keys of databases and collections, sorted, for exclusions', async () => {
+    const connection = {
+      id: 'c-1',
+      name: 'Local',
+      engine: 'mongodb',
+      hosts: 'db1',
+      excluded: 'yes',
+      exclusions: ['shop.logs', 3, 'shop.logs', '.x', 'archive'],
+    };
+    await writeFile(join(folder, 'connections.json'), JSON.stringify({ version: 1, connections: [connection] }));
+    const store = new Store(folder, connectionsFile);
+    await store.load();
+    const [read] = store.get().connections;
+    expect(read?.excluded).toBeUndefined();
+    expect(read?.exclusions).toEqual(['archive', 'shop.logs']);
   });
 });

@@ -13,6 +13,7 @@ import type {
   TlsSettings,
 } from '../../shared/connection';
 import type { EngineName, Json } from '../../shared/engine-request';
+import { exclusionFields, type Exclusions } from '../../shared/exclusion';
 import type { AppStep, Context, Outcome } from '../../shared/feature';
 import { noDanger, run } from '../../shared/feature';
 import type { ConnectionId } from '../../shared/ids';
@@ -209,6 +210,9 @@ export interface FileConnection {
   /** The own colors of its databases and, on a MongoDB connection, of its collections (`tree.color-of`). */
   readonly databaseColors?: ColorMap;
   readonly collectionColors?: ColorMap;
+  /** Whether it is excluded from searches, and which of its databases and collections are (`tree.excluded`). */
+  readonly excluded?: true;
+  readonly exclusions?: Exclusions;
   readonly readOnly?: boolean;
   readonly noHistory?: boolean;
   readonly queriesFolder?: string;
@@ -307,7 +311,8 @@ function withValue<K extends string>(key: K, value: string | undefined): { [P in
 /**
  * A connection of a file as Datardo saves it, with the id, the name and the folder it is given; what it replaces keeps
  * its read-only (D14), its undo setting and its link when the file has none, and the colors of its databases and of
- * its collections, each when the file has none.
+ * its collections and what of it is excluded from searches, each when the file has none; it stays excluded from
+ * searches if it was.
  */
 export function connectionOfFile(
   file: FileConnection,
@@ -329,6 +334,10 @@ export function connectionOfFile(
     ...(file.color === undefined ? {} : { color: file.color }),
     ...(databaseColors === undefined ? {} : { databaseColors }),
     ...(collectionColors === undefined ? {} : { collectionColors }),
+    ...exclusionFields(
+      { excluded: before?.excluded ?? file.excluded, exclusions: file.exclusions ?? before?.exclusions },
+      file.engine,
+    ),
     ...(file.tls === undefined ? {} : { tls }),
     ...(file.ssh === undefined ? {} : { ssh: sshOfFile(file.ssh) }),
     ...(file.queriesFolder === undefined ? {} : { queriesFolder: file.queriesFolder }),
@@ -360,6 +369,7 @@ export function fileOfConnection(
     ...(saved.color === undefined ? {} : { color: saved.color }),
     ...(saved.databaseColors === undefined ? {} : { databaseColors: saved.databaseColors }),
     ...(saved.collectionColors === undefined ? {} : { collectionColors: saved.collectionColors }),
+    ...exclusionFields(saved, saved.engine),
     ...(saved.readOnly ? { readOnly: true } : {}),
     ...(saved.keepsUndo ? {} : { noHistory: true }),
     ...(saved.queriesFolder === undefined ? {} : { queriesFolder: saved.queriesFolder }),
