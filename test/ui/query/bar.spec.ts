@@ -79,21 +79,26 @@ test.describe('query.bar', () => {
     const window = await openOrders();
     await barOf(window).getByRole('button', { name: 'Query mode' }).focus();
     const names: string[] = [];
-    for (let index = 0; index < 10; index += 1) {
+    for (let index = 0; index < 15; index += 1) {
       names.push(await window.evaluate(() => document.activeElement?.getAttribute('aria-label') ?? ''));
       await window.keyboard.press('Tab');
     }
     expect(names).toEqual([
       'Query mode, Find',
       'Filter',
+      'Run query, Find',
+      'Reset',
+      'Query at the right of the results',
+      'Builder',
+      'Queries',
+      'Explain',
+      'Code',
+      'Update many…',
+      'Delete many…',
       'Sort',
       'Project',
       'Skip',
       'Limit',
-      'Builder',
-      'Queries',
-      'Reset',
-      'Run query, Find',
     ]);
   });
 

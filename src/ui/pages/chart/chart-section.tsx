@@ -21,6 +21,7 @@ import type { Json } from '../../../shared/engine-request';
 import { readHints, type CollectionRef } from '../../query/collection-reads';
 import type { CollectionTab } from '../../query/collection-store';
 import { QueryBar } from '../../query/query-bar';
+import { QueryLayout } from '../../query/query-layout';
 import { PipelinePane } from '../aggregate/pipeline-editor';
 import { usePipeline } from '../aggregate/pipeline-store';
 import type { CollectionPageState } from '../collection/use-collection';
@@ -241,56 +242,62 @@ export function ChartSection({
   const seriesField = memory.drawn?.options.series;
   return (
     <section className={styles['section']} aria-label={text.section}>
-      <QueryBar
-        collectionRef={ref}
-        collection={collection}
-        instead={run}
-        pipeline={<PipelinePane collectionRef={ref} collection={collection} readOnly={page.readOnly} />}
-      />
-      <FirstRow collectionRef={ref} shown={shown} />
-      <div className={styles['controls']} role="group" aria-label={text.optionsLabel}>
-        {shown.controls.map((control) => (
-          <Control
-            key={`${state.input.type}-${control.control}`}
+      <QueryLayout
+        query={
+          <QueryBar
             collectionRef={ref}
-            control={control}
-            suggestions={suggestionsId}
+            collection={collection}
+            instead={run}
+            section="chart"
+            pipeline={<PipelinePane collectionRef={ref} collection={collection} readOnly={page.readOnly} />}
           />
-        ))}
-        <button
-          type="button"
-          className={styles['button']}
-          data-feature={shown.draw.element}
-          disabled={!connected}
-          onClick={() => void draw(ref, 'toolbar')}
-        >
-          {shown.draw.label}
-        </button>
-        <datalist id={suggestionsId}>
-          {suggestions.map((field) => (
-            <option key={field} value={field} />
+        }
+      >
+        <FirstRow collectionRef={ref} shown={shown} />
+        <div className={styles['controls']} role="group" aria-label={text.optionsLabel}>
+          {shown.controls.map((control) => (
+            <Control
+              key={`${state.input.type}-${control.control}`}
+              collectionRef={ref}
+              control={control}
+              suggestions={suggestionsId}
+            />
           ))}
-        </datalist>
-      </div>
-      {shown.message === undefined ? null : (
-        <p className={styles['message']} role="alert">
-          {shown.message}
-        </p>
-      )}
-      <p className={styles['line']} role="status">
-        {shown.line ?? ''}
-      </p>
-      <div className={styles['body']}>
-        {shown.state === undefined ? null : <p className={styles['state']}>{shown.state}</p>}
-        {shown.chart === undefined ? null : (
-          <ChartCanvas
-            tab={ref.tab}
-            view={shown.chart}
-            {...(seriesField === undefined ? {} : { seriesField })}
-            onMark={(mark) => void filterOnMark(place, ref, mark)}
-          />
+          <button
+            type="button"
+            className={styles['button']}
+            data-feature={shown.draw.element}
+            disabled={!connected}
+            onClick={() => void draw(ref, 'toolbar')}
+          >
+            {shown.draw.label}
+          </button>
+          <datalist id={suggestionsId}>
+            {suggestions.map((field) => (
+              <option key={field} value={field} />
+            ))}
+          </datalist>
+        </div>
+        {shown.message === undefined ? null : (
+          <p className={styles['message']} role="alert">
+            {shown.message}
+          </p>
         )}
-      </div>
+        <p className={styles['line']} role="status">
+          {shown.line ?? ''}
+        </p>
+        <div className={styles['body']}>
+          {shown.state === undefined ? null : <p className={styles['state']}>{shown.state}</p>}
+          {shown.chart === undefined ? null : (
+            <ChartCanvas
+              tab={ref.tab}
+              view={shown.chart}
+              {...(seriesField === undefined ? {} : { seriesField })}
+              onMark={(mark) => void filterOnMark(place, ref, mark)}
+            />
+          )}
+        </div>
+      </QueryLayout>
     </section>
   );
 }

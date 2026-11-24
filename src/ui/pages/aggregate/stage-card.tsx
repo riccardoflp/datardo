@@ -1,8 +1,8 @@
 /**
  * One card of the stage list of the pipeline editor (`aggregate.show`): its number, which shows the output up to it
  * (`aggregate.show-stage`); its name with the templates as suggestions (`aggregate.stage-template`); the checkbox
- * **Enabled** (`aggregate.toggle-stage`); its marks (`aggregate.stage-marks`); **Move left**, **Move right**
- * (`aggregate.move-stage`) and **Remove stage** (`aggregate.remove-stage`); its body in Datardo's editor with its
+ * **Enabled** (`aggregate.toggle-stage`); its marks (`aggregate.stage-marks`); **Move left**, **Move right**, or
+ * **Move up**, **Move down** in the query pane (`aggregate.move-stage`) and **Remove stage** (`aggregate.remove-stage`); its body in Datardo's editor with its
  * suggestions (`aggregate.autocomplete`), where `Ctrl+Enter` runs the pipeline up to the stage shown. A right click,
  * `Shift+F10` or the menu key opens its context menu.
  */
@@ -13,6 +13,7 @@ import { text } from '../../../features/aggregate/text';
 import type { FieldHint } from '../../../features/query/field-hints';
 import { MongoshEditor } from '../../components/editor/mongosh-editor';
 import { readHints, type CollectionRef } from '../../query/collection-reads';
+import { useQueryPlace } from '../../query/query-layout';
 import { editBody, focusStage, pressControl, renameStage, runFromEditor } from './pipeline-actions';
 import type { PipelineTab } from './pipeline-store';
 import styles from './pipeline-editor.module.css';
@@ -161,8 +162,8 @@ function CardHead({ card, collectionRef, kept }: Pick<CardProps, 'card' | 'colle
         }}
       />
       <span className={styles['spacer']} />
-      <IconButton control={card.moveLeft} icon="arrow-left" collectionRef={collectionRef} />
-      <IconButton control={card.moveRight} icon="arrow-right" collectionRef={collectionRef} />
+      <IconButton control={card.moveLeft} icon={card.moveLeft.icon ?? 'arrow-left'} collectionRef={collectionRef} />
+      <IconButton control={card.moveRight} icon={card.moveRight.icon ?? 'arrow-right'} collectionRef={collectionRef} />
       <IconButton control={card.remove} icon="trash" collectionRef={collectionRef} />
     </div>
   );
@@ -204,6 +205,8 @@ function CardMenu({
 /** A card of the stage list. */
 export function StageCard({ card, collectionRef, kept, fields, sizes }: CardProps): React.JSX.Element {
   const box = useRef<HTMLDivElement>(null);
+  // In the query pane each card is as wide as the pane: the width by the longest line is for the cards above the table.
+  const side = useQueryPlace().side;
   const flash = kept.flash?.stage === card.index ? kept.flash.at : undefined;
   useEffect(() => {
     if (card.marks.error) {
@@ -221,7 +224,7 @@ export function StageCard({ card, collectionRef, kept, fields, sizes }: CardProp
         data-dimmed={card.marks.dimmed}
         data-shown={card.marks.shown}
         data-error={card.marks.error}
-        style={{ width: widthOf(card, sizes) }}
+        style={side ? undefined : { width: widthOf(card, sizes) }}
         onFocus={(event) => {
           if (event.target.closest('[data-field="stage-body"]') !== null) {
             focusStage(collectionRef, card.index);

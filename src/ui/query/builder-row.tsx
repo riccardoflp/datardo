@@ -1,7 +1,8 @@
 /**
  * One row of the query builder (`query.builder`): the field with the fields of the collection as suggestions, the
  * operator, the value (a text with the frequent values of the field, the list of BSON types, or nothing), and the
- * button that removes the row. `Enter` in the row runs the query.
+ * button that removes the row. `Enter` in the row runs the query. In the query pane (`query.position`) a row takes two
+ * lines: the field and the button that removes the row, then the operator and the value.
  */
 import { useId } from 'react';
 import type { RowView } from '../../features/query/builder';
@@ -43,7 +44,7 @@ function ValueControl({
   if (value.kind === 'types') {
     return (
       <select
-        className={styles['select']}
+        className={`${styles['select'] ?? ''} ${styles['row-value'] ?? ''}`}
         aria-label={value.name}
         value={value.value}
         data-feature="query.builder@query-bar"
@@ -63,7 +64,7 @@ function ValueControl({
   return (
     <>
       <input
-        className={styles['input']}
+        className={`${styles['input'] ?? ''} ${styles['row-value'] ?? ''}`}
         aria-label={value.name}
         placeholder={value.placeholder}
         value={value.value}
@@ -96,7 +97,7 @@ export function BuilderRowControls(props: {
   return (
     <div className={styles['builder-row']} data-dashed={view.dashed}>
       <input
-        className={styles['input']}
+        className={`${styles['input'] ?? ''} ${styles['row-field'] ?? ''}`}
         aria-label={view.field.name}
         placeholder={view.field.placeholder}
         value={view.field.value}
@@ -114,7 +115,7 @@ export function BuilderRowControls(props: {
         ))}
       </datalist>
       <select
-        className={styles['select']}
+        className={`${styles['select'] ?? ''} ${styles['row-operator'] ?? ''}`}
         aria-label={view.operator.name}
         value={view.operator.value}
         data-feature="query.builder@query-bar"
@@ -132,7 +133,7 @@ export function BuilderRowControls(props: {
       <ValueControl view={view} row={row} actions={actions} />
       <button
         type="button"
-        className={styles['button']}
+        className={`${styles['button'] ?? ''} ${styles['row-remove'] ?? ''}`}
         aria-label={view.remove.tip}
         title={view.remove.tip}
         data-feature={view.remove.element}

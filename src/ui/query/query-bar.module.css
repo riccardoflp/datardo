@@ -1,33 +1,30 @@
-/* query.bar: the mode switch, the five fields and the buttons, which wrap on a narrow island; the builder and the error
-   line under them; the zones of query.drag over the fields while something of the table is dragged. */
+/* query.bar: each part of the bar is a cell of one grid, placed by name, so that the query above the table and the
+   query in the pane at its right (query.position) are the same elements in another layout. Above the table: the mode
+   switch, Filter, the run button and Reset, the toggle; the tools, the writes apart at the right; the builder; Sort,
+   Project, Skip and Limit, which wrap on a narrow island; the error line. The rows are spaced by margins, not by a
+   gap, so that a row with nothing in it takes no room. */
 .bar {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
+  display: grid;
+  grid-template-areas:
+    'mode filter run toggle'
+    'tools tools writes writes'
+    'builder builder builder builder'
+    'options options options options'
+    'pipeline pipeline pipeline pipeline'
+    'error error error error';
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: start;
+  column-gap: var(--space-2);
+  padding: var(--space-1) var(--space-3) var(--space-2);
   border-bottom: var(--border-width) solid var(--color-border);
 }
 
-.row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  gap: var(--space-2);
-}
-
-.field {
-  position: relative;
-  flex: 1 1 calc(var(--space-6) * 5);
-  min-width: 0;
-}
-
-.field[data-field='filter'] {
-  flex: 3 1 calc(var(--space-6) * 10);
-}
-
-.field[data-field='skip'],
-.field[data-field='limit'] {
-  flex: 0 1 calc(var(--space-6) * 3);
+.bar[data-mode='aggregate'] {
+  grid-template-areas:
+    'mode tools . toggle'
+    'pipeline pipeline pipeline pipeline'
+    'error error error error';
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
 }
 
 .digits {
@@ -56,12 +53,10 @@
   outline-offset: calc(var(--focus-width) * -1);
 }
 
-.buttons {
-  display: flex;
-  gap: var(--space-1);
-}
-
 .button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
   min-height: var(--editor-line-min-height);
   padding: var(--space-1) var(--space-2);
   border: var(--border-width) solid var(--color-border);
@@ -252,4 +247,202 @@
 .input:focus-visible {
   outline: var(--focus-width) solid var(--color-focus);
   outline-offset: calc(var(--focus-width) * -1);
+}
+
+/* The builder in the query pane: Condition and Clear on a line of their own, and each row on two lines, the field and
+   the button that removes the row, then the operator and the value. */
+.bar[data-side='true'] .builder-head .spacer {
+  flex-basis: 100%;
+}
+
+.bar[data-side='true'] .builder-row {
+  display: grid;
+  grid-template-areas:
+    'field field remove'
+    'operator value value';
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+
+.bar[data-side='true'] .row-field {
+  grid-area: field;
+}
+
+.bar[data-side='true'] .row-operator {
+  grid-area: operator;
+}
+
+.bar[data-side='true'] .row-value {
+  grid-area: value;
+}
+
+.bar[data-side='true'] .row-remove {
+  grid-area: remove;
+}
+
+/* The places of the parts in the grid of the bar, after the rules of the parts themselves. */
+.bar > * {
+  margin-top: var(--space-1);
+}
+
+.mode {
+  grid-area: mode;
+}
+
+.run-group {
+  display: flex;
+  grid-area: run;
+  gap: var(--space-1);
+}
+
+.toggle {
+  display: flex;
+  grid-area: toggle;
+}
+
+.tools {
+  display: flex;
+  flex-wrap: wrap;
+  grid-area: tools;
+  gap: var(--space-1);
+}
+
+.writes {
+  display: flex;
+  grid-area: writes;
+  justify-self: end;
+  gap: var(--space-1);
+}
+
+.bar > .builder {
+  grid-area: builder;
+}
+
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  grid-area: options;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.pipeline {
+  grid-area: pipeline;
+  min-width: 0;
+}
+
+.bar > .error {
+  grid-area: error;
+}
+
+.field {
+  position: relative;
+  flex: 1 1 calc(var(--space-6) * 5);
+  min-width: 0;
+}
+
+.bar > .field[data-field='filter'] {
+  grid-area: filter;
+}
+
+.field[data-field='skip'],
+.field[data-field='limit'] {
+  flex: 0 1 calc(var(--space-6) * 3);
+}
+
+/* The label of a field is shown above its box in the query pane only: a screen reader has it from the box. */
+.label {
+  display: none;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-small);
+}
+
+.box {
+  position: relative;
+  min-width: 0;
+}
+
+/* In the query pane: one control under the other, each label above its box, as wide as the pane. */
+.bar[data-side='true'] {
+  grid-template-areas:
+    'mode toggle'
+    'filter filter'
+    'tools tools'
+    'builder builder'
+    'options options'
+    'run run'
+    'error error'
+    'writes writes';
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: var(--space-1) var(--space-2) var(--space-2);
+  border-bottom: none;
+}
+
+.bar[data-side='true'][data-mode='aggregate'] {
+  grid-template-areas:
+    'mode toggle'
+    'tools tools'
+    'pipeline pipeline'
+    'error error';
+}
+
+.bar[data-side='true'] > * {
+  margin-top: var(--space-2);
+}
+
+.bar[data-side='true'] .label {
+  display: block;
+}
+
+.bar[data-side='true'] .mode {
+  justify-self: start;
+}
+
+.bar[data-side='true'] .options {
+  display: grid;
+  grid-template-areas:
+    'sort sort'
+    'project project'
+    'skip limit';
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.bar[data-side='true'] .field[data-field='sort'] {
+  grid-area: sort;
+}
+
+.bar[data-side='true'] .field[data-field='project'] {
+  grid-area: project;
+}
+
+.bar[data-side='true'] .field[data-field='skip'] {
+  grid-area: skip;
+}
+
+.bar[data-side='true'] .field[data-field='limit'] {
+  grid-area: limit;
+}
+
+/* Filter is at least 60 px high in the pane (Mongoster's), so that the zones over it, two by two, fit whole. */
+.bar[data-side='true'] .field[data-field='filter'] .box > :first-child {
+  min-height: var(--query-filter-min-height);
+}
+
+.bar[data-side='true'] .run-group > :first-child {
+  flex: 1;
+}
+
+.bar[data-side='true'] .writes {
+  justify-self: stretch;
+  padding-top: var(--space-2);
+  border-top: var(--border-width) solid var(--color-border);
+}
+
+.bar[data-side='true'] .field[data-field='filter'] .zones {
+  bottom: auto;
+  flex-wrap: wrap;
+  min-height: 100%;
+}
+
+.bar[data-side='true'] .field[data-field='filter'] .zone {
+  flex: 1 1 calc(50% - var(--space-1));
 }

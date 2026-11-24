@@ -1,7 +1,8 @@
 /**
  * The Documents section of a collection tab (`table.show`), from the top: the toolbar, the query bar, the selection
  * bar, then the grid of the documents (`table.rows`) or the message of its state (loading, empty, no match, failed with
- * **Run again** and **Reconnect**), and the paging row. `F5` in the section reads the page again (`table.refresh`).
+ * **Run again** and **Reconnect**), and the paging row; or, with the query at the right (`query.position`), the query
+ * pane at the right of the selection bar, the grid and the paging row. `F5` in the section reads the page again (`table.refresh`).
  */
 import { resetQuery } from '../../../features/query/reset';
 import { view as showView, type ShowView, type ToolbarButton } from '../../../features/table/show';
@@ -11,6 +12,7 @@ import { runQuery, type CollectionRef } from '../../query/collection-reads';
 import { changeQuery, type CollectionTab } from '../../query/collection-store';
 import { showStateOf } from '../../query/collection-view';
 import { QueryBar } from '../../query/query-bar';
+import { QueryLayout } from '../../query/query-layout';
 import { PipelinePane } from '../aggregate/pipeline-editor';
 import { usePipeline } from '../aggregate/pipeline-store';
 import { startFeature } from '../../shell/intent';
@@ -118,18 +120,25 @@ export function DocumentsSection({
       }}
     >
       <TableToolbar {...parts} />
-      <QueryBar
-        collectionRef={collectionRef}
-        collection={collection}
-        pipeline={<PipelinePane collectionRef={collectionRef} collection={collection} readOnly={page.readOnly} />}
-      />
-      <SelectionBar {...parts} />
-      {shown.body.kind === 'message' ? (
-        <Message body={shown.body} collectionRef={collectionRef} />
-      ) : (
-        <DocumentTable {...parts} dimmed={shown.body.dimmed} />
-      )}
-      {shown.paging ? <PagingRow collectionRef={collectionRef} collection={collection} /> : null}
+      <QueryLayout
+        query={
+          <QueryBar
+            collectionRef={collectionRef}
+            collection={collection}
+            section="documents"
+            writable={!page.view && !page.readOnly}
+            pipeline={<PipelinePane collectionRef={collectionRef} collection={collection} readOnly={page.readOnly} />}
+          />
+        }
+      >
+        <SelectionBar {...parts} />
+        {shown.body.kind === 'message' ? (
+          <Message body={shown.body} collectionRef={collectionRef} />
+        ) : (
+          <DocumentTable {...parts} dimmed={shown.body.dimmed} />
+        )}
+        {shown.paging ? <PagingRow collectionRef={collectionRef} collection={collection} /> : null}
+      </QueryLayout>
       <TableMenus {...parts} />
     </section>
   );

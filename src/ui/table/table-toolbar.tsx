@@ -1,16 +1,18 @@
 /**
  * The toolbar of the Documents section (`table.show`, `@toolbar`): **Refresh** (`table.refresh`), **Columns**
  * (`table.columns`), which reads **Columns (2 hidden)** while columns are hidden and opens its panel, the buttons of
- * the other areas once they are built, and the marks **view**, **time series** and **read-only** at the right end.
+ * the other areas once they are built, with their icons, alone while the main island is narrower than 900 px, and the
+ * marks **view**, **time series** and **read-only** at the right end.
  */
-import { view as showView, type ToolbarButton } from '../../features/table/show';
+import { useRef } from 'react';
+import { iconsAloneUnder, view as showView, type ToolbarButton } from '../../features/table/show';
 import { text } from '../../features/table/text';
-import { startOnDocuments, startOnFilter } from '../pages/document/document-actions';
+import { startOnDocuments } from '../pages/document/document-actions';
 import { exportShown } from '../pages/transfer/export-start';
-import { showCode } from '../pages/code/code-actions';
 import { startFeature } from '../shell/intent';
 import { isBuilt } from '../query/built';
 import { showStateOf } from '../query/collection-view';
+import { useWidthOf } from '../query/query-layout';
 import { ColumnsPanel } from './columns-panel';
 import { toggleColumnsPanel, useColumnsPanel } from './columns-panel-store';
 import { refreshTab } from './table-start';
@@ -29,15 +31,8 @@ function pressed(props: TablePartProps, button: ToolbarButton): void {
     case 'document.insert@toolbar':
       void startOnDocuments(ref, button.element);
       return;
-    case 'document.update-many@toolbar':
-    case 'document.delete-many@toolbar':
-      void startOnFilter(ref, button.element);
-      return;
     case 'transfer.export@toolbar':
       exportShown(ref, props.collection, props.columns, button.element);
-      return;
-    case 'codegen.show@query-bar':
-      showCode(ref, { kind: 'query' }, 'query-bar');
       return;
     default: {
       const at = button.element.indexOf('@');
@@ -61,8 +56,12 @@ export function TableToolbar(props: TablePartProps): React.JSX.Element {
     }),
   );
   const panelOpen = useColumnsPanel(collectionRef.tab);
+  const wrap = useRef<HTMLDivElement>(null);
+  // The toolbar is as wide as the main island: under 900 px the buttons with an icon show it alone.
+  const width = useWidthOf(wrap);
+  const iconsAlone = width > 0 && width < iconsAloneUnder;
   return (
-    <div className={styles['toolbar-wrap']}>
+    <div ref={wrap} className={styles['toolbar-wrap']}>
       <div className={styles['toolbar']} role="toolbar" aria-label={text.names.toolbar}>
         {shown.toolbar.buttons
           .filter((button) => isBuilt(button.element))
@@ -74,14 +73,18 @@ export function TableToolbar(props: TablePartProps): React.JSX.Element {
                 type="button"
                 className={styles['button']}
                 data-feature={button.element}
-                title={button.tip}
+                title={button.tip ?? (iconsAlone && button.icon !== undefined ? button.label : undefined)}
+                aria-label={iconsAlone && button.icon !== undefined ? button.label : undefined}
                 aria-expanded={columnsButton ? panelOpen : undefined}
                 aria-haspopup={columnsButton ? 'dialog' : undefined}
                 onClick={() => {
                   pressed(props, button);
                 }}
               >
-                {button.label}
+                {button.icon === undefined ? null : (
+                  <span className={`codicon codicon-${button.icon}`} aria-hidden="true" />
+                )}
+                {iconsAlone && button.icon !== undefined ? null : <span>{button.label}</span>}
               </button>
             );
           })}

@@ -1,88 +1,26 @@
 /**
- * The query bar of a collection tab (`query.bar`): the mode switch, the five fields, **Builder**, **Queries**, **Reset**
- * and the run button, which reads **Cancel** while a query runs; under it the builder when it is open, then the error
- * line. While a cell or a column header of the table is dragged, the zones of `query.drag` cover the fields. In a
- * section that runs something else from the bar (the Schema section's **Analyze**, the Explain section's **Explain**),
- * the run button and `Enter` start that instead ({@link RunInstead}).
+ * The query bar of a collection tab (`query.bar`). Above the table: the mode switch, **Filter**, the run button and
+ * **Reset**, the toggle of the query's place; **Builder**, **Queries**, **Explain**, **Code**, and apart **Update
+ * many…** and **Delete many…**; the builder when open; **Sort**, **Project**, **Skip**, **Limit**; the error line. In
+ * the query pane at the right of the table (`query.position`) the same controls are one under the other, each label
+ * above its box. Every part keeps its place in the page in both layouts, so that moving the query keeps the focus and
+ * the cursor. While a cell or a column header of the table is dragged, the zones of `query.drag` cover the fields.
  */
 import { useEffect } from 'react';
-import { view, type BarButton } from '../../features/query/bar';
+import { view, type BarField } from '../../features/query/bar';
 import { view as dragView } from '../../features/query/drag';
-import { BarFields } from './bar-fields';
-import { pressRun, resetBar, toggleBuilder } from './bar-actions';
-import { isBuilt } from './built';
+import { BarFields, type FieldsInput } from './bar-fields';
+import { BarButtons, type RunInstead } from './bar-buttons';
 import type { CollectionRef } from './collection-reads';
 import type { CollectionTab } from './collection-store';
 import { draggedOver, endDrag, useDragged } from './drag-data';
 import { ErrorLine } from './error-line';
 import { ModeMenu } from './mode-menu';
 import { QueryBuilder } from './query-builder';
-import { QueriesButton } from '../pages/saved-query/queries-list';
+import { useQueryPlace } from './query-layout';
 import styles from './query-bar.module.css';
-import { spokenName } from './spoken-name';
 
-/** What the run button does in a section that runs something else from the bar: its label, its element, its run. */
-export interface RunInstead {
-  readonly label: string;
-  readonly element: string;
-  readonly run: () => void;
-}
-
-function pressed(ref: CollectionRef, button: BarButton): void {
-  switch (button.element) {
-    case 'query.builder@query-bar':
-      toggleBuilder(ref);
-      return;
-    case 'query.reset@query-bar':
-      resetBar(ref);
-      return;
-    case 'query.run@query-bar':
-    case 'runner.cancel@list':
-      pressRun(ref);
-      return;
-    default:
-      return;
-  }
-}
-
-function Button({
-  button,
-  collectionRef,
-  instead,
-}: {
-  readonly button: BarButton;
-  readonly collectionRef: CollectionRef;
-  readonly instead?: RunInstead | undefined;
-}) {
-  const run = button.element === 'query.run@query-bar' || button.element === 'runner.cancel@list';
-  if (run && instead !== undefined) {
-    return (
-      <button
-        type="button"
-        className={`${styles['button'] ?? ''} ${styles['run'] ?? ''}`}
-        data-feature={instead.element}
-        onClick={instead.run}
-      >
-        {instead.label}
-      </button>
-    );
-  }
-  return (
-    <button
-      type="button"
-      className={`${styles['button'] ?? ''} ${run ? (styles['run'] ?? '') : ''}`}
-      data-feature={button.element}
-      aria-label={spokenName(button.name, button.label)}
-      title={button.tip}
-      aria-pressed={button.pressed}
-      onClick={() => {
-        pressed(collectionRef, button);
-      }}
-    >
-      {button.label}
-    </button>
-  );
-}
+export type { RunInstead } from './bar-buttons';
 
 /** A drag ends however it ends: dropped, let go outside a zone, or stopped with `Esc`. */
 function useDragEnd(): void {
@@ -99,12 +37,19 @@ function useDragEnd(): void {
   }, []);
 }
 
+/** Some fields of the bar, or nothing when there are none (in Aggregate). */
+function Fields({ input, fields }: { readonly input: FieldsInput; readonly fields: readonly BarField[] }) {
+  return fields.length === 0 ? null : <BarFields input={{ ...input, fields }} />;
+}
+
 /** The query bar. */
 export function QueryBar({
   collectionRef,
   collection,
   pipeline,
   instead,
+  section,
+  writable,
 }: {
   readonly collectionRef: CollectionRef;
   readonly collection: CollectionTab;
@@ -112,55 +57,59 @@ export function QueryBar({
   readonly pipeline?: React.ReactNode;
   /** What the run button and `Enter` start in place of the query. */
   readonly instead?: RunInstead;
+  /** The section the bar is in: only the Documents section has **Explain**, **Code** and the writes. */
+  readonly section?: 'documents' | 'schema' | 'chart';
+  /** The collection can be changed: not a view, not through a read-only connection. */
+  readonly writable?: boolean;
 }): React.JSX.Element {
-  const bar = view({ query: collection.query, running: collection.running });
+  const place = useQueryPlace();
+  const bar = view({
+    query: collection.query,
+    running: collection.running,
+    ...(section === undefined ? {} : { section }),
+    ...(writable === undefined ? {} : { writable }),
+    place,
+  });
   const what = useDragged();
   useDragEnd();
   const dragged =
     what === undefined || bar.pipeline
       ? undefined
       : { what, zones: dragView({ dragged: what, texts: collection.query.texts }) };
+  const input: FieldsInput = {
+    collectionRef,
+    collection,
+    fields: [],
+    ...(dragged === undefined ? {} : { dragged }),
+    ...(instead === undefined ? {} : { run: instead.run }),
+  };
+  const buttons = { collectionRef, instead };
   return (
     <div
       className={styles['bar']}
       role="search"
       data-feature="query.bar@query-bar"
+      data-side={bar.side}
+      data-mode={bar.pipeline ? 'aggregate' : 'find'}
       onDragEnter={(event) => {
         draggedOver(event.dataTransfer);
       }}
     >
-      <div className={styles['row']}>
+      <div className={styles['mode']}>
         <ModeMenu mode={bar.mode} collectionRef={collectionRef} />
-        <BarFields
-          input={{
-            collectionRef,
-            collection,
-            fields: bar.fields,
-            ...(dragged === undefined ? {} : { dragged }),
-            ...(instead === undefined ? {} : { run: instead.run }),
-          }}
-        />
-        <div className={styles['buttons']}>
-          {bar.buttons
-            .filter((button) => isBuilt(button.element))
-            .map((button) =>
-              button.element === 'saved-query.show@query-bar' ? (
-                <QueriesButton
-                  key={button.element}
-                  collectionRef={collectionRef}
-                  label={button.label}
-                  spoken={spokenName(button.name, button.label)}
-                  {...(button.tip === undefined ? {} : { tip: button.tip })}
-                  className={styles['button'] ?? ''}
-                />
-              ) : (
-                <Button key={button.element} button={button} collectionRef={collectionRef} instead={instead} />
-              ),
-            )}
-        </div>
       </div>
-      {bar.pipeline ? pipeline : null}
+      <Fields input={input} fields={bar.fields.filter((field) => field.field === 'filter')} />
+      <BarButtons buttons={bar.run} className={styles['run-group'] ?? ''} {...buttons} />
+      <BarButtons buttons={[bar.toggle]} className={styles['toggle'] ?? ''} {...buttons} />
+      <BarButtons buttons={bar.tools} className={styles['tools'] ?? ''} {...buttons} />
+      <BarButtons buttons={bar.writes} className={styles['writes'] ?? ''} {...buttons} />
       {bar.builderOpen ? <QueryBuilder collectionRef={collectionRef} collection={collection} /> : null}
+      {bar.fields.length === 0 ? null : (
+        <div className={styles['options']}>
+          <Fields input={input} fields={bar.fields.filter((field) => field.field !== 'filter')} />
+        </div>
+      )}
+      {bar.pipeline ? <div className={styles['pipeline']}>{pipeline}</div> : null}
       {bar.errorLine === undefined ? null : (
         <ErrorLine key={bar.errorLine.message} line={bar.errorLine} collectionRef={collectionRef} />
       )}

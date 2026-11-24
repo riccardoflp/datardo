@@ -10,6 +10,8 @@ export interface SettingDeclaration {
   readonly type: 'boolean' | 'integer' | 'string';
   readonly default: SettingValue;
   readonly enum?: readonly string[];
+  /** The name the menu of the Settings page shows for each value of `enum`, in its order; the value itself without. */
+  readonly 'x-enumTitles'?: readonly string[];
   readonly minimum?: number;
   readonly maximum?: number;
   readonly minLength?: number;
@@ -34,6 +36,7 @@ export interface SettingValues {
   readonly 'datardo.tab.restore': boolean;
   readonly 'datardo.runner.systemNotifications': boolean;
   readonly 'datardo.query.timeLimitSeconds': number;
+  readonly 'datardo.query.position': 'top' | 'right';
   readonly 'datardo.relation.detect': boolean;
   readonly 'datardo.undo.enabled': boolean;
   readonly 'datardo.undo.maxSizeMb': number;

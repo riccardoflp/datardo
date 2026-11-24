@@ -7,7 +7,7 @@ import { columnByKey, columnsOfDocuments } from '../../../src/features/table/det
 import { plan as expandPlan } from '../../../src/features/table/expand';
 import { request as refreshRequest, pageAfterRefresh } from '../../../src/features/table/refresh';
 import { view as rowMenu } from '../../../src/features/table/row-menu';
-import { view as show, type ShowState } from '../../../src/features/table/show';
+import { iconsAloneUnder, view as show, type ShowState } from '../../../src/features/table/show';
 import type { ColumnNode, MenuEntry, TableTarget } from '../../../src/features/table/types';
 import { emptyTexts } from '../../../src/features/query/types';
 import type { Json } from '../../../src/shared/engine-request';
@@ -262,10 +262,28 @@ describe('table.show', () => {
     expect(shown({ ...empty, emptyQuery: false }).paging).toBe(false);
   });
 
-  it('shows view and no Insert, Update many… or Delete many… on a view', () => {
+  it('shows view and no Insert on a view, and leaves Explain, Code, Update many… and Delete many… to the query bar', () => {
     const toolbar = shown({ target: view }).toolbar;
     expect(toolbar.marks.map((mark) => mark.label)).toEqual(['view']);
-    expect(toolbar.buttons.map((button) => button.label)).toEqual(['Refresh', 'Columns', 'Export', 'Explain', 'Code']);
+    expect(toolbar.buttons.map((button) => button.label)).toEqual(['Refresh', 'Columns', 'Export']);
+    expect(shown({}).toolbar.buttons.map((button) => button.label)).toEqual([
+      'Refresh',
+      'Columns',
+      'Insert',
+      'Export',
+      'Watch',
+    ]);
+  });
+
+  it('gives Insert, Export and Watch their icons, shown alone in a main island under 900 px', () => {
+    expect(shown({}).toolbar.buttons.map((button) => button.icon)).toEqual([
+      undefined,
+      undefined,
+      'add',
+      'export',
+      'pulse',
+    ]);
+    expect(iconsAloneUnder).toBe(900);
   });
 
   it('shows time series', () => {

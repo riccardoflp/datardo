@@ -1,7 +1,8 @@
 /**
- * The query builder under the bar (`query.builder`): **Match** *all* or *any* **of these conditions**, **+ Condition**
- * and **Clear**, one row per condition, and the note when there is something to say. Opened with an empty filter, it
- * shows one empty row with the cursor in its field.
+ * The query builder under the bar (`query.builder`): **Match** *all* or *any* **of these conditions**, **Condition**
+ * and **Clear** with their icons, one row per condition, and the note when there is something to say. Opened with an
+ * empty filter, it shows one empty row with the cursor in its field. In the query pane (`query.position`) **Condition**
+ * and **Clear** are on a line of their own under **Match … of these conditions**.
  */
 import { useEffect, useRef, useState } from 'react';
 import { emptyRow, view, withOperator, type BuilderRows } from '../../features/query/builder';
@@ -92,13 +93,15 @@ export function QueryBuilder({
           type="button"
           className={styles['button']}
           title={head.add.tip}
+          aria-label={head.add.name}
           disabled={head.add.disabled}
           data-feature={head.add.element}
           onClick={() => {
             set([...shown.rows, emptyRow]);
           }}
         >
-          {head.add.label}
+          <span className={`codicon codicon-${head.add.icon}`} aria-hidden="true" />
+          <span>{head.add.label}</span>
         </button>
         <button
           type="button"
@@ -110,7 +113,8 @@ export function QueryBuilder({
             clearRows(collectionRef.tab);
           }}
         >
-          {head.clear.label}
+          <span className={`codicon codicon-${head.clear.icon}`} aria-hidden="true" />
+          <span>{head.clear.label}</span>
         </button>
       </div>
       {built.rows.map((rowView, index) => {

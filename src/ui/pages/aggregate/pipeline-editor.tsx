@@ -1,6 +1,7 @@
 /**
  * The pipeline editor of a collection tab in Aggregate (`aggregate.show`), in place of the fields of the query bar:
- * the stage list with **+**, or the text after **Edit as text**; the toolbar; the line of what the table shows. While
+ * the stage list with **+**, or the text after **Edit as text**; the toolbar in two groups; the line of what the table
+ * shows. In the query pane (`query.position`) the cards are one under the other, as wide as the pane. While
  * a cell or a column header of the table is dragged, the conditions it can add cover the editor
  * (`aggregate.drop-condition`).
  */
@@ -14,6 +15,7 @@ import { isBuilt } from '../../query/built';
 import { readHints, type CollectionRef } from '../../query/collection-reads';
 import type { CollectionTab } from '../../query/collection-store';
 import { useDragged } from '../../query/drag-data';
+import { useQueryPlace } from '../../query/query-layout';
 import { useAppState } from '../../state/store';
 import { editText, pressControl, runWhole } from './pipeline-actions';
 import { PipelineDropZones } from './pipeline-drop-zones';
@@ -45,12 +47,14 @@ function ControlButton({
       type="button"
       className={`${styles['button'] ?? ''} ${control.feature === 'aggregate.run' ? (styles['run'] ?? '') : ''}`}
       data-feature={control.element}
+      title={control.tip}
       disabled={control.disabled === true}
       onClick={() => {
         pressControl(collectionRef, control);
       }}
     >
-      {control.label}
+      {control.icon === undefined ? null : <span className={`codicon codicon-${control.icon}`} aria-hidden="true" />}
+      <span>{control.label}</span>
     </button>
   );
 }
@@ -80,7 +84,7 @@ function StageList({
         <li key={card.index} className={styles['stage']}>
           {card.index === 0 ? null : (
             <span className={styles['arrow']} aria-hidden="true">
-              →
+              {shown.side ? '↓' : '→'}
             </span>
           )}
           <StageCard
@@ -99,13 +103,14 @@ function StageList({
             className={styles['add']}
             data-feature={shown.add.element}
             title={shown.add.label}
+            aria-label={shown.add.label}
             onClick={() => {
               if (shown.add !== undefined) {
                 pressControl(collectionRef, shown.add);
               }
             }}
           >
-            <span aria-hidden="true">+</span>
+            <span className={`codicon codicon-${shown.add.icon ?? 'add'}`} aria-hidden="true" />
           </button>
         </li>
       )}
@@ -160,11 +165,15 @@ function Toolbar({
   return (
     <div className={styles['foot']}>
       <div className={styles['toolbar']} role="toolbar" aria-label={text.toolbar.name}>
-        {shown.toolbar
-          .filter((control) => isBuilt(control.element))
-          .map((control) => (
-            <ControlButton key={control.element} control={control} collectionRef={collectionRef} />
-          ))}
+        {shown.toolbarGroups.map((group) => (
+          <div key={group[0]?.element ?? ''} className={styles['group']}>
+            {group
+              .filter((control) => isBuilt(control.element))
+              .map((control) => (
+                <ControlButton key={control.element} control={control} collectionRef={collectionRef} />
+              ))}
+          </div>
+        ))}
       </div>
       <p className={styles['line']} aria-live="polite">
         {shown.line.text}
@@ -194,10 +203,12 @@ export function PipelinePane(props: PipelinePaneProps): React.JSX.Element {
     readKept(collectionRef.tab, memory);
   }, [collectionRef.tab, memory]);
   const dragged = useDragged();
-  const shown = view({ editor: kept.draft, readOnly: props.readOnly });
+  const side = useQueryPlace().side;
+  const shown = view({ editor: kept.draft, readOnly: props.readOnly, side });
   return (
     <div
       className={styles['editor']}
+      data-side={side}
       role="region"
       aria-label={text.editor.region}
       data-feature="aggregate.show@query-bar"

@@ -12,6 +12,7 @@ import type { TabSample } from '../../../shared/state/schema';
 import type { CollectionRef } from '../../query/collection-reads';
 import type { CollectionTab } from '../../query/collection-store';
 import { QueryBar } from '../../query/query-bar';
+import { QueryLayout } from '../../query/query-layout';
 import { useAppState } from '../../state/store';
 import type { CollectionPageState } from '../collection/use-collection';
 import { showSection, type SectionPlace } from '../manage/section-actions';
@@ -128,34 +129,35 @@ export function SchemaSection({
   const run = { ...shown.queryBarButton, run: () => void analyze(ref, 'query-bar') };
   return (
     <section className={styles['section']} aria-label={text.section}>
-      <QueryBar collectionRef={ref} collection={collection} instead={run} />
-      <Toolbar shown={shown} collectionRef={ref} place={place} />
-      <div className={styles['body']}>
-        {shown.message === undefined ? null : <p className={styles['message']}>{shown.message}</p>}
-        {shown.cancelled === undefined ? null : (
-          <p className={styles['message']}>
-            {shown.cancelled.text}{' '}
-            <button
-              type="button"
-              className={styles['button']}
-              data-feature={shown.cancelled.element}
-              onClick={() => void analyze(ref, 'toolbar')}
-            >
-              {shown.cancelled.runAgain}
-            </button>
-          </p>
-        )}
-        {shown.rows.length === 0 ? null : (
-          <SchemaTable
-            shown={shown}
-            onFilter={(control) => void filterOn(ref, control)}
-            onExpand={(expanded) => {
-              expandFields(ref, expanded);
-            }}
-          />
-        )}
-        {shown.note === undefined ? null : <p className={styles['note']}>{shown.note}</p>}
-      </div>
+      <QueryLayout query={<QueryBar collectionRef={ref} collection={collection} instead={run} section="schema" />}>
+        <Toolbar shown={shown} collectionRef={ref} place={place} />
+        <div className={styles['body']}>
+          {shown.message === undefined ? null : <p className={styles['message']}>{shown.message}</p>}
+          {shown.cancelled === undefined ? null : (
+            <p className={styles['message']}>
+              {shown.cancelled.text}{' '}
+              <button
+                type="button"
+                className={styles['button']}
+                data-feature={shown.cancelled.element}
+                onClick={() => void analyze(ref, 'toolbar')}
+              >
+                {shown.cancelled.runAgain}
+              </button>
+            </p>
+          )}
+          {shown.rows.length === 0 ? null : (
+            <SchemaTable
+              shown={shown}
+              onFilter={(control) => void filterOn(ref, control)}
+              onExpand={(expanded) => {
+                expandFields(ref, expanded);
+              }}
+            />
+          )}
+          {shown.note === undefined ? null : <p className={styles['note']}>{shown.note}</p>}
+        </div>
+      </QueryLayout>
     </section>
   );
 }

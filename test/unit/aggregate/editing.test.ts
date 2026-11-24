@@ -174,6 +174,19 @@ describe('aggregate.move-stage', () => {
     expect(moved.stages[1]?.enabled).toBe(false);
   });
 
+  it('reads Move up and Move down in the query pane, on the card and in its menu, and moves the same way', () => {
+    const shown = view({ editor: editorOf(list), readOnly: false, side: true }).cards[0];
+    const moves = [shown?.moveLeft, shown?.moveRight, shown?.menu[0], shown?.menu[1]];
+    expect(moves.map((control) => control?.label)).toEqual(['Move up', 'Move down', 'Move up', 'Move down']);
+    expect([shown?.moveLeft.icon, shown?.moveRight.icon]).toEqual(['arrow-up', 'arrow-down']);
+    const above = view({ editor: editorOf(list), readOnly: false }).cards[0];
+    expect([above?.moveLeft.label, above?.moveRight.label]).toEqual(['Move left', 'Move right']);
+    // Move down sends what Move right sends, and the commands left and right move the stage the same way.
+    expect(shown?.moveRight.args).toEqual(above?.moveRight.args);
+    const moved = after(moveStage, editorOf(list), shown?.moveRight.args ?? {});
+    expect(names(moved)).toEqual(['$sort', '$match', '$limit']);
+  });
+
   it('says the move in its step', () => {
     const plan = planOf(
       moveStage(contextOn('aggregate.move-stage'), withPipeline(editorOf(three), { stage: 1, to: 'left' })),

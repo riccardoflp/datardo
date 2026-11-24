@@ -118,9 +118,9 @@ function Control({
             change(row.name, event.target.value);
           }}
         >
-          {(row.choices ?? []).map((choice) => (
+          {(row.choices ?? []).map((choice, index) => (
             <option key={choice} value={choice}>
-              {choice}
+              {row.choiceTitles?.[index] ?? choice}
             </option>
           ))}
         </select>

@@ -218,10 +218,19 @@
 .toolbar {
   display: flex;
   flex-wrap: wrap;
+  gap: var(--space-1) var(--space-4);
+}
+
+.group {
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--space-1);
 }
 
 .button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
   min-height: var(--editor-line-min-height);
   padding: var(--space-1) var(--space-2);
   border: var(--border-width) solid var(--color-border);
@@ -353,4 +362,45 @@
   .flash {
     animation-duration: var(--duration-short);
   }
+}
+
+/* In the query pane (query.position): the cards one under the other, each as wide as the pane, the arrow pointing
+   down and + under the last card; the text at least 240 px high, growing with its lines; each group of the toolbar on
+   a line of its own; the conditions of a drag two by two. */
+.editor[data-side='true'] .stages {
+  flex-direction: column;
+  align-items: stretch;
+  overflow-x: visible;
+}
+
+.editor[data-side='true'] .stage {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.editor[data-side='true'] .arrow,
+.editor[data-side='true'] .add {
+  align-self: center;
+}
+
+.editor[data-side='true'] .text > :first-child {
+  min-height: var(--pipeline-text-min-height);
+}
+
+.editor[data-side='true'] .toolbar {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.editor[data-side='true'] .zones {
+  bottom: auto;
+  min-height: 100%;
+}
+
+.editor[data-side='true'] .zones-row {
+  flex-wrap: wrap;
+}
+
+.editor[data-side='true'] .zone {
+  flex: 1 1 calc(50% - var(--space-1));
 }

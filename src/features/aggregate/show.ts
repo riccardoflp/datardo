@@ -22,6 +22,9 @@ export interface EditorControl {
   readonly feature: string;
   readonly args?: Json;
   readonly disabled?: boolean;
+  /** The Codicon before its name, on the buttons of the toolbar and on **+** (D23). */
+  readonly icon?: string;
+  readonly tip?: string;
 }
 
 /** One card of the stage list. */
@@ -69,7 +72,12 @@ export interface PipelineEditorView {
     readonly invalid?: string;
     readonly run: EditorControl;
   };
+  /** The buttons of the toolbar, in their order: the two groups one after the other. */
   readonly toolbar: readonly EditorControl[];
+  /** The two groups of the toolbar: **Run**, **Edit as text**, **Clear**; then **Explain**, **Code**, **Copy**, **Save as view…**. */
+  readonly toolbarGroups: readonly (readonly EditorControl[])[];
+  /** The cards are in the query pane, one under the other (`query.position`). */
+  readonly side: boolean;
   /** The line of what the table shows, with **show full pipeline** while a stage is shown. */
   readonly line: { readonly text: string; readonly showFull?: EditorControl };
   /** A card is as wide as its longest line within these, in px; its body grows to `bodyHeight` before it scrolls. */
@@ -80,6 +88,8 @@ export interface PipelineEditorView {
 export interface PipelineEditorInput {
   readonly editor: PipelineEditor;
   readonly readOnly: boolean;
+  /** The editor is in the query pane at the right of the table (`query.position`); above the table when not given. */
+  readonly side?: boolean;
 }
 
 /** The entry **Aggregate** of the mode menu of the query bar, which shows the editor. */
@@ -92,17 +102,41 @@ function control(label: string, element: string, feature: string, args?: Json): 
   return { label, element, feature, ...(args === undefined ? {} : { args }) };
 }
 
-/** A move control, disabled at the end the stage cannot move past. */
-function moveControl(editor: PipelineEditor, index: number, to: 'left' | 'right', element: string): EditorControl {
-  const label = to === 'left' ? text.editor.moveLeft : text.editor.moveRight;
-  const moved = control(label, element, 'aggregate.move-stage', { stage: index, to });
-  return canMove(editor, index, to) ? moved : { ...moved, disabled: true };
+/** Where the cards are: left to right above the table, one under the other in the query pane. */
+type CardsLaid = 'across' | 'down';
+
+/** The icon of a move on a card: the arrow of its direction. */
+const moveIcons = {
+  across: { left: 'arrow-left', right: 'arrow-right' },
+  down: { left: 'arrow-up', right: 'arrow-down' },
+} as const;
+
+/** The name of a move: **Move left** and **Move right**, or **Move up** and **Move down** in the query pane. */
+function moveLabel(to: 'left' | 'right', laid: CardsLaid): string {
+  if (laid === 'down') {
+    return to === 'left' ? text.editor.moveUp : text.editor.moveDown;
+  }
+  return to === 'left' ? text.editor.moveLeft : text.editor.moveRight;
 }
 
-function menuOf(stage: Stage, index: number, editor: PipelineEditor): readonly EditorControl[] {
+/** A move control, disabled at the end the stage cannot move past. */
+function moveControl(
+  editor: PipelineEditor,
+  index: number,
+  move: { readonly to: 'left' | 'right'; readonly laid: CardsLaid },
+  element: string,
+): EditorControl {
+  const moved = {
+    ...control(moveLabel(move.to, move.laid), element, 'aggregate.move-stage', { stage: index, to: move.to }),
+    icon: moveIcons[move.laid][move.to],
+  };
+  return canMove(editor, index, move.to) ? moved : { ...moved, disabled: true };
+}
+
+function menuOf(stage: Stage, index: number, editor: PipelineEditor, laid: CardsLaid): readonly EditorControl[] {
   return [
-    moveControl(editor, index, 'left', 'aggregate.move-stage@item-menu'),
-    moveControl(editor, index, 'right', 'aggregate.move-stage@item-menu'),
+    moveControl(editor, index, { to: 'left', laid }, 'aggregate.move-stage@item-menu'),
+    moveControl(editor, index, { to: 'right', laid }, 'aggregate.move-stage@item-menu'),
     control(
       stage.enabled ? text.editor.disable : text.editor.enable,
       'aggregate.toggle-stage@item-menu',
@@ -116,7 +150,7 @@ function menuOf(stage: Stage, index: number, editor: PipelineEditor): readonly E
   ];
 }
 
-function cardOf(editor: PipelineEditor, index: number, marks: StageMarks): StageCard {
+function cardOf(editor: PipelineEditor, index: number, marks: StageMarks, laid: CardsLaid): StageCard {
   const stage = editor.stages[index] ?? { name: '', body: '', enabled: true };
   return {
     index,
@@ -136,10 +170,10 @@ function cardOf(editor: PipelineEditor, index: number, marks: StageMarks): Stage
       checked: stage.enabled,
     },
     marks: { ...marks, element: 'aggregate.stage-marks@list' },
-    moveLeft: moveControl(editor, index, 'left', 'aggregate.move-stage@list'),
-    moveRight: moveControl(editor, index, 'right', 'aggregate.move-stage@list'),
+    moveLeft: moveControl(editor, index, { to: 'left', laid }, 'aggregate.move-stage@list'),
+    moveRight: moveControl(editor, index, { to: 'right', laid }, 'aggregate.move-stage@list'),
     remove: control(text.editor.remove, 'aggregate.remove-stage@list', 'aggregate.remove-stage', { stage: index }),
-    menu: menuOf(stage, index, editor),
+    menu: menuOf(stage, index, editor, laid),
     body: {
       value: stage.body,
       label: text.editor.body(index + 1),
@@ -164,36 +198,61 @@ export function lineOf(editor: PipelineEditor): PipelineEditorView['line'] {
   return { text: `${counted}${textNote}` };
 }
 
-function toolbarOf(editor: PipelineEditor, readOnly: boolean): readonly EditorControl[] {
+/** A button of the toolbar, with its icon, its tooltip and what it sends. */
+function tool(label: string, element: string, feature: string, look: { icon: string; tip: string; args?: Json }) {
+  return { ...control(label, element, feature, look.args), icon: look.icon, tip: look.tip };
+}
+
+function toolbarOf(editor: PipelineEditor, readOnly: boolean): readonly (readonly EditorControl[])[] {
   const asText = editor.text === undefined;
+  const { toolbar } = text;
   return [
-    control(text.toolbar.run, 'aggregate.run@toolbar', 'aggregate.run', { whole: true }),
-    control(text.toolbar.clear, 'aggregate.clear@toolbar', 'aggregate.clear'),
-    control(text.toolbar.explain, 'explain.show@query-bar', 'explain.show'),
-    ...(readOnly ? [] : [control(text.toolbar.saveAsView, 'aggregate.save-as-view@toolbar', 'aggregate.save-as-view')]),
-    control(
-      asText ? text.toolbar.editAsText : text.toolbar.editAsStages,
-      'aggregate.edit-as-text@toolbar',
-      'aggregate.edit-as-text',
-      {
-        to: asText ? 'text' : 'stages',
-      },
-    ),
-    control(text.toolbar.copy, 'aggregate.copy@toolbar', 'aggregate.copy'),
-    control(text.toolbar.code, 'codegen.show@query-bar', 'codegen.show'),
+    [
+      tool(toolbar.run, 'aggregate.run@toolbar', 'aggregate.run', {
+        icon: 'play',
+        tip: toolbar.runTip,
+        args: { whole: true },
+      }),
+      tool(
+        asText ? toolbar.editAsText : toolbar.editAsStages,
+        'aggregate.edit-as-text@toolbar',
+        'aggregate.edit-as-text',
+        { icon: 'json', tip: toolbar.editAsTextTip, args: { to: asText ? 'text' : 'stages' } },
+      ),
+      tool(toolbar.clear, 'aggregate.clear@toolbar', 'aggregate.clear', { icon: 'clear-all', tip: toolbar.clearTip }),
+    ],
+    [
+      tool(toolbar.explain, 'explain.show@query-bar', 'explain.show', { icon: 'telescope', tip: toolbar.explainTip }),
+      tool(toolbar.code, 'codegen.show@query-bar', 'codegen.show', { icon: 'code', tip: toolbar.codeTip }),
+      tool(toolbar.copy, 'aggregate.copy@toolbar', 'aggregate.copy', { icon: 'copy', tip: toolbar.copyTip }),
+      ...(readOnly
+        ? []
+        : [
+            tool(toolbar.saveAsView, 'aggregate.save-as-view@toolbar', 'aggregate.save-as-view', {
+              icon: 'save-as',
+              tip: toolbar.saveAsViewTip,
+            }),
+          ]),
+    ],
   ];
 }
 
 /** Feature: aggregate.show. What the pipeline editor shows. */
 export function view(input: PipelineEditorInput): PipelineEditorView {
   const { editor } = input;
+  const side = input.side === true;
+  const laid: CardsLaid = side ? 'down' : 'across';
   const marks = marksView(editor);
-  const cards = editor.text === undefined ? marks.map((stageMarks, index) => cardOf(editor, index, stageMarks)) : [];
+  const cards =
+    editor.text === undefined ? marks.map((stageMarks, index) => cardOf(editor, index, stageMarks, laid)) : [];
   const empty = editor.text === undefined && editor.stages.length === 0;
+  const groups = toolbarOf(editor, input.readOnly);
   const base = {
     mode: editor.text === undefined ? 'stages' : 'text',
     cards,
-    toolbar: toolbarOf(editor, input.readOnly),
+    toolbar: groups.flat(),
+    toolbarGroups: groups,
+    side,
     line: lineOf(editor),
     sizes: cardSizes,
   } as const;
@@ -211,5 +270,8 @@ export function view(input: PipelineEditorInput): PipelineEditorView {
       },
     };
   }
-  return { ...base, add: control(text.editor.addStage, 'aggregate.add-stage@list', 'aggregate.add-stage') };
+  return {
+    ...base,
+    add: { ...control(text.editor.addStage, 'aggregate.add-stage@list', 'aggregate.add-stage'), icon: 'add' },
+  };
 }

@@ -36,10 +36,6 @@ deleting what it matches.
   **Query above or beside the results**): `src/queryBarHtml.ts › queryBarHtml`, `src/shared/icons.ts › iconSvg`,
   `media/webview.css` (`.q-filter`, `.q-tools`, `.q-write`, `.collection-actions` under 900 px). **Skip** and
   **Limit** as fields of their own are *New in Datardo*: Mongoster only has the page size and the page.
-- **Differs**: (M40) The bar is one row of text buttons without icons: the mode switch, **Filter**, **Sort**,
-  **Project**, **Skip**, **Limit**, then **Builder**, **Queries**, **Reset** and **Find**; **Explain**, **Code**,
-  **Update many…** and **Delete many…** are in the toolbar of the Documents section; the placeholders of **Sort** and
-  **Project** end *drag a column here*; there is no toggle of the query's place.
 
 Every button of the bar has a Codicon before its name ([D23](../decisions.md#d23--codicons-for-every-icon)); the
 toggle of the query's place has its icon alone. What it shows above the table, in rows; a row whose controls do not
@@ -85,18 +81,18 @@ name is still its tooltip and the name a screen reader says.
 Acceptance:
 
 - [ ] A collection tab opened for the first time shows **Find**, the five fields empty with the placeholders above,
-      the builder closed, and no error line. (differs)
+      the builder closed, and no error line.
 - [ ] The query bar of `shop.orders` above the table has, on its first row, **Find ▾**, **Filter**, **Find**,
       **Reset** and the toggle at the right end; on its second, **Builder**, **Queries**, **Explain**, **Code**, then
       **Update many…** and **Delete many…** apart at the right; on its third, **Sort**, **Project**, **Skip** and
-      **Limit**. (differs)
+      **Limit**.
 - [ ] **Find** has the icon `play`, **Reset** `discard`, **Builder** `list-filter`, **Queries** `history`,
       **Explain** `telescope`, **Code** `code`, **Update many…** `edit`, **Delete many…** `trash`; the mode switch has
-      none, and the toggle has its icon `layout-sidebar-right` and no text. (differs)
+      none, and the toggle has its icon `layout-sidebar-right` and no text.
 - [ ] **Explain** shows the Explain section of the tab for the query in the bar, and **Code** its Code section; the
-      toolbar of the Documents section no longer has them, nor **Update many…** and **Delete many…**. (differs)
+      toolbar of the Documents section no longer has them, nor **Update many…** and **Delete many…**.
 - [ ] In a main island 899 px wide **Queries** shows its icon and no text, with the tooltip *Recent and saved
-      queries* and the name *Queries* for a screen reader; at 900 px it shows its name again. (differs)
+      queries* and the name *Queries* for a screen reader; at 900 px it shows its name again.
 - [ ] **Filter**, **Sort** and **Project** are Datardo's editor: they color what is typed (`query.highlight`) and
       suggest fields, operators and values (`query.autocomplete`). **Skip** and **Limit** take digits only.
 - [ ] **Filter** grows with its text up to 240 px high, then scrolls; **Sort** and **Project** stay one line and
@@ -106,20 +102,20 @@ Acceptance:
       suggestion instead.
 - [ ] While a query runs, the run button reads **Cancel** and starts `runner.cancel`; when the query ends, by itself
       or cancelled, it reads **Find** again. Only its name changes: it keeps its place, and its icon becomes
-      `debug-stop` while it reads **Cancel** *(Datardo's choice)*. (differs)
+      `debug-stop` while it reads **Cancel** *(Datardo's choice)*.
 - [ ] A field whose text cannot be read is outlined as invalid when the query is run, and the outline goes as soon as
       its text is edited.
 - [ ] The error line shows one message at a time, the last one, and is empty after a query that succeeds. A message of
       the server has **Details** and **Run again**, as the runner shows every error inside a page.
 - [ ] In **Aggregate** the fields, **Builder**, **Reset**, the bar's **Explain** and **Code**, **Update many…** and
       **Delete many…** give way to the pipeline editor (`aggregate.show`); back in **Find** the fields hold the texts
-      they had. (differs)
+      they had.
 - [ ] On a read-only connection and on a view the bar has neither **Update many…** nor **Delete many…**; the rest is
-      the same, and nothing else in it writes. (differs)
+      the same, and nothing else in it writes.
 - [ ] `Ctrl+F` puts the cursor in **Filter** with its text selected. `Tab` goes through the controls in the order
       above, and each has a name a screen reader says: *Query mode*, *Filter*, *Run query*, *Reset*, the toggle's
       tooltip, *Builder*, *Queries*, *Explain*, *Code*, *Update many…*, *Delete many…*, *Sort*, *Project*, *Skip*,
-      *Limit*. (differs)
+      *Limit*.
 
 ### `query.position` — Put the query above or beside the results
 
@@ -753,8 +749,6 @@ The rows and the text of **Filter** follow each other.
 - **Ported from**: `src/webview/builder.ts › FilterBuilder`, `src/shared/builder.ts` (`BUILDER_OPS`, `BUILDER_TYPES`);
   README, **Visual query builder**. The icons of the head and its layout in the query pane are Mongoster 0.9.0's:
   `src/webview/builder.ts` (`iconSvg`), `media/webview.css` (`body.query-side .builder-head`, `.builder-row`).
-- **Differs**: (M40) The head's buttons are **+ Condition** and **Clear**, text without icons, and the builder has one
-  layout, the one above the table.
 
 What it shows:
 
@@ -800,7 +794,7 @@ Acceptance:
 - [ ] Typing `{ age: { $gte: 20, $lte: 30 } }` in **Filter** shows two rows, `age ≥ 20` and `age ≤ 30`; so does a
       filter that comes from a drop, a recent query or a saved one. Rows still being filled in stay, after the others.
 - [ ] A filter with a syntax error shows no rows and the note *The filter has a syntax error: fix it in the box above
-      to edit it here.*; **Condition** and the choice are disabled. (differs)
+      to edit it here.*; **Condition** and the choice are disabled.
 - [ ] The filter `{ items: { $elemMatch: { sku: "A1" } } }` shows no rows and the note *This filter uses operators the
       rows can't show ($elemMatch, $expr, nested $or…): edit it in the box above, or Clear to start over here.*, and
       the text of **Filter** is left exactly as it is.
@@ -812,10 +806,9 @@ Acceptance:
 - [ ] Every control of a row has a name a screen reader says: *Field of condition 1*, *Operator of condition 1*,
       *Value of condition 1*.
 - [ ] **Condition** has the icon `add` and the name *Add a condition* for a screen reader; **Clear** has the icon
-      `clear-all`. (differs)
+      `clear-all`.
 - [ ] In a query pane 380 px wide, the row `status`, `=`, `paid` shows `status` and its remove button on one line and
       `=` and `paid` on the next, and **Condition** and **Clear** are under **Match all of these conditions**.
-      (differs)
 
 ### `query.builder-filter` — The filter of the builder's rows
 
@@ -1119,8 +1112,6 @@ can do in the sort and the projection; dropping it on one adds that and runs the
   (`docs/features/03-collection-tab.md`, `src/shared/dropZones.ts › sortZones`, `projectionZones`),
   `src/webview/main.ts › showDropzones`, `media/webview.css` (`body.query-side #dropzones`); CHANGELOG 0.9.0, *A cell
   dragged from the table can now be dropped on Sort and Project too*.
-- **Differs**: (M40) A dragged cell shows zones over **Filter** only: only a column header can be dropped on **Sort**
-  and **Project**; the zones have one layout, the one of the bar above the table.
 
 The zones. Each shows its label and the field, written `items[].sku` for a field of the elements of an expanded array:
 
@@ -1170,15 +1161,14 @@ Acceptance:
 - [ ] Dragging the cell `total` 42 shows, besides the zones over **Filter**, **▲ ascending** and **▼ descending** over
       **Sort** and **include** and **exclude** over **Project**, each with `total`; with the sort `{ status: 1 }`,
       dropping it on **▼ descending** writes `{ status: 1, total: -1 }` in **Sort** and runs the query from the first
-      page. (differs)
+      page.
 - [ ] Dragging a cell of `total` with the projection `{ total: 1 }` shows **✕ remove** over **Project**; dropping it
-      there empties **Project**. (differs)
+      there empties **Project**.
 - [ ] Dragging the `qty` of the second element of `items`, in an expanded array, shows `items[].qty` over **Sort**
       with the tooltip *items.qty: -1 (after the fields already in the sort)* on **▼ descending**; dropping it there
-      writes `{ "items.qty": -1 }`. (differs)
+      writes `{ "items.qty": -1 }`.
 - [ ] With the query in a pane 380 px wide, dragging the cell `status` of a paid order shows its four zones over
       **Filter** on two lines, **= equals** and **≠ not equal**, then **≥ from** and **≤ to**, each label whole.
-      (differs)
 - [ ] Everything a drop does can be done without dragging: the zones over **Filter** are in **Add to filter** of the
       menus of a cell and of a column header, and the zones over **Sort** and **Project**, for a cell as for a header,
       are in **Sort** and **Project** of the menu of its column's header.
@@ -1248,8 +1238,6 @@ Sets, changes or removes the direction of one field in the sort, keeping the oth
 - **Uses**: `query.parse`, `query.format`, `query.run`.
 - **Ported from**: `src/shared/query.ts › mergeSort`. A cell as well as a header: Mongoster 0.9.0,
   `src/shared/dropZones.ts › sortZones`.
-- **Differs**: (M40) Only a dragged column header offers the zones over **Sort**; a dragged cell does not
-  (`query.drag`).
 
 Rules of the result:
 
@@ -1285,8 +1273,6 @@ it.
 - **Uses**: `query.parse`, `query.format`, `query.run`.
 - **Ported from**: `src/shared/query.ts › mergeProjection`. A cell as well as a header: Mongoster 0.9.0,
   `src/shared/dropZones.ts › projectionZones`.
-- **Differs**: (M40) Only a dragged column header offers the zones over **Project**; a dragged cell does not
-  (`query.drag`).
 
 Rules of the result:
 
