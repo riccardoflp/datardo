@@ -14,6 +14,7 @@ import { isRedisStringProblem, redisFromString } from './redis-string';
 import { newConnectionId } from './save';
 import { newFolderQuestion } from './move-to-folder';
 import { isEncrypted } from './read-file';
+import { securityNotes } from './importing/notes';
 import { fileText, organizeText, planText, transferText } from './text';
 import type { FileConnection, FileConnections } from './types';
 import {
@@ -139,17 +140,23 @@ function chooseQuestion(source: ImportSource, file: FileConnections, choices: Im
         choices: file.connections.map((each, index) => ({
           value: String(index),
           label: each.name,
-          description: describe(each, choices.saved, choices.same.includes(index)),
+          description: describe(each, { saved: choices.saved, all: file.connections }, choices.same.includes(index)),
         })),
       },
     ],
   });
 }
 
-/** What an item of the list says of a connection: engine, host, whether it exists, its settings and its notes. */
-export function describe(connection: FileConnection, saved: readonly ConnectionView[], same: boolean): string {
-  const exists = saved.some((each) => each.name === connection.name);
-  const ssh = connection.ssh;
+/**
+ * What an item of the list says of a connection: engine, host, whether it exists, its settings, what it does beyond
+ * its host and its notes. `all` is every connection of the file, which a redis-oplog link names.
+ */
+export function describe(
+  connection: FileConnection,
+  among: { readonly saved: readonly ConnectionView[]; readonly all: readonly FileConnection[] },
+  same: boolean,
+): string {
+  const exists = among.saved.some((each) => each.name === connection.name);
   return [
     connection.engine === 'mongodb' ? 'MongoDB' : 'Redis',
     hostsOf(connection.engine, connection.connectionString),
@@ -157,9 +164,7 @@ export function describe(connection: FileConnection, saved: readonly ConnectionV
     ...(connection.folder === undefined ? [] : [connection.folder]),
     ...(connection.color === undefined ? [] : [connection.color]),
     ...(connection.readOnly === true ? ['read-only'] : []),
-    ...(connection.tls === undefined ? [] : ['TLS']),
-    ...(ssh === undefined ? [] : [`SSH ${ssh.username}@${ssh.host}`]),
-    ...(connection.oplog === undefined ? [] : ['redis-oplog']),
+    ...securityNotes(connection, among.all),
     ...connection.notes,
   ].join(' · ');
 }

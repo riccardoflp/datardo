@@ -1583,11 +1583,9 @@ either engine, from a file or the clipboard.
   (`src/shared/connectionsFile.ts › securityNotes`, `urlHost`; `src/connectionsTransfer.ts › summary`, and the
   **Replace** of `importConnections`). The queries folder in the detail is new in Datardo, which keeps one per
   connection.
-- **Differs**: (M37) the detail of an item names only **TLS**, **SSH <user>@<host>** and **redis-oplog**: not the
-  invalid certificates and host names allowed, a proxy, the SSH port, the host redis-oplog publishes to, the undo
-  history left off or the queries folder; (M38) it does not count the colors of databases and collections, a custom
-  color is not read, and **Replace** carries no such color; (M39) it says nothing of the exclusions from searches,
-  and **Replace** carries none.
+- **Differs**: (M38) the detail of an item does not count the colors of databases and collections, a custom color is
+  not read, and **Replace** carries no such color; (M39) it says nothing of the exclusions from searches, and
+  **Replace** carries none.
 
 Acceptance:
 
@@ -1602,17 +1600,17 @@ Acceptance:
       TLS settings or from the options `tlsInsecure`, `tlsAllowInvalidCertificates` and `tlsAllowInvalidHostnames`
       left in the connection string; **proxy <host>[:<port>]**, from `proxyHost` and `proxyPort`; **SSH
       <user>@<host>[:<port>]**, the port only when it is not 22; **redis-oplog → <host>:<port>**, the Redis server
-      the writes would be published to; **no undo history**; **queries folder <path>**. (differs)
+      the writes would be published to; **no undo history**; **queries folder <path>**.
 - [ ] An entry `Prod` of a Datardo file with `"uri":
       "mongodb://ada@db1/app?proxyHost=socks.example.com&proxyPort=1080&tlsInsecure=true"`, `"ssh": { "host": "jump",
       "port": 2200, "username": "me", "auth": "password" }`, `"noHistory": true`, `"queriesFolder": "/home/eve/.ssh"`
       and a `redisOplog` linked to an entry with `"uri": "rediss://cache.example.com:6380"` has the detail `MongoDB ·
       db1 · invalid certificates allowed · invalid host names allowed · proxy socks.example.com:1080 · SSH
       me@jump:2200 · redis-oplog → cache.example.com:6380 · no undo history · queries folder /home/eve/.ssh · no
-      password · no SSH password`. (differs)
+      password · no SSH password`.
 - [ ] No password is ever part of the detail: a Mongoster file's Redis address `redis://:s3cret@cache:6379/0` shows
       as **redis-oplog → cache:6379**, and one whose host cannot be read as **redis-oplog → a host that could not be
-      read**. (differs)
+      read**.
 - [ ] A Datardo file entry with `"color": "#1E90FF"`, `"databaseColors": { "shop": "teal" }`,
       `"collectionColors": { "shop.orders": "none", "shop.logs": "#12abef" }`, `"excluded": true` and
       `"exclusions": ["archive"]` has in its detail `#1e90ff`, **1 database color**, **2 collection colors**,
