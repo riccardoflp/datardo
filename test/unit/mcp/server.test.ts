@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  batchRefusal,
   bodyAnswer,
   checkRequest,
   listenHost,
@@ -10,6 +11,7 @@ import {
   plan,
   retryMs,
   tooLargeAnswer,
+  tooManyAnswer,
   type HttpHead,
 } from '../../../src/features/mcp/server';
 import { mcpContext, mcpState, planOf } from './harness';
@@ -131,5 +133,21 @@ describe('mcp.server', () => {
       notStartedAfter(mcpState({ warnedPorts: [37018] }), 37019, 'Port 37019 is used by another program.'),
     ).toHaveLength(1);
     expect(retryMs).toBe(3000);
+  });
+
+  it('refuses a batch of more than 20 messages with 400 before any of them runs', () => {
+    const message = { jsonrpc: '2.0', id: 1, method: 'ping' };
+    expect(batchRefusal(Array.from({ length: 21 }, () => message))).toBe(tooManyAnswer);
+    expect(tooManyAnswer).toMatchObject({
+      status: 400,
+      body: {
+        jsonrpc: '2.0',
+        id: null,
+        error: { code: -32600, message: 'Too many requests in one batch: at most 20' },
+      },
+    });
+    expect(tooManyAnswer.headers['Connection']).toBe('close');
+    expect(batchRefusal(Array.from({ length: 20 }, () => message))).toBeUndefined();
+    expect(batchRefusal(message)).toBeUndefined();
   });
 });

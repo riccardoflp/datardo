@@ -5,14 +5,16 @@
  * (`list_databases`, `list_collections`), the shape of a collection (`describe_collection`), and documents found with
  * a query (`find_documents`) or an aggregation (`aggregate`). None of them writes: they send only `listDatabases`,
  * `listCollections`, `$sample`, `listIndexes`, `$listSearchIndexes`, `find`, `countDocuments` and `aggregate` without
- * `$out` or `$merge`. No connection string, password, SSH passphrase or user name is ever returned.
+ * the stages of `mcp.refuse-write-stages`, never on a `system.*` collection, and `find` skips at most 1,000,000
+ * documents. No connection string, password, SSH passphrase or user name is ever returned.
  */
 import type { Json } from '../../shared/engine-request';
 import type { Context } from '../../shared/feature';
 import { connectionState } from '../../shared/state/connections';
 import { groupThousands } from '../../shared/text-units';
 import { collectionArgs, intArg, requiredArg, toolConnection } from './arguments';
-import { bounds, COUNT_CAP, counted, MOST_FIELDS } from './output-limits';
+import { bounds, COUNT_CAP, counted, MOST_FIELDS, SKIP_MAX } from './output-limits';
+import { definitionText, mcpSettings } from './read-data';
 import { fieldLine, sampledFields } from './tool/fields';
 import {
   documentsText,
@@ -94,8 +96,11 @@ function listCollections(session: ToolSession): string {
   return JSON.stringify(listed, null, 2);
 }
 
-/** `- name: { key } unique sparse TTL 3600s partial { … } hidden`. */
-export function indexLine(index: Readonly<Record<string, unknown>>): string {
+/**
+ * `- name: { key } unique sparse TTL 3600s partial { … } hidden`; without `readData` the partial filter expression is
+ * its shape, `partial { status: ? }`.
+ */
+export function indexLine(index: Readonly<Record<string, unknown>>, readData: boolean): string {
   const ttl = numberIn(index['expireAfterSeconds']);
   return [
     `- ${textIn(index['name']) ?? ''}: ${shellText(index['key'] ?? {})}`,
@@ -104,7 +109,7 @@ export function indexLine(index: Readonly<Record<string, unknown>>): string {
     ...(ttl === undefined ? [] : [`TTL ${String(ttl)}s`]),
     ...(index['partialFilterExpression'] === undefined
       ? []
-      : [`partial ${shellText(index['partialFilterExpression'])}`]),
+      : [`partial ${definitionText(index['partialFilterExpression'] as Json, readData)}`]),
     ...(index['hidden'] === true ? ['hidden'] : []),
   ].join(' ');
 }
@@ -148,7 +153,9 @@ function describeCollection(session: ToolSession): string {
     `${target.database}.${target.collection}: ${count === undefined ? 'unknown number of' : `about ${counted(count, 'document')},`} ${counted(sampled.length, 'document')} sampled.`,
     '',
     'Indexes:',
-    ...(indexList.length === 0 || isView ? ['- none (a view)'] : indexList.map(indexLine)),
+    ...(indexList.length === 0 || isView
+      ? ['- none (a view)']
+      : indexList.map((index) => indexLine(index, mcpSettings(session.context.state.settings).readData))),
     ...searchIndexLines(search),
     '',
     'Fields (path: types, % of documents that have it):',
@@ -169,7 +176,7 @@ function matchingText(total: unknown): string {
 
 function findDocuments(session: ToolSession): string {
   const query = queryArgs(session);
-  const skip = intArg(session.args, 'skip', [0, 0, Number.MAX_SAFE_INTEGER]);
+  const skip = intArg(session.args, 'skip', [0, 0, SKIP_MAX]);
   const range = bounds.documents;
   const limit = intArg(session.args, 'limit', range);
   const target = collectionArgs(session);
@@ -269,7 +276,7 @@ export const group = groupOf('mcp.data-tools', [
       filter: filterProp,
       sort: sortProp,
       projection: projectionProp,
-      skip: { type: 'integer', minimum: 0, default: 0 },
+      skip: { type: 'integer', minimum: 0, maximum: SKIP_MAX, default: 0, description: 'Documents skipped.' },
       limit: documentsLimit,
     },
     required: ['connection', 'database', 'collection'],
@@ -280,7 +287,7 @@ export const group = groupOf('mcp.data-tools', [
     name: 'aggregate',
     title: 'Run an aggregation',
     description:
-      'Runs an aggregation pipeline and returns its first results in mongosh syntax. Pipelines with $out or $merge are refused. Read only.',
+      'Runs an aggregation pipeline and returns its first results in mongosh syntax. Pipelines that write ($out, $merge), that are not a plain read of the collection or that read a system.* collection are refused. Read only.',
     properties: {
       connection: connectionProp,
       database: databaseProp,

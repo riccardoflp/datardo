@@ -15,7 +15,8 @@ import { featureId } from '../../shared/ids';
 import { appTarget } from '../../shared/target';
 import type { AppState } from '../../shared/state';
 import { sameToken } from './access-token';
-import { parseErrorResponse } from './protocol';
+import { MAX_BATCH } from './output-limits';
+import { parseErrorResponse, rpcErrors } from './protocol';
 import { mcpSettings } from './read-data';
 import { text } from './text';
 import { mcpStateOf, urlOf } from './tool/server-state';
@@ -118,6 +119,28 @@ export const parseErrorAnswer: HttpAnswer = {
   headers: { ...closing, 'Content-Type': 'application/json' },
   body: parseErrorResponse,
 };
+
+/**
+ * The answer to a JSON-RPC batch of more than {@link MAX_BATCH} messages, each of which could run a command for 30 s:
+ * 400 with the JSON-RPC error -32600 and `id: null`, and none of its messages runs.
+ */
+export const tooManyAnswer: HttpAnswer = {
+  status: 400,
+  headers: { ...closing, 'Content-Type': 'application/json' },
+  body: {
+    jsonrpc: '2.0',
+    id: null,
+    error: {
+      code: rpcErrors.invalidRequest,
+      message: `Too many requests in one batch: at most ${String(MAX_BATCH)}`,
+    },
+  },
+};
+
+/** The refusal of a body read as JSON before any of its messages runs: a batch of more than 20 messages. */
+export function batchRefusal(parsed: unknown): HttpAnswer | undefined {
+  return Array.isArray(parsed) && parsed.length > MAX_BATCH ? tooManyAnswer : undefined;
+}
 
 /** The answer that carries what `mcp.protocol` answered: 200 with it, or 202 with no body for notifications only. */
 export function bodyAnswer(body: Json | undefined): HttpAnswer {

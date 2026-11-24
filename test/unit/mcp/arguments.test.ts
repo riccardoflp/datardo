@@ -136,4 +136,45 @@ describe('mcp.arguments', () => {
     const refused = drive('list_databases', { connection: 'Local' }, { app: () => 'needs-the-user' }, state);
     expect(failureOf(refused)).toBe('Local is not connected and needs the user to connect it in Datardo.');
   });
+
+  it('refuses a system.* collection in every tool that takes a collection, on and off, and sends nothing', () => {
+    const tools = [
+      'describe_collection',
+      'find_documents',
+      'aggregate',
+      'count_documents',
+      'distinct_values',
+      'describe_relations',
+      'collection_options',
+      'explain_query',
+      'index_advice',
+      'collection_stats',
+      'watch_changes',
+      'write_history',
+      'redis_oplog_status',
+      'open_query',
+      'open_aggregation',
+      'open_search',
+      'open_watch',
+      'open_explain',
+    ];
+    const extra = { pipeline: '[ { $match: {} } ]', field: 'name', query: 'ada', text: 'ada' };
+    for (const readData of [true, false]) {
+      const state = mcpState({ settings: { 'datardo.mcp.readData': readData } });
+      for (const tool of tools) {
+        for (const [database, collection] of [
+          ['admin', 'system.users'],
+          ['shop', 'system.profile'],
+          ['shop', 'system.views'],
+        ] as const) {
+          const driven = drive(tool, { connection: 'Local', database, collection, ...extra }, {}, state);
+          expect(failureOf(driven), `${tool} ${collection}`).toBe(
+            `${database}.${collection} is a system collection: Datardo's MCP server doesn't read the system.* collections (users, profiler, views…).`,
+          );
+          expect(driven.sent, tool).toEqual([]);
+          expect(driven.apps, tool).toEqual([]);
+        }
+      }
+    }
+  });
 });

@@ -1,9 +1,11 @@
 /**
  * The text of `current_operations` and `collection_stats` (`mcp.performance-tools`): an entry of `currentOp`, and the
- * sizes and uses of a collection's indexes. With `datardo.mcp.readData` off, a command is written as its shape.
+ * sizes and uses of a collection's indexes. With `datardo.mcp.readData` off, a command and a partial filter expression
+ * are written as their shapes.
  */
 import type { Json } from '../../../shared/engine-request';
 import { clippedLine, counted } from '../output-limits';
+import { definitionText } from '../read-data';
 import { listOf, numberIn, recordOf, shellText, textIn, dateIn } from './mongo';
 import { queryShape, withoutNoise } from './slow-ops';
 import { sizeText } from './units';
@@ -147,7 +149,12 @@ function sizeOrUnknown(bytes: number | undefined): string {
   return bytes === undefined ? '?' : sizeText(bytes);
 }
 
-function indexLine(index: Entry, storage: readonly Entry[], uses: ReadonlyMap<string, IndexUse>): string {
+function indexLine(
+  index: Entry,
+  storage: readonly Entry[],
+  uses: ReadonlyMap<string, IndexUse>,
+  readData: boolean,
+): string {
   const name = String(index['name']);
   const sizes = storage
     .map((each) => numberIn(recordOf(each['indexSizes'])[name]))
@@ -167,18 +174,22 @@ function indexLine(index: Entry, storage: readonly Entry[], uses: ReadonlyMap<st
     ...(ttl === undefined ? [] : [`TTL ${String(ttl)}s`]),
     ...(index['partialFilterExpression'] === undefined
       ? []
-      : [`partial ${shellText(index['partialFilterExpression'])}`]),
+      : [`partial ${definitionText(index['partialFilterExpression'] as Json, readData)}`]),
     ...(index['hidden'] === true ? ['hidden'] : []),
     ...(building ? ['BUILDING'] : []),
   ];
   return `- ${name} ${shellText(index['key'] ?? {})}: ${parts.join(', ')}`;
 }
 
-/** The text of `collection_stats`, from `$collStats` (one per shard), `listIndexes` and `$indexStats`. */
+/**
+ * The text of `collection_stats`, from `$collStats` (one per shard), `listIndexes` and `$indexStats`; without
+ * `readData` a partial filter expression is given as its shape.
+ */
 export function statsText(
   name: string,
   timeseries: boolean,
   read: { readonly storage: readonly Entry[]; readonly indexes: readonly Entry[]; readonly stats: readonly Json[] },
+  readData: boolean,
 ): string {
   const { storage, indexes, stats } = read;
   const uses = indexUses(stats);
@@ -199,6 +210,6 @@ export function statsText(
     `- indexes: ${String(indexes.length)}, total size ${sizeOrUnknown(indexSize)}${size && indexSize ? ` (${String(Math.round((indexSize / size) * 100))}% of the data size)` : ''}`,
     '',
     'Indexes:',
-    ...indexes.map((index) => indexLine(index, storage, uses)),
+    ...indexes.map((index) => indexLine(index, storage, uses, readData)),
   ].join('\n');
 }

@@ -7,7 +7,7 @@
  * of those the tools ask the main process, and a tab opened is never a console or a playground.
  */
 import type { ConnectionRequest, Json, MongoRequest, RedisRequest } from '../../../shared/engine-request';
-import { writeStageNames } from '../../aggregate/types';
+import { writeStageAnywhere } from '../refuse-write-stages';
 import { mcpActions } from '../types';
 
 /** The methods of MongoDB a tool may call: they read. */
@@ -81,7 +81,10 @@ function recordOf(value: Json | undefined): Readonly<Record<string, Json>> | und
     : undefined;
 }
 
-/** Whether a pipeline has no stage that writes: no `$out`, no `$merge`, spaces around the name ignored. */
+/**
+ * Whether a pipeline has no stage that writes: no `$out`, no `$merge`, spaces around the name ignored, at the top nor
+ * in the pipelines nested in `$facet`, `$lookup` and `$unionWith`.
+ */
 export function isReadingPipeline(pipeline: Json | undefined): boolean {
   if (pipeline === undefined) {
     return true;
@@ -89,10 +92,10 @@ export function isReadingPipeline(pipeline: Json | undefined): boolean {
   if (!Array.isArray(pipeline)) {
     return false;
   }
-  return (pipeline as readonly Json[]).every((stage) => {
-    const record = recordOf(stage);
-    return record !== undefined && Object.keys(record).every((name) => !writeStageNames.includes(name.trim()));
-  });
+  return (
+    (pipeline as readonly Json[]).every((stage) => recordOf(stage) !== undefined) &&
+    writeStageAnywhere(pipeline) === undefined
+  );
 }
 
 function isReadingCommand(command: Readonly<Record<string, Json>> | undefined): boolean {
@@ -166,6 +169,8 @@ export const toolActions: ReadonlySet<string> = new Set([
   'saved-query.list',
   // The advice of the Index advisor, from reads only (`advisor.read-indexes`, `advisor.read-slow-operations`).
   'advisor.analyze',
+  // The reads of the Sharding section through a mongos, for `sharding_status`: it never starts or stops the balancer.
+  'monitor.sharding',
 ]);
 
 /** The kinds of tab no tool opens: a console or a playground, where a command or a script would run. */

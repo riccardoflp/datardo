@@ -130,6 +130,34 @@ describe('mcp.server', () => {
     expect([notifications.status, notifications.text]).toEqual([202, '']);
   });
 
+  it('refuses a batch of 21 messages with 400 and runs none of them, logging nothing', async () => {
+    const sent = live.sent.length;
+    const lines = live.mcpLines().length;
+    const call = {
+      jsonrpc: '2.0',
+      method: 'tools/call',
+      params: { name: 'list_databases', arguments: { connection: 'Local' } },
+    };
+    const batch = await asked({
+      body: JSON.stringify(Array.from({ length: 21 }, (_, index) => ({ ...call, id: index + 1 }))),
+    });
+    expect(batch.status).toBe(400);
+    expect(JSON.parse(batch.text)).toEqual({
+      jsonrpc: '2.0',
+      id: null,
+      error: { code: -32600, message: 'Too many requests in one batch: at most 20' },
+    });
+    expect(live.sent.length).toBe(sent);
+    expect(live.mcpLines()).toHaveLength(lines);
+    const twenty = await asked({
+      body: JSON.stringify(
+        Array.from({ length: 20 }, (_, index) => ({ jsonrpc: '2.0', id: index + 1, method: 'ping' })),
+      ),
+    });
+    expect(twenty.status).toBe(200);
+    expect(JSON.parse(twenty.text)).toHaveLength(20);
+  });
+
   it('runs beside another server, each with its own token', async () => {
     const other = await liveMcp();
     try {

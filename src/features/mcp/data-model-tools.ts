@@ -10,7 +10,15 @@
 import type { Json } from '../../shared/engine-request';
 import type { Context } from '../../shared/feature';
 import { listAction, parse as parseQueries, request as queriesRequest } from '../saved-query/list';
-import { boolArg, collectionArgs, intArg, requiredArg, stringArg, toolConnection } from './arguments';
+import {
+  boolArg,
+  collectionArgs,
+  intArg,
+  refuseSystemCollection,
+  requiredArg,
+  stringArg,
+  toolConnection,
+} from './arguments';
 import { COUNT_CAP, clippedLine, counted } from './output-limits';
 import { mcpSettings } from './read-data';
 import { optionsText } from './tool/collection-options';
@@ -38,8 +46,14 @@ function placeOf(target: ReturnType<typeof collectionArgs>): MongoPlace {
 function countDocuments(session: ToolSession): string {
   const query = queryArgs(session);
   const exact = boolArg(session.args, 'exact', false);
-  const target = collectionArgs(session);
   const empty = Object.keys(query.filter).length === 0;
+  // A count per filter tells the values one question at a time ({ email: /^a/ }): without readData, only the total.
+  if (!empty && !mcpSettings(session.context.state.settings).readData) {
+    throw new ToolProblem(
+      'A filter is refused because datardo.mcp.readData is off: counting what matches a filter tells the values of the documents. Call it without a filter for the total, or use open_query to show the user the matching documents.',
+    );
+  }
+  const target = collectionArgs(session);
   const [count, estimate] = session.send([
     mongoCall(placeOf(target), 'countDocuments', [query.filter, exact ? {} : { limit: COUNT_CAP }]),
     ...(empty ? [mongoCall(placeOf(target), 'estimatedDocumentCount', [{}])] : []),
@@ -149,9 +163,12 @@ export function relationLine(relation: DetectedRelation): string {
 }
 
 function describeRelations(session: ToolSession): string {
-  const connection = toolConnection(session, 'mongodb');
   const database = requiredArg(session.args, 'database');
   const collection = stringArg(session.args, 'collection');
+  if (collection !== undefined) {
+    refuseSystemCollection(database, collection);
+  }
+  const connection = toolConnection(session, 'mongodb');
   const sample = intArg(session.args, 'sample', [100, 1, 2000]);
   const reply = recordOf(
     replyOrProblem(session.app('relation.detect', { connection: connection.id, database, sample })),
@@ -188,7 +205,8 @@ function collectionOptions(session: ToolSession): string {
       { _id: namespace, dropped: { $ne: true } },
     ]),
   ]);
-  return optionsText(namespace, target.entry, isFailed(sharded) ? null : sharded);
+  const readData = mcpSettings(session.context.state.settings).readData;
+  return optionsText(namespace, target.entry, isFailed(sharded) ? null : sharded, readData);
 }
 
 function listSavedQueries(session: ToolSession): string {
@@ -205,7 +223,7 @@ export const group = groupOf('mcp.data-model-tools', [
   {
     name: 'count_documents',
     title: 'Count documents',
-    description: `The number of documents that match a filter (counting stops at 100,000 unless exact is true); with no filter, also the estimate from the collection's metadata.`,
+    description: `The number of documents that match a filter (counting stops at 100,000 unless exact is true); with no filter, also the estimate from the collection's metadata. With datardo.mcp.readData off only the total is given: a filter is refused.`,
     properties: {
       connection: connectionProp,
       database: databaseProp,

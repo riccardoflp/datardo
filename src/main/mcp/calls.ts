@@ -49,10 +49,13 @@ function failedReply(error: unknown): FailedReply {
   const record = typeof error === 'object' && error !== null ? (error as Record<string, unknown>) : {};
   const message = error instanceof Error ? error.message : String(error);
   const code = record['code'];
+  // Only an answer of a MongoDB server has a code name (`MongoEngineError`): it tells it from a network failure.
+  const codeName = record['codeName'];
   return {
     kind: 'error',
     message: withoutSecrets(message),
     ...(typeof code === 'number' || typeof code === 'string' ? { code } : {}),
+    ...(typeof codeName === 'string' ? { codeName } : {}),
   };
 }
 

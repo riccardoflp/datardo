@@ -133,7 +133,7 @@
       "default": true,
       "title": "Let assistants read data",
       "x-group": "MCP server",
-      "description": "Whether the tools of the MCP server may return documents and the values of keys."
+      "description": "Whether the tools of the MCP server may return documents and the values of keys. Off, the tools that return them and explain_query are not offered, count_documents gives only totals, and what could quote a value (commands, validators, view pipelines, partial filters, saved queries, a server's error) is reduced to its shape or its code."
     },
     "datardo.key.separator": {
       "type": "string",

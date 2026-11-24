@@ -99,6 +99,11 @@ export interface FailedReply {
   readonly message: string;
   /** The server's code, when it gave one: MongoDB's `13` (Unauthorized). */
   readonly code?: number | string;
+  /**
+   * The name of the server's code, `ConversionFailure`: given only by a MongoDB server's own answer to a command, so
+   * that a failure of the network or of a time limit of Datardo's is told from an error of the server (`mcp.read-data`).
+   */
+  readonly codeName?: string;
 }
 
 /** The reply of a request to Redis that got no answer within the time limit (`mcp.output-limits`). */

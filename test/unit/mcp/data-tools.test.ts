@@ -103,16 +103,25 @@ describe('mcp.data-tools', () => {
 
   it('writes an index with all its options', () => {
     expect(
-      indexLine({
-        name: 'ttl',
-        key: { at: 1 },
-        unique: true,
-        sparse: true,
-        expireAfterSeconds: 3600,
-        partialFilterExpression: { a: 1 },
-        hidden: true,
-      }),
+      indexLine(
+        {
+          name: 'ttl',
+          key: { at: 1 },
+          unique: true,
+          sparse: true,
+          expireAfterSeconds: 3600,
+          partialFilterExpression: { a: 1 },
+          hidden: true,
+        },
+        true,
+      ),
     ).toBe('- ttl: { at: 1 } unique sparse TTL 3600s partial { a: 1 } hidden');
+  });
+
+  it('writes a partial filter expression as its shape with datardo.mcp.readData off', () => {
+    expect(
+      indexLine({ name: 'active', key: { status: 1 }, partialFilterExpression: { status: 'active' } }, false),
+    ).toBe('- active: { status: 1 } partial { status: ? }');
   });
 
   it('finds documents, with their BSON types kept', () => {

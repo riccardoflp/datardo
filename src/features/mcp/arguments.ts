@@ -2,7 +2,8 @@
  * Feature: mcp.arguments
  *
  * How every tool reads its arguments: the connection by id or by name, for its engine, connected as opening it would;
- * the database and the collection, which must exist; a Redis database and a key; strings, whole numbers, switches,
+ * the database and the collection, which must exist and must not be a `system.*` collection; a Redis database and a
+ * key; strings, whole numbers, switches,
  * times, resume tokens, lists and names of a fixed set, each with the sentence the model sees when it is wrong.
  */
 import type { ConnectionView } from '../../shared/connection';
@@ -13,6 +14,7 @@ import { isJsonObject } from '../query/mongosh/ejson';
 import { mongoCall, recordOf } from './tool/mongo';
 import { ToolProblem, type ToolSession } from './tool/program';
 import { keyBytes } from './tool/redis';
+import { isSystemCollection, systemCollectionSentence } from './tool/system-collections';
 import { mcpActions, type ToolArguments } from './types';
 
 /**
@@ -89,11 +91,25 @@ export interface CollectionArgs {
   readonly entry: Readonly<Record<string, unknown>>;
 }
 
-/** The collection of a MongoDB tool, which must exist: `<database>.<collection> doesn't exist on <connection>: …`. */
+/**
+ * A `system.*` collection named by the assistant is refused in every database, by every tool that takes a collection,
+ * whatever `datardo.mcp.readData` says, before anything is sent: `admin.system.users is a system collection: …`.
+ */
+export function refuseSystemCollection(database: string, collection: string): void {
+  if (isSystemCollection(collection)) {
+    throw new ToolProblem(systemCollectionSentence(database, collection));
+  }
+}
+
+/**
+ * The collection of a MongoDB tool, which must exist: `<database>.<collection> doesn't exist on <connection>: …`; a
+ * `system.*` collection is refused before the connection is even connected.
+ */
 export function collectionArgs(session: ToolSession): CollectionArgs {
-  const connection = toolConnection(session, 'mongodb');
   const database = requiredArg(session.args, 'database');
   const collection = requiredArg(session.args, 'collection');
+  refuseSystemCollection(database, collection);
+  const connection = toolConnection(session, 'mongodb');
   const [reply] = session.send([
     mongoCall({ connection: connection.id, database }, 'listCollections', [{ name: collection }, {}]),
   ]);
@@ -104,12 +120,15 @@ export function collectionArgs(session: ToolSession): CollectionArgs {
   return { connection, database, collection, entry: recordOf(entry) };
 }
 
-/** `collection` without `database` is refused. */
+/** `collection` without `database` is refused, and so is a `system.*` collection. */
 export function databaseAndCollection(args: ToolArguments): { database?: string; collection?: string } {
   const database = stringArg(args, 'database');
   const collection = stringArg(args, 'collection');
   if (collection !== undefined && database === undefined) {
     throw new ToolProblem('collection needs database.');
+  }
+  if (collection !== undefined && database !== undefined) {
+    refuseSystemCollection(database, collection);
   }
   return { ...(database === undefined ? {} : { database }), ...(collection === undefined ? {} : { collection }) };
 }

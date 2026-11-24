@@ -132,8 +132,8 @@ function checkCollection(session: ToolSession, where: { database?: string; colle
 }
 
 function openSearch(session: ToolSession): string {
-  const connection = toolConnection(session, 'mongodb');
   const where = databaseAndCollection(session.args);
+  const connection = toolConnection(session, 'mongodb');
   const text = requiredArg(session.args, 'text');
   const regex = boolArg(session.args, 'regex', false);
   if (regex) {
@@ -165,8 +165,8 @@ function openSearch(session: ToolSession): string {
 }
 
 function openWatch(session: ToolSession): string {
-  const connection = toolConnection(session, 'mongodb');
   const where = databaseAndCollection(session.args);
+  const connection = toolConnection(session, 'mongodb');
   checkCollection(session, where);
   const [hello] = session.send([mongoCommand({ connection: connection.id, database: 'admin' }, { hello: 1 })]);
   const reply = recordOf(hello);

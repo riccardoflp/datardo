@@ -1,10 +1,12 @@
 /**
  * The tools of the MCP server called by an MCP client over HTTP against the test MongoDB and Redis (M29): every tool
  * offered runs and writes nothing (the documents, the collections, the keys and the profiler level are the same
- * after), `$out` and `$merge` are refused, a `$lookup` with `$merge` inside is refused by the server with nothing
- * written, `datardo.mcp.readData` hides the seven tools and every value at the next request, no answer holds a
- * connection's password or the access token, and a tool connects a saved connection or opens a tab for the user. The
- * keys are `m29:*` in database 11 of the shared Redis, the documents in the database `m29shop`.
+ * after), `$out` and `$merge` are refused at any depth before anything is sent, and so are a `$lookup` of a `system.*`
+ * collection, a `system.*` collection given to a tool and a skip beyond 1,000,000 (M37); `datardo.mcp.readData` hides
+ * the eight tools and every value at the next request, a marker value in a validator, a view, a partial index or a key
+ * included; no answer holds a connection's password or the access token, and a tool connects a saved connection or
+ * opens a tab for the user. The keys are `m29:*` in database 11 of the shared Redis, the documents in the database
+ * `m29shop`.
  */
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { builtTools, waitingTools } from '../../../src/features/mcp';
@@ -18,7 +20,7 @@ const decoder = new TextDecoder();
 let live: LiveMcp;
 
 /** Values that only reading the data could give: none may be returned with `datardo.mcp.readData` off. */
-const values = ['ada@example.com', 'bob@example.com', 'hello-m29-value', 'secret-hash-value'];
+const values = ['ada@example.com', 'bob@example.com', 'hello-m29-value', 'secret-hash-value', 'marker-m37-value'];
 
 const orders: Json[] = [
   { _id: 1, status: 'active', total: { $numberInt: '10' }, email: 'ada@example.com' },
@@ -189,22 +191,105 @@ describe('mcp.refuse-write-stages', () => {
     expect(names).not.toContain('copy');
   });
 
-  it('a $merge inside a $lookup is refused by the server, with its message and nothing written', async () => {
-    const reply = await live.tool('aggregate', {
-      connection: 'Local',
-      database: shopDatabase,
-      collection: 'orders',
-      pipeline: '[ { $lookup: { from: "orders", pipeline: [ { $merge: { into: "copy" } } ], as: "x" } } ]',
-    });
-    expect(reply.isError).toBe(true);
-    expect(reply.text).toMatch(/\$merge/u);
+  it('refuses $out in a $facet, $merge in a $lookup and a $lookup of system.users, and sends nothing', async () => {
+    const before = live.sent.length;
+    live.opened.length = 0;
+    for (const [pipeline, words] of [
+      ['[ { $facet: { a: [ { $out: "copy" } ] } } ]', '$out writes to the database'],
+      ['[ { $lookup: { from: "orders", pipeline: [ { $merge: { into: "copy" } } ], as: "x" } } ]', '$merge writes'],
+      [
+        '[ { $lookup: { from: "system.users", localField: "a", foreignField: "user", as: "u" } } ]',
+        'The pipeline reads system.users',
+      ],
+      ['[ { $currentOp: { allUsers: true } } ]', '$currentOp is refused'],
+    ] as const) {
+      for (const tool of ['aggregate', 'explain_query', 'open_aggregation']) {
+        const reply = await live.tool(tool, { connection: 'Local', database: 'admin', collection: 'orders', pipeline });
+        expect(reply.isError, `${tool} ${pipeline}`).toBe(true);
+        expect(reply.text).toContain(words);
+      }
+    }
+    expect(live.sent.slice(before).filter((each) => each.request.engine === 'mongodb')).toEqual([]);
+    expect(live.opened).toEqual([]);
     const names = JSON.stringify(await onShop('runCommand', [{ listCollections: 1, nameOnly: true }]));
     expect(names).not.toContain('copy');
   });
 });
 
+describe('mcp.output-limits', () => {
+  it('reads a skip of 1,000,000 and refuses 1,000,001 before anything is sent', async () => {
+    const most = await live.tool('find_documents', {
+      connection: 'Local',
+      database: shopDatabase,
+      collection: 'orders',
+      skip: 1_000_000,
+    });
+    expect(most.isError, most.text).toBe(false);
+    const before = live.sent.length;
+    const beyond = await live.tool('find_documents', {
+      connection: 'Local',
+      database: shopDatabase,
+      collection: 'orders',
+      skip: 1_000_001,
+    });
+    expect(beyond).toEqual({ text: 'skip must be between 0 and 1000000.', isError: true });
+    expect(live.sent.slice(before)).toEqual([]);
+  });
+});
+
+describe('mcp.arguments', () => {
+  it('refuses a system.* collection given to a tool, and sends nothing', async () => {
+    const before = live.sent.length;
+    for (const tool of [
+      'describe_collection',
+      'find_documents',
+      'count_documents',
+      'collection_options',
+      'open_query',
+    ]) {
+      const reply = await live.tool(tool, { connection: 'Local', database: 'admin', collection: 'system.users' });
+      expect(reply).toEqual({
+        text: "admin.system.users is a system collection: Datardo's MCP server doesn't read the system.* collections (users, profiler, views…).",
+        isError: true,
+      });
+    }
+    expect(live.sent.slice(before)).toEqual([]);
+  });
+});
+
+describe('mcp.debugging-tools', () => {
+  it('write_history never shows a user created in admin.system.users', async () => {
+    const user = 'm37-history-user';
+    await live.mongo('admin', 'runCommand', [{ dropUser: user }]).catch(() => undefined);
+    await live.mongo('admin', 'runCommand', [{ createUser: user, pwd: 'm37-history-password', roles: [] }]);
+    try {
+      const reply = await live.tool('write_history', { connection: 'Local', database: 'admin', since: '2m' });
+      expect(reply.isError, reply.text).toBe(false);
+      expect(reply.text).not.toContain(user);
+      expect(reply.text).not.toContain('system.users');
+      expect(reply.text).not.toContain('SCRAM');
+    } finally {
+      await live.mongo('admin', 'runCommand', [{ dropUser: user }]);
+    }
+  });
+});
+
 describe('mcp.read-data', () => {
-  it('with the setting off hides the seven tools and every value, and on again offers them at the next request', async () => {
+  it('with the setting off hides the eight tools and every value, and on again offers them at the next request', async () => {
+    const marker = 'marker-m37-value';
+    await onShop('runCommand', [
+      {
+        create: 'marked',
+        validator: { $jsonSchema: { properties: { plan: { bsonType: 'string', enum: [marker] } } } },
+      },
+    ]);
+    await onShop('runCommand', [{ create: 'markedview', viewOn: 'orders', pipeline: [{ $match: { email: marker } }] }]);
+    await onShop(
+      'createIndex',
+      [{ email: 1 }, { name: 'marked', partialFilterExpression: { email: marker } }],
+      'orders',
+    );
+    await live.redis('SET', 'm29:marker', marker);
     setReadData(false);
     const listed = (await live.rpc('tools/list'))['result'] as { tools: { name: string }[] };
     const names = listed.tools.map((tool) => tool.name);
@@ -217,17 +302,37 @@ describe('mcp.read-data', () => {
       expect(call['error']).toMatchObject({ code: -32602, message: `Unknown tool: ${hidden}` });
     }
     expect(names).toHaveLength(builtTools.length - hiddenWithoutReadData.length);
+    const sent = live.sent.length;
     const counted = await live.tool('count_documents', {
       connection: 'Local',
       database: shopDatabase,
       collection: 'orders',
       filter: '{ status: "active" }',
     });
-    expect(counted.text).toContain('2 documents match { status: "active" }');
+    expect(counted.isError).toBe(true);
+    expect(counted.text).toMatch(/^A filter is refused because datardo\.mcp\.readData is off/u);
+    expect(live.sent.slice(sent)).toEqual([]);
+    const total = await live.tool('count_documents', {
+      connection: 'Local',
+      database: shopDatabase,
+      collection: 'orders',
+    });
+    expect(total.text).toContain('3 documents');
     const start = live.answered.length;
     for (const tool of builtTools.filter((each) => !hiddenWithoutReadData.includes(each.name))) {
-      await live.tool(tool.name, argumentsOf(tool));
+      for (const collection of ['orders', 'marked', 'markedview']) {
+        await live.tool(tool.name, {
+          ...argumentsOf(tool),
+          ...('collection' in argumentsOf(tool) ? { collection } : {}),
+        });
+      }
     }
+    const options = await live.tool('collection_options', {
+      connection: 'Local',
+      database: shopDatabase,
+      collection: 'marked',
+    });
+    expect(options.text).toContain('enum: ?');
     const answers = live.answered.slice(start).join('\n');
     for (const value of values) {
       expect(answers).not.toContain(value);

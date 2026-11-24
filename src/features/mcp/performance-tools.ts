@@ -8,13 +8,22 @@
  */
 import type { Json } from '../../shared/engine-request';
 import type { Context } from '../../shared/feature';
-import { boolArg, collectionArgs, intArg, oneOfArg, requiredArg, stringArg, toolConnection } from './arguments';
+import {
+  boolArg,
+  collectionArgs,
+  intArg,
+  oneOfArg,
+  refuseSystemCollection,
+  requiredArg,
+  stringArg,
+  toolConnection,
+} from './arguments';
 import { counted, MAX_TIME_MS } from './output-limits';
-import { mcpSettings } from './read-data';
+import { definitionText, mcpSettings } from './read-data';
 import { adviceText, type AdvisorReply } from './tool/advice';
 import { notAuthorized } from './tool/deployment';
 import { explainText, suggestIndex, summarizeExplain } from './tool/explain';
-import { listOf, mongoCall, recordOf, textIn, shellText, type MongoPlace } from './tool/mongo';
+import { listOf, mongoCall, recordOf, textIn, type MongoPlace } from './tool/mongo';
 import { microsOf, operationText, statsText } from './tool/operations';
 import { replyOrProblem, ToolProblem, type ToolSession } from './tool/program';
 import { pipelineArg, queryArgs } from './tool/query';
@@ -200,6 +209,9 @@ function currentOperations(session: ToolSession): string {
 function indexAdvice(session: ToolSession): string {
   const database = requiredArg(session.args, 'database');
   const only = stringArg(session.args, 'collection');
+  if (only !== undefined) {
+    refuseSystemCollection(database, only);
+  }
   const connection = toolConnection(session, 'mongodb');
   if (only !== undefined) {
     const [reply] = session.send([
@@ -227,9 +239,11 @@ function collectionStats(session: ToolSession): string {
   const target = collectionArgs(session);
   const name = `${target.database}.${target.collection}`;
   const options = recordOf(target.entry['options']);
+  const readData = mcpSettings(session.context.state.settings).readData;
   if (target.entry['type'] === 'view') {
     const source = textIn(options['viewOn']) ?? '?';
-    return `${name} is a view on ${source} with the pipeline ${shellText(options['pipeline'] ?? [])}: it stores no documents and has no indexes of its own; use collection_stats on ${source}.`;
+    const pipeline = definitionText((options['pipeline'] ?? []) as Json, readData);
+    return `${name} is a view on ${source} with the pipeline ${pipeline}: it stores no documents and has no indexes of its own; use collection_stats on ${source}.`;
   }
   const place: MongoPlace = {
     connection: target.connection.id,
@@ -260,11 +274,12 @@ function collectionStats(session: ToolSession): string {
     .map(recordOf)
     .filter((each) => each['building'] === true && !listed.some((index) => index['name'] === each['name']))
     .map((each) => recordOf(each['spec']));
-  const text = statsText(name, target.entry['type'] === 'timeseries', {
-    storage: shards,
-    indexes: [...listed, ...building],
-    stats: uses,
-  });
+  const text = statsText(
+    name,
+    target.entry['type'] === 'timeseries',
+    { storage: shards, indexes: [...listed, ...building], stats: uses },
+    readData,
+  );
   const note = isFailed(stats)
     ? notAuthorized(stats)
       ? 'Index uses were not read: $indexStats needs the clusterMonitor role.'
@@ -294,6 +309,9 @@ export const group = groupOf('mcp.performance-tools', [
       },
     },
     required: ['connection', 'database', 'collection'],
+    // The plan quotes the bounds of the query, a failed explain the values it failed on, and documents examined
+    // against returned is a count per filter: offered only with `datardo.mcp.readData` (`mcp.read-data`).
+    readsData: true,
     run: explainQuery,
   },
   {

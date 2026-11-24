@@ -114,6 +114,18 @@ describe('mcp.server', () => {
     expect(isReadingPipeline([{ $merge: { into: 'copy' } }])).toBe(false);
     expect(isReadingPipeline('[{ $out: "copy" }]')).toBe(false);
     expect(isReadingPipeline([5])).toBe(false);
+    expect(isReadingPipeline([{ $facet: { a: [{ $out: 'copy' }] } }])).toBe(false);
+    expect(
+      isReadingPipeline([
+        {
+          $lookup: {
+            from: 'x',
+            as: 'y',
+            pipeline: [{ $unionWith: { coll: 'z', pipeline: [{ $merge: { into: 'w' } }] } }],
+          },
+        },
+      ]),
+    ).toBe(false);
     expect(isReadingRequest(mongo('aggregate', [[{ $out: 'copy' }]]))).toBe(false);
     expect(isReadingRequest(mongo('watch', [[{ $merge: { into: 'copy' } }]]))).toBe(false);
     expect(isReadingRequest(mongo('aggregate', [[{ $match: {} }, { $group: { _id: '$a' } }]]))).toBe(true);
@@ -184,6 +196,7 @@ describe('mcp.server', () => {
       'mcp.open-tab',
       'mcp.undo-history',
       'mcp.undo-write',
+      'monitor.sharding',
       'saved-query.list',
     ]);
     expect(isToolTab({ feature: 'tab.open', args: { shows: { kind: 'collection' } } })).toBe(true);
