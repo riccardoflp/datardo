@@ -1367,7 +1367,8 @@ Rules of the result:
   The predicate is made once for each rule when the rules or the page change, then run on each document of the page
   (500 at most).
 - **Paths**: a dotted path goes through sub-documents and into the elements of arrays (`items.qty` matches when the
-  `qty` of any element does); a numeric segment is also an index (`items.1.qty`); a missing field is equal to `null`.
+  `qty` of any element does); a numeric segment is also an index (`items.1.qty`); a missing field is equal to `null`,
+  and `undefined` only to `undefined`, as in MongoDB 8.0 *(differs from Mongoster, where it is equal to `null`)*.
 - **Equality** (`{ f: v }`, `$eq`): the same type and value. Numbers are equal across `Int32`, `Int64`, `Double` and
   `Decimal128` by their value: `5`, `NumberLong(5)`, `Double(5)` and `NumberDecimal("5.0")` are equal. A sub-document
   is equal to one with the same fields in the same order, their values equal by these rules. An array matches when it
@@ -1396,9 +1397,11 @@ Rules of the result:
   - operands MongoDB would refuse: *$in needs an array.*, *$all needs an array.*, *$size needs a whole number.*,
     *$mod needs an array of two numbers: [ divisor, remainder ].*, *$mod: the divisor can not be 0.*, *$type: unknown
     type "text".*, *$options needs $regex.*, *$elemMatch needs a document.*, *$not needs an operator such as { $gt: 1
-    } or a regular expression.*, *$and needs a non-empty array of conditions.*, *$gt can't compare with a regular
-    expression.*, *$and goes at the top of the condition or inside $elemMatch, not on a field.*, *Invalid regular
-    expression /\<pattern\>/: \<reason\>*.
+    } or a regular expression.*, *$and needs a non-empty array of conditions.*, *The conditions of $and must be
+    documents.*, *$gt can't compare with a regular expression.*, *$and goes at the top of the condition or inside
+    $elemMatch, not on a field.*, *$in can't contain an operator.*, *$type needs at least one type.*, *$regex needs a
+    string or a regular expression.*, *$options must be a string.*, *Invalid regular expression /\<pattern\>/:
+    \<reason\>*.
 - A document the predicate cannot read (a value of a form it does not expect) does not match; drawing the table never
   stops because of a rule.
 
@@ -1438,7 +1441,8 @@ a cell's color over its row's.
 
 - **Kind**: Derivation
 - **Engine**: MongoDB
-- **Function**: `src/features/table/format-table.ts › tableFormat(rules, documents, hidden)`
+- **Function**: `src/features/table/format-table.ts › tableFormat(rules, documents, hidden, now)`, and `›
+  colorOfCell(format, cell)` for a cell of `table.rows`
 - **Uses**: `table.match`, `query.parse`, `table.format-field`, `table.format-scopes`, `table.cell-text`,
   `connection.color-presets`.
 - **Ported from**: query.format-table (Mongoster 0.9.0 and 0.10.0, proposals 0002 and 0003;
@@ -1450,9 +1454,10 @@ Rules of the result:
 
 - The inputs are the rules that reach the collection in the order they are tried (its own in M41; from M42 those of
   the four formatting scopes, `table.format-scopes`), the documents of the page (of **Find** or of the output of
-  **Aggregate**) and whether formatting is hidden (`table.toggle-formatting`). The result is, for each document, the
-  color of its row and the colors of its cells by column key and, in an expanded array, by element, each with the rule
-  that gave it; and, for each rule that cannot be used, why.
+  **Aggregate**), whether formatting is hidden (`table.toggle-formatting`) and the time the page was read, which
+  `ISODate()`, `new Date()` and `ObjectId()` in a condition stand for (`query.parse`). The result is, for each
+  document, the color of its row and the colors of its cells by column key and, in an expanded array, by element,
+  each with the rule that gave it; and, for each rule that cannot be used, why.
 - A color is a preset, with a strength from 0 to 1 when a field rule gives one (`table.format-field`), a second preset
   and its share for a scale between two colors, and an outline for a pinned value among the shades of its own color.
 - **Rows**: the first enabled rule that colors rows and gives the document a color colors its row: every cell of the
@@ -1755,8 +1760,8 @@ Which color a value of the field gets from a field rule, and what the rule's leg
 
 - **Kind**: Derivation
 - **Engine**: MongoDB
-- **Function**: `src/features/table/format-field.ts › colorOfValue(rule, page, value)` and `› legendOfRule(rule,
-  documents)`
+- **Function**: `src/features/table/format-field.ts › colorOfValue(rule, page, value)`, where `page` is `›
+  fieldOnPage(rule, documents)`, and `› legendOfRule(rule, documents)`
 - **Uses**: `query.format`.
 - **Ported from**: query.format-field (Mongoster 0.10.0, proposal 0003; `src/shared/formatField.ts ›
   fieldPaint`, `fieldMode`, `resolveField`, `paletteOf`, `fieldLegend`, `valuesOf`). Knowing a value by the text of
@@ -1927,7 +1932,9 @@ tried.
 
 - **Kind**: Derivation
 - **Engine**: MongoDB
-- **Function**: `src/features/table/format-scopes.ts › rulesInOrder(rules, collection)`
+- **Function**: `src/features/table/format-scopes.ts › rulesInOrder(rules, collection)`; which tabs a change reaches,
+  `› scopeReaches(place, collection)`; what follows what, `› withoutConnection`, `› withoutDatabase`, `›
+  withoutCollection` and `› withRenamedCollection`
 - **Uses**: `table.format-table`.
 - **Ported from**: query.format-rules and query.format-table, scopes (Mongoster 0.10.0, proposal 0003;
   `src/shared/formatting.ts › rulesInOrder`, `scopeOfRule`, `readScopesOff`; `src/formattingStore.ts ›
@@ -2115,8 +2122,9 @@ the rules of a file are added to the rules of a scope.
 
 - **Kind**: Derivation
 - **Engine**: MongoDB
-- **Function**: `src/features/table/formatting-file.ts › formattingFileText(rules, scopes, place)` and
-  `› groupsOfFormattingFile(text)`
+- **Function**: `src/features/table/formatting-file.ts › formattingFileText(rules, scopes, place)`,
+  `› groupsOfFormattingFile(text)` and `› rulesWithImported(existing, incoming, newId)`; the rules themselves are read
+  by `src/shared/formatting-rules.ts › readFormatRules(value)`, which `src/storage` can use too
 - **Uses**: `table.format-scopes`.
 - **Ported from**: query.format-transfer (Mongoster 0.10.0, proposal 0003; `src/shared/formattingFile.ts ›
   formattingFile`, `readFormattingFile`, `mergeImport`; `src/shared/formatting.ts › readFormatRules`). The name of
@@ -2162,7 +2170,8 @@ Rules of the result:
 - **Added to a scope**: the rules of a group go after the rules already there, each with a new id; a rule equal to one
   already there, all but its id, is skipped and counted as already there; past 100 rules, the rest are counted as not
   fitting. Nothing is replaced.
-- The rules of `formatting.json`, Datardo's own file, are read with the same rules.
+- The rules of `formatting.json`, Datardo's own file, are read with the same rules
+  (`src/shared/formatting-rules.ts › readStoredFormatting(value)`).
 
 Acceptance:
 

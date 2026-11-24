@@ -11,6 +11,43 @@ export const text = {
     notSubdocumentElement: (key: string) => `This element of ${key} is not a sub-document`,
     more: (count: number) => `… ${String(count)} more elements — open the document to see all`,
   },
+  /** Why a condition of a formatting rule cannot be used (`table.match`, `table.format-table`). */
+  match: {
+    notDocument: 'The condition must be a document: { field: value }.',
+    unsupported: (operator: string) => `${operator} is not supported in a formatting rule.`,
+    unknown: (operator: string) => `Unknown operator ${operator}.`,
+    needsArray: (operator: string) => `${operator} needs an array.`,
+    noOperatorIn: (operator: string) => `${operator} can't contain an operator.`,
+    size: '$size needs a whole number.',
+    mod: '$mod needs an array of two numbers: [ divisor, remainder ].',
+    modZero: '$mod: the divisor can not be 0.',
+    unknownType: (written: string) => `$type: unknown type ${written}.`,
+    noType: '$type needs at least one type.',
+    optionsWithoutRegex: '$options needs $regex.',
+    optionsText: '$options must be a string.',
+    regexOperand: '$regex needs a string or a regular expression.',
+    elemMatch: '$elemMatch needs a document.',
+    not: '$not needs an operator such as { $gt: 1 } or a regular expression.',
+    logic: (operator: string) => `${operator} needs a non-empty array of conditions.`,
+    logicDocuments: (operator: string) => `The conditions of ${operator} must be documents.`,
+    logicOnField: (operator: string) =>
+      `${operator} goes at the top of the condition or inside $elemMatch, not on a field.`,
+    compareRegex: (operator: string) => `${operator} can't compare with a regular expression.`,
+    badRegex: (pattern: string, reason: string) => `Invalid regular expression /${pattern}/: ${reason}`,
+    empty: 'Type a condition, such as { status: "failed" }.',
+    syntax: (message: string) => `Invalid syntax: ${message}`,
+  },
+  /** The legend of a field rule (`table.format-field`). */
+  legend: {
+    repeats: (field: string, count: number) => `${field} has ${String(count)} values on this page: the colors repeat.`,
+  },
+  /** The formatting file (`table.formatting-file`). */
+  formattingFile: {
+    tooLarge: 'The file is larger than 1 MB: it is not a file of formatting rules.',
+    notJson: (message: string) => `The file is not JSON: ${message}`,
+    notFormatting: 'The file is not a file of formatting rules exported from Datardo or Mongoster.',
+    newer: 'The file was exported by a newer Datardo: update Datardo to import it.',
+  },
   copied: 'Copied to the clipboard',
   formats: {
     title: 'Copy as',
