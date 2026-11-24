@@ -71,3 +71,51 @@ body {
 [data-color='gray'] {
   --connection-color: var(--color-connection-gray);
 }
+
+/*
+ * The color of a formatting rule (table.format-table), on a row, a cell or a swatch: the token of its preset, which
+ * the table mixes into its canvas at the share the element gives as --format-share.
+ */
+[data-format='red'] {
+  --format-color: var(--color-format-red);
+}
+
+[data-format='orange'] {
+  --format-color: var(--color-format-orange);
+}
+
+[data-format='yellow'] {
+  --format-color: var(--color-format-yellow);
+}
+
+[data-format='green'] {
+  --format-color: var(--color-format-green);
+}
+
+[data-format='blue'] {
+  --format-color: var(--color-format-blue);
+}
+
+[data-format='purple'] {
+  --format-color: var(--color-format-purple);
+}
+
+[data-format='pink'] {
+  --format-color: var(--color-format-pink);
+}
+
+[data-format='teal'] {
+  --format-color: var(--color-format-teal);
+}
+
+[data-format='indigo'] {
+  --format-color: var(--color-format-indigo);
+}
+
+[data-format='brown'] {
+  --format-color: var(--color-format-brown);
+}
+
+[data-format='gray'] {
+  --format-color: var(--color-format-gray);
+}

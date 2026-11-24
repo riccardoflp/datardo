@@ -107,7 +107,10 @@ export const pinsFile: StoredFile<PinsByConnection> = {
   }),
 };
 
-/** The fields of `window.json` that remember the islands, and the width of the query pane (`query.position`). */
+/**
+ * The fields of `window.json` that remember the islands, the view of the inspector island (`nav.inspector`) and the
+ * width of the query pane (`query.position`).
+ */
 export function islandFields(nav: NavState): Record<string, Json> {
   return {
     explorerWidth: nav.widths.explorer,
@@ -115,6 +118,7 @@ export function islandFields(nav: NavState): Record<string, Json> {
     explorerHidden: nav.explorerHidden,
     inspectorHidden: nav.inspectorHidden,
     queryPaneWidth: nav.queryPaneWidth,
+    inspectorView: nav.inspectorView,
   };
 }
 
@@ -146,6 +150,8 @@ export function islandsOf(fields: Readonly<Record<string, Json>>, nav: NavState)
     explorerHidden: flag('explorerHidden', nav.explorerHidden),
     inspectorHidden: flag('inspectorHidden', nav.inspectorHidden),
     queryPaneWidth: queryPaneWidthOf(fields['queryPaneWidth']),
+    // An optional field of version 1 (M41): absent or unknown, the Selection view (`nav.inspector`).
+    inspectorView: fields['inspectorView'] === 'formatting' ? 'formatting' : 'selection',
   };
 }
 

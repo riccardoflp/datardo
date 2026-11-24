@@ -40,7 +40,7 @@ import { isOffered as isTreeOffered } from '../tree/commands';
 import { canGo } from '../nav/back';
 import { isOffered as isCopyPathOffered } from '../nav/copy-path';
 import { pinOfTab } from '../nav/pin';
-import { isOffered as isInspectorOffered } from '../nav/toggle-inspector';
+import { isOffered as isInspectorOffered, isViewOffered } from '../nav/toggle-inspector';
 import { appPlan, appStep, navInput, startArgs } from '../nav/types';
 import { isOffered as isResetOffered } from '../settings/reset';
 import { isOffered as isCloseOffered } from '../tab/close';
@@ -182,6 +182,9 @@ function isOfferedByItsCard(state: AppState, id: string): boolean {
       return canGo(navInput(state), 'forward');
     case 'nav.toggle-inspector':
       return isInspectorOffered(navInput(state));
+    case 'nav.toggle-inspector:formatting':
+    case 'nav.toggle-inspector:selection':
+      return isViewOffered(navInput(state), id === 'nav.toggle-inspector:formatting' ? 'formatting' : 'selection');
     case 'nav.copy-path':
       return active !== undefined && isCopyPathOffered(active.shows);
     case 'nav.pin':

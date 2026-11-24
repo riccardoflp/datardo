@@ -449,11 +449,10 @@ macOS is made from it, and the documentation of the keys is generated from it.
 - **Uses**: `palette.key-press`, `palette.run-command`, `window.app-menu`.
 - **Ported from**: *New in Datardo*. For reference, Mongoster's commands and their titles are in the `contributes`
   of its `package.json`; its desktop app opens them with `Ctrl+Shift+P`.
-- **Differs**: (M41) the table has no row for `nav.toggle-inspector:formatting` and `nav.toggle-inspector:selection`.
 
 Acceptance:
 
-- [ ] `Ctrl+Shift+F` starts `nav.toggle-inspector:formatting`, titled **Formatting rules** (differs).
+- [ ] `Ctrl+Shift+F` starts `nav.toggle-inspector:formatting`, titled **Formatting rules**.
 - [ ] `>` in Go to lists every command of every area by title, each with its key at the right when it has one.
 - [ ] Every command of the table above is listed with exactly that title and that key.
 - [ ] No two rows of that list have the same title, and no two the same key.

@@ -20,6 +20,7 @@ import { isSectionCommand, runSectionCommand } from '../pages/manage/section-com
 import { isGridFsCommand, runGridFsCommand } from '../pages/gridfs/gridfs-commands';
 import { isIndexCommand, runIndexCommand } from '../pages/index/index-commands';
 import { isTableCommand, runTableCommand } from '../table/table-commands';
+import { focusViewAsked } from '../table/formatting-start';
 import { isUserCommand, runUserCommand } from '../pages/user/user-commands';
 import { runTreeCommand } from '../tree/tree-commands';
 import { openAbout } from '../window/about';
@@ -169,5 +170,9 @@ export function runCommand(id: string, state: AppState): void {
   const intent = intentOf(state, id);
   if (intent !== undefined) {
     startIntent(withWindowArgs(intent, state));
+  }
+  // **Formatting rules** and **Inspect the selection** move the focus into the view they show (`nav.toggle-inspector`).
+  if (intent !== undefined && (id === 'nav.toggle-inspector:formatting' || id === 'nav.toggle-inspector:selection')) {
+    focusViewAsked(id, state);
   }
 }

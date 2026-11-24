@@ -63,7 +63,11 @@ function forgetOfBucket(context: Context, place: BucketPlace): readonly AppStep[
   const connection = savedConnection(context.state.connections, place.connection);
   return connection === undefined
     ? []
-    : forgetStep(connection, { kind: 'bucket', database: place.database, bucket: place.bucket });
+    : forgetStep(
+        connection,
+        { kind: 'bucket', database: place.database, bucket: place.bucket },
+        context.state.table.formatting,
+      );
 }
 
 /**

@@ -1,6 +1,6 @@
 /**
  * Everything the grid of a tab draws from, worked out once per change of its documents, columns or selection: the
- * columns in the order of their layout, the header rows, the rows, the widths and the pinned lefts, the selected
+ * columns in the order of their layout, the header rows, the rows with the colors of the formatting rules, the widths and the pinned lefts, the selected
  * cell, the selected rows and the directions of the sort.
  */
 import { useMemo } from 'react';
@@ -22,6 +22,7 @@ import {
   rowOffsets,
   type HeaderCell,
 } from './grid-model';
+import { useRowsFormatting } from './formatting-rules';
 import type { TableColumns } from './table-columns';
 
 /** A width being dragged, drawn before it is saved. */
@@ -75,11 +76,13 @@ export function useGridView(
 ): GridView {
   const { columns, target, dimmed } = parts;
   const { documents, query } = collection;
+  // The colors of the formatting rules (`table.format-table`), `ISODate()` in a condition being the time of the read.
+  const formatting = useRowsFormatting(ref, documents, collection.ranAt);
   const layoutPart = useMemo(() => {
     const arranged = arrangedColumns(columns.columns, columns.layout);
     const drawn = drawnLeaves(arranged.columns);
     const first = (query.page - 1) * query.pageSize + 1;
-    const rows = rowsOfDocuments(documents, arranged.columns, first);
+    const rows = rowsOfDocuments(documents, arranged.columns, first, formatting);
     return {
       arranged,
       drawn,
@@ -90,7 +93,7 @@ export function useGridView(
       rows,
       ...rowOffsets(rows.map((row) => row.height)),
     };
-  }, [columns, documents, query.page, query.pageSize]);
+  }, [columns, documents, query.page, query.pageSize, formatting]);
   const widths = widthsWith(layoutPart.widths, layoutPart.drawn, resizing);
   const sortText = query.ran?.sort ?? query.texts.sort;
   const findDirections = useMemo(() => sortDirections(sortText), [sortText]);

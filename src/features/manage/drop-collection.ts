@@ -136,7 +136,11 @@ export function plan(context: Context, answers: Answers): Outcome {
     title: view ? text.dropCollection.viewTitle(namespace) : text.dropCollection.title(namespace),
     steps: [
       writeStep(place, mongoRequest(place, 'drop', []), databaseTarget(place, place.database)),
-      ...forgetStep(place.connection, { kind: 'collection', database: place.database, collection: place.collection }),
+      ...forgetStep(
+        place.connection,
+        { kind: 'collection', database: place.database, collection: place.collection },
+        context.state.table.formatting,
+      ),
     ],
     danger: dangerOf(place, view, answers),
     undo: { cannot: text.dropCollection.cannotUndo },

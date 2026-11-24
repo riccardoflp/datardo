@@ -120,6 +120,12 @@ function Heading({
           selectCell(grid.ref, { at: 'header', column: cell.column });
         }
       }}
+      onMouseDown={(event) => {
+        // A right click leaves the selected cell as it is: **Format cells…** proposes its value (`table.column-menu`).
+        if (event.button === 2) {
+          event.preventDefault();
+        }
+      }}
       onContextMenu={(event) => {
         event.preventDefault();
         openTableMenu({

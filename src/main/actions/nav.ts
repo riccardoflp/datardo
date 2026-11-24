@@ -106,7 +106,13 @@ function widths(services: MainServices, args: Json): Promise<void> {
 /** The actions of this area, by name. */
 export const actions: AreaActions = (services) => ({
   'nav.set-explorer': (args) => change(services, { explorerHidden: field(args, 'hidden') === true }),
-  'nav.set-inspector': (args) => change(services, { inspectorHidden: field(args, 'hidden') === true }),
+  'nav.set-inspector': (args) => {
+    const view = field(args, 'view');
+    return change(services, {
+      inspectorHidden: field(args, 'hidden') === true,
+      ...(view === 'formatting' || view === 'selection' ? { inspectorView: view } : {}),
+    });
+  },
   'nav.set-widths': (args) => widths(services, args),
   'nav.show-page': (args) => showPage(services, args),
   'nav.go-to-place': (args) => goToPlace(services, args),

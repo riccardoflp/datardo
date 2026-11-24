@@ -14,37 +14,45 @@ import { deleteSecretsStep } from './secrets';
 import { planText } from './text';
 import { appStep, connectionsOf, nothingToDo, targetConnection } from './types';
 import { operationCount } from '../undo/forget-connection';
+import { rulesOfConnection } from '../table/format-scopes';
+import { text as tableText } from '../table/text';
 
 /**
  * What belongs to the connection in the other areas. The pins are counted in the app's state (`nav.pin`). The queries
  * saved for me (`saved-query.save`) and whether Datardo remembers anything else of it (its file of `state/`) are read
  * from the data folder by `connection.remove:counts`, which gives `answers.counts`; a count of 0 leaves its step
- * (`saved-query.forget-connection`, `connection.forget-state`) out of the plan. The operations of the undo history are
- * counted in the app's state (`undo.forget-connection`).
+ * (`saved-query.forget-connection`, `connection.forget-state`) out of the plan. The operations of the undo history
+ * (`undo.forget-connection`) and the formatting rules (`table.format-scopes`) are counted in the app's state.
  */
 export interface RemovalCounts {
   readonly savedQueries: number;
   readonly pins: number;
   readonly undoOperations: number;
+  /** The formatting rules of the connection, of its databases and of its collections (`table.format-scopes`). */
+  readonly formattingRules: number;
   /** Whether Datardo remembers anything else of it: its file of `state/`. */
   readonly remembers: boolean;
 }
 
 /** Nothing of the connection in the other areas. */
-export const nothingElse: RemovalCounts = { savedQueries: 0, pins: 0, undoOperations: 0, remembers: false };
+export const nothingElse: RemovalCounts = {
+  savedQueries: 0,
+  pins: 0,
+  undoOperations: 0,
+  formattingRules: 0,
+  remembers: false,
+};
 
-function countsOf(value: unknown, pins: number, undoOperations: number): RemovalCounts {
+/** What the app's state counts: the pins, the operations of the undo history and the formatting rules. */
+type StateCounts = Pick<RemovalCounts, 'pins' | 'undoOperations' | 'formattingRules'>;
+
+function countsOf(value: unknown, counted: StateCounts): RemovalCounts {
   if (typeof value !== 'object' || value === null) {
-    return { ...nothingElse, pins, undoOperations };
+    return { ...nothingElse, ...counted };
   }
   const fields = value as Readonly<Record<string, unknown>>;
   const count = (name: string): number => (typeof fields[name] === 'number' ? fields[name] : 0);
-  return {
-    savedQueries: count('savedQueries'),
-    pins,
-    undoOperations,
-    remembers: fields['remembers'] === true,
-  };
+  return { savedQueries: count('savedQueries'), ...counted, remembers: fields['remembers'] === true };
 }
 
 /** The confirmation's detail: what is deleted with it, each on its line and only when there is some. */
@@ -55,6 +63,7 @@ export function removalText(counts: RemovalCounts, publishers: readonly Connecti
     ...(counts.savedQueries > 0 ? [planText.savedQueries(counts.savedQueries)] : []),
     ...(counts.pins > 0 ? [planText.pins(counts.pins)] : []),
     ...(counts.undoOperations > 0 ? [planText.undoOperations(counts.undoOperations)] : []),
+    ...(counts.formattingRules > 0 ? [tableText.formatting.rulesCount(counts.formattingRules)] : []),
     ...(counts.remembers ? [planText.remembers] : []),
     planText.removeCannotUndo,
     ...(publishers.length > 0 ? [planText.noLongerPublish(publishers.map((each) => each.name).join(', '))] : []),
@@ -81,6 +90,9 @@ function removalSteps(
       : []),
     ...(counts.pins > 0 ? [appStep('nav.forget-pins', id, planText.deletePins(counts.pins, name))] : []),
     ...(counts.remembers ? [appStep('connection.forget-state', id, planText.deleteRemembered(name))] : []),
+    ...(counts.formattingRules > 0
+      ? [appStep('table.forget-formatting', id, tableText.formatting.deleteOf(counts.formattingRules, name))]
+      : []),
     ...publishers.map((each) =>
       appStep('connection.unlink', { connection: each.id }, planText.unlink(each.name, name)),
     ),
@@ -138,7 +150,11 @@ export function plan(context: Context, answers: Answers): Outcome {
   const { state } = context;
   const connections = connectionsOf(state);
   const pins = (state.nav.pins[connection.id] ?? []).length;
-  const counts = countsOf(answers['counts'], pins, operationCount(state, connection.id));
+  const counts = countsOf(answers['counts'], {
+    pins,
+    undoOperations: operationCount(state, connection.id),
+    formattingRules: rulesOfConnection(state.table.formatting, connection.id),
+  });
   const publishers = connections.saved.filter(
     (each) => each.engine === 'mongodb' && each.publishesTo === connection.id,
   );

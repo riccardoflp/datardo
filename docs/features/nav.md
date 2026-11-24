@@ -834,8 +834,6 @@ collection, for the formatting rules that color it.
   takes the place of Mongoster's Formatting pane (Mongoster 0.9.0 and 0.10.0, query.format-rules,
   proposal 0003; `src/webview/formatting.ts`, `src/shared/formatting.ts › readFormattingPane`), by the author's
   decision of 2026-11-24.
-- **Differs**: (M41) the island has one view, the selection: no **Selection** and **Formatting** tabs in its first
-  row, no `Ctrl+Shift+F`, and no view is remembered.
 
 Acceptance:
 
@@ -849,15 +847,15 @@ Acceptance:
 - [ ] The island hidden on a collection tab is hidden on a keys tab too, and after a restart.
 - [ ] A document that takes 2 seconds to read shows the turning sign; one that takes 100 ms does not.
 - [ ] On the Documents section of `shop.orders` the first row reads **Selection** and **Formatting**; on a keys tab
-  and on the Indexes section it has no tabs (differs).
+  and on the Indexes section it has no tabs.
 - [ ] With **Formatting** shown, clicking rows of the table leaves the Formatting view shown; `Enter` on a cell shows
-  the Selection view with that document (differs).
-- [ ] With the focus on **Selection** in the first row, `Right` then `Enter` shows the Formatting view (differs).
+  the Selection view with that document.
+- [ ] With the focus on **Selection** in the first row, `Right` then `Enter` shows the Formatting view.
 - [ ] With **Formatting** shown, making a keys tab active shows the selected key; coming back to `shop.orders` shows
-  the Formatting view again (differs).
+  the Formatting view again.
 - [ ] With the island hidden, `Ctrl+Shift+F` on `shop.orders` shows the island on the Formatting view, and it stays
-  shown on the next collection tab; `Ctrl+Shift+F` again shows the Selection view (differs).
-- [ ] A Datardo quit with the Formatting view shown starts with it shown on the first collection tab (differs).
+  shown on the next collection tab; `Ctrl+Shift+F` again shows the Selection view.
+- [ ] A Datardo quit with the Formatting view shown starts with it shown on the first collection tab.
 
 ### `nav.toggle-inspector` — Show or hide the inspector island
 
@@ -891,8 +889,6 @@ selection or the formatting rules.
 - **Ported from**: *New in Datardo*. Choosing the Formatting view takes the place of opening and closing Mongoster's
   Formatting pane (Mongoster 0.9.0 and 0.10.0, query.format-rules; the `Formatting` button,
   `saveFormattingPane`, `mongoster.formattingPane`).
-- **Differs**: (M41) it only hides and shows the island: there are no views to choose, no **Formatting** in the
-  toolbar and no `Ctrl+Shift+F`.
 
 Acceptance:
 
@@ -902,12 +898,12 @@ Acceptance:
 - [ ] Hiding the island with the focus in it puts the focus on the selected row of the table.
 - [ ] With the island hidden, Go to lists **Show inspector** on a keys tab.
 - [ ] **Formatting** in the toolbar of `shop.orders` shows the Formatting view and is pressed; a second click shows
-  the Selection view (differs).
-- [ ] `Ctrl+Shift+F` on a keys tab and on Home does nothing, and Go to lists no **Formatting rules** there (differs).
+  the Selection view.
+- [ ] `Ctrl+Shift+F` on a keys tab and on Home does nothing, and Go to lists no **Formatting rules** there.
 - [ ] `Ctrl+Shift+B` with the Formatting view shown hides the island; again, it shows it on the Formatting view
-  (differs).
+ .
 - [ ] Go to › **Formatting rules** with the island hidden shows it on the Formatting view with the focus on the
-  first rule, or on **Add rule…** when there is none (differs).
+  first rule, or on **Add rule…** when there is none.
 
 ## The status line
 

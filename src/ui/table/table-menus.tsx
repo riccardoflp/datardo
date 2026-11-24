@@ -6,6 +6,7 @@
 import { useEffect, useRef } from 'react';
 import { view as cellMenuView } from '../../features/table/cell-menu';
 import { view as columnMenuView } from '../../features/table/column-menu';
+import { selectedCell } from './selected-cell';
 import { columnByKey } from '../../features/table/detect-columns';
 import { view as rowMenuView } from '../../features/table/row-menu';
 import { selectedDocuments, selectionAfter } from '../../features/table/selection';
@@ -93,7 +94,21 @@ function columnMenu(props: TablePartProps, request: Extract<TableMenuRequest, { 
     return undefined;
   }
   const within = request.within === undefined ? {} : { within: request.within };
-  const entries = columnMenuView({ column, layout: columns.layout, texts: collection.query.texts, target, ...within });
+  // **Format cells…** proposes the value of the selected cell when it is a cell of this column.
+  const selected =
+    collection.cell === undefined ? undefined : selectedCell(collection.documents, columns, collection.cell);
+  const selectedValue =
+    column !== '#' && selected?.column?.key === column.key && selected.value !== undefined
+      ? { selectedValue: selected.value }
+      : {};
+  const entries = columnMenuView({
+    column,
+    layout: columns.layout,
+    texts: collection.query.texts,
+    target,
+    ...within,
+    ...selectedValue,
+  });
   const context: EntryContext = {
     ref: props.collectionRef,
     collection,

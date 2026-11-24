@@ -786,7 +786,7 @@ Drops the two collections of a bucket, with every file in it.
 - **Ported from**: `src/gridfs.ts` (`dropBucket`); `src/extension.ts` (the command that drops a bucket). The color and
   the exclusion that go: Mongoster 0.9.0 (tree.collection-color-follows, tree.exclusion-follows; the
   `mongoster.dropGridFSBucket` handler). The formatting rules that go are Datardo's choice.
-- **Differs**: (M39) the plan forgets no exclusion from searches; (M41) nor formatting rules.
+- **Differs**: (M39) the plan forgets no exclusion from searches.
 
 Acceptance:
 

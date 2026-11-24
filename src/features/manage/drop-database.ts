@@ -76,7 +76,7 @@ export function plan(context: Context, answers: Answers): Outcome {
     title: text.dropDatabase.title(place.database),
     steps: [
       writeStep(place, mongoRequest({ database: place.database }, 'dropDatabase', []), connectionTarget(place)),
-      ...forgetStep(place.connection, { kind: 'database', database: place.database }),
+      ...forgetStep(place.connection, { kind: 'database', database: place.database }, context.state.table.formatting),
     ],
     danger: {
       kind: 'destructive',

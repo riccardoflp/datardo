@@ -2,16 +2,20 @@
  * Feature: table.rows
  *
  * Lays the documents out as rows: one row per document, one sub-row per element when an array is expanded, the cells
- * of an expanded group across the group where the value is not what the group expects.
+ * of an expanded group across the group where the value is not what the group expects; and the colors the formatting
+ * rules give the rows and the cells (`table.format-table`), each with the line its tooltip adds.
  */
 import type { Json } from '../../shared/engine-request';
 import { isSubdocument, type JsonObject } from '../query/mongosh/ejson';
+import type { FormatRule } from '../../shared/formatting-rules';
 import { leafCount } from './detect-columns';
+import { colorOfCell, type DocumentFormat, type DrawnColor, type TableFormat } from './format-table';
+import { formattingLine } from './parts/rule-summary';
+import { mostElements, valueAt } from './parts/values';
 import { text } from './text';
 import { rowKeyOf, type ColumnNode, type Document, type RowKey } from './types';
 
-/** How many elements of an array are shown as sub-rows for each document. */
-export const mostElements = 20;
+export { mostElements, valueAt };
 
 /** What a cell holds: a value, no value (a field the document does not have), the filler of a group, or the elements left out. */
 export type CellContent =
@@ -34,6 +38,20 @@ export interface Cell {
   readonly element?: { readonly array: string; readonly index: number };
   /** What the tooltip says before the value, for a value that is not what its group expects. */
   readonly note?: string;
+  /** The color a cell rule gives it, over its row's. */
+  readonly color?: PaintedColor;
+}
+
+/** A color of a row or a cell, with the line its tooltip adds: *Formatting: { status: "failed" } (red)*. */
+export interface PaintedColor {
+  readonly drawn: DrawnColor;
+  readonly line: string;
+}
+
+/** The formatting of the page: the colors `table.format-table` gave, and the rules that gave them, for the lines. */
+export interface RowsFormatting {
+  readonly format: TableFormat;
+  readonly rules: readonly FormatRule[];
 }
 
 /** A document as rows. */
@@ -44,18 +62,8 @@ export interface Row {
   /** How many sub-rows it covers. */
   readonly height: number;
   readonly cells: readonly Cell[];
-}
-
-/** The value at a path from an object, or `undefined` when a segment is absent or a parent is not a sub-document. */
-export function valueAt(object: Json, path: readonly string[]): Json | undefined {
-  let current: Json = object;
-  for (const segment of path) {
-    if (!isSubdocument(current) || !Object.hasOwn(current, segment)) {
-      return undefined;
-    }
-    current = current[segment] as Json;
-  }
-  return current;
+  /** The color a row rule gives every cell of its sub-rows but the row number. */
+  readonly color?: PaintedColor;
 }
 
 function contentOf(value: Json | undefined): CellContent {
@@ -148,24 +156,42 @@ function cellsOf(nodes: readonly ColumnNode[], where: Where): Cell[] {
   });
 }
 
+function painted(drawn: DrawnColor | undefined, rules: readonly FormatRule[]): PaintedColor | undefined {
+  const rule = drawn === undefined ? undefined : rules.find((each) => each.id === drawn.rule);
+  return drawn === undefined || rule === undefined ? undefined : { drawn, line: formattingLine(rule, drawn) };
+}
+
+function paintedCells(cells: readonly Cell[], format: DocumentFormat, rules: readonly FormatRule[]): readonly Cell[] {
+  return cells.map((cell) => {
+    const color = painted(colorOfCell(format, cell), rules);
+    return color === undefined ? cell : { ...cell, color };
+  });
+}
+
 /**
  * Feature: table.rows
  *
  * The rows of the documents of a page under the columns to draw: each document's number from the first of the query,
- * its height in sub-rows and its cells.
+ * its height in sub-rows and its cells; with the formatting of the page, the color of each row and cell.
  */
 export function rowsOfDocuments(
   documents: readonly Document[],
   columns: readonly ColumnNode[],
   firstNumber: number,
+  formatting?: RowsFormatting,
 ): readonly Row[] {
   return documents.map((document: JsonObject, index) => {
     const height = rowHeight(document, columns);
+    const cells = cellsOf(columns, { base: document, depth: 0, subRow: 0, height });
+    const format = formatting?.format.documents[index];
+    const rules = formatting?.rules ?? [];
+    const color = painted(format?.row, rules);
     return {
       number: firstNumber + index,
       key: rowKeyOf(document, index),
       height,
-      cells: cellsOf(columns, { base: document, depth: 0, subRow: 0, height }),
+      cells: format === undefined ? cells : paintedCells(cells, format, rules),
+      ...(color === undefined ? {} : { color }),
     };
   });
 }

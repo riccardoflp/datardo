@@ -5,7 +5,7 @@
  * click opens the menu of the cell or of the row.
  */
 import { cellOfValue } from '../../features/table/cell-text';
-import type { Cell, Row } from '../../features/table/rows';
+import type { Cell, PaintedColor, Row } from '../../features/table/rows';
 import { text as tableText } from '../../features/table/text';
 import type { Position } from '../../features/table/navigate';
 import { startDrag } from '../query/drag-data';
@@ -30,6 +30,23 @@ function clicked(grid: GridView, index: number, at: Position, event: React.Mouse
   } else {
     changeSelection(grid.ref, { kind: 'only', index });
   }
+}
+
+/**
+ * How a row or a cell is drawn in the color of a formatting rule (`table.format-table`): the preset in `data-format`,
+ * which `theme/base.css` turns into its formatting token, mixed into the surface at the share given.
+ */
+function formatAttributes(color: PaintedColor | undefined): {
+  readonly 'data-format'?: string;
+  readonly style?: React.CSSProperties;
+} {
+  if (color === undefined) {
+    return {};
+  }
+  return {
+    'data-format': color.drawn.color,
+    style: { '--format-share': `${String(color.drawn.percent)}%` } as React.CSSProperties,
+  };
 }
 
 function contentOf(cell: Cell): {
@@ -75,13 +92,16 @@ function ValueCell(props: {
   const within = cell.element?.array;
   // A cell that holds a reference is a link (`relation.follow`): `Ctrl`+click and `Ctrl+Enter` follow it.
   const link = linkOf(props.references, cell.column, value);
-  const title = link === undefined ? shown.title : [shown.title, link.tooltip].filter(Boolean).join('\n');
+  const title = [shown.title, link?.tooltip, cell.color?.line].filter(Boolean).join('\n');
+  const format = formatAttributes(cell.color);
+  const sticky = left === undefined ? {} : { left, position: 'sticky', zIndex: 'var(--z-sticky-number)' };
   return (
     <td
       colSpan={cell.span}
       rowSpan={cell.height}
       className={link === undefined ? styles['cell'] : `${styles['cell'] ?? ''} ${linkClass}`}
-      style={left === undefined ? undefined : { left, position: 'sticky', zIndex: 'var(--z-sticky-number)' }}
+      data-format={format['data-format']}
+      style={{ ...format.style, ...sticky } as React.CSSProperties}
       data-pos={positionKey(at)}
       data-selected={selected ? 'true' : undefined}
       data-content={cell.content.kind}
@@ -141,6 +161,7 @@ function ValueCell(props: {
     >
       <span className={styles['cell-text']}>{shown.text}</span>
       {shown.type === undefined ? null : <span className={styles['spoken']}>, {shown.type}</span>}
+      {cell.color === undefined ? null : <span className={styles['spoken']}>, {cell.color.line}</span>}
     </td>
   );
 }
@@ -157,7 +178,7 @@ function NumberCell({ grid, index, row }: { readonly grid: GridView; readonly in
       data-selected={selected ? 'true' : undefined}
       aria-colindex={1}
       tabIndex={selected ? 0 : -1}
-      title={tableText.rows.inspect}
+      title={row.color === undefined ? tableText.rows.inspect : `${tableText.rows.inspect}\n${row.color.line}`}
       onClick={(event) => {
         clicked(grid, index, at, event);
       }}
@@ -175,6 +196,7 @@ function NumberCell({ grid, index, row }: { readonly grid: GridView; readonly in
       }}
     >
       {row.number}
+      {row.color === undefined ? null : <span className={styles['spoken']}>, {row.color.line}</span>}
     </td>
   );
 }
@@ -194,13 +216,15 @@ export function DocumentRows({
   }
   const selected = grid.selected.has(row.key);
   const first = grid.header.length + (grid.offsets[index] ?? 0) + 1;
+  const rowFormat = formatAttributes(row.color);
   return (
     <>
       {Array.from({ length: row.height }, (_, subRow) => (
         <tr
           key={String(subRow)}
           className={styles['row']}
-          style={{ height: subRowHeight }}
+          data-format={rowFormat['data-format']}
+          style={{ height: subRowHeight, ...rowFormat.style }}
           aria-rowindex={first + subRow}
           aria-selected={selected}
           data-row={index}

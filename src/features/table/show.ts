@@ -35,6 +35,17 @@ export interface ShowState {
   readonly selected: number;
   /** In Aggregate, what the table says in place of rows after a pipeline that wrote (`aggregate.write-output`). */
   readonly note?: string;
+  /** The formatting rules of the collection: how many are on, whether formatting is hidden, the view shown. */
+  readonly formatting?: ToolbarFormatting;
+}
+
+/** What the **Formatting** button says and whether it is pressed (`table.formatting`). */
+export interface ToolbarFormatting {
+  /** How many rules that reach the collection are on. */
+  readonly on: number;
+  readonly hidden: boolean;
+  /** Whether the Formatting view of the inspector island is shown. */
+  readonly shown: boolean;
 }
 
 /** A button of the toolbar. */
@@ -44,6 +55,8 @@ export interface ToolbarButton {
   readonly tip?: string;
   /** The Codicon before its name; a button with one shows it alone while the main island is under 900 px. */
   readonly icon?: string;
+  /** A button that shows something while pressed: **Formatting** while the Formatting view is shown. */
+  readonly pressed?: boolean;
 }
 
 /** Under this width of the main island, in px, the buttons with an icon show it alone (Mongoster's). */
@@ -73,12 +86,28 @@ export interface ShowView {
   readonly statusLine?: string;
 }
 
+/** **Formatting (2)** while 2 rules are on, **Formatting (off)** while formatting is hidden, else **Formatting**. */
+export function formattingButton(formatting: ToolbarFormatting): ToolbarButton {
+  const label = formatting.hidden
+    ? text.formatting.off
+    : formatting.on > 0
+      ? text.formatting.count(formatting.on)
+      : text.formatting.button;
+  return {
+    label,
+    element: 'nav.toggle-inspector@toolbar',
+    tip: text.formatting.buttonTip,
+    pressed: formatting.shown,
+  };
+}
+
 function toolbarButtons(state: ShowState): readonly ToolbarButton[] {
   const writes = canWrite(state.target);
   const columns = columnsView({ columns: state.columns, layout: state.layout, search: '' }).button;
   return [
     { label: text.show.refresh, element: 'table.refresh@toolbar' },
     columns,
+    ...(state.formatting === undefined ? [] : [formattingButton(state.formatting)]),
     ...(writes
       ? [{ label: text.show.insert, tip: text.show.insertTip, element: 'document.insert@toolbar', icon: 'add' }]
       : []),
@@ -137,7 +166,7 @@ function body(state: ShowState): ShowBody {
 /**
  * Feature: table.show
  *
- * The toolbar (**Refresh**, **Columns**, then **Insert** on a collection that can be changed, **Export** and **Watch**
+ * The toolbar (**Refresh**, **Columns**, **Formatting**, then **Insert** on a collection that can be changed, **Export** and **Watch**
  * with their icons, and the marks **view**, **time series**, **read-only**), the selection bar, the table or the
  * message of its state, the paging row, and the status line `50 of 1,204 documents · 38 ms`. **Explain**, **Code**,
  * **Update many…** and **Delete many…** are in the query bar (`query.bar`), which follows the query to its pane.

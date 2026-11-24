@@ -14,6 +14,7 @@ import { start as startPalette } from './palette';
 import { start as startUndo } from './undo';
 import { start as startOplog } from './oplog';
 import { start as startTable } from './table';
+import { start as startFormatting } from './formatting';
 import { start as startPlaygrounds } from './playgrounds';
 import { start as startConsoles } from './consoles';
 import { start as startSavedQueries } from './saved-queries';
@@ -44,6 +45,7 @@ const starts: readonly AreaStart[] = [
   startTabs,
   startPalette,
   startTable,
+  startFormatting,
   startConsoles,
   startPubSub,
   startSavedQueries,

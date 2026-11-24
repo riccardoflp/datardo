@@ -157,6 +157,10 @@
   background: var(--color-canvas);
 }
 
+.row[data-format] {
+  background: color-mix(in srgb, var(--format-color) var(--format-share), var(--color-canvas));
+}
+
 .row[aria-selected='true'] {
   background: var(--color-selected);
 }
@@ -181,6 +185,10 @@
   white-space: nowrap;
   vertical-align: top;
   cursor: default;
+}
+
+.cell[data-format] {
+  background: color-mix(in srgb, var(--format-color) var(--format-share), var(--color-canvas));
 }
 
 .cell[data-content='missing'] {

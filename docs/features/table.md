@@ -48,8 +48,7 @@ The first section of a collection tab: the documents of a collection or of a vie
   0.9.0 (commits 98c0cb5, 0240a8c). The **Formatting** button: Mongoster 0.9.0 and 0.10.0 (query.format-rules,
   proposals 0002 and 0003; `src/webview/formatting.ts › FormattingPaneUi`, the `formattingBtn` of
   `src/collectionPanel.ts`).
-- **Differs**: (M41) the toolbar has no **Formatting** button and the rows are drawn without colors; (M42) the
-  button's count is that of the collection's own rules, not of the four formatting scopes.
+- **Differs**: (M42) the button's count is that of the collection's own rules, not of the four formatting scopes.
 
 What it shows, from the top:
 
@@ -126,10 +125,10 @@ Acceptance:
 - [ ] The table is announced to a screen reader as a grid with its numbers of rows and columns, and each cell with the
       name of its column.
 - [ ] With the row rule `{ status: "failed" }` red, the toolbar reads **Formatting (1)** and the failed orders are
-      red; with it turned off, **Formatting** (differs).
+      red; with it turned off, **Formatting**.
 - [ ] A click on **Formatting** shows the Formatting view of the inspector island and the button is pressed; a second
-      click shows the selection again (differs).
-- [ ] After **Hide formatting**, the toolbar reads **Formatting (off)** and no row is colored (differs).
+      click shows the selection again.
+- [ ] After **Hide formatting**, the toolbar reads **Formatting (off)** and no row is colored.
 - [ ] With one rule on in each of the four formatting scopes, the toolbar reads **Formatting (4)**; with the section
       **Everywhere** left out of `shop.orders`, **Formatting (3)** (differs).
 
@@ -268,7 +267,6 @@ Lays the documents out as rows: one row per document, or one sub-row per element
   (`renderNodes`, `renderElements`, `addCell`). The colors of the rows and cells: Mongoster 0.9.0 and
   0.10.0 (query.format-table; `src/webview/main.ts › renderGrid`, `formatCell`, `src/webview/formatting.ts ›
   applyPaint`). The line *Formatting: …* in the tooltips is *New in Datardo*.
-- **Differs**: (M41) the rows and the cells carry no color and their tooltips no line *Formatting: …*.
 
 Rules of the result:
 
@@ -328,11 +326,10 @@ Acceptance:
       copied or edited.
 - [ ] The row number covers every sub-row of its document, and a click on it selects the document.
 - [ ] With the row rule `{ status: "failed" }` red, the row number of a failed order has the tooltip *Inspect
-      document* and *Formatting: { status: "failed" } (red)*, and every cell of its row but the row number is red
-      (differs).
+      document* and *Formatting: { status: "failed" } (red)*, and every cell of its row but the row number is red.
 - [ ] With `items` expanded and the cell rule `{ "items.qty": { $gt: 1 } }` green on `items.qty`, Ada's first sub-row
       has a green `qty` with the tooltip line *Formatting: { "items.qty": { $gt: 1 } } (green)*, and her second sub-row
-      has no color there (differs).
+      has no color there.
 
 ### `table.expand` — Expand a field into columns or sub-rows
 
@@ -1253,7 +1250,7 @@ What can be done with a column and with its field in the documents.
   path** and the expand entries in this menu are *New in Datardo*: in Mongoster they are only reached by dragging the
   header. **Format cells…** and **Color by this field**: Mongoster 0.9.0 and 0.10.0 (query.format-rules,
   `src/webview/main.ts › showColumnMenu`).
-- **Differs**: (M41) the menu has no **Format cells…**; (M42) nor **Color by this field**.
+- **Differs**: (M42) the menu has no **Color by this field**.
 
 In order:
 
@@ -1285,7 +1282,7 @@ Acceptance:
 - [ ] The menu of the row number column has **Columns…** and **Reset all columns** only.
 - [ ] The menu opens and is used with the keyboard as that of a row.
 - [ ] **Format cells…** is in the menu of every column but the row number, in **Find** and in **Aggregate**, on a view
-      and on a read-only connection (differs).
+      and on a read-only connection.
 - [ ] **Color by this field** is in the menu of every column but the row number, before **Format cells…**, in
       **Find** and in **Aggregate**, on a view and on a read-only connection (differs).
 

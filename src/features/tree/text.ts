@@ -152,6 +152,7 @@ export const text = {
       `forget ${kept.length < 2 ? kept.join('') : `${kept.slice(0, -1).join(', ')} and ${kept.at(-1) ?? ''}`} of ${what}`,
     theColor: 'the color',
     theColors: 'the colors',
+    theFormattingRules: 'the formatting rules',
     databaseAndCollections: (database: string) => `${database} and its collections`,
   },
 } as const;

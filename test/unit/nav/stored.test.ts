@@ -67,12 +67,14 @@ describe('nav.resize', () => {
       explorerHidden: true,
       inspectorHidden: false,
       queryPaneWidth: 380,
+      inspectorView: 'selection',
     });
     expect(islandsOf(islandFields(nav), initialNavState)).toEqual({
       widths: { explorer: 320, inspector: 400 },
       explorerHidden: true,
       inspectorHidden: false,
       queryPaneWidth: 380,
+      inspectorView: 'selection',
     });
   });
 
@@ -82,6 +84,7 @@ describe('nav.resize', () => {
       explorerHidden: false,
       inspectorHidden: false,
       queryPaneWidth: 380,
+      inspectorView: 'selection',
     });
   });
 });

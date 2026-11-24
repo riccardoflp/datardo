@@ -89,6 +89,20 @@
   --color-connection-brown: #d4a373;
   --color-connection-gray: #a9b0bb;
 
+  /* The colors of the formatting rules (table.format-table), mixed into the canvas of the table, at most 45% for a cell
+   * and 22% for a row: every text color stays at least 4.5:1 over every share of them. */
+  --color-format-red: #df2020;
+  --color-format-orange: #a15717;
+  --color-format-yellow: #786711;
+  --color-format-green: #127d24;
+  --color-format-blue: #1d67cd;
+  --color-format-purple: #9b36e2;
+  --color-format-pink: #d21e87;
+  --color-format-teal: #11786b;
+  --color-format-indigo: #5555e7;
+  --color-format-brown: #945e38;
+  --color-format-gray: #606876;
+
   /* The syntax colors of mongosh text (query.highlight), one for each role, the same in the editors and the cells: at
    * least 4.5:1 against the canvas, the island, the raised surfaces, a hovered and a selected line. */
   --color-syntax-key: #9cc7ff;
@@ -148,6 +162,17 @@
     --color-connection-indigo: #4041b5;
     --color-connection-brown: #7a4a24;
     --color-connection-gray: #5b6270;
+    --color-format-red: #f7c5c5;
+    --color-format-orange: #f2c9a6;
+    --color-format-yellow: #e9d263;
+    --color-format-green: #7eed90;
+    --color-format-blue: #bcd4f5;
+    --color-format-purple: #e4c9f7;
+    --color-format-pink: #f7c5e2;
+    --color-format-teal: #67e9d8;
+    --color-format-indigo: #cecef8;
+    --color-format-brown: #e4cbb9;
+    --color-format-gray: #cdd0d6;
     --color-syntax-key: #0451a5;
     --color-syntax-op: #a14806;
     --color-syntax-string: #17703e;

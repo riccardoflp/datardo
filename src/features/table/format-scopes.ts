@@ -158,3 +158,62 @@ export function withRenamedCollection(kept: KeptFormatting, where: TableCollecti
     collections: withEntry(withEntry(database.collections, where.collection, undefined), name, moved),
   }));
 }
+
+/** A collection's own rules, in their order (the scope **This collection**). */
+export function collectionRules(kept: KeptFormatting, where: TableCollection): readonly FormatRule[] {
+  return placesOf(kept, where).collection?.rules ?? [];
+}
+
+/**
+ * A collection's own rules replaced by `rules`, the scopes it leaves out kept; a collection left with nothing goes, and
+ * so do a database and a connection left with nothing.
+ */
+export function withCollectionRules(
+  kept: KeptFormatting,
+  where: TableCollection,
+  rules: readonly FormatRule[],
+): KeptFormatting {
+  const connection = own(kept.connections, where.connection) ?? { rules: [], databases: {} };
+  const database = own(connection.databases, where.database) ?? { rules: [], collections: {} };
+  const off = own(database.collections, where.collection)?.off ?? [];
+  const collection: CollectionFormatting | undefined =
+    rules.length === 0 && off.length === 0 ? undefined : { rules, off };
+  const collections = withEntry(database.collections, where.collection, collection);
+  const nextDatabase: DatabaseFormatting | undefined =
+    database.rules.length === 0 && Object.keys(collections).length === 0 ? undefined : { ...database, collections };
+  const databases = withEntry(connection.databases, where.database, nextDatabase);
+  const nextConnection: ConnectionFormatting | undefined =
+    connection.rules.length === 0 && Object.keys(databases).length === 0 ? undefined : { ...connection, databases };
+  return { ...kept, connections: withEntry(kept.connections, where.connection, nextConnection) };
+}
+
+/** How many rules a connection keeps: its own, its databases' and its collections' (`connection.remove`). */
+export function rulesOfConnection(kept: KeptFormatting, connection: string): number {
+  const found = own(kept.connections, connection);
+  if (found === undefined) {
+    return 0;
+  }
+  const databases = Object.values(found.databases);
+  const collections = databases.flatMap((database) => Object.values(database.collections));
+  return (
+    found.rules.length +
+    databases.reduce((sum, database) => sum + database.rules.length, 0) +
+    collections.reduce((sum, collection) => sum + collection.rules.length, 0)
+  );
+}
+
+/** Whether a drop made from Datardo would forget rules: the collections named, or the whole database. */
+export function hasRulesOf(
+  kept: KeptFormatting,
+  place: DatabasePlace,
+  collections: readonly string[] | 'whole-database',
+): boolean {
+  const database = own(own(kept.connections, place.connection)?.databases ?? {}, place.database);
+  if (database === undefined) {
+    return false;
+  }
+  if (collections === 'whole-database') {
+    return database.rules.length > 0 || Object.values(database.collections).some((each) => each.rules.length > 0);
+  }
+  return collections.some((name) => (own(database.collections, name)?.rules.length ?? 0) > 0);
+}

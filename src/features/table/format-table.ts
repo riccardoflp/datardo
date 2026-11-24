@@ -11,7 +11,8 @@ import { idOfTime, parsedValue } from '../query/parse';
 import { isSubdocument } from '../query/mongosh/ejson';
 import { colorOfValue, fieldOnPage, type FormatPaint } from './format-field';
 import { matcherOfFilter, type Matcher } from './match';
-import { mostElements, valueAt, type Cell } from './rows';
+import { mostElements, valueAt } from './parts/values';
+import type { Cell } from './rows';
 import { text } from './text';
 import type { Document } from './types';
 
