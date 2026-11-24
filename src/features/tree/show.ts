@@ -11,6 +11,7 @@ import { connectionState } from '../../shared/state/connections';
 import type { TabShows } from '../../shared/state/tabs';
 import { view as emptyView, type EmptyTreeView } from '../nav/empty';
 import { navInput } from '../nav/types';
+import { exclusionOf, type ExcludingConnection } from './excluded';
 import { expandedAfterClearing, view as filterView, type FilterView } from './filter';
 import * as menuMongodb from './menu-mongodb';
 import * as menuRedis from './menu-redis';
@@ -20,6 +21,7 @@ import * as nodeStates from './node-states';
 import * as pages from './pages';
 import * as pinned from './pinned';
 import * as redis from './redis';
+import { selectedNodes } from './select';
 import { text } from './text';
 import {
   currentConnection,
@@ -199,13 +201,14 @@ export function nodeOfTab(shows: TabShows): string | undefined {
 }
 
 /**
- * The tree island once a tab became active: the node of what it shows is selected, and its database expanded when
- * the database is already loaded; a tab of the app selects nothing.
+ * The tree island once a tab became active: the node of what it shows is selected alone (nodes selected together
+ * before are not any more: `tree.select`), and its database expanded when the database is already loaded; a tab of
+ * the app selects nothing.
  */
 export function revealedFor(island: TreeIsland, shows: TabShows): TreeIsland {
   const node = nodeOfTab(shows);
+  const { selected: _selected, selection: _selection, ...rest } = island;
   if (node === undefined) {
-    const { selected: _selected, ...rest } = island;
     return rest;
   }
   const database =
@@ -216,15 +219,25 @@ export function revealedFor(island: TreeIsland, shows: TabShows): TreeIsland {
     loaded && parent !== undefined && !island.expanded.includes(parent)
       ? [...island.expanded, parent]
       : island.expanded;
-  return { ...island, selected: node, expanded };
+  return { ...rest, selected: node, expanded };
 }
 
-/** The context menu of a line of the tree island: of the heading **Databases**, a node, a pinned item or a page. */
-export function menuOfItem(input: TreeInput, item: TreeItem): readonly MenuEntry[] {
+/**
+ * The context menu of a line of the tree island: of the heading **Databases**, a node, a pinned item or a page. On one
+ * of several nodes selected together among the lines shown (`items`), the menu of all of them (`tree.select`).
+ */
+export function menuOfItem(input: TreeInput, item: TreeItem, items: readonly TreeItem[] = []): readonly MenuEntry[] {
   if (item.kind === 'line' || !item.hasMenu) {
     return [];
   }
   const connection = currentConnection(input.state);
+  const together = selectedNodes(input.island, items);
+  if (connection?.engine === 'mongodb' && together.length > 1 && together.some((each) => each.id === item.id)) {
+    return menuMongodb.several(
+      input,
+      together.map((each) => each.ref),
+    );
+  }
   const ref: NodeRef = item.kind === 'heading' ? { kind: 'heading', part: item.part } : item.ref;
   if (connection === undefined) {
     return [];
@@ -281,13 +294,17 @@ export function withoutReads(island: TreeIsland): TreeIsland {
   return { ...island, mongodb: freshIsland.mongodb, redis: freshIsland.redis };
 }
 
-/** The databases the filter needs the collections of: every MongoDB database whose collections are not read yet. */
-export function databasesToList(island: TreeIsland): readonly string[] {
+/**
+ * The databases the filter needs the collections of: every MongoDB database whose collections are not read yet, but
+ * those excluded from searches, whose collections the filter never shows (`tree.excluded`).
+ */
+export function databasesToList(island: TreeIsland, connection: ExcludingConnection = {}): readonly string[] {
   const loadable = island.mongodb.databases;
   if (island.filter.text.trim() === '' || loadable.kind !== 'loaded') {
     return [];
   }
   return loadable.value
     .map((database) => database.name)
-    .filter((name) => (island.mongodb.contents[name]?.kind ?? 'idle') === 'idle');
+    .filter((name) => (island.mongodb.contents[name]?.kind ?? 'idle') === 'idle')
+    .filter((name) => exclusionOf(connection, { kind: 'database', database: name }) !== 'own');
 }

@@ -117,7 +117,13 @@ export type PartName = 'pinned' | 'databases' | 'pages';
  */
 export interface TreeIsland {
   readonly expanded: readonly string[];
+  /** The node selected, which is also the anchor of `Shift` (`tree.select`). */
   readonly selected?: string;
+  /**
+   * The nodes selected together with `Ctrl` and `Shift` (`tree.select`), which may leave out the anchor; absent while
+   * `selected` alone is.
+   */
+  readonly selection?: readonly string[];
   readonly collapsedParts: readonly PartName[];
   /** The filter: whether its field is open, and the text that applies (300 ms after the last key). */
   readonly filter: { readonly open: boolean; readonly text: string };

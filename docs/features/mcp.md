@@ -632,8 +632,6 @@ documents found with a query or an aggregation.
   `src/mcp/context.ts`); the bound of `skip`, the `system.*` collections refused and the partial filters as shapes
   from Mongoster 0.9.0; the lists without what is excluded from searches from Mongoster 0.9.0 (`src/mcpTools.ts`,
   `src/shared/exclusions.ts › ownExclusion`).
-- **Differs**: (M39) the three lists give every connection, database and collection, since nothing can be excluded from
-  searches yet.
 
 The tools:
 
@@ -670,10 +668,10 @@ Acceptance:
 - [ ] With the connection Staging excluded from searches, `list_connections` leaves it out; with the database `logs`
   of Local excluded, `list_databases` of Local leaves it out; with `shop.audit` excluded, `list_collections` of `shop`
   leaves out `audit` and keeps the others, and with `shop` excluded it still lists every collection of `shop` that
-  has no exclusion of its own. (differs)
+  has no exclusion of its own.
 - [ ] With every connection excluded, `list_connections` says `The user excluded every connection saved in Datardo
   from searches.`; with every collection of `shop` excluded, `list_collections` says `The user excluded every
-  collection of shop from searches.` (differs)
+  collection of shop from searches.`
 - [ ] What is excluded still answers when it is named: `list_databases` of Staging, `describe_collection` of
   `shop.audit` and `find_documents` on a collection of `logs` answer as if nothing were excluded (`mcp.arguments`).
 

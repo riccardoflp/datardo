@@ -39,7 +39,6 @@ that contain it, grouped by collection, while the collections are still being re
   `src/mcpTools.ts` (`open_search`). Mongoster opens one page per scope, fixed when it opens; choosing the scope in
   the page, and several collections of a database as a scope, are new in Datardo. What is excluded, and the summary
   that says how many were left out: Mongoster 0.9.0 (tree.excluded; `src/webview/search.ts › renderSummary`).
-- **Differs**: (M39) the summary never says how many were left out: nothing is excluded from searches.
 
 What the page shows, from the top:
 
@@ -144,9 +143,9 @@ Acceptance:
   with `regex` true and the text `([` it answers *Invalid regular expression: …* and opens nothing.
 - [ ] After a restart of Datardo the restored tab has its text, mode, scope and options, and no results.
 - [ ] With `exclusions: ["archive", "shop.logs"]` on Local, a search with **In** at **Every database** reads no
-  collection of `archive` and not `shop.logs`, and its summary ends with *2 excluded · 0.4 s*. (differs)
+  collection of `archive` and not `shop.logs`, and its summary ends with *2 excluded · 0.4 s*.
 - [ ] **Search documents…** on the collection `logs` of `shop`, excluded, ticks it and its search reads it; on the
-  database `archive`, excluded, its search reads the collections of `archive`. (differs)
+  database `archive`, excluded, its search reads the collections of `archive`.
 
 ### `search.collections` — Read the collections a search reads
 
@@ -168,8 +167,6 @@ The collections of the scope, in the order they are read and shown, each with it
   for what the connection excludes from searches.
 - **Ported from**: `src/search.ts › SearchPanel.collections`; README, *Global search*. Leaving out what is excluded:
   Mongoster 0.9.0 (`src/search.ts › SearchPanel.collections`, `src/shared/exclusions.ts › leaveOutExcluded`).
-- **Differs**: (M39) every database and collection the rules below keep is read: nothing is excluded, and nothing is
-  counted as left out.
 
 Rules:
 
@@ -202,11 +199,11 @@ Acceptance:
 - [ ] A collection whose `estimatedDocumentCount` fails is still read, and its progress shows the documents read
   without a total.
 - [ ] With `exclusions: ["crm", "shop.orders"]` and **Every database**, nothing is sent to `crm`, `shop` reads
-  `fs.files` alone, and 2 are left out. (differs)
-- [ ] With **In** at `crm`, excluded, the collections of `crm` are read and none is counted as left out. (differs)
+  `fs.files` alone, and 2 are left out.
+- [ ] With **In** at `crm`, excluded, the collections of `crm` are read and none is counted as left out.
 - [ ] With `exclusions: ["shop.fs.files", "shop.recent"]`, **In** at `shop` and **Views** off, `orders` alone is
-  read, and 1 is left out: the view `recent` was left out by **Views** first. (differs)
-- [ ] With `orders` ticked, excluded, it is read and nothing is left out. (differs)
+  read, and 1 is left out: the view `recent` was left out by **Views** first.
+- [ ] With `orders` ticked, excluded, it is read and nothing is left out.
 
 ### `search.scan` — Read the documents of the collections and find the matches
 

@@ -14,7 +14,7 @@ import { columnsKey, nothingRemembered, rememberedColumns } from '../../shared/s
 import { withCollectionRenamed as stateRenamed } from '../../storage/connection-state';
 import { renamedColors } from '../../features/tree/color-of';
 import { findConnection, writeConnection } from '../connections';
-import { withMaps } from './tree';
+import { moveExclusion, withMaps } from './tree';
 import { savedQueriesData } from '../saved-queries';
 import type { MainServices } from '../services';
 import { connectionStateStore } from '../table';
@@ -130,6 +130,7 @@ export async function moveCollection(services: MainServices, args: Json): Promis
   await moveSavedQueries(renamed);
   movePins(services, renamed);
   moveColor(services, renamed);
+  moveExclusion(services, renamed);
   moveTab(services, renamed);
 }
 

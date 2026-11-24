@@ -143,7 +143,7 @@ function isOfferedByItsArea(state: AppState, id: string): boolean | undefined {
   if (id.startsWith('query.position:')) {
     return isPositionOffered(state, id);
   }
-  if (id.startsWith('tree.set-')) {
+  if (id.startsWith('tree.set-') || id === 'tree.exclude-from-searches') {
     return isTreeOffered(state, id);
   }
   if (id.startsWith('index.')) {

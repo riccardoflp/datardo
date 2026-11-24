@@ -8,7 +8,7 @@ import { moveControl } from '../../features/tree/pinned';
 import type { Control, TreeItem } from '../../features/tree/types';
 import { focusIsland } from '../shell/focus';
 import type { TreeHandle } from '../components/tree';
-import { activate, press, pressKey, toggle, type TreeActions } from './tree-actions';
+import { activate, press, pressKey, selectWith, toggle, type TreeActions } from './tree-actions';
 import type { OpenMenu } from './tree-menu';
 import { listForFilter } from './tree-reads';
 import { menuOfCard, type IslandRow } from './tree-rows';
@@ -35,7 +35,7 @@ function useMenu(source: ActionsSource, focusItem: (item: string) => void) {
   const [menu, setMenu] = useState<OpenMenu | undefined>(undefined);
   const openMenu = (item: string, at?: { readonly x: number; readonly y: number }): void => {
     const found = source.shown.items.find((each) => each.id === item);
-    const entries = found === undefined ? [] : menuOfItem(source.input, found);
+    const entries = found === undefined ? [] : menuOfItem(source.input, found, source.shown.items);
     if (found === undefined || entries.length === 0) {
       return;
     }
@@ -127,6 +127,8 @@ export function useTreeActions(source: ActionsSource) {
       const onTwisty = event.target instanceof Element && event.target.closest('[data-twisty]') !== null;
       if (onTwisty && row.expanded !== undefined) {
         toggle(base, row.id, row.expanded ? 'collapse' : 'expand');
+      } else if (event.ctrlKey || event.metaKey || event.shiftKey) {
+        selectWith(base, row.item, event.shiftKey ? 'range' : 'toggle');
       } else {
         activate(base, row.item);
       }

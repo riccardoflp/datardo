@@ -117,6 +117,8 @@ export interface SearchRun {
   readonly state: RunState;
   /** The collections, once `search.collections` has answered. */
   readonly scans: readonly CollectionScan[];
+  /** The databases and collections left out because they are excluded from searches, once listed (`tree.excluded`). */
+  readonly excluded?: number;
   /** When **Search** was pressed, and when the search ended or was stopped, in milliseconds since 1970. */
   readonly startedAt: number;
   readonly endedAt?: number;

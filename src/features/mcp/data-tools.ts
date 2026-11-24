@@ -6,11 +6,13 @@
  * a query (`find_documents`) or an aggregation (`aggregate`). None of them writes: they send only `listDatabases`,
  * `listCollections`, `$sample`, `listIndexes`, `$listSearchIndexes`, `find`, `countDocuments` and `aggregate` without
  * the stages of `mcp.refuse-write-stages`, never on a `system.*` collection, and `find` skips at most 1,000,000
- * documents. No connection string, password, SSH passphrase or user name is ever returned.
+ * documents. No connection string, password, SSH passphrase or user name is ever returned. The three lists leave out
+ * what is excluded from searches by an entry of its own (`tree.excluded`); a tool given its name answers for it.
  */
 import type { Json } from '../../shared/engine-request';
 import type { Context } from '../../shared/feature';
 import { connectionState } from '../../shared/state/connections';
+import { exclusionOf } from '../tree/excluded';
 import { groupThousands } from '../../shared/text-units';
 import { collectionArgs, intArg, requiredArg, toolConnection } from './arguments';
 import { bounds, COUNT_CAP, counted, MOST_FIELDS, SKIP_MAX } from './output-limits';
@@ -48,7 +50,11 @@ function listConnections(session: ToolSession): string {
   if (connections.saved.length === 0) {
     return 'No connections are saved in Datardo.';
   }
-  const listed = connections.saved.map((each) => ({
+  const kept = connections.saved.filter((each) => each.excluded !== true);
+  if (kept.length === 0) {
+    return 'The user excluded every connection saved in Datardo from searches.';
+  }
+  const listed = kept.map((each) => ({
     name: each.name,
     id: each.id,
     engine: each.engine,
@@ -64,14 +70,16 @@ function listDatabases(session: ToolSession): string {
   const [reply] = session.send([
     mongoCommand({ connection: connection.id, database: 'admin' }, { listDatabases: 1, nameOnly: false }),
   ]);
-  const databases = listOf(recordOf(replyOrProblem(reply))['databases']).map((each) => {
-    const database = recordOf(each);
-    return {
-      name: textIn(database['name']) ?? '',
-      sizeOnDisk: numberIn(database['sizeOnDisk']) ?? 0,
-      empty: database['empty'] === true,
-    };
-  });
+  const databases = listOf(recordOf(replyOrProblem(reply))['databases'])
+    .map((each) => {
+      const database = recordOf(each);
+      return {
+        name: textIn(database['name']) ?? '',
+        sizeOnDisk: numberIn(database['sizeOnDisk']) ?? 0,
+        empty: database['empty'] === true,
+      };
+    })
+    .filter((each) => exclusionOf(connection, { kind: 'database', database: each.name }) !== 'own');
   return JSON.stringify(databases, null, 2);
 }
 
@@ -92,7 +100,11 @@ function listCollections(session: ToolSession): string {
         ...(viewOn === undefined ? {} : { viewOn }),
       };
     })
+    .filter((each) => exclusionOf(connection, { kind: 'collection', database, collection: each.name }) !== 'own')
     .sort((one, other) => (one.name < other.name ? -1 : one.name > other.name ? 1 : 0));
+  if (listed.length === 0) {
+    return `The user excluded every collection of ${database} from searches.`;
+  }
   return JSON.stringify(listed, null, 2);
 }
 

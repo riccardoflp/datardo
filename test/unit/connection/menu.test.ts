@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { view, type MenuEntry } from '../../../src/features/connection/menu';
 import type { ConnectionStateName } from '../../../src/shared/connection';
-import { mongoConnection, stateWith } from './context';
+import { mongoConnection, redisConnection, stateWith } from './context';
 
 function labels(entries: readonly MenuEntry[]): readonly string[] {
   return entries.map((entry) => (entry.kind === 'item' ? entry.label : '—'));
@@ -30,6 +30,7 @@ describe('connection.menu', () => {
       '—',
       'Move to folder…',
       'Set color…',
+      'Exclude from searches',
       'Make read-only',
       'Stop keeping undo history',
       'Link a Redis connection…',
@@ -78,6 +79,32 @@ describe('connection.menu', () => {
       label: 'Connect',
       feature: 'connection.connect',
       element: 'connection.connect@connection-switcher',
+    });
+  });
+
+  it('shows Exclude from searches after Set color… on MongoDB and Redis, and Include in searches once excluded, read-only too', () => {
+    const cache = redisConnection();
+    for (const connection of [local, cache]) {
+      const entries = labels(
+        view({ connections: stateWith([connection]).connections, connection, place: 'home' }).entries,
+      );
+      expect(entries[entries.indexOf('Set color…') + 1]).toBe('Exclude from searches');
+    }
+    const excluded = { ...local, excluded: true as const, readOnly: true };
+    const menu = view({
+      connections: stateWith([excluded]).connections,
+      connection: excluded,
+      place: 'connection-switcher',
+    });
+    const entries = labels(menu.entries);
+    expect(entries[entries.indexOf('Set color…') + 1]).toBe('Include in searches');
+    expect(entries).not.toContain('Exclude from searches');
+    expect(menu.entries.find((entry) => entry.kind === 'item' && entry.label === 'Include in searches')).toEqual({
+      kind: 'item',
+      label: 'Include in searches',
+      feature: 'tree.exclude-from-searches',
+      element: 'tree.exclude-from-searches@connection-switcher',
+      args: { connection: local.id, action: 'include', scope: 'connection' },
     });
   });
 });

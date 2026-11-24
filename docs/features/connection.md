@@ -918,7 +918,6 @@ The entries offered on a saved connection, the same wherever the connection is s
   that create, back up and restore are in the tree island's own menu. **Exclude from searches** and **Include in
   searches** come from tree.exclude of Mongoster 0.9.0 (`package.json`, `mongoster.exclude`, `mongoster.include`),
   which offers them on the connection's node of its tree.
-- **Differs**: (M39) the menu has no **Exclude from searches** and no **Include in searches**.
 
 What it shows, in this order, with a line between the groups:
 
@@ -948,7 +947,7 @@ Acceptance:
 - [ ] Every entry can be reached with the keyboard: `Shift+F10` on a card or a line opens the menu, the arrows move,
       `Enter` chooses, `Escape` closes.
 - [ ] A MongoDB connection and a Redis connection both show **Exclude from searches** after **Set color…**; once
-      excluded, the menu shows **Include in searches** in its place, also on a read-only connection. (differs)
+      excluded, the menu shows **Include in searches** in its place, also on a read-only connection.
 
 ### `connection.folder-menu` — The menu of a folder
 

@@ -2,11 +2,13 @@
  * What the controls and the keys of the tree island do, as its Views said: a control starts its feature through the
  * bridge from its place, except the reads of the tree itself (`tree.refresh`, **Load more**), whose results the
  * window keeps; the window's own actions (**Collapse all**, the filter) change the island; a key does what
- * `tree.keyboard` says.
+ * `tree.keyboard` says. `Ctrl+click`, `Shift+click`, `Shift+Down`, `Shift+Up` and `Escape` change the nodes selected
+ * together (`tree.select`).
  */
 import { view as keyboardView, type KeyEffect } from '../../features/tree/keyboard';
 import { moveControl } from '../../features/tree/pinned';
 import { scopeOf } from '../../features/tree/refresh';
+import { isSelectable, selectionAfter } from '../../features/tree/select';
 import { collapsedAll, toggled } from '../../features/tree/show';
 import { wholeArg, type Control, type TreeInput, type TreeItem } from '../../features/tree/types';
 import type { ConnectionId, Place } from '../../shared/ids';
@@ -83,11 +85,11 @@ export function toggle(actions: TreeActions, item: string, to: 'expand' | 'colla
   }
 }
 
-/** Selects a node of the tree: the selection is the island's, kept per connection. */
+/** Selects a node of the tree alone: the selection is the island's, kept per connection. */
 function select(actions: TreeActions, item: TreeItem): void {
   if (item.kind === 'node') {
     changeIsland(actions.connection, (island) =>
-      island.selected === item.id ? island : { ...island, selected: item.id },
+      selectionAfter(island, actions.items, { kind: 'only', item: item.id }),
     );
   }
 }
@@ -109,6 +111,18 @@ export function activate(actions: TreeActions, item: TreeItem): void {
   if (expandable) {
     toggle(actions, item.id, item.expanded ? 'collapse' : 'expand');
   }
+}
+
+/**
+ * `Ctrl+click` (`toggle`) and `Shift+click` (`range`) on a line: on a node that can be selected with others, the
+ * selection changes and nothing opens; on any other line they do what a click does.
+ */
+export function selectWith(actions: TreeActions, item: TreeItem, how: 'toggle' | 'range'): void {
+  if (!isSelectable(item)) {
+    activate(actions, item);
+    return;
+  }
+  changeIsland(actions.connection, (island) => selectionAfter(island, actions.items, { kind: how, item: item.id }));
 }
 
 /** Carries out what a key does. */
@@ -136,6 +150,17 @@ function carryOut(actions: TreeActions, effect: KeyEffect, item: TreeItem | unde
     case 'filter':
       actions.openFilter();
       return;
+    case 'select': {
+      const change = { kind: 'range', item: effect.item, from: effect.from } as const;
+      changeIsland(actions.connection, (island) => selectionAfter(island, actions.items, change));
+      actions.focusItem(effect.item);
+      return;
+    }
+    case 'escape': {
+      const change = { kind: 'escape', item: effect.item } as const;
+      changeIsland(actions.connection, (island) => selectionAfter(island, actions.items, change));
+      return;
+    }
     case 'none':
       return;
   }
@@ -149,6 +174,7 @@ const named: Readonly<Record<string, string>> = {
   Home: 'Home',
   End: 'End',
   Enter: 'Enter',
+  Escape: 'Escape',
   ' ': 'Space',
   F5: 'F5',
   ContextMenu: 'ContextMenu',
@@ -164,6 +190,9 @@ export function keyOf(event: React.KeyboardEvent): string | undefined {
   }
   if (event.ctrlKey || event.metaKey || event.altKey) {
     return undefined;
+  }
+  if (event.shiftKey && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) {
+    return event.key === 'ArrowDown' ? 'Shift+Down' : 'Shift+Up';
   }
   return named[event.key] ?? (/^[\p{L}\p{N}]$/u.test(event.key) ? event.key : undefined);
 }
@@ -186,7 +215,8 @@ export function pressKey(actions: TreeActions, event: React.KeyboardEvent, item:
     return;
   }
   const key = keyOf(event);
-  if (key === undefined) {
+  // `Escape` is the tree's only while nodes are selected together; otherwise it is left to the window.
+  if (key === undefined || (key === 'Escape' && treeOf(actions.connection).island.selection === undefined)) {
     return;
   }
   const now = Date.now();

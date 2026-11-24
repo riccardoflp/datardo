@@ -168,6 +168,43 @@ describe('search.show', () => {
     expect(shown.groups[1]?.head).toEqual(['2 documents']);
   });
 
+  it('ends its summary with 2 excluded · 0.4 s when the exclusions of Local left 2 out', () => {
+    const scan = scanEnded(scanned(startScan(collection('orders')), documents(3, 'x'), mario), 0);
+    const listed = runAfter(startRun(1, typed, 1000), {
+      kind: 'listed',
+      search: 1,
+      collections: [scan.collection],
+      excluded: 2,
+      at: 1100,
+    });
+    const run = runAfter(listed, { kind: 'scanned', search: 1, index: 0, scan, at: 1400 });
+    expect(view(page(typed, run)).optionsRow.summary).toBe(
+      '1 collection · 3 documents read · 2 excluded · 0.4 s · done',
+    );
+    expect(view(page(typed, searched(typed, [scan], 'done'))).optionsRow.summary).not.toContain('excluded');
+  });
+
+  it('ticks the excluded collection logs from its node, and sets In to the excluded database archive', () => {
+    const withExclusions = (context: Context): Context => ({
+      ...context,
+      state: {
+        ...context.state,
+        connections: {
+          ...context.state.connections,
+          saved: context.state.connections.saved.map((each) =>
+            each.id === local.id ? { ...each, exclusions: ['archive', 'shop.logs'] } : each,
+          ),
+        },
+      },
+    });
+    const logs = { kind: 'collection', connection: local.id, database: 'shop', collection: 'logs' } as const;
+    const ticked = appSteps(withExclusions(contextOn('search.show', logs)));
+    expect(ticked[1]?.args).toEqual({ connection: local.id, database: 'shop', collections: ['logs'] });
+    const archive = { kind: 'database', connection: local.id, database: 'archive' } as const;
+    const whole = appSteps(withExclusions(contextOn('search.show', archive)));
+    expect(whole[1]?.args).toEqual({ connection: local.id, database: 'archive', collections: [] });
+  });
+
   it('disables Views while collections are ticked', () => {
     expect(view(page({ ...typed, collections: ['recent'] })).optionsRow.views.enabled).toBe(false);
     expect(view(page(typed)).optionsRow.views.enabled).toBe(true);

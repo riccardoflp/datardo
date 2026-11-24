@@ -42,6 +42,7 @@ export function summaryParts(run: SearchRun): readonly string[] {
     ...(read > 0 ? [text.summary.documentsRead(read)] : []),
     ...(found > 0 ? [text.summary.found(found, groups)] : []),
     ...(unreadable > 0 ? [text.summary.notReadable(unreadable)] : []),
+    ...((run.excluded ?? 0) > 0 ? [text.summary.excluded(run.excluded ?? 0)] : []),
     ...(milliseconds === undefined ? [] : [text.summary.seconds(milliseconds)]),
   ];
 }

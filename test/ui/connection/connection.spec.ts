@@ -340,6 +340,7 @@ test('the menu of the current connection, from the … button of the connection 
     'Copy connection string',
     'Move to folder…',
     'Set color…',
+    'Exclude from searches',
     'Allow changes',
     'Remove connection',
   ]);

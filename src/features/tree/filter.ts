@@ -8,6 +8,7 @@
  * until Datardo quits, and is not saved.
  */
 import type { EngineName } from '../../shared/engine-request';
+import { exclusionOf, isExcluded, type ExcludingConnection } from './excluded';
 import { matches } from './match';
 import type { Namespace } from './namespaces';
 import { text } from './text';
@@ -61,21 +62,28 @@ export interface FilteredDatabase {
 
 /**
  * A MongoDB database under a filter: shown when its name matches or one of its collections or buckets does. A database
- * whose collections are not known, or could not be listed, is shown only when its own name matches.
+ * whose collections are not known, or could not be listed, is shown only when its own name matches. What the
+ * connection excludes from searches matches nothing (`tree.match`), and an excluded database is not shown at all.
  */
 export function filterDatabase(
   filter: string,
   database: string,
   contents: Loadable<DatabaseContents> | undefined,
+  connection: ExcludingConnection = {},
 ): FilteredDatabase {
-  const own = matches(filter, { kind: 'database', name: database });
-  if (filter.trim() === '' || contents?.kind !== 'loaded') {
+  const excluded = exclusionOf(connection, { kind: 'database', database }) === 'own';
+  const own = matches(filter, { kind: 'database', name: database, excluded });
+  if (filter.trim() === '' || contents?.kind !== 'loaded' || excluded) {
     return { shown: own, expanded: false };
   }
-  const keeps = (name: string): boolean => matches(filter, { kind: 'collection', database, name });
+  const keeps = (name: string, kind: 'collection' | 'bucket'): boolean => {
+    const target =
+      kind === 'bucket' ? ({ kind, database, bucket: name } as const) : ({ kind, database, collection: name } as const);
+    return matches(filter, { kind: 'collection', database, name, excluded: isExcluded(connection, target) });
+  };
   const kept: DatabaseContents = {
-    buckets: contents.value.buckets.filter(keeps),
-    entries: contents.value.entries.filter((entry) => keeps(entry.name)),
+    buckets: contents.value.buckets.filter((name) => keeps(name, 'bucket')),
+    entries: contents.value.entries.filter((entry) => keeps(entry.name, 'collection')),
   };
   const any = kept.buckets.length > 0 || kept.entries.length > 0;
   return { shown: own || any, expanded: own || any, contents: kept };

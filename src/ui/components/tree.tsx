@@ -30,6 +30,10 @@ export interface TreeRow {
 /** What a tree is given. */
 export interface TreeProps<Row extends TreeRow> {
   readonly label: string;
+  /** Whether several lines can be selected together (`aria-multiselectable`). */
+  readonly multiselectable?: boolean;
+  /** The identifier of the tree's element, written whole by the caller (`data-feature`). */
+  readonly element?: string;
   readonly rows: readonly Row[];
   /** The line that had the focus last. */
   readonly focus: string | undefined;
@@ -112,7 +116,13 @@ function TreeOf<Row extends TreeRow>(props: TreeProps<Row>, ref: React.Forwarded
   );
   const tabStop = tabStopOf(props.rows, props.focus);
   return (
-    <div role="tree" aria-label={props.label} className={styles['tree']}>
+    <div
+      role="tree"
+      aria-label={props.label}
+      {...(props.multiselectable === true ? { 'aria-multiselectable': true } : {})}
+      {...(props.element === undefined ? {} : { 'data-feature': props.element })}
+      className={styles['tree']}
+    >
       {props.rows.map((row) => (
         <div
           key={row.id}

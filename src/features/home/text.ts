@@ -36,7 +36,7 @@ export const text = {
   card: {
     engines: { mongodb: 'MongoDB', redis: 'Redis' },
     version: (engine: string, version: string) => `${engine} ${version}`,
-    marks: { readOnly: 'Read-only', ssh: 'SSH', oplog: 'redis-oplog' },
+    marks: { readOnly: 'Read-only', ssh: 'SSH', oplog: 'redis-oplog', excluded: 'Excluded from searches' },
     states: {
       connecting: 'Connecting…',
       connected: 'Connected',

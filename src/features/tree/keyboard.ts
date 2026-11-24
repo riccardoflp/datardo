@@ -3,8 +3,10 @@
  *
  * Everything the tree island does with the mouse, done with keys, as the tree pattern of the WAI-ARIA Authoring
  * Practices has them: what each key does on the line that has the focus. No key of the tree writes to a deployment.
+ * `Shift+Down`, `Shift+Up` and `Escape` change the nodes selected together (`tree.select`).
  */
 import type { RefreshScope } from './refresh';
+import { isSelectable } from './select';
 import type { Control, TreeItem } from './types';
 
 /** How long the letters typed add up to one name, in ms (Datardo's choice). */
@@ -29,6 +31,10 @@ export type KeyEffect =
   | { readonly kind: 'menu'; readonly item: string }
   | { readonly kind: 'refresh'; readonly scope: RefreshScope }
   | { readonly kind: 'filter' }
+  /** `Shift+Down`, `Shift+Up`: the focus moves to `item`, selected with every node from the anchor (`from` without one). */
+  | { readonly kind: 'select'; readonly item: string; readonly from: string }
+  /** `Escape`: with several nodes selected, only `item` stays selected. */
+  | { readonly kind: 'escape'; readonly item: string }
   | { readonly kind: 'none' };
 
 /** What the keys are pressed on. */
@@ -161,11 +167,31 @@ function arrows(input: KeyboardInput, shown: readonly TreeItem[], at: number): K
   }
 }
 
+/**
+ * `Shift+Down`, `Shift+Up` on a node that can be selected with others: the next or the previous one, stopping at the
+ * first and the last; on any other line, they move as `Down` and `Up`.
+ */
+function selecting(input: KeyboardInput, shown: readonly TreeItem[], at: number): KeyEffect | undefined {
+  if (input.key !== 'Shift+Down' && input.key !== 'Shift+Up') {
+    return undefined;
+  }
+  const item = shown[at];
+  if (!isSelectable(item)) {
+    return focusAt(shown, input.key === 'Shift+Down' ? at + 1 : at - 1);
+  }
+  const selectable = shown.filter(isSelectable);
+  const index = selectable.findIndex((each) => each.id === item.id);
+  const next = selectable[Math.max(0, Math.min(selectable.length - 1, index + (input.key === 'Shift+Down' ? 1 : -1)))];
+  return { kind: 'select', item: next?.id ?? item.id, from: item.id };
+}
+
 function commands(input: KeyboardInput, item: TreeItem | undefined): KeyEffect {
   if (item === undefined) {
     return { kind: 'none' };
   }
   switch (input.key) {
+    case 'Escape':
+      return { kind: 'escape', item: item.id };
     case 'Enter':
       return enter(item);
     case 'Space':
@@ -193,6 +219,6 @@ export function view(input: KeyboardInput): KeyResult {
   if (/^[\p{L}\p{N}]$/u.test(input.key)) {
     return typedAhead(input, shown, at);
   }
-  const moved = arrows(input, shown, at);
+  const moved = arrows(input, shown, at) ?? selecting(input, shown, at);
   return { effect: moved ?? commands(input, shown[at]), typed: input.typed };
 }

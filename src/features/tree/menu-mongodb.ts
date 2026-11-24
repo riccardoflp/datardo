@@ -8,6 +8,8 @@
  */
 import type { ConnectionView } from '../../shared/connection';
 import type { Json } from '../../shared/engine-request';
+import { exclusionOf } from './excluded';
+import { exclusionNodeOf, targetOfExclusionNode, type ExclusionNode } from './parts/exclusion-plan';
 import { pinControl, pinsOf } from './pinned';
 import { text } from './text';
 import {
@@ -69,20 +71,44 @@ function backups(built: Built, restore: 'with-restore' | 'without-restore'): rea
 }
 
 /**
- * The group that organizes a node: **Set color…** (`tree.set-database-color` on a database,
- * `tree.set-collection-color` on a collection, a view or a bucket); it writes only Datardo's own file, so it stays on a
- * read-only connection.
+ * **Exclude from searches** on the nodes given that are not excluded by an entry of their own, and **Include in
+ * searches** on those that are, each only when it changes one of them (`tree.exclude-from-searches`).
  */
-function organize(built: Built, of: 'database' | 'collection'): readonly Control[] {
-  return of === 'database'
-    ? entry(built, text.menu.setColor, {
-        element: 'tree.set-database-color@tree-menu',
-        feature: 'tree.set-database-color',
-      })
-    : entry(built, text.menu.setColor, {
-        element: 'tree.set-collection-color@tree-menu',
-        feature: 'tree.set-collection-color',
-      });
+function exclusionEntries(input: TreeInput, connection: ConnectionView, nodes: readonly ExclusionNode[]): Control[] {
+  if (!input.isAvailable('tree.exclude-from-searches')) {
+    return [];
+  }
+  const own = nodes.filter((node) => exclusionOf(connection, targetOfExclusionNode(node)) === 'own');
+  const control = (label: string, action: 'exclude' | 'include', changed: readonly ExclusionNode[]): Control =>
+    startControl(label, 'tree.exclude-from-searches@tree-menu', 'tree.exclude-from-searches', {
+      connection: connection.id,
+      args: { connection: connection.id, action, nodes: changed as unknown as Json },
+    });
+  const others = nodes.filter((node) => !own.includes(node));
+  return [
+    ...(others.length > 0 ? [control(text.menu.excludeFromSearches, 'exclude', others)] : []),
+    ...(own.length > 0 ? [control(text.menu.includeInSearches, 'include', own)] : []),
+  ];
+}
+
+/**
+ * The group that organizes a node: **Set color…** (`tree.set-database-color` on a database,
+ * `tree.set-collection-color` on a collection, a view or a bucket), then **Exclude from searches** or **Include in
+ * searches**; they write only Datardo's own file, so they stay on a read-only connection.
+ */
+function organize(built: Built, node: NodeRef): readonly Control[] {
+  const color =
+    node.kind === 'database'
+      ? entry(built, text.menu.setColor, {
+          element: 'tree.set-database-color@tree-menu',
+          feature: 'tree.set-database-color',
+        })
+      : entry(built, text.menu.setColor, {
+          element: 'tree.set-collection-color@tree-menu',
+          feature: 'tree.set-collection-color',
+        });
+  const excluded = exclusionNodeOf(node);
+  return [...color, ...(excluded === undefined ? [] : exclusionEntries(built.input, built.connection, [excluded]))];
 }
 
 function headingMenu(built: Built): readonly MenuEntry[] {
@@ -112,7 +138,7 @@ function databaseMenu(built: Built, database: string): readonly MenuEntry[] {
       ),
       ...entry(built, text.menu.newPlayground, { element: 'playground.open@tree-menu', feature: 'playground.open' }),
     ],
-    organize(built, 'database'),
+    organize(built, { kind: 'database', database }),
     [
       ...entry(built, text.menu.searchDocuments, { element: 'search.show@tree-menu', feature: 'search.show' }),
       ...entry(built, text.menu.relationshipDiagram, {
@@ -202,7 +228,7 @@ const drop = { element: 'manage.drop-collection@tree-menu', feature: 'manage.dro
 function viewMenu(built: Built, node: Entry): readonly MenuEntry[] {
   return menuOf([
     openAndPin(built, node),
-    organize(built, 'collection'),
+    organize(built, node),
     entry(built, text.menu.newPlayground, { element: 'playground.open@tree-menu', feature: 'playground.open' }),
     [
       ...entry(built, text.menu.searchDocuments, { element: 'search.show@tree-menu', feature: 'search.show' }),
@@ -221,7 +247,7 @@ function collectionMenu(built: Built, node: Entry): readonly MenuEntry[] {
   const allowsAll = node.collectionKind === 'collection';
   return menuOf([
     openAndPin(built, node),
-    organize(built, 'collection'),
+    organize(built, node),
     [
       ...entry(
         built,
@@ -272,7 +298,7 @@ function bucketMenu(built: Built, database: string, bucket: string): readonly Me
     : [];
   return menuOf([
     open,
-    organize(built, 'collection'),
+    organize(built, { kind: 'bucket', database, name: bucket }),
     entry(built, text.menu.uploadFiles, { element: 'gridfs.upload@tree-menu', feature: 'gridfs.upload' }, 'writes'),
     entry(
       built,
@@ -299,6 +325,23 @@ function argsOfNode(connection: ConnectionView, node: NodeRef): Json {
     case 'page':
       return { connection: connection.id };
   }
+}
+
+/**
+ * Feature: tree.menu-mongodb — the menu opened on one of several nodes selected together (`tree.select`): **Exclude
+ * from searches** and **Include in searches**, each when it changes one of them, acting on all the selected nodes it
+ * changes; no other entry.
+ */
+export function several(input: TreeInput, nodes: readonly NodeRef[]): readonly MenuEntry[] {
+  const connection = currentConnection(input.state);
+  if (connection?.engine !== 'mongodb') {
+    return [];
+  }
+  const excluded = nodes.flatMap((node) => {
+    const found = exclusionNodeOf(node);
+    return found === undefined ? [] : [found];
+  });
+  return menuOf([exclusionEntries(input, connection, excluded)]);
 }
 
 /**

@@ -17,6 +17,7 @@ import { isCollapsed } from '../tab/collapse-group';
 import { text as tabText } from '../tab/text';
 import { fullScreenTitle } from '../window/full-screen';
 import { text as navText } from '../nav/text';
+import { exclusionTitle } from '../tree/commands';
 import { text } from './text';
 
 /** The commands of the palette area, each on the Commands line of its card (R2.3). */
@@ -160,6 +161,8 @@ function titleNow(registered: Command, state: AppState | undefined): string {
       return fullScreenTitle(state.window);
     case 'nav.pin':
       return activePin(state)?.pinned === true ? tabText.menu.unpin : tabText.menu.pin;
+    case 'tree.exclude-from-searches':
+      return exclusionTitle(state);
     case 'tab.collapse-group': {
       const active = activeTabOf(state.tabs);
       const connection = active === undefined ? undefined : tabConnectionOf(active);
