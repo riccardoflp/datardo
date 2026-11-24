@@ -55,6 +55,10 @@ export function StatusLine(props: { readonly input: NavInput; readonly openSwitc
           <span className={styles['dot']} data-dot={line.connection.dot} aria-hidden="true" />
         )}
         <span className={styles['cut']}>{line.connection.text}</span>
+        {line.connection.latency === undefined ? null : (
+          // The latency changes every ping: its place keeps one width, so that the parts after it do not move (R10.8).
+          <span className={styles['latency']}>· {line.connection.latency}</span>
+        )}
       </button>
       {line.reconnect === undefined ? null : (
         <button

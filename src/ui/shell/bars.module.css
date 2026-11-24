@@ -163,6 +163,15 @@ button.part:hover {
   white-space: nowrap;
 }
 
+/* `· 999 ms` at most while the server answers: the digits are as wide as each other, and the place keeps its width. */
+.latency {
+  flex: none;
+  min-width: 8ch;
+  font-variant-numeric: tabular-nums;
+  text-align: start; /* not the centering of its button, which would move the separator by half the change */
+  white-space: nowrap;
+}
+
 .spacer {
   flex: 1;
 }

@@ -258,6 +258,9 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
 - A field of one line, such as the filter of the query bar, no longer shows a scroll bar when its text is longer than
   the field.
 - A notification no longer covers the pager row of a tab.
+- The latency of the status line keeps one width as it changes, so the parts after it no longer move at every ping.
+- The total of the pager and the pin of a pinned column can be read again: they were drawn in the color meant for
+  text on the accent.
 - A read in progress leaves what was shown in place until its answer comes, and dims it or says it is working only
   after 200 ms: the table of a collection or of a pipeline, its pager and its total, the keys tab, the key in the
   inspector and the largest keys of the Server page, the value of a key tab and the groups of a stream, the header of

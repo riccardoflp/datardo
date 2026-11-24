@@ -128,7 +128,7 @@
 }
 
 .pin[aria-pressed='true'] {
-  color: var(--color-accent-text);
+  color: var(--color-accent);
 }
 
 .empty {

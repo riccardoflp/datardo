@@ -18,7 +18,7 @@
   padding: 0;
   border: none;
   background: none;
-  color: var(--color-accent-text);
+  color: var(--color-accent);
   font: inherit;
   text-decoration: underline dotted;
   min-width: var(--space-5);

@@ -19,7 +19,8 @@ describe('nav.status-line', () => {
       input({ connections: [local], nav: { current: local.id, latency: { connection: local.id, milliseconds: 4 } } }),
     );
     expect(line.connection).toMatchObject({
-      text: 'Local · connected · 4 ms',
+      text: 'Local · connected',
+      latency: '4 ms',
       element: 'nav.switch-connection@status-line',
     });
   });

@@ -15,7 +15,10 @@ import type { NavInput, SavedConnection } from './types';
 
 /** The connection part: a button that opens the connection switcher. */
 export interface ConnectionPart {
+  /** The name and the state: `Local · connected`. */
   readonly text: string;
+  /** While connected, the latency `nav.ping` read last (`4 ms`), drawn after the text in a place of its own width. */
+  readonly latency?: string;
   readonly dot?: Dot;
   /** Whether the latency is shown in the warning color. */
   readonly slow: boolean;
@@ -60,15 +63,13 @@ function connectionPart(input: NavInput, current: SavedConnection | undefined): 
   if (current === undefined) {
     return { text: text.statusLine.noConnection, slow: false, element };
   }
-  const words = [current.name, text.states[current.status.kind]];
   const latency = latencyOf(input, current);
   const connected = current.status.kind === 'connected';
-  if (connected && input.nav.latency?.connection === current.id) {
-    words.push(latencyText(latency));
-  }
+  const shown = connected && input.nav.latency?.connection === current.id ? { latency: latencyText(latency) } : {};
   const tooltip = current.status.kind === 'reconnecting' ? { tooltip: current.status.reason } : {};
   return {
-    text: words.join(' · '),
+    text: [current.name, text.states[current.status.kind]].join(' · '),
+    ...shown,
     dot: dotOf(current.status),
     slow: connected && isSlow(latency),
     element,
