@@ -14,6 +14,7 @@ import { fedSummary } from '../features/transfer/ends/summary';
 import type { RunnerPorts } from '../runner/ports';
 import { writeLog } from '../runner/log';
 import { start } from '../runner/start';
+import { closeDataFolder } from '../storage/modes';
 import { appActions } from './actions';
 import { answerTheBridge } from './bridge';
 import { AppStateHolder } from './app-state';
@@ -139,6 +140,10 @@ async function startDatardo(): Promise<void> {
       runtime: { electron: process.versions.electron, chromium: process.versions.chrome, node: process.versions.node },
       dataFolder: services.dataFolder,
     },
+  });
+  // Before any store reads its file: what an older version wrote with the umask's modes is closed (R14.11).
+  await closeDataFolder(services.dataFolder, (text) => {
+    writeLog(sharedPorts(), [{ feature: 'window.open-data-folder', kind: 'error', text }]);
   });
   await startAreas(services);
   const startFeature = (asked: Intent): ReturnType<typeof start> => start(sharedPorts(), asked);
