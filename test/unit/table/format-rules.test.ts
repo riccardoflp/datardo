@@ -200,15 +200,19 @@ describe('table.toggle-formatting', () => {
 
 describe('table.formatting', () => {
   const state = (rules: readonly FormatRule[], more: Partial<FormattingState> = {}): FormattingState => ({
-    rules,
+    sections: { collection: rules, database: [], connection: [], global: [] },
+    off: [],
+    names: { database: 'shop', connection: 'Local' },
     problems: new Map(),
     hidden: false,
+    documents: [],
+    now: 0,
     ...more,
   });
 
   it('with no rule, the view reads No formatting rules.', () => {
     expect(formattingView(state([])).empty).toBe(
-      "No formatting rules. Add one, or use Format cells… in a column header's menu.",
+      "No formatting rules. Add one, or use Color by this field or Format cells… in a column header's menu.",
     );
   });
 

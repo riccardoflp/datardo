@@ -119,3 +119,48 @@ body {
 [data-format='gray'] {
   --format-color: var(--color-format-gray);
 }
+
+/* The second color of a scale between two presets, mixed into the first at --format-toward-share. */
+[data-format-toward='red'] {
+  --format-toward-color: var(--color-format-red);
+}
+
+[data-format-toward='orange'] {
+  --format-toward-color: var(--color-format-orange);
+}
+
+[data-format-toward='yellow'] {
+  --format-toward-color: var(--color-format-yellow);
+}
+
+[data-format-toward='green'] {
+  --format-toward-color: var(--color-format-green);
+}
+
+[data-format-toward='blue'] {
+  --format-toward-color: var(--color-format-blue);
+}
+
+[data-format-toward='purple'] {
+  --format-toward-color: var(--color-format-purple);
+}
+
+[data-format-toward='pink'] {
+  --format-toward-color: var(--color-format-pink);
+}
+
+[data-format-toward='teal'] {
+  --format-toward-color: var(--color-format-teal);
+}
+
+[data-format-toward='indigo'] {
+  --format-toward-color: var(--color-format-indigo);
+}
+
+[data-format-toward='brown'] {
+  --format-toward-color: var(--color-format-brown);
+}
+
+[data-format-toward='gray'] {
+  --format-toward-color: var(--color-format-gray);
+}

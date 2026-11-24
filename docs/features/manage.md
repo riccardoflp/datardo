@@ -260,7 +260,6 @@ Drops a database with all its collections, after the user types its name.
 - **Ported from**: manage.drop-database; `src/manage.ts`, `src/extension.ts`. The colors and the exclusions that go:
   Mongoster 0.9.0 and 0.10.0 (tree.collection-color-follows, tree.exclusion-follows; the `mongoster.dropDatabase`
   handler). The formatting rules that go are Datardo's choice.
-- **Differs**: (M42) the plan forgets no formatting rules of a database.
 
 Acceptance:
 
@@ -280,7 +279,7 @@ Acceptance:
   `exclusions` have no `shop` nor any key that starts with `shop.`, and the entries of `crm` stay.
 - [ ] Dropping a database forgets the formatting rules of its collections.
 - [ ] Dropping a database forgets the formatting rules of its section **Database shop**; those of the connection and
-  of **Everywhere** stay. (differs)
+  of **Everywhere** stay.
 
 ### `manage.name-rules` — Valid names of databases and collections
 

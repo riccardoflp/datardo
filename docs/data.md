@@ -40,7 +40,8 @@ dropped ([D34](decisions.md#d34--removing-a-connection-removes-what-datardo-keep
 collection's rules follow its rename and go with a drop made from Datardo, a database's with **Drop database…**, and
 all of a connection's with its removal (`table.format-scopes`,
 [D72](decisions.md#d72--formatting-rules-in-the-inspector-island-kept-in-a-file-of-their-own)). `formatting.json` is
-recorded at version 1 in `test/fixtures/stored/formatting/v1/` by M41.
+recorded at version 1 in `test/fixtures/stored/formatting/v1/` by M41, and with the rules of a database, a connection
+and everywhere, field rules and `off` in `test/fixtures/stored/formatting/v1-scopes/` by M42.
 
 The fields of `connections.json` that M38 and M39 add are optional fields of version 1, each absent when it is empty
 or false, so a file of an earlier Datardo reads as nothing colored and nothing excluded:

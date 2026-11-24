@@ -161,6 +161,14 @@
   background: color-mix(in srgb, var(--format-color) var(--format-share), var(--color-canvas));
 }
 
+.row[data-format-toward] {
+  background: color-mix(
+    in srgb,
+    color-mix(in srgb, var(--format-toward-color) var(--format-toward-share), var(--format-color)) var(--format-share),
+    var(--color-canvas)
+  );
+}
+
 .row[aria-selected='true'] {
   background: var(--color-selected);
 }
@@ -189,6 +197,19 @@
 
 .cell[data-format] {
   background: color-mix(in srgb, var(--format-color) var(--format-share), var(--color-canvas));
+}
+
+.cell[data-format-toward] {
+  background: color-mix(
+    in srgb,
+    color-mix(in srgb, var(--format-toward-color) var(--format-toward-share), var(--format-color)) var(--format-share),
+    var(--color-canvas)
+  );
+}
+
+/* A pinned value among the shades of its own color, told apart by an outline in that color. */
+.cell[data-format-outlined='true'] {
+  box-shadow: inset 0 0 0 var(--focus-width) var(--format-color);
 }
 
 .cell[data-content='missing'] {
@@ -248,4 +269,11 @@
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
+}
+
+/* A row of a pinned value among the shades of its own color: its cells outlined above and below. */
+.row[data-format-outlined='true'] > .cell:not([data-format]) {
+  box-shadow:
+    inset 0 var(--focus-width) 0 var(--format-color),
+    inset 0 calc(var(--focus-width) * -1) 0 var(--format-color);
 }

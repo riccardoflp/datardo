@@ -53,7 +53,11 @@ function pressed(props: TablePartProps, button: ToolbarButton): void {
 /** The toolbar. */
 export function TableToolbar(props: TablePartProps): React.JSX.Element {
   const { collection, columns, target, collectionRef } = props;
-  const formatting = toolbarFormatting(useAppState(), useCollectionFormatting(collectionRef, collection.ranAt));
+  const formatting = toolbarFormatting(
+    useAppState(),
+    useCollectionFormatting(collectionRef, collection.ranAt),
+    collectionRef,
+  );
   const shown = showView({
     ...showStateOf(collection, {
       view: target.view,

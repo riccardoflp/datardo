@@ -40,4 +40,7 @@ export const commands: readonly Command[] = [
   command('table.add-format-rule', text.formatting.commandAdd),
   command('table.add-format-rule:cells', text.formatting.formatCells),
   command('table.toggle-formatting', text.formatting.hide),
+  command('table.color-by-field', text.fieldRule.colorByField),
+  command('table.export-formatting', text.exportFile.entry),
+  command('table.import-formatting', text.importFile.entry),
 ];

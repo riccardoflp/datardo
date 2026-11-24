@@ -34,18 +34,28 @@ function clicked(grid: GridView, index: number, at: Position, event: React.Mouse
 
 /**
  * How a row or a cell is drawn in the color of a formatting rule (`table.format-table`): the preset in `data-format`,
- * which `theme/base.css` turns into its formatting token, mixed into the surface at the share given.
+ * which `theme/base.css` turns into its formatting token, mixed into the surface at the share given; a scale between
+ * two presets with the second in `data-format-toward` at its share; a pinned value among the shades of its own color
+ * outlined.
  */
 function formatAttributes(color: PaintedColor | undefined): {
   readonly 'data-format'?: string;
+  readonly 'data-format-toward'?: string;
+  readonly 'data-format-outlined'?: boolean;
   readonly style?: React.CSSProperties;
 } {
   if (color === undefined) {
     return {};
   }
+  const { drawn } = color;
   return {
-    'data-format': color.drawn.color,
-    style: { '--format-share': `${String(color.drawn.percent)}%` } as React.CSSProperties,
+    'data-format': drawn.color,
+    ...(drawn.toward === undefined ? {} : { 'data-format-toward': drawn.toward.color }),
+    ...(drawn.outlined === true ? { 'data-format-outlined': true } : {}),
+    style: {
+      '--format-share': `${String(drawn.percent)}%`,
+      ...(drawn.toward === undefined ? {} : { '--format-toward-share': `${String(drawn.toward.percent)}%` }),
+    } as React.CSSProperties,
   };
 }
 
@@ -101,6 +111,8 @@ function ValueCell(props: {
       rowSpan={cell.height}
       className={link === undefined ? styles['cell'] : `${styles['cell'] ?? ''} ${linkClass}`}
       data-format={format['data-format']}
+      data-format-toward={format['data-format-toward']}
+      data-format-outlined={format['data-format-outlined']}
       style={{ ...format.style, ...sticky } as React.CSSProperties}
       data-pos={positionKey(at)}
       data-selected={selected ? 'true' : undefined}
@@ -224,6 +236,8 @@ export function DocumentRows({
           key={String(subRow)}
           className={styles['row']}
           data-format={rowFormat['data-format']}
+          data-format-toward={rowFormat['data-format-toward']}
+          data-format-outlined={rowFormat['data-format-outlined']}
           style={{ height: subRowHeight, ...rowFormat.style }}
           aria-rowindex={first + subRow}
           aria-selected={selected}

@@ -1,15 +1,18 @@
 /**
  * The open rule of the Formatting view, under its line (`table.edit-format-rule`): **Name**, **Color the cell of**,
- * **When the document matches** in the mongosh editor with why it cannot be used under it, and the eleven colors.
+ * **When the document matches** in the mongosh editor with why it cannot be used under it, and the eleven colors; for
+ * a field rule, **Name** and the controls of `table.edit-field-rule`.
  * What is typed colors the table at once and is saved a second after the last key, when the box is left or with
  * `Enter`; `Esc` closes the rule and gives the focus back to its line.
  */
 import { useId } from 'react';
 import type { OpenView } from '../../features/table/formatting';
-import type { PresetColor } from '../../shared/formatting-rules';
+import type { Document } from '../../features/table/types';
+import type { FieldRule, PresetColor } from '../../shared/formatting-rules';
 import { MongoshEditor } from '../components/editor/mongosh-editor';
 import type { CollectionRef } from '../query/collection-reads';
 import { useFieldHints } from '../pages/index/field-hints';
+import { FieldRuleOpen } from './formatting-field';
 import { flushTyping, typeIn } from './formatting-store';
 import styles from './formatting.module.css';
 
@@ -21,6 +24,10 @@ export interface OpenProps {
   readonly now: number;
   /** The columns of the page, offered in **Color the cell of**. */
   readonly columns: readonly string[];
+  /** The field rule open, whose controls replace the condition and the colors. */
+  readonly fieldRule?: FieldRule;
+  readonly documents: readonly Document[];
+  readonly memoryKey: string;
   readonly onColor: (color: PresetColor) => void;
   readonly onClose: () => void;
 }
@@ -62,6 +69,30 @@ export function FormattingOpen(props: OpenProps): React.JSX.Element {
           onKeyDown={onEnter}
         />
       </label>
+      {props.fieldRule === undefined ? (
+        <ConditionParts {...props} id={id} fields={fields} />
+      ) : (
+        <FieldRuleOpen
+          open={open}
+          rule={props.fieldRule}
+          memoryKey={props.memoryKey}
+          collectionRef={ref}
+          documents={props.documents}
+          now={now}
+          columns={props.columns}
+        />
+      )}
+    </div>
+  );
+}
+
+/** A condition rule's **Color the cell of**, **When the document matches** and colors. */
+function ConditionParts(
+  props: OpenProps & { readonly id: string; readonly fields: Parameters<typeof MongoshEditor>[0]['fields'] },
+): React.JSX.Element {
+  const { open, collectionRef: ref, now, id, fields } = props;
+  return (
+    <>
       <label className={styles['box']}>
         <span>{open.field.label}</span>
         <input
@@ -132,6 +163,6 @@ export function FormattingOpen(props: OpenProps): React.JSX.Element {
           ))}
         </div>
       </div>
-    </div>
+    </>
   );
 }

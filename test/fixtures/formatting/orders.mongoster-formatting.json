@@ -1,0 +1,79 @@
+{
+  "mongosterFormatting": 1,
+  "groups": [
+    {
+      "scope": "global",
+      "rules": [
+        {
+          "id": "m5",
+          "condition": "{ deleted: true }",
+          "color": "gray",
+          "name": "Deleted"
+        }
+      ]
+    },
+    {
+      "scope": "database",
+      "database": "shop",
+      "rules": [
+        {
+          "id": "m4",
+          "kind": "field",
+          "field": "paid",
+          "target": "cell",
+          "mode": "boolean",
+          "scale": {
+            "from": "green",
+            "to": "red"
+          }
+        }
+      ]
+    },
+    {
+      "scope": "collection",
+      "database": "shop",
+      "collection": "orders",
+      "rules": [
+        {
+          "id": "m1",
+          "kind": "field",
+          "field": "status",
+          "target": "row",
+          "mode": "values",
+          "pinned": [
+            {
+              "value": "\"failed\"",
+              "color": "red"
+            },
+            {
+              "value": "\"late\"",
+              "color": "orange"
+            }
+          ],
+          "palette": "blue",
+          "name": "Status"
+        },
+        {
+          "id": "m2",
+          "kind": "field",
+          "field": "amount",
+          "target": "cell",
+          "mode": "scale",
+          "min": 0,
+          "max": 500,
+          "scale": {
+            "from": "red",
+            "to": "green"
+          }
+        },
+        {
+          "id": "m3",
+          "condition": "{ amount: { $gt: 1000 } }",
+          "field": "amount",
+          "color": "purple",
+          "enabled": false
+        }
+      ]
+    }
+  ]
+}

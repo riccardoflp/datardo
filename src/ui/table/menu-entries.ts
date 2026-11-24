@@ -20,7 +20,7 @@ import { featureOfElement } from '../query/built';
 import type { CollectionRef } from '../query/collection-reads';
 import { changeQuery, type CollectionTab } from '../query/collection-store';
 import { openColumnsPanel } from './columns-panel-store';
-import { openNewRule } from './formatting-start';
+import { colorByField, openNewRule } from './formatting-start';
 import type { TableColumns } from './table-columns';
 import { arrange, collapseColumn, copyDocuments, expandColumn, startOnCollection } from './table-start';
 import { chooseReferenceEntry } from '../pages/relation/table-links';
@@ -118,6 +118,9 @@ export function chooseEntry(context: EntryContext, entry: ChosenEntry): void {
       openNewRule(ref, { field: textArg(args, 'field'), ...value }, 'column-menu');
       return;
     }
+    case 'table.color-by-field':
+      colorByField(ref, textArg(args, 'field'), 'column-menu');
+      return;
     case 'table.selection':
       changeQuery(ref.tab, (query) => ({ ...query, selection: { keys: [] } }));
       return;

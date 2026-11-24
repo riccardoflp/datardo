@@ -17,7 +17,7 @@ import { collectionRefOf, runQuery, type CollectionRef } from '../query/collecti
 import { changeQuery, collectionOf, type CollectionTab } from '../query/collection-store';
 import { pagingStateOf } from '../query/collection-view';
 import { openColumnsPanel } from './columns-panel-store';
-import { addRuleCommand } from './formatting-start';
+import { addRuleCommand, colorByField } from './formatting-start';
 import { selectedCell } from './selected-cell';
 import { sortByHeader } from './table-actions';
 import { tableColumnsOf, type TableColumns } from './table-columns';
@@ -151,7 +151,16 @@ export function runTableCommand(id: string, state: AppState): void {
       addRuleCommand(on.ref, cell?.column?.key, cell?.value);
       return;
     }
+    case 'table.color-by-field': {
+      const key = cellOf(on)?.column?.key;
+      if (key !== undefined) {
+        colorByField(on.ref, key);
+      }
+      return;
+    }
     case 'table.toggle-formatting':
+    case 'table.export-formatting':
+    case 'table.import-formatting':
       void startOnCollection(on.ref, feature, {});
       return;
     case 'table.copy-value': {
