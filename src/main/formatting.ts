@@ -2,15 +2,19 @@
  * Conditional formatting in the main process: `formatting.json` (data.md; D72) loaded into the app's state when
  * Datardo starts and written again after each change, and the changes the runner's app steps make to it, each through
  * a pure function of `table.format-scopes`: a collection's own rules saved (`table.add-format-rule`,
- * `table.edit-format-rule`), formatting hidden or shown (`table.toggle-formatting`), the rules of a connection deleted
+ * `table.edit-format-rule`), the rules of any scope saved (`table.edit-field-rule`, `table.move-format-rule`,
+ * `table.import-formatting`), the scopes a collection leaves out (a section's checkbox), formatting hidden or shown (`table.toggle-formatting`), the rules of a connection deleted
  * (`connection.remove`), those of a collection or a database forgotten after a drop made from Datardo
  * (`manage.drop-collection`, `manage.drop-database`, `gridfs.drop-bucket`), and those of a collection moved after its
  * rename (`manage.rename-collection`). It imports nothing of Electron, so that the tests read it.
  */
 import type { Json } from '../shared/engine-request';
-import { readFormatRules, type KeptFormatting } from '../shared/formatting-rules';
+import { isFormatScope, readFormatRules, type FormatScope, type KeptFormatting } from '../shared/formatting-rules';
 import {
   withCollectionRules,
+  withPlaceRules,
+  withScopesOff,
+  type ScopePlace,
   withRenamedCollection,
   withoutCollection,
   withoutConnection,
@@ -53,11 +57,54 @@ function changeRules(services: MainServices, change: (kept: KeptFormatting) => K
   }
 }
 
-/** `table.save-formatting` `{ connection, database, collection, rules }`: a collection's own rules, in their order. */
+/** The place of a scope of `{ scope, connection?, database?, collection? }`. */
+function placeOf(args: Json): ScopePlace {
+  const scope = fields(args)['scope'];
+  if (scope === 'global') {
+    return { scope };
+  }
+  if (scope === 'connection') {
+    return { scope, connection: textField(args, 'connection') };
+  }
+  if (scope === 'database') {
+    return { scope, connection: textField(args, 'connection'), database: textField(args, 'database') };
+  }
+  if (scope === 'collection') {
+    return { scope, ...collectionOf(args) };
+  }
+  throw new Error('The action needs scope.');
+}
+
+/**
+ * `table.save-formatting` `{ connection, database, collection, rules }`: a collection's own rules, in their order; or
+ * `{ saves: [{ scope, connection?, database?, collection?, rules }] }`: the rules of each scope given, all at once.
+ */
 export function saveCollectionRules(services: MainServices, args: Json): Promise<void> {
+  const saves = fields(args)['saves'];
+  if (Array.isArray(saves)) {
+    const places = (saves as readonly Json[]).map((save) => ({
+      place: placeOf(save),
+      rules: readFormatRules(fields(save)['rules']).rules,
+    }));
+    changeRules(services, (kept) =>
+      places.reduce((each, { place, rules }) => withPlaceRules(each, place, rules), kept),
+    );
+    return Promise.resolve();
+  }
   const where = collectionOf(args);
   const { rules } = readFormatRules(fields(args)['rules']);
   changeRules(services, (kept) => withCollectionRules(kept, where, rules));
+  return Promise.resolve();
+}
+
+/** `table.set-formatting-off` `{ connection, database, collection, off }`: the scopes a collection leaves out. */
+export function setFormattingOff(services: MainServices, args: Json): Promise<void> {
+  const where = collectionOf(args);
+  const given = fields(args)['off'];
+  const off: readonly FormatScope[] = Array.isArray(given)
+    ? (given as readonly Json[]).filter((each) => isFormatScope(each))
+    : [];
+  changeRules(services, (kept) => withScopesOff(kept, where, off));
   return Promise.resolve();
 }
 

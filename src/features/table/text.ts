@@ -2,6 +2,8 @@
  * The text of the interface of the table area, word for word as its cards write it (R10.1).
  */
 
+import { formattingText } from './parts/formatting-text';
+
 /** The text of the table area. */
 export const text = {
   rows: {
@@ -37,74 +39,7 @@ export const text = {
     empty: 'Type a condition, such as { status: "failed" }.',
     syntax: (message: string) => `Invalid syntax: ${message}`,
   },
-  /** The legend of a field rule (`table.format-field`). */
-  legend: {
-    repeats: (field: string, count: number) => `${field} has ${String(count)} values on this page: the colors repeat.`,
-  },
-  /** Conditional formatting: the Formatting view, its rules and their plans (`table.formatting` and its operations). */
-  formatting: {
-    title: 'Formatting rules',
-    addRule: 'Add rule…',
-    condition: 'Condition…',
-    conditionTip: 'Color the row or a cell of the documents matching a filter',
-    hide: 'Hide formatting',
-    hideTip: 'Show the tables without colors; the rules stay as they are',
-    show: 'Show formatting',
-    showTip: 'Color the tables again by the rules',
-    none: "No formatting rules. Add one, or use Format cells… in a column header's menu.",
-    tooMany: 'A collection keeps at most 100 formatting rules.',
-    list: 'Formatting rules of the collection',
-    row: 'Row',
-    turnOff: 'Turn off',
-    turnOn: 'Turn on',
-    drag: 'Drag to reorder',
-    more: (summary: string) => `More actions for ${summary}`,
-    moveUp: 'Move up',
-    moveDown: 'Move down',
-    remove: 'Remove',
-    removeRule: 'Remove rule',
-    rowTip: (condition: string) => `The row when the document matches ${condition}`,
-    cellTip: (field: string, condition: string) => `The cell of ${field} when the document matches ${condition}`,
-    rowByTip: (field: string) => `The row by the value of ${field}`,
-    cellByTip: (cell: string, field: string) => `The cell of ${cell} by the value of ${field}`,
-    howTo: 'Drag to reorder: the first rule that gives a color wins · click to edit · F2 to name',
-    byField: (field: string) => `by ${field}`,
-    name: 'Name',
-    namePlaceholder: 'Name',
-    nameTip: 'A name for the rule, shown in place of its condition or field',
-    cellOf: 'Color the cell of',
-    cellOfTip: "The field whose cell is colored; empty: the document's whole row",
-    cellOfPlaceholder: 'Row',
-    matches: 'When the document matches',
-    matchesPlaceholder: '{ status: "failed" } — a filter, as in the query bar',
-    color: 'Color',
-    fieldDollar: 'A field can not start with $.',
-    tooltipLine: (rule: string, color: string) => `Formatting: ${rule} (${color})`,
-    scale: 'scale',
-    count: (count: number) => `Formatting (${String(count)})`,
-    off: 'Formatting (off)',
-    button: 'Formatting',
-    buttonTip: 'Color the rows and cells by rules, in the inspector island',
-    formatCells: 'Format cells…',
-    formatCellsTip: (field: string) => `Color the cells of ${field} when the document matches a condition`,
-    saveStep: (collection: string) => `save the formatting rules of ${collection}`,
-    addTitle: 'Add a formatting rule',
-    editTitle: 'Change the formatting rules',
-    hideStep: 'hide formatting',
-    showStep: 'show formatting',
-    cannotUndo: 'It changes how the table is shown, not a deployment.',
-    commandAdd: 'Add formatting rule…',
-    /** What **Remove connection…** deletes of them (`connection.remove`). */
-    rulesCount: (count: number) => `${String(count)} formatting rules`,
-    deleteOf: (count: number, name: string) => `delete the ${String(count)} formatting rules of ${name}`,
-  },
-  /** The formatting file (`table.formatting-file`). */
-  formattingFile: {
-    tooLarge: 'The file is larger than 1 MB: it is not a file of formatting rules.',
-    notJson: (message: string) => `The file is not JSON: ${message}`,
-    notFormatting: 'The file is not a file of formatting rules exported from Datardo or Mongoster.',
-    newer: 'The file was exported by a newer Datardo: update Datardo to import it.',
-  },
+  ...formattingText,
   copied: 'Copied to the clipboard',
   formats: {
     title: 'Copy as',

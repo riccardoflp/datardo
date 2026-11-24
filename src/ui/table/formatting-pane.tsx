@@ -1,24 +1,25 @@
 /**
  * `table.formatting`: the Formatting view of the inspector island, beside the table of a collection tab. Its head adds
- * a rule (`table.add-format-rule`) and hides or shows formatting (`table.toggle-formatting`); its list is the
- * collection's rules, changed in place (`table.edit-format-rule`), the table following each change.
+ * a rule (`table.add-format-rule`, `table.color-by-field`), hides or shows formatting (`table.toggle-formatting`) and
+ * exports or imports rules (`table.export-formatting`, `table.import-formatting`); its four sections are the rules that
+ * reach the collection, changed in place (`table.edit-format-rule`, `table.edit-field-rule`), dragged or moved between
+ * sections (`table.move-format-rule`), each section's checkbox leaving its rules out of the collection; the table
+ * follows each change.
  */
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { isFull, newConditionRule } from '../../features/table/add-format-rule';
-import type { RuleChange } from '../../features/table/edit-format-rule';
-import { view, type FormattingView, type RuleLine } from '../../features/table/formatting';
-import { text } from '../../features/table/text';
+import { view, type FormattingEntry, type FormattingView } from '../../features/table/formatting';
 import type { ColumnNode } from '../../features/table/types';
-import { isFieldRule, type FormatRule, type FormatRuleId, type PresetColor } from '../../shared/formatting-rules';
+import type { FormatRuleId } from '../../shared/formatting-rules';
 import type { TabId } from '../../shared/ids';
 import { collectionRefOf, type CollectionRef } from '../query/collection-reads';
-import { useCollection, type CollectionTab } from '../query/collection-store';
+import { useCollection } from '../query/collection-store';
+import { useAppState } from '../state/store';
+import { addByField, addConditionRule, changeRule, rulesById } from './formatting-changes';
 import { focusIn, focusLine, isNewFocusRequest, lineControls, lineElement, listKeyOf } from './formatting-keys';
-import { FormattingLine } from './formatting-line';
-import { FormattingOpen } from './formatting-open';
-import { useCollectionFormatting, useTableFormat, type CollectionFormatting } from './formatting-rules';
-import { addRule, changeDraft, editRules, flushTyping, openRule, showNote, typedRule } from './formatting-store';
+import { useCollectionFormatting, useTableFormat } from './formatting-rules';
+import { Section, type ListProps } from './formatting-section';
+import { changeDraft, flushTyping, openRule } from './formatting-store';
 import { useTableColumns } from './table-columns';
 import { startOnCollection } from './table-start';
 import styles from './formatting.module.css';
@@ -29,16 +30,68 @@ function columnKeys(columns: readonly ColumnNode[]): readonly string[] {
 }
 
 /**
- * **Add rule…** › **Condition…**: a new row rule, open, with the focus in its condition; with 100 rules already, the
- * line *A collection keeps at most 100 formatting rules.* in its place.
+ * A button of the head that opens a menu. With `takesFocus`, an entry chosen puts the focus where it opens a rule, not
+ * back on the button.
  */
-export function addConditionRule(ref: CollectionRef, formatting: CollectionFormatting, now: number): void {
-  if (isFull(formatting.saved)) {
-    showNote(formatting.key, text.formatting.tooMany);
-    return;
-  }
-  showNote(formatting.key, undefined);
-  addRule(ref, newConditionRule(crypto.randomUUID(), formatting.rules), now);
+function MenuButton({
+  label,
+  element,
+  icon,
+  entries,
+  onChoose,
+  takesFocus = false,
+}: {
+  readonly label: string;
+  readonly element?: string;
+  readonly icon?: string;
+  readonly entries: readonly FormattingEntry[];
+  readonly onChoose: (entry: FormattingEntry) => void;
+  readonly takesFocus?: boolean;
+}): React.JSX.Element {
+  const chosen = useRef(false);
+  return (
+    <DropdownMenu.Root modal={false}>
+      <DropdownMenu.Trigger asChild>
+        <button
+          type="button"
+          className={icon === undefined ? menuStyles['button'] : styles['icon-button']}
+          data-feature={element}
+          aria-label={icon === undefined ? undefined : label}
+          title={icon === undefined ? undefined : label}
+        >
+          {icon === undefined ? label : <span className={`codicon ${icon}`} aria-hidden="true" />}
+        </button>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Portal>
+        <DropdownMenu.Content
+          className={menuStyles['menu']}
+          aria-label={label}
+          align="start"
+          onCloseAutoFocus={(event) => {
+            if (chosen.current) {
+              chosen.current = false;
+              event.preventDefault();
+            }
+          }}
+        >
+          {entries.map((entry) => (
+            <DropdownMenu.Item
+              key={entry.label}
+              className={menuStyles['item']}
+              data-feature={entry.element}
+              title={entry.tip}
+              onSelect={() => {
+                chosen.current = takesFocus;
+                onChoose(entry);
+              }}
+            >
+              {entry.label}
+            </DropdownMenu.Item>
+          ))}
+        </DropdownMenu.Content>
+      </DropdownMenu.Portal>
+    </DropdownMenu.Root>
+  );
 }
 
 function Head({
@@ -47,28 +100,21 @@ function Head({
   collectionRef,
 }: {
   readonly shown: FormattingView;
-  readonly onAdd: () => void;
+  readonly onAdd: (element: string) => void;
   readonly collectionRef: CollectionRef;
 }): React.JSX.Element {
-  const { add, toggle } = shown.head;
+  const { add, toggle, more } = shown.head;
   return (
     <div className={styles['head']}>
-      <DropdownMenu.Root modal={false}>
-        <DropdownMenu.Trigger asChild>
-          <button type="button" className={menuStyles['button']} data-feature="table.add-format-rule@inspector">
-            {add.label}
-          </button>
-        </DropdownMenu.Trigger>
-        <DropdownMenu.Portal>
-          <DropdownMenu.Content className={menuStyles['menu']} aria-label={add.label} align="start">
-            {add.entries.map((entry) => (
-              <DropdownMenu.Item key={entry.label} className={menuStyles['item']} title={entry.tip} onSelect={onAdd}>
-                {entry.label}
-              </DropdownMenu.Item>
-            ))}
-          </DropdownMenu.Content>
-        </DropdownMenu.Portal>
-      </DropdownMenu.Root>
+      <MenuButton
+        label={add.label}
+        element="table.add-format-rule@inspector"
+        entries={add.entries}
+        takesFocus
+        onChoose={(entry) => {
+          onAdd(entry.element);
+        }}
+      />
       <button
         type="button"
         className={menuStyles['button']}
@@ -81,47 +127,16 @@ function Head({
       >
         {toggle.label}
       </button>
+      <MenuButton
+        label={more.label}
+        icon="codicon-ellipsis"
+        entries={more.entries}
+        onChoose={(entry) => {
+          void startOnCollection(collectionRef, entry.element, {});
+        }}
+      />
     </div>
   );
-}
-
-/** A change of a rule: the line of what it could not do is dropped, and a new rule not saved is changed in place. */
-function changeRule(ref: CollectionRef, formatting: CollectionFormatting, change: RuleChange): void {
-  showNote(formatting.key, undefined);
-  const draft = formatting.memory.draft;
-  const id = change.kind === 'set' ? change.rule.id : change.id;
-  if (draft !== undefined && draft.id === id && !formatting.saved.some((rule) => rule.id === id)) {
-    if (change.kind === 'remove') {
-      changeDraft(formatting.key, undefined);
-      openRule(formatting.key, undefined);
-    }
-    return;
-  }
-  flushTyping();
-  editRules(ref, change);
-}
-
-/** The color of the open rule chosen. */
-function colorRule(ref: CollectionRef, formatting: CollectionFormatting, color: PresetColor, now: number): void {
-  const { open, draft } = formatting.memory;
-  const rule = formatting.rules.find((each) => each.id === open?.id);
-  if (open === undefined || rule === undefined || isFieldRule(rule)) {
-    return;
-  }
-  if (draft?.id === rule.id && !formatting.saved.some((each) => each.id === rule.id)) {
-    changeDraft(formatting.key, { ...draft, color });
-    return;
-  }
-  flushTyping();
-  editRules(ref, { kind: 'set', rule: { ...typedRule(rule, open, now), color } });
-}
-
-interface ListProps {
-  readonly shown: FormattingView;
-  readonly collectionRef: CollectionRef;
-  readonly formatting: CollectionFormatting;
-  readonly collection: CollectionTab;
-  readonly root: React.RefObject<HTMLDivElement | null>;
 }
 
 function keyOnList(
@@ -160,73 +175,42 @@ function keyOnList(
       changeRule(props.collectionRef, props.formatting, { kind: 'step', id: line.id, by: asked.by });
       return;
     case 'name':
-      openRule(props.formatting.key, rulesById(props.formatting.rules, line.id), 'name');
+      openRule(props.formatting.key, rulesById(props.formatting, line.id), 'name');
       return;
     case 'menu':
       act.setMenu(line.id);
   }
 }
 
-function rulesById(rules: readonly FormatRule[], id: FormatRuleId): FormatRule | undefined {
-  return rules.find((rule) => rule.id === id);
-}
-
-function RuleList(props: ListProps): React.JSX.Element {
-  const { shown, collectionRef: ref, formatting, collection } = props;
+function RuleSections(props: ListProps): React.JSX.Element {
+  const { shown, collectionRef: ref, collection } = props;
   const [active, setActive] = useState<FormatRuleId | undefined>(undefined);
   const [menu, setMenu] = useState<FormatRuleId | undefined>(undefined);
   const { columns } = useTableColumns(ref, collection);
   const keys = useMemo(() => columnKeys(columns), [columns]);
   const activeId = shown.lines.some((line) => line.id === active) ? active : shown.lines[0]?.id;
-  const lineOf = (line: RuleLine, index: number): React.JSX.Element => (
-    <li key={line.id} data-rule={line.id} className={styles['item']}>
-      <FormattingLine
-        line={line}
-        active={line.id === activeId}
-        menuOpen={menu === line.id}
-        onMenu={(open) => {
-          setMenu(open ? line.id : undefined);
-        }}
-        onChange={(change) => {
-          changeRule(ref, formatting, change);
-        }}
-        onOpen={() => {
-          openRule(formatting.key, line.open ? undefined : rulesById(formatting.rules, line.id));
-        }}
-        onFocus={() => {
-          setActive(line.id);
-        }}
-        onDrop={(dragged) => {
-          changeRule(ref, formatting, { kind: 'move', id: dragged, to: index });
-        }}
-      />
-      {shown.open?.id === line.id ? (
-        <FormattingOpen
-          open={shown.open}
-          collectionRef={ref}
-          now={collection.ranAt}
-          columns={keys}
-          onColor={(color) => {
-            colorRule(ref, formatting, color, collection.ranAt);
-          }}
-          onClose={() => {
-            openRule(formatting.key, undefined);
-            focusLine(props.root.current, line.id);
-          }}
-        />
-      ) : null}
-    </li>
-  );
   return (
-    <ul
-      className={styles['list']}
+    <div
+      className={styles['sections']}
+      role="group"
       aria-label={shown.listLabel}
       onKeyDown={(event) => {
         keyOnList(event, props, { active: activeId, setMenu });
       }}
     >
-      {shown.lines.map(lineOf)}
-    </ul>
+      {shown.sections.map((section) => (
+        <Section
+          key={section.scope}
+          {...props}
+          section={section}
+          activeId={activeId}
+          menu={menu}
+          setMenu={setMenu}
+          setActive={setActive}
+          columns={keys}
+        />
+      ))}
+    </div>
   );
 }
 
@@ -241,16 +225,22 @@ function Pane({
   const now = collection.ranAt;
   const formatting = useCollectionFormatting(ref, now);
   const format = useTableFormat(formatting, collection.documents, now);
+  const state = useAppState();
   const root = useRef<HTMLDivElement>(null);
   const { memory, key } = formatting;
+  const connection = state.connections.saved.find((each) => each.id === ref.connection)?.name ?? ref.connection;
   const shown = view({
-    rules: formatting.rules,
+    sections: formatting.sections,
+    off: formatting.off,
+    names: { database: ref.database, connection },
     ...(memory.draft === undefined ? {} : { draft: memory.draft.id }),
     problems: new Map(format.problems.map((problem) => [problem.rule, problem.message])),
     hidden: formatting.hidden,
     ...(memory.note === undefined ? {} : { note: memory.note }),
     ...(memory.open === undefined ? {} : { open: memory.open }),
     ...(formatting.typedProblem === undefined ? {} : { typedProblem: formatting.typedProblem }),
+    documents: collection.documents,
+    now,
   });
   useEffect(() => {
     if (isNewFocusRequest(key, memory)) {
@@ -270,8 +260,12 @@ function Pane({
       <Head
         shown={shown}
         collectionRef={ref}
-        onAdd={() => {
-          addConditionRule(ref, formatting, now);
+        onAdd={(element) => {
+          if (element === 'table.color-by-field@inspector') {
+            addByField(ref, formatting, collection.documents);
+          } else {
+            addConditionRule(ref, formatting, now);
+          }
         }}
       />
       {shown.note === undefined ? null : (
@@ -280,9 +274,7 @@ function Pane({
         </p>
       )}
       {shown.empty === undefined ? null : <p className={styles['empty']}>{shown.empty}</p>}
-      {shown.lines.length === 0 ? null : (
-        <RuleList shown={shown} collectionRef={ref} formatting={formatting} collection={collection} root={root} />
-      )}
+      <RuleSections shown={shown} collectionRef={ref} formatting={formatting} collection={collection} root={root} />
     </div>
   );
 }

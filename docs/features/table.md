@@ -48,7 +48,6 @@ The first section of a collection tab: the documents of a collection or of a vie
   0.9.0 (commits 98c0cb5, 0240a8c). The **Formatting** button: Mongoster 0.9.0 and 0.10.0 (query.format-rules,
   proposals 0002 and 0003; `src/webview/formatting.ts › FormattingPaneUi`, the `formattingBtn` of
   `src/collectionPanel.ts`).
-- **Differs**: (M42) the button's count is that of the collection's own rules, not of the four formatting scopes.
 
 What it shows, from the top:
 
@@ -130,7 +129,7 @@ Acceptance:
       click shows the selection again.
 - [ ] After **Hide formatting**, the toolbar reads **Formatting (off)** and no row is colored.
 - [ ] With one rule on in each of the four formatting scopes, the toolbar reads **Formatting (4)**; with the section
-      **Everywhere** left out of `shop.orders`, **Formatting (3)** (differs).
+      **Everywhere** left out of `shop.orders`, **Formatting (3)**.
 
 ### `table.detect-columns` — The columns of a page of documents
 
@@ -1250,7 +1249,6 @@ What can be done with a column and with its field in the documents.
   path** and the expand entries in this menu are *New in Datardo*: in Mongoster they are only reached by dragging the
   header. **Format cells…** and **Color by this field**: Mongoster 0.9.0 and 0.10.0 (query.format-rules,
   `src/webview/main.ts › showColumnMenu`).
-- **Differs**: (M42) the menu has no **Color by this field**.
 
 In order:
 
@@ -1284,7 +1282,7 @@ Acceptance:
 - [ ] **Format cells…** is in the menu of every column but the row number, in **Find** and in **Aggregate**, on a view
       and on a read-only connection.
 - [ ] **Color by this field** is in the menu of every column but the row number, before **Format cells…**, in
-      **Find** and in **Aggregate**, on a view and on a read-only connection (differs).
+      **Find** and in **Aggregate**, on a view and on a read-only connection.
 
 ### `table.refresh` — Refresh the documents
 

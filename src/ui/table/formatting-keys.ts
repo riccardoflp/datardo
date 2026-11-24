@@ -75,8 +75,8 @@ export function focusIn(
       root.querySelector<HTMLElement>('[data-field="condition"] .cm-content')?.focus();
       return;
     }
-    if (on === 'name') {
-      root.querySelector<HTMLElement>('[data-open-part="name"]')?.focus();
+    if (on === 'name' || on === 'field') {
+      root.querySelector<HTMLElement>(`[data-open-part="${on}"]`)?.focus();
       return;
     }
     const line =

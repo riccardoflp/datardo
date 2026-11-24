@@ -5,6 +5,7 @@
  * condition; with 100 rules already, the view reads *A collection keeps at most 100 formatting rules.* instead.
  */
 import { isFull, newConditionRule, type FormatCells } from '../../features/table/add-format-rule';
+import { newFieldRule } from '../../features/table/color-by-field';
 import { collectionRules } from '../../features/table/format-scopes';
 import { text } from '../../features/table/text';
 import { shownView } from '../../features/nav/inspector';
@@ -19,7 +20,7 @@ import type { Json } from '../../shared/engine-request';
 import { collectionOf } from '../query/collection-store';
 import { startFeature } from '../shell/intent';
 import { currentAppState } from '../state/store';
-import { addRule, focusFormatting, memoryKey, showNote } from './formatting-store';
+import { addFieldRule, addRule, focusFormatting, memoryKey, showNote } from './formatting-store';
 
 /** Shows the Formatting view of the active tab, with the island. */
 export function showFormattingView(place?: Place): void {
@@ -39,6 +40,26 @@ export function openNewRule(ref: CollectionRef, cells: FormatCells | undefined, 
   }
   showNote(key, undefined);
   addRule(ref, newConditionRule(crypto.randomUUID(), saved, cells), collectionOf(ref.tab).ranAt);
+}
+
+/**
+ * **Color by this field**, in the menu of a column header and on the column of the selected cell: a new field rule of
+ * the field, saved at once and shown open in the Formatting view; with 100 rules already, the view reads *A collection
+ * keeps at most 100 formatting rules.* instead.
+ */
+export function colorByField(ref: CollectionRef, field: string, place?: Place): void {
+  const { connection, database, collection } = ref;
+  const saved = collectionRules(currentAppState().table.formatting, { connection, database, collection });
+  const key = memoryKey(ref);
+  showFormattingView(place);
+  if (isFull(saved)) {
+    showNote(key, text.formatting.tooMany);
+    focusFormatting(key);
+    return;
+  }
+  showNote(key, undefined);
+  const rule = newFieldRule(crypto.randomUUID(), saved, field, collectionOf(ref.tab).documents);
+  addFieldRule(ref, rule, place === 'column-menu' ? 'table.color-by-field@column-menu' : 'table.color-by-field');
 }
 
 /**

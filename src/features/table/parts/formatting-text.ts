@@ -1,0 +1,245 @@
+/**
+ * The text of conditional formatting, word for word as the cards of the table area write it (R10.1): the Formatting
+ * view and its sections, field rules and their legend, moving rules between sections, and the formatting files. It is
+ * part of the area's `text` (`src/features/table/text.ts`), which spreads it.
+ */
+
+/** How many rules, as a list of scopes and a notification say it: *1 rule*, *3 rules*. */
+function rules(count: number): string {
+  return `${String(count)} rule${count === 1 ? '' : 's'}`;
+}
+
+/** The text of conditional formatting. */
+export const formattingText = {
+  /** The legend of a field rule (`table.format-field`). */
+  legend: {
+    repeats: (field: string, count: number) => `${field} has ${String(count)} values on this page: the colors repeat.`,
+  },
+  formatting: {
+    title: 'Formatting rules',
+    addRule: 'Add rule…',
+    condition: 'Condition…',
+    conditionTip: 'Color the row or a cell of the documents matching a filter',
+    byField: (field: string) => `by ${field}`,
+    byFieldEntry: 'By field…',
+    byFieldTip: "Color by a field's values: true and false, a scale for numbers and dates, a color per value",
+    hide: 'Hide formatting',
+    hideTip: 'Show the tables without colors; the rules stay as they are',
+    show: 'Show formatting',
+    showTip: 'Color the tables again by the rules',
+    moreHead: 'More formatting actions',
+    none: "No formatting rules. Add one, or use Color by this field or Format cells… in a column header's menu.",
+    tooMany: 'A collection keeps at most 100 formatting rules.',
+    list: 'Formatting rules of the collection',
+    row: 'Row',
+    turnOff: 'Turn off',
+    turnOn: 'Turn on',
+    drag: 'Drag to reorder',
+    more: (summary: string) => `More actions for ${summary}`,
+    moveUp: 'Move up',
+    moveDown: 'Move down',
+    remove: 'Remove',
+    removeRule: 'Remove rule',
+    rowTip: (condition: string) => `The row when the document matches ${condition}`,
+    cellTip: (field: string, condition: string) => `The cell of ${field} when the document matches ${condition}`,
+    rowByTip: (field: string) => `The row by the value of ${field}`,
+    cellByTip: (cell: string, field: string) => `The cell of ${cell} by the value of ${field}`,
+    absent: (field: string) => `No ${field} in this table.`,
+    howTo:
+      'Drag to reorder, or into another section: the first rule that gives a color wins · click to edit · F2 to name',
+    name: 'Name',
+    namePlaceholder: 'Name',
+    nameTip: 'A name for the rule, shown in place of its condition or field',
+    cellOf: 'Color the cell of',
+    cellOfTip: "The field whose cell is colored; empty: the document's whole row",
+    cellOfPlaceholder: 'Row',
+    matches: 'When the document matches',
+    matchesPlaceholder: '{ status: "failed" } — a filter, as in the query bar',
+    color: 'Color',
+    fieldDollar: 'A field can not start with $.',
+    tooltipLine: (rule: string, color: string) => `Formatting: ${rule} (${color})`,
+    scale: 'scale',
+    count: (count: number) => `Formatting (${String(count)})`,
+    off: 'Formatting (off)',
+    button: 'Formatting',
+    buttonTip: 'Color the rows and cells by rules, in the inspector island',
+    formatCells: 'Format cells…',
+    formatCellsTip: (field: string) => `Color the cells of ${field} when the document matches a condition`,
+    saveStep: (collection: string) => `save the formatting rules of ${collection}`,
+    saveDatabaseStep: (database: string) => `save the formatting rules of the database ${database}`,
+    saveConnectionStep: (connection: string) => `save the formatting rules of the connection ${connection}`,
+    saveEverywhereStep: 'save the formatting rules for everywhere',
+    leaveOutStep: (rules: string, collection: string) => `leave ${rules} out of ${collection}`,
+    takeAgainStep: (collection: string, rules: string) => `color ${collection} by ${rules} again`,
+    addTitle: 'Add a formatting rule',
+    editTitle: 'Change the formatting rules',
+    hideStep: 'hide formatting',
+    showStep: 'show formatting',
+    cannotUndo: 'It changes how the table is shown, not a deployment.',
+    commandAdd: 'Add formatting rule…',
+    /** What **Remove connection…** deletes of them (`connection.remove`). */
+    rulesCount: (count: number) => `${String(count)} formatting rules`,
+    deleteOf: (count: number, name: string) => `delete the ${String(count)} formatting rules of ${name}`,
+  },
+  /** The four sections of the Formatting view (`table.format-scopes`). */
+  sections: {
+    collection: 'This collection',
+    database: (name: string) => `Database ${name}`,
+    connection: (name: string) => `Connection ${name}`,
+    global: 'Everywhere',
+    collectionTip: 'Rules for this collection only',
+    databaseTip: 'Rules for every collection of this database',
+    connectionTip: 'Rules for every collection of this connection',
+    globalTip: 'Rules for every collection of every connection',
+    leaveOut: "Leave these rules out of this collection's table",
+    takeAgain: "Color this collection's table by these rules too",
+    count: (count: number) => (count === 0 ? 'no rules' : String(count)),
+    full: (section: string) => `${section} keeps at most 100 formatting rules.`,
+    /** How a step names the rules of a section: `the rules of the database shop`. */
+    ownRules: 'its own rules',
+    databaseRules: (name: string) => `the rules of the database ${name}`,
+    connectionRules: (name: string) => `the rules of the connection ${name}`,
+    globalRules: 'the rules for everywhere',
+    /** How a step names a section: `the database Local / shop`. */
+    databasePlace: (place: string) => `the database ${place}`,
+    connectionPlace: (name: string) => `the connection ${name}`,
+    globalPlace: 'everywhere',
+  },
+  /** Moving and copying a rule to another section (`table.move-format-rule`). */
+  moves: {
+    moveTo: 'Move to',
+    moveToTip: 'The rule leaves this scope for another',
+    copyTo: 'Copy to',
+    copyToTip: 'A copy of the rule in another scope',
+    thisCollection: 'This collection',
+    thisDatabase: 'This database',
+    thisConnection: 'This connection',
+    everywhere: 'Everywhere',
+    moveTitle: 'Move a formatting rule',
+    copyTitle: 'Copy a formatting rule',
+    moveStep: (from: string, to: string) => `move a formatting rule from ${from} to ${to}`,
+    copyStep: (from: string, to: string) => `copy a formatting rule from ${from} to ${to}`,
+  },
+  /** An open field rule (`table.edit-field-rule`) and **Color by this field** (`table.color-by-field`). */
+  fieldRule: {
+    colorByField: 'Color by this field',
+    colorByFieldTip: (field: string) =>
+      `Color the table by the values of ${field}: true and false, a scale for numbers and dates, a color per value`,
+    addTitle: 'Color by a field',
+    field: 'Field',
+    fieldTip: 'The field whose values choose the color',
+    fieldPlaceholder: 'field',
+    fieldEmpty: 'Type the field whose values choose the color.',
+    target: 'Color',
+    targetTip: 'What the value colors',
+    cell: 'The cell',
+    row: 'The whole row',
+    as: 'As',
+    asTip: 'How the values are colored; Automatic decides from the values of the page',
+    automatic: (chosen: string) => `Automatic (${chosen})`,
+    values: 'A color per value',
+    scale: 'A scale, for numbers and dates',
+    boolean: 'True and false',
+    swap: 'Swap colors',
+    swapTip: 'True and false exchange their colors',
+    scaleKind: 'Scale',
+    scaleKindTip: 'The colors of the scale',
+    oneColor: 'One color, stronger as the value grows',
+    redToGreen: 'Red to green',
+    greenToRed: 'Green to red',
+    scaleColor: 'Scale color',
+    min: 'First end',
+    max: 'Last end',
+    minTip: 'The value that gets the first color; smaller values get it too. Empty: the smallest of each page',
+    maxTip: 'The value that gets the last color; larger values get it too. Empty: the largest of each page',
+    endProblem: 'An end is a number or a date, such as 0 or ISODate("2024-01-01T00:00:00Z").',
+    fromPage: 'From this page',
+    fromPageTip: "Take the smallest and the largest value of this page as the scale's ends",
+    scaleBar: (from: string, to: string) => `A scale from ${from} to ${to}`,
+    palette: 'Palette',
+    paletteTip: 'Where the values that are not pinned take their colors',
+    allColors: 'All colors',
+    shadesOf: (color: string) => `Shades of ${color.toLowerCase()}`,
+    legend: (field: string) => `Values of ${field}`,
+    pinned: 'Pinned',
+    unpin: 'Unpin',
+    unpinTip: 'The value takes a color of the palette again',
+    pinTip: 'Pin this value to a color',
+    pinnedTip: 'Pinned to this color: choose another, or unpin',
+    pinChoice: (tip: string, value: string) => `${tip}: ${value}`,
+    colorOf: (value: string) => `Color of ${value}`,
+    pinValue: 'Pin a value…',
+    pinValuePlaceholder: 'Pin a value… "home", 42, true',
+    pinValueTip: 'A value in mongosh syntax to give a color of its own (Enter); the page need not show it',
+    tooManyPins: 'A rule keeps at most 100 pinned values.',
+    noValues: (field: string) => `No ${field} on this page.`,
+  },
+  formattingFile: {
+    tooLarge: 'The file is larger than 1 MB: it is not a file of formatting rules.',
+    notJson: (message: string) => `The file is not JSON: ${message}`,
+    notFormatting: 'The file is not a file of formatting rules exported from Datardo or Mongoster.',
+    newer: 'The file was exported by a newer Datardo: update Datardo to import it.',
+    rules,
+  },
+  /** **Export formatting…** (`table.export-formatting`). */
+  exportFile: {
+    entry: 'Export formatting…',
+    tip: 'Write formatting rules to a file, to share them; nothing of the connection is in it',
+    title: 'Export formatting',
+    choose: 'Choose the rules to export',
+    next: 'Next',
+    button: 'Export',
+    kind: 'Formatting rules (JSON)',
+    collection: (name: string) => `Collection ${name}`,
+    noRules: 'There are no formatting rules to export.',
+    write: (path: string) => `write ${path}`,
+    exported: (count: number, file: string) =>
+      `${rules(count)} exported to ${file}. The file has nothing of the connection: no name, no address, no password.`,
+    couldNotExport: (reason: string) => `The formatting rules could not be exported: ${reason}`,
+    nothingToUndo:
+      'Nothing to undo in Datardo; the file is written where the user chose, replacing a file of that name.',
+  },
+  /** **Import formatting…** (`table.import-formatting`). */
+  importFile: {
+    entry: 'Import formatting…',
+    tip: 'Add the formatting rules of a file to the ones already here',
+    title: 'Import formatting',
+    button: 'Import',
+    kind: 'Formatting rules (JSON)',
+    allFiles: 'All files',
+    choose: 'Choose the rules to import',
+    next: 'Next',
+    where: 'Where do the rules go? They are added after the ones already there',
+    everywhere: 'Everywhere',
+    aConnection: 'A connection',
+    aDatabase: 'A database',
+    aCollection: 'A collection',
+    collection: (database: string | undefined, collection: string) =>
+      `Collection ${database === undefined ? '' : `${database}.`}${collection}`,
+    sameScopes: 'The same scopes',
+    sameScopesTip: (collection: string, database: string, connection: string) =>
+      `into ${collection}, ${database}, ${connection} and everywhere, each group in its own`,
+    allInto: (section: string) => `All into ${section.charAt(0).toLowerCase()}${section.slice(1)}`,
+    addStep: (count: number, place: string) =>
+      `add ${String(count)} formatting rule${count === 1 ? '' : 's'} to ${place}`,
+    noRules: 'The file has no formatting rules.',
+    noUsableRules: (count: number) => `The file has no formatting rule that can be read (${String(count)} could not).`,
+    unreadable: (reason: string) => `The file could not be read: ${reason}`,
+    tooLargeReason: 'the file is larger than 1 MB.',
+    cannotUndo: 'An imported rule is removed in the Formatting view.',
+    /** What the user reads after an import, as Mongoster says it (`importSummary`). */
+    summary: (counts: { added: number; already: number; unreadable: number; over: number }): string => {
+      const first = `Imported ${String(counts.added)} formatting rule${counts.added === 1 ? '' : 's'}`;
+      const already =
+        counts.already === 0
+          ? ''
+          : `, ${String(counts.already)} ${counts.already === 1 ? 'was' : 'were'} already there`;
+      const parts = [
+        `${first}${already}`,
+        ...(counts.unreadable === 0 ? [] : [`${rules(counts.unreadable)} could not be read`]),
+        ...(counts.over === 0 ? [] : [`${rules(counts.over)} did not fit: a scope keeps at most 100`]),
+      ];
+      return `${parts.join('. ')}.`;
+    },
+  },
+} as const;

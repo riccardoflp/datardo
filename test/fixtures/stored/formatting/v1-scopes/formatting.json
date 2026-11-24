@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "hidden": false,
+  "global": [
+    {
+      "id": "7c1e5a1f-3e5c-4d2f-8b54-4a2a7a7a2b01",
+      "condition": "{ deleted: true }",
+      "color": "gray",
+      "name": "Deleted"
+    }
+  ],
+  "connections": {
+    "c-local": {
+      "rules": [
+        {
+          "id": "7c1e5a1f-3e5c-4d2f-8b54-4a2a7a7a2b02",
+          "kind": "field",
+          "field": "paid",
+          "target": "cell",
+          "mode": "boolean",
+          "scale": {
+            "from": "green",
+            "to": "red"
+          }
+        }
+      ],
+      "databases": {
+        "shop": {
+          "rules": [
+            {
+              "id": "7c1e5a1f-3e5c-4d2f-8b54-4a2a7a7a2b03",
+              "kind": "field",
+              "field": "amount",
+              "target": "cell",
+              "mode": "scale",
+              "min": 0,
+              "max": 500,
+              "scale": {
+                "from": "red",
+                "to": "green"
+              }
+            }
+          ],
+          "collections": {
+            "orders": {
+              "rules": [
+                {
+                  "id": "7c1e5a1f-3e5c-4d2f-8b54-4a2a7a7a2b04",
+                  "kind": "field",
+                  "field": "status",
+                  "target": "row",
+                  "mode": "values",
+                  "pinned": [
+                    {
+                      "value": "\"failed\"",
+                      "color": "red"
+                    }
+                  ],
+                  "palette": "blue",
+                  "name": "Status",
+                  "enabled": false
+                }
+              ],
+              "off": ["global"]
+            }
+          }
+        }
+      }
+    }
+  }
+}

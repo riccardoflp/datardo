@@ -66,16 +66,8 @@ export function rulesByScope(kept: KeptFormatting, where: TableCollection): Rule
   };
 }
 
-/**
- * Feature: table.format-scopes
- *
- * The rules that color a collection's table, in the order they are tried, each with its scope: scope by scope from
- * the nearest, each list in its order, without the scopes the collection leaves out; a rule whose id was seen in a
- * nearer scope is left out.
- */
-export function rulesInOrder(kept: KeptFormatting, where: TableCollection): RulesOfCollection {
-  const off = placesOf(kept, where).collection?.off ?? [];
-  const byScope = rulesByScope(kept, where);
+/** The rules of the four scopes in the order they are tried, without the scopes left out and the ids seen already. */
+export function orderedRules(byScope: RulesByScope, off: readonly FormatScope[]): readonly ScopedRule[] {
   const seen = new Set<string>();
   const rules: ScopedRule[] = [];
   for (const scope of formatScopes.filter((each) => !off.includes(each))) {
@@ -84,7 +76,57 @@ export function rulesInOrder(kept: KeptFormatting, where: TableCollection): Rule
       rules.push({ rule, scope });
     }
   }
-  return { rules, off };
+  return rules;
+}
+
+/**
+ * Feature: table.format-scopes
+ *
+ * The rules that color a collection's table, in the order they are tried, each with its scope: scope by scope from
+ * the nearest, each list in its order, without the scopes the collection leaves out; a rule whose id was seen in a
+ * nearer scope is left out.
+ */
+export function rulesInOrder(kept: KeptFormatting, where: TableCollection): RulesOfCollection {
+  const off = scopesOff(kept, where);
+  return { rules: orderedRules(rulesByScope(kept, where), off), off };
+}
+
+/** The scopes a collection leaves out (a section's checkbox). */
+export function scopesOff(kept: KeptFormatting, where: TableCollection): readonly FormatScope[] {
+  return placesOf(kept, where).collection?.off ?? [];
+}
+
+/** How many rules that are on color a collection's table: the count of the **Formatting** button (`table.show`). */
+export function rulesOn(kept: KeptFormatting, where: TableCollection): number {
+  return rulesInOrder(kept, where).rules.filter((each) => each.rule.enabled !== false).length;
+}
+
+/** The place of a scope that reaches a collection: the collection, its database, its connection, or everywhere. */
+export function placeOfScope(scope: FormatScope, where: TableCollection): ScopePlace {
+  switch (scope) {
+    case 'collection':
+      return { scope, connection: where.connection, database: where.database, collection: where.collection };
+    case 'database':
+      return { scope, connection: where.connection, database: where.database };
+    case 'connection':
+      return { scope, connection: where.connection };
+    case 'global':
+      return { scope };
+  }
+}
+
+/** The scope of the rule of an id among those that reach a collection, the nearest first. */
+export function scopeOfRule(byScope: RulesByScope, id: string): FormatScope | undefined {
+  return formatScopes.find((scope) => byScope[scope].some((rule) => rule.id === id));
+}
+
+/** Every rule id Datardo keeps, in every scope: a new rule takes an id none of them has. */
+export function ruleIds(kept: KeptFormatting): ReadonlySet<string> {
+  const connections = Object.values(kept.connections);
+  const databases = connections.flatMap((connection) => Object.values(connection.databases));
+  const collections = databases.flatMap((database) => Object.values(database.collections));
+  const lists = [kept.global, ...[...connections, ...databases, ...collections].map((each) => each.rules)];
+  return new Set(lists.flatMap((rules) => rules.map((rule) => rule.id)));
 }
 
 /** Whether a change to the rules of a scope reaches the tab of a collection, which is then colored again. */
@@ -164,6 +206,43 @@ export function collectionRules(kept: KeptFormatting, where: TableCollection): r
   return placesOf(kept, where).collection?.rules ?? [];
 }
 
+/** A connection's rules changed; a connection left with nothing goes. */
+function withConnection(
+  kept: KeptFormatting,
+  id: string,
+  change: (connection: ConnectionFormatting) => ConnectionFormatting,
+): KeptFormatting {
+  const next = change(own(kept.connections, id) ?? { rules: [], databases: {} });
+  const empty = next.rules.length === 0 && Object.keys(next.databases).length === 0;
+  return { ...kept, connections: withEntry(kept.connections, id, empty ? undefined : next) };
+}
+
+/** A database's rules changed; a database left with nothing goes, and its connection when it is left with nothing. */
+function withDatabaseOf(
+  kept: KeptFormatting,
+  place: DatabasePlace,
+  change: (database: DatabaseFormatting) => DatabaseFormatting,
+): KeptFormatting {
+  return withConnection(kept, place.connection, (connection) => {
+    const next = change(own(connection.databases, place.database) ?? { rules: [], collections: {} });
+    const empty = next.rules.length === 0 && Object.keys(next.collections).length === 0;
+    return { ...connection, databases: withEntry(connection.databases, place.database, empty ? undefined : next) };
+  });
+}
+
+/** A collection's rules or the scopes it leaves out changed; a collection left with nothing goes, and so on up. */
+function withCollectionOf(
+  kept: KeptFormatting,
+  where: TableCollection,
+  change: (collection: CollectionFormatting) => CollectionFormatting,
+): KeptFormatting {
+  return withDatabaseOf(kept, where, (database) => {
+    const next = change(own(database.collections, where.collection) ?? { rules: [], off: [] });
+    const empty = next.rules.length === 0 && next.off.length === 0;
+    return { ...database, collections: withEntry(database.collections, where.collection, empty ? undefined : next) };
+  });
+}
+
 /**
  * A collection's own rules replaced by `rules`, the scopes it leaves out kept; a collection left with nothing goes, and
  * so do a database and a connection left with nothing.
@@ -173,18 +252,45 @@ export function withCollectionRules(
   where: TableCollection,
   rules: readonly FormatRule[],
 ): KeptFormatting {
-  const connection = own(kept.connections, where.connection) ?? { rules: [], databases: {} };
-  const database = own(connection.databases, where.database) ?? { rules: [], collections: {} };
-  const off = own(database.collections, where.collection)?.off ?? [];
-  const collection: CollectionFormatting | undefined =
-    rules.length === 0 && off.length === 0 ? undefined : { rules, off };
-  const collections = withEntry(database.collections, where.collection, collection);
-  const nextDatabase: DatabaseFormatting | undefined =
-    database.rules.length === 0 && Object.keys(collections).length === 0 ? undefined : { ...database, collections };
-  const databases = withEntry(connection.databases, where.database, nextDatabase);
-  const nextConnection: ConnectionFormatting | undefined =
-    connection.rules.length === 0 && Object.keys(databases).length === 0 ? undefined : { ...connection, databases };
-  return { ...kept, connections: withEntry(kept.connections, where.connection, nextConnection) };
+  return withCollectionOf(kept, where, (collection) => ({ ...collection, rules }));
+}
+
+/** The rules of a scope's place: a collection's own, a database's, a connection's, or those for everywhere. */
+export function rulesOfPlace(kept: KeptFormatting, place: ScopePlace): readonly FormatRule[] {
+  switch (place.scope) {
+    case 'global':
+      return kept.global;
+    case 'connection':
+      return own(kept.connections, place.connection)?.rules ?? [];
+    case 'database':
+      return own(own(kept.connections, place.connection)?.databases ?? {}, place.database)?.rules ?? [];
+    case 'collection':
+      return collectionRules(kept, place);
+  }
+}
+
+/** The rules of a scope's place replaced by `rules`, in their order; what is left with nothing goes. */
+export function withPlaceRules(kept: KeptFormatting, place: ScopePlace, rules: readonly FormatRule[]): KeptFormatting {
+  switch (place.scope) {
+    case 'global':
+      return { ...kept, global: rules };
+    case 'connection':
+      return withConnection(kept, place.connection, (connection) => ({ ...connection, rules }));
+    case 'database':
+      return withDatabaseOf(kept, place, (database) => ({ ...database, rules }));
+    case 'collection':
+      return withCollectionRules(kept, place, rules);
+  }
+}
+
+/** The scopes a collection leaves out replaced by `off`, its rules kept (a section's checkbox). */
+export function withScopesOff(
+  kept: KeptFormatting,
+  where: TableCollection,
+  off: readonly FormatScope[],
+): KeptFormatting {
+  const known = formatScopes.filter((scope) => off.includes(scope));
+  return withCollectionOf(kept, where, (collection) => ({ ...collection, off: known }));
 }
 
 /** How many rules a connection keeps: its own, its databases' and its collections' (`connection.remove`). */

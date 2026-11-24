@@ -11,7 +11,12 @@ import { plan as removeConnection } from '../../../src/features/connection/remov
 import { feature as dropBucket } from '../../../src/features/gridfs/drop-bucket';
 import { plan as dropCollection } from '../../../src/features/manage/drop-collection';
 import { plan as dropDatabase } from '../../../src/features/manage/drop-database';
-import { collectionRules, withCollectionRules } from '../../../src/features/table/format-scopes';
+import {
+  collectionRules,
+  rulesByScope,
+  withCollectionRules,
+  withPlaceRules,
+} from '../../../src/features/table/format-scopes';
 import { moveCollection } from '../../../src/main/actions/manage';
 import { actions as tableActions } from '../../../src/main/actions/table';
 import { actions as treeActions } from '../../../src/main/actions/tree';
@@ -121,6 +126,44 @@ describe('manage.drop-database', () => {
     );
     expect(rulesOf(given, 'shop', 'logs')).toEqual([]);
     expect(rulesOf(given, 'crm', 'users')).toEqual([rule]);
+  });
+});
+
+describe('manage.drop-database', () => {
+  it('dropping a database forgets the rules of its section Database shop; the connection and Everywhere stay', async () => {
+    const scoped = [
+      { place: { scope: 'database', connection: 'c-local', database: 'shop' }, id: 'd' },
+      { place: { scope: 'connection', connection: 'c-local' }, id: 'c' },
+      { place: { scope: 'global' }, id: 'g' },
+    ] as const;
+    const withScopes = scoped.reduce<KeptFormatting>(
+      (each, { place, id }) => withPlaceRules(each, place, [{ ...rule, id }]),
+      noFormatting,
+    );
+    const state = stateWith([local]);
+    const context = contextOf(
+      'manage.drop-database',
+      { ...state, table: { ...state.table, formatting: { hidden: false, ...withScopes } } },
+      { kind: 'connection', connection: local.id },
+    );
+    const collections = { buckets: [], entries: [{ name: 'orders', kind: 'collection', system: false }] };
+    expect(stepTexts(planOf(dropDatabase(context, started({ database: 'shop' }, { collections }))))).toEqual([
+      'db.getSiblingDB("shop").dropDatabase()',
+      'forget the formatting rules of shop and its collections',
+    ]);
+    const given = await services();
+    given.state.dispatch({ slice: 'table', type: 'formatting-changed', formatting: { hidden: false, ...withScopes } });
+    await treeActions(given)['tree.forget-colors']?.(
+      { connection: 'c-local', database: 'shop' },
+      new AbortController().signal,
+    );
+    const where = { connection: 'c-local', database: 'shop', collection: 'orders' };
+    const after = rulesByScope(given.state.get().table.formatting, where);
+    expect([after.database, after.connection.map((each) => each.id), after.global.map((each) => each.id)]).toEqual([
+      [],
+      ['c'],
+      ['g'],
+    ]);
   });
 });
 

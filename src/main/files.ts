@@ -14,6 +14,8 @@ import { pictureWriter } from '../features/chart/save-picture';
 import { svgWriter } from '../features/relation/export-svg';
 import { text as relationText } from '../features/relation/text';
 import { queryFileWriter } from '../features/saved-query/types';
+import { formattingFileWriter } from '../features/table/export-formatting';
+import { text as tableText } from '../features/table/text';
 import { writeAtomically } from '../storage/store';
 import { notify } from '../runner/notify';
 import { whenRunnerReady } from './bridge';
@@ -74,6 +76,12 @@ function diagramText(args: Json): Promise<string> {
   return Promise.resolve(typeof text === 'string' ? text : '');
 }
 
+/** table.formatting-file { text }: the formatting rules exported, made when the plan was (table.export-formatting). */
+function formattingText(args: Json): Promise<string> {
+  const text = jsonFields(args)['text'];
+  return Promise.resolve(typeof text === 'string' ? text : '');
+}
+
 /** The writers of the content of a file, by name. */
 const writers: Readonly<Record<string, (args: Json) => Promise<string>>> = {
   'connection.write-file': connectionsFile,
@@ -81,6 +89,7 @@ const writers: Readonly<Record<string, (args: Json) => Promise<string>>> = {
   'watch.export': watchText,
   'pubsub.messages': messagesFile,
   [svgWriter]: diagramText,
+  [formattingFileWriter]: formattingText,
 };
 
 /** The message a file that could not be written ends with, for the writers whose card words it. */
@@ -88,6 +97,9 @@ function failureOf(writer: string, path: string, error: unknown): string | undef
   const message = error instanceof Error ? error.message : String(error);
   if (writer === 'playground.text') {
     return saveFailedMessage(path, message);
+  }
+  if (writer === formattingFileWriter) {
+    return tableText.exportFile.couldNotExport(message);
   }
   return writer === svgWriter ? relationText.svg.notSaved(message) : undefined;
 }

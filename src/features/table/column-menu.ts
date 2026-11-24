@@ -87,10 +87,20 @@ function arrangeEntries(state: ColumnMenuState, column: ColumnNode): readonly Me
   ];
 }
 
-/** **Format cells…**, which opens a new rule for the cells of the column (`table.add-format-rule`). */
+/**
+ * **Color by this field**, which adds a field rule of the column (`table.color-by-field`), and **Format cells…**, which
+ * opens a new rule for the cells of the column (`table.add-format-rule`).
+ */
 function formatEntries(state: ColumnMenuState, column: ColumnNode): readonly MenuEntry[] {
   const value = state.selectedValue === undefined ? {} : { value: state.selectedValue };
   return [
+    {
+      kind: 'entry',
+      label: text.fieldRule.colorByField,
+      element: 'table.color-by-field@column-menu',
+      tip: text.fieldRule.colorByFieldTip(column.key),
+      args: { field: column.key },
+    },
     {
       kind: 'entry',
       label: text.formatting.formatCells,
