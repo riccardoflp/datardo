@@ -1,59 +1,102 @@
 # The query bar
 
 The query bar of the Documents section of a collection tab: the filter, the sort, the projection, skip and limit,
-typed in mongosh syntax and run with `find`; running and cancelling, the time limit and the errors of the server; the
-query builder; the syntax colors and the autocomplete of the editors; dragging a field or a value into the bar; the
-query a tab remembers; counting the matching documents. This area also holds the two functions every other area uses
-to read and write MongoDB values as text: `query.parse` and `query.format`. The table under the bar is the
-[table](table.md) area; the pipeline editor that takes the bar's place in Aggregate is the aggregate area's
-`aggregate.show`; recent and saved queries are the saved-query area's.
+typed in mongosh syntax and run with `find`; where the query sits, above the table or in the query pane at its right;
+running and cancelling, the time limit and the errors of the server; the query builder; the syntax colors and the
+autocomplete of the editors; dragging a field or a value into the bar; the query a tab remembers; counting the
+matching documents. This area also holds the two functions every other area uses to read and write MongoDB values as
+text: `query.parse` and `query.format`. The table under the bar is the [table](table.md) area; the pipeline editor
+that takes the bar's place in Aggregate is the aggregate area's `aggregate.show`; recent and saved queries are the
+saved-query area's.
 
 Every card here reads and never writes to a deployment, so all of it works through a read-only connection and on a
 view.
 
 ### `query.bar` — The query bar
 
-The row of the Documents section where a query is typed and run: which documents, in which order, which of their
-fields, and how many.
+The part of a collection tab where a query is typed and run (which documents, in which order, which of their fields,
+and how many) together with the buttons that act on that query: explaining it, writing it as code, updating or
+deleting what it matches.
 
 - **Kind**: View
 - **Engine**: MongoDB
 - **Function**: `src/features/query/bar.ts › view(state)`
-- **Entry points**: the top of the Documents section of a collection tab, under its toolbar; its own controls are in
-  the query bar (`@query-bar`). `Ctrl+F`, while the tab has the focus, moves it to **Filter**; Go to, **Focus
-  filter**.
+- **Entry points**: the top of the Documents section of a collection tab, under its toolbar, or the query pane at the
+  right of the table when the query is put there (`query.position`); its own controls are in the query bar
+  (`@query-bar`). `Ctrl+F`, while the tab has the focus, moves it to **Filter**; Go to, **Focus filter**.
 - **Offered when**: the active tab is a collection tab showing its Documents section, for a collection or a view,
   whatever the connection allows.
 - **Commands**: `query.bar`
 - **Uses**: `query.mode`, `query.run`, `query.reset`, `query.builder`, `query.highlight`, `query.autocomplete`,
-  `query.drag`, `query.restore`, `aggregate.show`, `runner.cancel`.
+  `query.drag`, `query.restore`, `query.position`, `aggregate.show`, `saved-query.show`, `explain.show`,
+  `codegen.show`, `document.update-many`, `document.delete-many`, `runner.cancel`.
 - **Ported from**: `src/collectionPanel.ts › CollectionPanel.html` (the rows marked `find-only`),
-  `src/webview/main.ts` (`run`, `autosize`, the keys of the inputs); README, **Filter / Sort / Project**. **Skip** and
+  `src/webview/main.ts` (`run`, `autosize`, the keys of the inputs); README, **Filter / Sort / Project**. The order of
+  the rows, the icons and the buttons that keep only their icon on a narrow tab are Mongoster 0.9.0's (CHANGELOG,
+  **Query above or beside the results**): `src/queryBarHtml.ts › queryBarHtml`, `src/shared/icons.ts › iconSvg`,
+  `media/webview.css` (`.q-filter`, `.q-tools`, `.q-write`, `.collection-actions` under 900 px). **Skip** and
   **Limit** as fields of their own are *New in Datardo*: Mongoster only has the page size and the page.
+- **Differs**: (M40) The bar is one row of text buttons without icons: the mode switch, **Filter**, **Sort**,
+  **Project**, **Skip**, **Limit**, then **Builder**, **Queries**, **Reset** and **Find**; **Explain**, **Code**,
+  **Update many…** and **Delete many…** are in the toolbar of the Documents section; the placeholders of **Sort** and
+  **Project** end *drag a column here*; there is no toggle of the query's place.
 
-What it shows, from the left; on a narrow island the fields after **Filter** wrap to a second row:
+Every button of the bar has a Codicon before its name ([D23](../decisions.md#d23--codicons-for-every-icon)); the
+toggle of the query's place has its icon alone. What it shows above the table, in rows; a row whose controls do not
+fit wraps:
 
-1. The mode switch, **Find ▾**: a menu with **Find** (tooltip *Filter, sort and project documents*) and **Aggregate**
-   (tooltip *Build an aggregation pipeline*). It starts `query.mode`.
-2. **Filter**: an editor of several lines. Placeholder: `{ field: "value" }  —  or drag a cell / column here`. Empty
-   means every document.
-3. **Sort**: an editor of one line. Placeholder: `{ field: -1 }  —  or drag a column here`. Empty means the order the
-   server returns.
-4. **Project**: an editor of one line. Placeholder: `{ field: 1 }  —  or drag a column here`. Empty means every field.
-5. **Skip**: a whole number, 0 or more. Placeholder: `0`. Empty means 0.
-6. **Limit**: a whole number, 1 or more. Placeholder: *no limit*. Empty means every matching document, a page at a
-   time.
-7. **Builder** (tooltip *Build the filter from fields, operators and values*), which shows or hides `query.builder`
-   under the bar; **Queries**, which opens the list of the recent and saved queries of the collection, the saved-query
-   area's; **Reset** (tooltip *Clear filter, sort and projection*), which starts `query.reset`; and the run button,
-   **Find** (tooltip *Run query (Ctrl+Enter)*), which starts `query.run`.
+1. **The top row.**
+   - The mode switch, **Find ▾**: a menu with **Find** (tooltip *Filter, sort and project documents*) and
+     **Aggregate** (tooltip *Build an aggregation pipeline*). It starts `query.mode`. It has no icon.
+   - **Filter**: an editor of several lines, which takes the width left. Placeholder: `{ field: "value" }  —  or drag
+     a cell / column here`. Empty means every document.
+   - The run button, **Find** (icon `play`, tooltip *Run query (Ctrl+Enter)*), which starts `query.run`, and
+     **Reset** (icon `discard`, tooltip *Clear filter, sort and projection*), which starts `query.reset`.
+   - At the right end, the toggle of the query's place (icon `layout-sidebar-right`), which starts `query.position`.
+2. **The row of tools.** **Builder** (icon `list-filter`, tooltip *Build the filter from fields, operators and
+   values*), which shows or hides `query.builder`; **Queries** (icon `history`, tooltip *Recent and saved queries*),
+   which opens the list of the recent and saved queries of the collection (`saved-query.show`); **Explain** (icon
+   `telescope`, tooltip *Show how MongoDB runs this query: index used, documents examined*), which shows the Explain
+   section (`explain.show`); **Code** (icon `code`, tooltip *The query as code for mongosh, Node.js, Python, Java, C#
+   or Go*), which shows the Code section (`codegen.show`). Apart, at the right end of the row: **Update many…** (icon
+   `edit`, tooltip *Update every document matching the filter*, `document.update-many`) and **Delete many…** (icon
+   `trash`, tooltip *Delete every document matching the filter*, `document.delete-many`), not shown on a view or
+   through a read-only connection.
+3. **The builder**, when it is open (`query.builder`).
+4. **The row of options.**
+   - **Sort**: an editor of one line. Placeholder: `{ field: -1 }  —  or drag a column or a cell here`. Empty means
+     the order the server returns.
+   - **Project**: an editor of one line. Placeholder: `{ field: 1 }  —  or drag a column or a cell here`. Empty means
+     every field.
+   - **Skip**: a whole number, 0 or more. Placeholder: `0`. Empty means 0.
+   - **Limit**: a whole number, 1 or more. Placeholder: *no limit*. Empty means every matching document, a page at a
+     time.
+5. **The error line.**
 
-Under the bar: the builder when it is open, then the error line.
+In **Aggregate** the top row holds the mode switch, **Queries** and the toggle; the pipeline editor (`aggregate.show`)
+takes the place of the rest, with its own **Explain** and **Code**. In the Schema and Chart sections, which use the
+bar too, the run button reads **Analyze** or **Draw** (`schema.show`, `chart.show`), and **Explain**, **Code**,
+**Update many…** and **Delete many…** are not shown. When the query is at the right of the table, the same controls
+are in the query pane, one under the other, in the order `query.position` gives.
+
+While the main island is narrower than 900 px (Mongoster's width for its tab), **Queries** shows its icon alone; its
+name is still its tooltip and the name a screen reader says.
 
 Acceptance:
 
 - [ ] A collection tab opened for the first time shows **Find**, the five fields empty with the placeholders above,
-      the builder closed, and no error line.
+      the builder closed, and no error line. (differs)
+- [ ] The query bar of `shop.orders` above the table has, on its first row, **Find ▾**, **Filter**, **Find**,
+      **Reset** and the toggle at the right end; on its second, **Builder**, **Queries**, **Explain**, **Code**, then
+      **Update many…** and **Delete many…** apart at the right; on its third, **Sort**, **Project**, **Skip** and
+      **Limit**. (differs)
+- [ ] **Find** has the icon `play`, **Reset** `discard`, **Builder** `list-filter`, **Queries** `history`,
+      **Explain** `telescope`, **Code** `code`, **Update many…** `edit`, **Delete many…** `trash`; the mode switch has
+      none, and the toggle has its icon `layout-sidebar-right` and no text. (differs)
+- [ ] **Explain** shows the Explain section of the tab for the query in the bar, and **Code** its Code section; the
+      toolbar of the Documents section no longer has them, nor **Update many…** and **Delete many…**. (differs)
+- [ ] In a main island 899 px wide **Queries** shows its icon and no text, with the tooltip *Recent and saved
+      queries* and the name *Queries* for a screen reader; at 900 px it shows its name again. (differs)
 - [ ] **Filter**, **Sort** and **Project** are Datardo's editor: they color what is typed (`query.highlight`) and
       suggest fields, operators and values (`query.autocomplete`). **Skip** and **Limit** take digits only.
 - [ ] **Filter** grows with its text up to 240 px high, then scrolls; **Sort** and **Project** stay one line and
@@ -62,17 +105,141 @@ Acceptance:
       **Limit**, and adds a line in **Filter**. While the list of suggestions is open, `Enter` and `Tab` insert the
       suggestion instead.
 - [ ] While a query runs, the run button reads **Cancel** and starts `runner.cancel`; when the query ends, by itself
-      or cancelled, it reads **Find** again.
+      or cancelled, it reads **Find** again. Only its name changes: it keeps its place, and its icon becomes
+      `debug-stop` while it reads **Cancel** *(Datardo's choice)*. (differs)
 - [ ] A field whose text cannot be read is outlined as invalid when the query is run, and the outline goes as soon as
       its text is edited.
 - [ ] The error line shows one message at a time, the last one, and is empty after a query that succeeds. A message of
       the server has **Details** and **Run again**, as the runner shows every error inside a page.
-- [ ] In **Aggregate** the fields, **Builder** and **Reset** give way to the pipeline editor (`aggregate.show`); back
-      in **Find** they hold the texts they had.
-- [ ] On a read-only connection and on a view the bar is the same: nothing in it writes.
+- [ ] In **Aggregate** the fields, **Builder**, **Reset**, the bar's **Explain** and **Code**, **Update many…** and
+      **Delete many…** give way to the pipeline editor (`aggregate.show`); back in **Find** the fields hold the texts
+      they had. (differs)
+- [ ] On a read-only connection and on a view the bar has neither **Update many…** nor **Delete many…**; the rest is
+      the same, and nothing else in it writes. (differs)
 - [ ] `Ctrl+F` puts the cursor in **Filter** with its text selected. `Tab` goes through the controls in the order
-      above, and each has a name a screen reader says: *Query mode*, *Filter*, *Sort*, *Project*, *Skip*, *Limit*,
-      *Builder*, *Queries*, *Reset*, *Run query*.
+      above, and each has a name a screen reader says: *Query mode*, *Filter*, *Run query*, *Reset*, the toggle's
+      tooltip, *Builder*, *Queries*, *Explain*, *Code*, *Update many…*, *Delete many…*, *Sort*, *Project*, *Skip*,
+      *Limit*. (differs)
+
+### `query.position` — Put the query above or beside the results
+
+The user chooses whether the query (the filter with its buttons, the builder, the sort, the projection, skip and
+limit, or the stages of the pipeline) sits above the table or in a pane of the main island at the right of the
+table, which can be made wider or narrower. The choice and the width hold for every collection tab and across starts.
+
+- **Kind**: Operation
+- **Engine**: MongoDB
+- **Function**: `src/features/query/position.ts › plan(context, answers)`
+- **Entry points**: the toggle at the right end of the query bar's top row (`@query-bar`), with the icon
+  `layout-sidebar-right` and no text, pressed while the query is put at the right; its tooltip, which is also its
+  name for a screen reader, is *Query at the right of the results* while the query is above and *Query above the
+  results* while it is at the right. The splitter between the table and the query pane (`@query-bar`): dragged,
+  double-clicked, or moved with the keyboard when it has the focus. **Place of the query** in the **Queries** group of
+  the Settings page, a menu with **Above the results** and **At the right of the results** (`settings.change`). Go to,
+  **Query at the right of the results** while the query is above, **Query above the results** while it is at the
+  right.
+- **Offered when**: the active tab is a collection tab showing a section with the query bar: Documents, in **Find**
+  and in **Aggregate**, Schema and Chart. The other sections have no query bar, so no toggle, and keep all the room of
+  the main island.
+- **Plan**: one app step: for the toggle and Go to, `set datardo.query.position to right` (or `top`), the step
+  `settings.change` writes, so the Settings page shows the new value; for the splitter, `set the width of the query
+  pane to 420 px`, when a drag ends, at each key, at a double click.
+- **Danger**: None.
+- **Read-only**: Allowed, because it writes nothing to a deployment.
+- **Undo**: Cannot be undone: nothing is written to a deployment, so nothing is recorded. The toggle puts the query
+  back; a double click on the splitter gives the default width back.
+- **After**: every collection tab draws its query in the new place at once, the open ones and the ones opened later,
+  and after a restart. What is typed in the fields and in the stages, the builder and the stage shown stay as they
+  were, the focus stays in the control that had it, and nothing is run. The setting is kept in `settings.json`; the
+  width with the widths of the islands ([stored data](../data.md#the-data-folder)).
+- **Commands**: `query.position:top`, `query.position:right`
+- **Settings**: `datardo.query.position`: `top`, the default, or `right`.
+- **Uses**: `settings.change`, `settings.read`, `query.bar`, `query.builder`, `query.drag`, `aggregate.show`,
+  `nav.layout`.
+- **Ported from**: Mongoster 0.9.0, query.pane (`docs/features/03-collection-tab.md`): `src/shared/queryPane.ts`
+  (`readQueryPane`, `clampPaneWidth`, `paneLayout`, `draggedWidth`, `keyedWidth`, `MIN_RESULTS_WIDTH`),
+  `src/webview/queryPane.ts › QueryPaneUi`, `src/queryBarHtml.ts`, `media/webview.css` (`body.query-side`), the
+  setting `mongoster.queryBar.position`; CHANGELOG 0.9.0, **Query above or beside the results**. Narrowing the pane
+  before putting the query above, and `Home`, `End` and `Enter` on the splitter, are *New in Datardo*, as
+  `nav.layout` and `nav.resize` do for the islands; Mongoster puts the query above as soon as its width does not fit.
+
+Rules:
+
+- **Where the pane is.** The query pane is part of the main island, under the toolbar of the section, which keeps the
+  whole width, and at the right of the table with its selection bar and its paging (in the Schema and Chart sections,
+  at the right of the section's content), with the splitter between them; the inspector island stays at its own place,
+  at the right of the main island. `nav.layout` is not changed by this: the pane takes its room from the table only,
+  never from another island.
+- **What it holds**, from the top, each label above its box, as wide as the pane: the mode switch, with the toggle at
+  the right end of its row; **Filter**, at least 60 px high (Mongoster's), still growing with its text up to 240 px;
+  **Builder**, **Queries**, **Explain**, **Code**; the builder, when it is open (`query.builder`); **Sort**;
+  **Project**; **Skip** and **Limit** side by side on one line *(Datardo's choice)*; **Find**, as wide as the pane
+  leaves it, and **Reset**; the error line; then, under a line, **Update many…** and **Delete many…**. In
+  **Aggregate**: the mode switch, **Queries** and the toggle, then the pipeline editor as `aggregate.show` lays it out
+  in the pane. The pane scrolls up and down when its content is taller than the main island; it never scrolls
+  sideways.
+- **The width** is kept from 260 to 900 px, and is 380 px by default (Mongoster's). The splitter is 8 px wide
+  *(Datardo's choice, as the gaps between islands)*; the table keeps at least 360 px (Mongoster's).
+- **Where the query is drawn**, from the width M of the main island: with `top`, above the table. With `right`, the
+  pane is as wide as the remembered width, but no wider than M − 8 − 360, which leaves the table 360 px; when that is
+  260 px or more, the query is at the right with that width; otherwise it is above the table. The remembered width
+  is not changed by this, so a wider main island gives it back, as `nav.layout` does with the islands.
+- While `right` cannot be shown, the toggle stays pressed, and its tooltip and name are *Query at the right of the
+  results: the tab is too narrow, so it is above them for now*.
+- **The splitter.** Over it the pointer becomes the horizontal resize pointer. Dragging it to the left widens the
+  pane, and the pane follows the drag as it goes; the drag stops at 260 px, at 900 px and at the width that leaves
+  the table 360 px. A double click gives 380 px. With the focus on it, `Left` widens the pane by 20 px and `Right`
+  narrows it by 20 px, by 60 px with `Shift` (Mongoster's); `Home` gives the minimum, `End` the widest the main island
+  allows, `Enter` the default. Its tooltip is *Drag to resize the query (double-click: default width)*; a screen
+  reader says **Width of the query**, with the width.
+- There is one place and one width for every collection tab of every connection: a toggle in one tab moves the query
+  of all of them.
+- A stored value of the setting that is neither `top` nor `right` counts as `top` (`settings.read`); a stored width
+  that is not a number counts as 380 px, and one outside 260 to 900 px is brought to the nearest of the two.
+
+Worked examples (width of the main island, setting, remembered width → where the query is):
+
+- 1,000, `right`, 380 → at the right, 380 px; the table 612 px.
+- 700, `right`, 380 → at the right, 332 px; the table 360 px.
+- 628, `right`, 380 → at the right, 260 px; the table 360 px.
+- 627, `right`, 380 → above, with the toggle pressed and the tooltip that says the tab is too narrow.
+- 1,000, `right`, 900 → at the right, 632 px; the table 360 px.
+- 1,000, `top`, 500 → above.
+- A window 1,280 px wide with the explorer at 280 px and the inspector island at 360 px gives a main island of
+  568 px (`nav.layout`) → above; with the explorer hidden (`nav.toggle-explorer`), 856 px → at the right, 380 px.
+
+Acceptance:
+
+- [ ] With nothing stored, a collection tab shows its query above the table, the toggle not pressed, with the tooltip
+      *Query at the right of the results*.
+- [ ] In a window 1,920 px wide with both islands shown, pressing the toggle in the tab of `shop.orders` puts
+      **Filter**, the buttons, **Sort**, **Project**, **Skip** and **Limit** one under the other in a pane 380 px wide
+      at the right of the table and left of the inspector island; `settings.json` then holds
+      `"datardo.query.position": "right"`, the toggle is pressed and its tooltip reads *Query above the results*.
+- [ ] Pressing the toggle again puts the query above the table, and `datardo.query.position` is no longer in
+      `settings.json`.
+- [ ] With the query at the right, the open tab of `shop.customers` of another connection has its query at the
+      right too, and so has a collection tab opened afterwards; after quitting and starting again, the place and the
+      width are the same.
+- [ ] Choosing **At the right of the results** for **Place of the query** in the Settings page moves the query of
+      every open collection tab at once.
+- [ ] Each worked example above gives the place and the widths shown.
+- [ ] In a window 1,280 px wide with the explorer at 280 px and the inspector island at 360 px, the query stays above
+      with the toggle pressed and the tooltip *Query at the right of the results: the tab is too narrow, so it is
+      above them for now*; `Ctrl+B` puts it at the right, 380 px wide; `Ctrl+B` again puts it above, and the width
+      remembered is still 380 px.
+- [ ] Dragging the splitter 40 px to the left makes the pane 420 px wide, and it is 420 px wide after a restart;
+      `Left` then makes it 440 px, `Shift+Right` 380 px, `Home` 260 px, a double click 380 px; in a main island of
+      1,000 px, `End` makes it 632 px.
+- [ ] `{ status: ` typed in **Filter** and never run is still there, with the cursor where it was, after the toggle
+      moves the query; moving it sends nothing to the server.
+- [ ] In **Aggregate** the pane holds the stages one under the other (`aggregate.show`); in the Schema section it
+      holds the filter and **Analyze**; the Indexes section shows no toggle and its content takes the whole main
+      island.
+- [ ] Stored `"datardo.query.position": "left"` shows the query above the table.
+- [ ] Through a read-only connection and on a view the toggle and the pane work the same, and the pane has neither
+      **Update many…** nor **Delete many…**.
+- [ ] The Log has `[query.position] set datardo.query.position to right`.
 
 ### `query.mode` — Switch between Find and Aggregate
 
@@ -584,15 +751,23 @@ The rows and the text of **Filter** follow each other.
 - **Uses**: `query.builder-filter`, `query.builder-rows`, `query.field-hints`, `query.format`, `query.parse`,
   `query.run`, `query.restore`.
 - **Ported from**: `src/webview/builder.ts › FilterBuilder`, `src/shared/builder.ts` (`BUILDER_OPS`, `BUILDER_TYPES`);
-  README, **Visual query builder**.
+  README, **Visual query builder**. The icons of the head and its layout in the query pane are Mongoster 0.9.0's:
+  `src/webview/builder.ts` (`iconSvg`), `media/webview.css` (`body.query-side .builder-head`, `.builder-row`).
+- **Differs**: (M40) The head's buttons are **+ Condition** and **Clear**, text without icons, and the builder has one
+  layout, the one above the table.
 
 What it shows:
 
-1. A head: **Match**, a choice between **all** and **any**, **of these conditions**; at the right **+ Condition**
-   (tooltip *Add a condition*) and **Clear** (tooltip *Remove every condition (and the filter)*).
+1. A head: **Match**, a choice between **all** and **any**, **of these conditions**; at the right **Condition** (icon
+   `add`, tooltip *Add a condition*) and **Clear** (icon `clear-all`, tooltip *Remove every condition (and the
+   filter)*).
 2. One row per condition: the field, with the placeholder *field* and the fields of the collection as suggestions
    (`query.field-hints`); the operator; the value; and a button that removes the row (tooltip *Remove the condition*).
 3. A note, when there is something to say.
+
+In the query pane (`query.position`), **Condition** and **Clear** are on a line of their own under **Match … of these
+conditions**, and each row takes two lines: the field and the button that removes the row, then the operator and the
+value.
 
 The operators, with their tooltips:
 
@@ -625,7 +800,7 @@ Acceptance:
 - [ ] Typing `{ age: { $gte: 20, $lte: 30 } }` in **Filter** shows two rows, `age ≥ 20` and `age ≤ 30`; so does a
       filter that comes from a drop, a recent query or a saved one. Rows still being filled in stay, after the others.
 - [ ] A filter with a syntax error shows no rows and the note *The filter has a syntax error: fix it in the box above
-      to edit it here.*; **+ Condition** and the choice are disabled.
+      to edit it here.*; **Condition** and the choice are disabled. (differs)
 - [ ] The filter `{ items: { $elemMatch: { sku: "A1" } } }` shows no rows and the note *This filter uses operators the
       rows can't show ($elemMatch, $expr, nested $or…): edit it in the box above, or Clear to start over here.*, and
       the text of **Filter** is left exactly as it is.
@@ -636,6 +811,11 @@ Acceptance:
 - [ ] The builder is open or closed for each tab by itself, and a tab is restored with it as it was left.
 - [ ] Every control of a row has a name a screen reader says: *Field of condition 1*, *Operator of condition 1*,
       *Value of condition 1*.
+- [ ] **Condition** has the icon `add` and the name *Add a condition* for a screen reader; **Clear** has the icon
+      `clear-all`. (differs)
+- [ ] In a query pane 380 px wide, the row `status`, `=`, `paid` shows `status` and its remove button on one line and
+      `=` and `paid` on the next, and **Condition** and **Clear** are under **Match all of these conditions**.
+      (differs)
 
 ### `query.builder-filter` — The filter of the builder's rows
 
@@ -920,21 +1100,27 @@ Acceptance:
 
 ### `query.drag` — Drag a field or a value into the bar
 
-A cell or a column header dragged from the table shows, over the bar, the conditions it can become; dropping it on one
-adds that condition and runs the query.
+A cell or a column header dragged from the table shows, over the bar, the conditions it can become and what its field
+can do in the sort and the projection; dropping it on one adds that and runs the query.
 
 - **Kind**: View
 - **Engine**: MongoDB
 - **Function**: `src/features/query/drag.ts › view(state)`
 - **Entry points**: dragging a cell or a column header of the table (`@table`); the zones appear over **Filter**,
-  **Sort** and **Project** (`@query-bar`).
+  **Sort** and **Project** (`@query-bar`), above the table or in the query pane (`query.position`).
 - **Offered when**: in **Find**, for a cell that has a value and for any column header. A cell with no value, a
   `… more elements` cell and the row number cannot be dragged. In **Aggregate** the drop goes to the pipeline
-  (`aggregate.show`).
+  (`aggregate.show`), and nothing is offered over a sort or a projection, which Aggregate does not have.
 - **Uses**: `query.add-condition`, `query.add-sort`, `query.add-projection`, `query.run`, `query.builder`,
-  `table.arrange-columns`.
+  `query.position`, `table.arrange-columns`.
 - **Ported from**: `src/webview/main.ts` (`zonesFor`, `showDropzones`, `showOptionZones`, `dropzone`, `addCondition`,
-  `setOption`); README, **Drag & drop into the filter, sort and projection**.
+  `setOption`); README, **Drag & drop into the filter, sort and projection**. A cell dropped on **Sort** and
+  **Project**, and the zones of **Filter** two by two in the query pane, are Mongoster 0.9.0's: query.drop-options
+  (`docs/features/03-collection-tab.md`, `src/shared/dropZones.ts › sortZones`, `projectionZones`),
+  `src/webview/main.ts › showDropzones`, `media/webview.css` (`body.query-side #dropzones`); CHANGELOG 0.9.0, *A cell
+  dragged from the table can now be dropped on Sort and Project too*.
+- **Differs**: (M40) A dragged cell shows zones over **Filter** only: only a column header can be dropped on **Sort**
+  and **Project**; the zones have one layout, the one of the bar above the table.
 
 The zones. Each shows its label and the field, written `items[].sku` for a field of the elements of an expanded array:
 
@@ -948,12 +1134,19 @@ The zones. Each shows its label and the field, written `items[].sku` for a field
 | a header | **Filter** | **exists** | *<field>: { $exists: true }* | `{ $exists: true }` |
 | a header | **Filter** | **missing** | *<field>: { $exists: false }* | `{ $exists: false }` |
 | a header | **Filter** | **is null** | *<field>: null* | `null` |
-| a header | **Sort** | **▲ ascending** | *<field>: 1 (after the fields already in the sort)* | `1` |
-| a header | **Sort** | **▼ descending** | *<field>: -1 (after the fields already in the sort)* | `-1` |
-| a header of a field in the sort | **Sort** | **✕ remove** | *Remove <field> from the sort* | removes it |
-| a header | **Project** | **include** | *<field>: 1 (only the included fields are shown, and _id)* | `1` |
-| a header | **Project** | **exclude** | *<field>: 0 (every field but the excluded ones is shown)* | `0` |
-| a header of a field in the projection | **Project** | **✕ remove** | *Remove <field> from the projection* | removes it |
+| a cell or a header | **Sort** | **▲ ascending** | *<field>: 1 (after the fields already in the sort)* | `1` |
+| a cell or a header | **Sort** | **▼ descending** | *<field>: -1 (after the fields already in the sort)* | `-1` |
+| a cell or a header of a field in the sort | **Sort** | **✕ remove** | *Remove <field> from the sort* | removes it |
+| a cell or a header | **Project** | **include** | *<field>: 1 (only the included fields are shown, and _id)* | `1` |
+| a cell or a header | **Project** | **exclude** | *<field>: 0 (every field but the excluded ones is shown)* | `0` |
+| a cell or a header of a field in the projection | **Project** | **✕ remove** | *Remove <field> from the projection* | removes it |
+
+A cell gives **Sort** and **Project** its field, as its header does: its value plays no part there. A cell of the
+elements of an expanded array gives the dotted path of its field (`items.sku`), shown on the zone as `items[].sku`.
+
+Above the table the zones of each field are side by side over it. In the query pane, the zones over **Filter** go two
+by two, on as many lines as they need, over the filter, which is at least 60 px high there, so that no label is cut;
+the zones over **Sort** and over **Project**, three at most, stay side by side.
 
 Acceptance:
 
@@ -961,7 +1154,7 @@ Acceptance:
       with `status`; dropping it on **= equals** writes `{ status: "paid" }` in **Filter**, flashes the field once and
       runs the query from the first page.
 - [ ] Dragging a cell with `true`, with an `ObjectId` or with a sub-document shows **= equals** and **≠ not equal**
-      only.
+      only over **Filter**.
 - [ ] Dropping `total` 10 on **≥ from**, then `total` 50 on **≤ to**, gives `{ total: { $gte: 10, $lte: 50 } }`.
 - [ ] Dragging the `sku` of the second element of `items`, in an expanded array, shows the field as `items[].sku` and
       the tooltip ends with *· same element of items ($elemMatch)*; dropping it on **= equals** gives
@@ -974,8 +1167,21 @@ Acceptance:
 - [ ] Letting go outside a zone changes nothing and the zones go away; `Esc` while dragging does the same.
 - [ ] A drop updates the rows of the builder when it is open.
 - [ ] A header dropped on another header moves the column and adds nothing to the query (`table.arrange-columns`).
-- [ ] Everything a drop does can be done without dragging: the same entries are in **Add to filter**, **Sort** and
-      **Project** of the menus of a cell and of a column header.
+- [ ] Dragging the cell `total` 42 shows, besides the zones over **Filter**, **▲ ascending** and **▼ descending** over
+      **Sort** and **include** and **exclude** over **Project**, each with `total`; with the sort `{ status: 1 }`,
+      dropping it on **▼ descending** writes `{ status: 1, total: -1 }` in **Sort** and runs the query from the first
+      page. (differs)
+- [ ] Dragging a cell of `total` with the projection `{ total: 1 }` shows **✕ remove** over **Project**; dropping it
+      there empties **Project**. (differs)
+- [ ] Dragging the `qty` of the second element of `items`, in an expanded array, shows `items[].qty` over **Sort**
+      with the tooltip *items.qty: -1 (after the fields already in the sort)* on **▼ descending**; dropping it there
+      writes `{ "items.qty": -1 }`. (differs)
+- [ ] With the query in a pane 380 px wide, dragging the cell `status` of a paid order shows its four zones over
+      **Filter** on two lines, **= equals** and **≠ not equal**, then **≥ from** and **≤ to**, each label whole.
+      (differs)
+- [ ] Everything a drop does can be done without dragging: the zones over **Filter** are in **Add to filter** of the
+      menus of a cell and of a column header, and the zones over **Sort** and **Project**, for a cell as for a header,
+      are in **Sort** and **Project** of the menu of its column's header.
 
 ### `query.add-condition` — Add a condition to the filter
 
@@ -1037,10 +1243,13 @@ Sets, changes or removes the direction of one field in the sort, keeping the oth
 - **Kind**: Derivation
 - **Engine**: MongoDB
 - **Function**: `src/features/query/add-sort.ts › sortWithField(text, field, direction)`
-- **Entry points**: the zones over **Sort** while a column header is dragged (`@query-bar`); **Sort** in the menu of a
-  column header (`@column-menu`).
+- **Entry points**: the zones over **Sort** while a column header or a cell is dragged (`@query-bar`); **Sort** in the
+  menu of a column header (`@column-menu`).
 - **Uses**: `query.parse`, `query.format`, `query.run`.
-- **Ported from**: `src/shared/query.ts › mergeSort`.
+- **Ported from**: `src/shared/query.ts › mergeSort`. A cell as well as a header: Mongoster 0.9.0,
+  `src/shared/dropZones.ts › sortZones`.
+- **Differs**: (M40) Only a dragged column header offers the zones over **Sort**; a dragged cell does not
+  (`query.drag`).
 
 Rules of the result:
 
@@ -1071,10 +1280,13 @@ it.
 - **Kind**: Derivation
 - **Engine**: MongoDB
 - **Function**: `src/features/query/add-projection.ts › projectionWithField(text, field, value)`
-- **Entry points**: the zones over **Project** while a column header is dragged (`@query-bar`); **Project** in the
-  menu of a column header (`@column-menu`).
+- **Entry points**: the zones over **Project** while a column header or a cell is dragged (`@query-bar`); **Project**
+  in the menu of a column header (`@column-menu`).
 - **Uses**: `query.parse`, `query.format`, `query.run`.
-- **Ported from**: `src/shared/query.ts › mergeProjection`.
+- **Ported from**: `src/shared/query.ts › mergeProjection`. A cell as well as a header: Mongoster 0.9.0,
+  `src/shared/dropZones.ts › projectionZones`.
+- **Differs**: (M40) Only a dragged column header offers the zones over **Project**; a dragged cell does not
+  (`query.drag`).
 
 Rules of the result:
 

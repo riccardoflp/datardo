@@ -175,12 +175,15 @@ One saved connection: what it is, where it leads, how it is, and the button to g
 - **Reads**: the connection as it is saved (never its connection string, which stays in the secret storage:
   `connection.secrets`), and its state.
 - **Shows**:
-  - a band in the color of the connection, at the left edge; grey when it has no color;
+  - a band in the color of the connection, at the left edge: one of the eleven presets drawn with its token, or a
+    custom color as it is (`connection.color-presets`); the theme's neutral mark when it has no color, which is not
+    the preset **Gray**;
   - its name, cut with `…` when it does not fit;
   - its engine, **MongoDB** or **Redis**, and, while it is connected, the version (`MongoDB 8.0`);
   - its address, without credentials (`home.address`);
   - its marks, in this order, each only when it applies: **Read-only**, **SSH** (it goes through an SSH tunnel),
-    **redis-oplog** (a MongoDB connection linked to a Redis connection: `connection.link-redis`);
+    **redis-oplog** (a MongoDB connection linked to a Redis connection: `connection.link-redis`), **Excluded from
+    searches** (the connection itself is: `tree.exclude-from-searches`);
   - its state, one of the five of `connection.state`, without the latency: nothing when it is not connected;
     *Connecting…*; *Connected*; *Reconnecting…*, with the reason of the drop when the pointer rests on it; *Failed*,
     with the first line of the reason, and the whole reason when the pointer rests on it;
@@ -199,14 +202,23 @@ One saved connection: what it is, where it leads, how it is, and the button to g
     Home, its card reads *Failed*.
   - A screen reader says, for a card: the name, the engine, the address, the marks and the state.
 - **Uses**: `home.address`, `home.card-menu`, `nav.switch-connection`, `connection.state`, `connection.connect`,
-  `connection.reconnect`, `connection.menu`, `connection.secrets`, `connection.link-redis`.
+  `connection.reconnect`, `connection.menu`, `connection.secrets`, `connection.link-redis`,
+  `connection.color-presets`, `tree.exclude-from-searches`, `tree.excluded`.
 - **Ported from**: *New in Datardo*. The marks **Read-only**, **SSH** and **redis-oplog** are those Mongoster writes
-  beside a connection: `src/tree.ts` (`ConnectionNode`).
+  beside a connection: `src/tree.ts` (`ConnectionNode`). **Excluded from searches** stands for the `excluded`
+  Mongoster 0.9.0 writes beside an excluded connection in its tree (`src/tree.ts › markExcluded`); the eleven presets
+  and the custom colors are those of Mongoster 0.9.0 (`src/shared/colors.ts`).
+- **Differs**: (M38) the band takes one of six colors, and grey when there is none; (M39) the card has no mark
+  **Excluded from searches**.
 
 Acceptance:
 
 - [ ] The card of Production, a red read-only MongoDB connection through an SSH tunnel, shows a red band,
   `Production`, **MongoDB**, its address, **Read-only** and **SSH**, and the button **Connect**.
+- [ ] The card of a connection colored teal has a band of the token of teal in each theme; one colored `#1e90ff`, a
+  band of exactly `#1e90ff`; one colored **Gray** a band unlike that of a connection with no color. (differs)
+- [ ] The card of Archive, excluded from searches, shows **Excluded from searches** after its other marks; after
+  **Include in searches** in its menu the mark is gone. (differs)
 - [ ] No card shows a user name, a password or the options of a connection string, in its text or in what is shown
   when the pointer rests on it.
 - [ ] **Connect** on Local makes Local the current connection, opens its Overview tab when it has no tab, and

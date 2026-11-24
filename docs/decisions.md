@@ -651,6 +651,108 @@ that needed it asks for a fixed version itself. Rejected: `npm audit fix --force
 in the product, but `npm audit` would keep hiding a real one among them).
 *Decided on 2026-11-24, when the author asked for the advisories to be fixed: to confirm.*
 
+## D68 — What of Mongoster 0.9.0 and 0.10.0 comes to Datardo
+
+Datardo was written from Mongoster 0.8.0. Mongoster 0.9.0 and 0.10.0 came after it, and M37 to M42 bring what they
+added, adapted to Datardo's islands: the fixes of Mongoster's security audit (M37,
+[D73](#d73--the-fixes-of-mongosters-security-audit-and-the-fuses-of-the-packaged-application)), eleven colors and a
+custom one for connections, and colors of their own for databases and collections (M38,
+[D69](#d69--colors-of-databases-and-collections-eleven-presets-and-a-custom-color)), exclusions from searches and
+several nodes selected in the tree (M39,
+[D70](#d70--an-exclusion-from-searches-is-kept-on-the-connection-and-is-not-an-access-control)), the query beside the
+results (M40, [D71](#d71--the-query-beside-the-results-is-a-setting-and-its-pane-takes-its-room-from-the-table)), and
+conditional formatting (M41, M42, [D72](#d72--formatting-rules-in-the-inspector-island-kept-in-a-file-of-their-own)).
+Not ported: the seventeen color themes of 0.9.0 and their previews in the empty tab area, since Datardo keeps the look
+of sketch A1 ([D65](#d65--the-colors-of-sketch-a1-with-more-contrast-between-the-surfaces)); the menus `File`, `Edit`,
+`View`, `Tools` and `Help` of its title bar, since Datardo's top bar has Go to
+([D5](#d5--the-window-draws-its-own-frame)); and what belongs to its hosts (workspace settings of VS Code, the port
+shared between windows, links in notifications, its own file protocol). Rejected: porting the themes as sets of tokens
+over the A1 surfaces, and High Contrast alone, both offered to the author.
+*Decided by the author on 2026-11-24.*
+
+## D69 — Colors of databases and collections, eleven presets and a custom color
+
+A connection takes one of eleven presets (red, orange, yellow, green, blue, purple, and now pink, teal, indigo, brown,
+gray) or a custom `#rrggbb` from the dialog **Choose a color** (`connection.custom-color`). A MongoDB database, a
+Redis database and a collection, view or GridFS bucket can have a color of their own, which wins over what is above
+it (`tree.color-of`); they are kept as maps on the connection's entry (`databaseColors`, `collectionColors`), so that
+the connection's export carries them and its removal removes them, as in Mongoster. Datardo draws every color
+itself, so a custom color is exact everywhere, and the nearest preset is needed only to write a Compass file. A
+color reaches an icon of the tree or of a tab only when it is the database's or the collection's own: the
+connection's color alone stays on its island, its group of tabs and its card, as `connection.set-color` already
+said, so that the tree stays calm. The five new presets have tokens in both themes held to R10.10 like the six.
+**None** on a database looks the same as no color, since the connection's color never reaches an icon: only
+**None** is offered there. Rejected: coloring the tree with the connection's color (Mongoster does, in VS Code's
+tree); colors of Redis namespaces (a namespace is a part of a key's name, not something the server keeps).
+*Decided by the author on 2026-11-24 for the Redis databases; the rest is Mongoster's proposal 0001, adapted:
+to confirm.*
+
+## D70 — An exclusion from searches is kept on the connection and is not an access control
+
+A connection of either engine, and a MongoDB database, collection, view or bucket, can be excluded from searches
+(`tree.exclude-from-searches`): the tree's filter, Search documents on a connection or a database and the lists of
+the MCP server skip it, and it stays in the tree, dimmed, and in Go to, which finds it by its name. Naming it still
+works everywhere, the MCP server included: an exclusion keeps noise out of searches, it does not hide data, and
+[security](security.md) says so (T9). The exclusions are kept on the connection (`excluded`, `exclusions`), carried by
+its export. Several nodes of a MongoDB connection can be selected in the tree (`tree.select`), to be excluded or
+included together; the other entries of the menu act on one node. Rejected: excluding Redis databases or namespaces
+one by one (nothing searches across them).
+*Decided on 2026-11-24 from Mongoster 0.9.0: to confirm.*
+
+## D71 — The query beside the results is a setting, and its pane takes its room from the table
+
+`datardo.query.position` puts the query bar (or the stages of a pipeline) above the table or in a pane at its right,
+inside the main island, left of the inspector island (`query.position`). It is one choice for every collection tab,
+as in Mongoster; the pane's width is window state (`queryPaneWidth`). The pane takes its room from the table only:
+the islands keep theirs ([`nav.layout`](features/nav.md#navlayout--how-the-islands-share-the-window) is unchanged), and
+when the table would get less than 360 pixels the query goes above for the moment, with its toggle saying why. **Update
+many…**, **Delete many…**, **Explain** and **Code** move into the query bar, so that they follow the query.
+Rejected: a pane of the inspector island (the user chose the main island); narrowing the inspector island first
+([Q142](#open-questions)).
+*Decided by the author on 2026-11-24.*
+
+## D72 — Formatting rules in the inspector island, kept in a file of their own
+
+The rules of conditional formatting are edited in a **Formatting** view of the inspector island
+(`table.formatting`, `nav.inspector`), beside the selection, so that the table keeps its width and changes while a
+rule is edited. They use the eleven presets, never a custom color, mixed at 12 % into a row and 28 % into a cell
+with tokens of their own (`--color-format-<preset>`), since the connections' tokens fail R10.10 at those shares. The
+matcher of conditions is Datardo's own, pure, for display only (`table.match`); no library is added. The rules are
+kept in `formatting.json`, a versioned file of their own ([data](data.md#the-data-folder)), not with the state of a
+connection, which may be lost. A collection's rules follow a rename and go with a drop made from Datardo, a database's
+with its drop, a connection's with its removal; Mongoster keeps them after a drop, but nothing would list them
+afterwards. Rules are exported to and imported from `.datardo-formatting.json`, which reads Mongoster's
+`.mongoster-formatting.json` too. Rejected: a pane between the table and the inspector island (offered to the
+author); the connections' tokens for the formatting colors.
+*Decided by the author on 2026-11-24 for the place; the rest from Mongoster's proposals 0002 and 0003: to confirm.*
+
+## D73 — The fixes of Mongoster's security audit, and the fuses of the packaged application
+
+What Mongoster's audit found (its commit `eaff767`) is fixed in Datardo where it applies: the MCP server answers at
+most 20 messages of a batch, refuses `system.*` collections, the stages that are not a plain read and `$out` or
+`$merge` nested in another stage, and with `datardo.mcp.readData` off gives no value at all, not even in a count, a
+validator or a server's error (R5.6, R14.7); a folder backup percent-encodes its names as mongodump does, and a restore
+offers no system database and creates no TTL index on documents that were already there (`backup.folder-layout`,
+`backup.restore`); the data folder and the temporary copies of GridFS files are readable only by the user (R14.11);
+the main process opens a file only when this session wrote it and its type opens as data, and shows anything else in
+its folder (R14.10); the packaged application has Electron's fuses, `runAsNode`, `NODE_OPTIONS` and `--inspect` off,
+`onlyLoadAppFromAsar` and cookie encryption on, and asar integrity off while the installers are not signed
+([D45](#d45--the-installers-are-not-signed), R14.12). The import of connections lists what each one weakens.
+Rejected: keeping Redis error texts out with `readData` off (they quote the command, which the assistant wrote).
+*Decided on 2026-11-24, when the author asked for Mongoster's new features to be planned: to confirm.*
+
+## D74 — A milestone may change a card an earlier one built
+
+A card is changed in place, never copied: its lines say what Datardo will do, its **Differs** line what the code does
+today, each with the milestone that changes it, and the acceptance lines the code does not meet end with
+*(differs)* ([feature contract](feature-contract.md#a-card-that-changes-after-it-was-built)). The milestone lists it
+in its **Features** marked *(changed)*, beside the milestone that built it, and the index shows both; `roadmap.py`
+takes the list from the `changes` of the milestone, and `catalog.py` accepts a card in several milestones only when
+the later ones mark it. A card that one milestone names by itself is no longer taken by an earlier milestone that
+takes its whole area. Rejected: a copy of the card for the new milestone (two cards for one function), and moving the
+card to the new milestone (the history of the earlier one would change).
+*Decided on 2026-11-24 for M37 to M42: to confirm.*
+
 ## Open questions
 
 - **Q1** — *Answered on 2026-11-18 by [D7](#d7--home-is-the-first-page)*: the last active tab when tabs are restored,
@@ -1562,3 +1664,19 @@ Raised while the catalog was written; each names the cards that hold the current
   `--password-store=gnome-libsecret` on Linux when `XDG_CURRENT_DESKTOP` is not one Chromium knows and a secret
   service answers. Should it? Until the author answers, Datardo leaves Chromium's choice as it is
   (`connection.secrets`).
+- **Q142** — With the query put at the right (`query.position`), a window 1,280 pixels wide with the explorer and the
+  inspector island shown leaves the main island 568 pixels, and the query stays above the table until the explorer is
+  hidden. `nav.layout` could narrow the inspector island, down to 240 pixels, before the query falls back above.
+  Should it? Until the author answers, the pane takes its room from the table only
+  ([D71](#d71--the-query-beside-the-results-is-a-setting-and-its-pane-takes-its-room-from-the-table)).
+- **Q143** — The Formatting view of the inspector island has the key `Ctrl+Shift+F` (`nav.toggle-inspector`), which
+  many programs give to searching everywhere. Is it the right key? Until the author answers, it is the one the cards
+  give.
+- **Q144** — The dialog **Choose a color** returns a color like a question of `runner.ask`, which has four forms
+  (text, pick one, pick many, a form). Should `runner.ask` gain a fifth form, a color, drawn by
+  `connection.custom-color`, or should the dialog stay a View of its own that answers like a question? Until the
+  author answers, it is a View of its own.
+- **Q145** — M37 lets the main process open only files this session wrote (R14.10). **Reveal** of a scheduled task's
+  output (`transfer.export`, `task.show`) shows files of earlier sessions, and `gridfs.open` checks the type of its
+  copies only. Should both also refuse a path the main process did not make? Proposed: yes for the copies of
+  `gridfs.open`, which are all in its private folder.

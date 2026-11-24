@@ -2,7 +2,8 @@
 
 The tree island of the explorer: what the current connection holds. Its three parts (**Pinned**, the engine's tree
 and **Pages of** the connection), the nodes of each engine with what a click does, the counts beside them, how a
-node loads and fails, refresh, the filter, the keyboard, and the context menu of each kind of node. The features the
+node loads and fails, refresh, the filter, the keyboard, several nodes selected, the colors of databases and
+collections, what is excluded from searches, and the context menu of each kind of node. The features the
 menus start belong to their own areas, which list this menu as `@tree-menu`; pinning is `nav.pin`; the connection
 island above the tree, and the connections themselves, are the [connection](connection.md) area's.
 
@@ -23,10 +24,13 @@ Shows what the current connection holds, in three parts, and follows the active 
 - **After**: the buttons of the island's header: **Filter** (`tree.filter`), **Refresh** (`tree.refresh`) and
   **Collapse all**, which collapses every node of the engine's tree.
 - **Uses**: `tree.pinned`, `tree.mongodb`, `tree.redis`, `tree.pages`, `tree.filter`, `tree.refresh`,
-  `tree.node-states`, `tree.keyboard`, `tree.menu-mongodb`, `tree.menu-redis`, `connection.connect`,
-  `connection.add`, `nav.switch-connection`, `nav.rail`.
+  `tree.node-states`, `tree.keyboard`, `tree.select`, `tree.color-of`, `tree.excluded`, `tree.menu-mongodb`,
+  `tree.menu-redis`, `connection.connect`, `connection.add`, `nav.switch-connection`, `nav.rail`.
 - **Ported from**: the connections view of Mongoster, below a connection (`src/tree.ts › MongoTreeProvider`,
-  `src/extension.ts`). One connection at a time, **Pinned** and **Pages of** are new in Datardo.
+  `src/extension.ts`). One connection at a time, **Pinned** and **Pages of** are new in Datardo. The colors of
+  databases and collections and several nodes selected: Mongoster 0.9.0 and 0.10.0 (tree.set-collection-color,
+  tree.set-database-color, tree.exclude; `src/tree.ts`, `src/standalone/shell/tree.ts`).
+- **Differs**: (M38) no node takes a color; (M39) one node at a time is selected, and nothing is shown excluded.
 
 What it shows, in this order:
 
@@ -51,9 +55,12 @@ Acceptance:
       island is shown.
 - [ ] While it connects, **Databases** shows **Connecting…**; when it cannot, the reason and **Retry**.
 - [ ] While the connection is reconnecting, the nodes already loaded stay, dimmed, and nothing is read.
-- [ ] The nodes do not take the connection's color: the color is on the connection island.
+- [ ] The nodes do not take the connection's color: the color is on the connection island. A node's icon takes a
+      color only when its database, collection, view or bucket has one of its own (`tree.color-of`). (differs)
 - [ ] The island has the role `tree`; each node says its name, its kind, its count when it has one and whether it is
       expanded.
+- [ ] When a tab becomes active, its node is selected alone: nodes selected together before are not any more
+      (`tree.select`). (differs)
 
 ### `tree.pinned` — Pinned items
 
@@ -68,14 +75,18 @@ The items of the connection the user pinned, at the top of the tree island.
 - **After**: a click on a collection or a view opens its collection tab (`table.show`); on a namespace, its keys tab
   (`key.show`); on a key, its key tab (`key.open`); on a page, that page; on a saved query, the collection tab with
   that query, as the saved queries' own area says. The context menu has **Open** and **Unpin** (`nav.pin`).
-- **Uses**: `nav.pin`, `table.show`, `key.show`, `key.open`, `tab.open`.
+- **Uses**: `nav.pin`, `table.show`, `key.show`, `key.open`, `tab.open`, `tree.color-of`.
 - **Ported from**: *New in Datardo*.
+- **Differs**: (M38) the icons of the items take no color.
 
 Acceptance:
 
 - [ ] The items are listed in the order `nav.pin` keeps them, each with the icon of its kind, its name and, after
       it, where it is: `orders` with `shop`; `orders:` with `db0`; `orders:42` with `db0`; a saved query with its
       collection; a page with nothing.
+- [ ] The icon of a pinned collection, view, namespace or key takes the color its node in **Databases** takes (that
+      of its collection, or of its database), and a saved query that of its collection (`tree.color-of`); a page
+      takes none. (differs)
 - [ ] With no pinned item the part is not shown, heading included.
 - [ ] Pins belong to one connection: another connection's tree shows its own.
 - [ ] The filter of the tree does not hide pinned items.
@@ -140,10 +151,13 @@ collections.
   **Refresh**, a collection **Insert document**, a bucket **Upload files to GridFS…**; the heading **Databases**
   shows **Create database…**.
 - **Uses**: `tree.list-databases`, `tree.list-collections`, `tree.count`, `tree.menu-mongodb`, `tree.node-states`,
-  `table.show`, `gridfs.show`, `manage.create-collection`, `document.insert`, `tree.refresh`, `tab.open`.
+  `tree.color-of`, `tree.excluded`, `tree.select`, `table.show`, `gridfs.show`, `manage.create-collection`,
+  `document.insert`, `tree.refresh`, `tab.open`.
 - **Ported from**: `src/tree.ts` (`DatabaseNode`, `CollectionNode`, `BucketNode`, `MongoTreeProvider.databases`,
   `collections`), `src/shared/gridfs.ts › bucketNames`. The time series node and the document counts are new in
-  Datardo.
+  Datardo. The colored icons and the excluded nodes: Mongoster 0.9.0 and 0.10.0 (`src/tree.ts › connectionIcon`,
+  `markExcluded`).
+- **Differs**: (M38) every icon is drawn in the usual color; (M39) no node is dimmed or marked **excluded**.
 
 What each node shows:
 
@@ -154,6 +168,12 @@ What each node shows:
 | View | eye | nothing | `shop.active_orders (view)` |
 | Time series collection | clock | nothing | `shop.weather (time series)` |
 | GridFS bucket | files | **GridFS** | **GridFS bucket shop.fs (fs.files and fs.chunks)** |
+
+A node whose database, collection, view or bucket has a color of its own has its icon in that color
+(`tree.color-of`); its name keeps the usual color. A node excluded from searches (`tree.excluded`) has its icon and
+its name dimmed, whatever its color; after its name, before what the table says, **excluded** when it has an entry of
+its own, or **excluded with its database** under an excluded database, joined by ` · ` (`excluded · 1,204`); and its
+hover text has a last line *Excluded from searches*, or *Excluded from searches with the database archive*.
 
 Acceptance:
 
@@ -173,6 +193,13 @@ Acceptance:
       **Upload files to GridFS…** are not shown.
 - [ ] A database that was dropped outside Datardo disappears at the next refresh; an open tab of one of its
       collections stays, and says what its page says.
+- [ ] With `databaseColors: { shop: "teal" }` and `collectionColors: { "shop.orders": "#1e90ff", "shop.logs": "none"
+      }` on a red connection, the icon of `shop` is teal, of `orders` `#1e90ff`, of `users` teal, of `logs` plain, and
+      every node of `crm` plain; no name changes color. (differs)
+- [ ] With `exclusions: ["archive", "shop.logs"]`, `archive` shows `excluded · 3.2 MB` after its name, its
+      collections **excluded with its database**, `logs` `excluded · 120`, and all of them are dimmed; `shop` and
+      its other collections are not. (differs)
+- [ ] A screen reader says **excluded** with the name of an excluded node. (differs)
 
 ### `tree.list-databases` — List the databases
 
@@ -263,9 +290,11 @@ The databases of a Redis connection and, under each, the namespaces of its keys.
   click, expands or collapses the node without opening anything. **Load more** scans further
   (`tree.scan-namespaces`). **<n> more namespaces** opens the keys tab of the parent.
 - **Uses**: `tree.redis-databases`, `tree.scan-namespaces`, `tree.namespaces`, `tree.count`, `tree.menu-redis`,
-  `tree.node-states`, `key.show`, `tab.open`.
+  `tree.node-states`, `tree.color-of`, `key.show`, `tab.open`.
 - **Settings**: `datardo.key.separator`, the text key names are split at, `:` by default.
-- **Ported from**: *New in Datardo*.
+- **Ported from**: *New in Datardo*. The color of a database: Mongoster 0.10.0, for its MongoDB
+  databases (tree.set-database-color).
+- **Differs**: (M38) every icon is drawn in the usual color.
 
 What each node shows:
 
@@ -273,6 +302,10 @@ What each node shows:
 | --- | --- | --- | --- |
 | Database | `db0`, `db1`, … | its number of keys (`1,204`), from `INFO keyspace` | **db0: 1,204 keys, 310 with an expiry** |
 | Namespace | its last part (`2024` for `orders:2024:`) | the keys seen under it (`312`, or `312+`) | its pattern (`orders:2024:*`) |
+
+A database with a color of its own has its icon, and the icons of its namespaces, in that color (`tree.color-of`);
+the names keep the usual color. Nothing of Redis is excluded from searches but the whole connection
+(`tree.excluded`), which leaves the tree as it is.
 
 Acceptance:
 
@@ -292,6 +325,8 @@ Acceptance:
       under none; changing the setting rebuilds the nodes from the keys already scanned, without scanning again.
 - [ ] A database with no key shows **No keys** when expanded; one whose keys form no namespace shows **No
       namespaces**.
+- [ ] With `databaseColors: { "3": "green" }` on a red connection, the icon of `db3` and of every namespace under it
+      is green, and `db0` and its namespaces are plain. (differs)
 
 ### `tree.redis-databases` — List the Redis databases
 
@@ -439,17 +474,20 @@ Shows only the databases and the collections, or the namespaces, whose name cont
 - **Function**: `src/features/tree/filter.ts › view(state)`
 - **Entry points**: **Filter** in the header of the tree island (`@tree`); `Ctrl+F` while the tree island has the
   focus; Go to (**Filter the tree**).
-- **Reads**: MongoDB: the collections of every database (`tree.list-collections`), to tell which databases hold a
-  match. Redis: nothing more than the tree has already read.
+- **Reads**: MongoDB: the collections of every database that is not excluded from searches
+  (`tree.list-collections`), to tell which databases hold a match. Redis: nothing more than the tree has already
+  read.
 - **After**: the field opens under the header, with the placeholder **e.g. orders, shop, shop.ord** for MongoDB and
   **e.g. orders, db1, orders:2024** for Redis, and the hint **Part of a database or collection name, or
   database.collection; empty shows everything** for MongoDB, **Part of a database or namespace name; empty shows
   everything** for Redis. **Clear filter**, at the end of the field, empties it.
 - **Commands**: `tree.filter`.
-- **Uses**: `tree.match`, `tree.list-collections`, `tree.node-states`.
+- **Uses**: `tree.match`, `tree.excluded`, `tree.list-collections`, `tree.node-states`.
 - **Ported from**: the README's **Filtering the tree**; `src/extension.ts › filterTree`, `setTreeFilter`;
   `src/tree.ts › MongoTreeProvider.setFilter`, `matches`, `databases`, `collections`; `package.json` (**Filter
-  Databases and Collections…**, **Clear Filter**). The filter of Redis is new in Datardo.
+  Databases and Collections…**, **Clear Filter**). The filter of Redis is new in Datardo. Skipping what is excluded:
+  Mongoster 0.9.0 (tree.excluded; `src/tree.ts › MongoTreeProvider.matches`, `databases`, `collections`).
+- **Differs**: (M39) nothing is excluded: the filter looks into every database and can match any node.
 
 Acceptance:
 
@@ -470,6 +508,10 @@ Acceptance:
 - [ ] **Pinned** and **Pages of** are not filtered.
 - [ ] A database whose collections cannot be listed is shown only when its own name matches; no error is shown for
       it.
+- [ ] MongoDB, with `exclusions: ["archive", "shop.logs"]`: typing `o` shows `shop` with `orders` and not `logs`, and
+      no `archive` nor anything of it; typing `archive` shows **Nothing matches "archive"**; no `listCollections` is
+      sent for `archive`. (differs)
+- [ ] With the field empty, the excluded nodes are shown again, dimmed (`tree.mongodb`). (differs)
 
 ### `tree.match` — Whether a node matches the filter
 
@@ -478,11 +520,17 @@ The rule that decides which names the filter keeps.
 - **Kind**: Derivation
 - **Engine**: Any
 - **Function**: `src/features/tree/match.ts › matches(filter, node)`
-- **Ported from**: `src/tree.ts › MongoTreeProvider.matches`.
+- **Uses**: `tree.excluded`.
+- **Ported from**: `src/tree.ts › MongoTreeProvider.matches`; what is excluded never matches since Mongoster 0.9.0
+  (`src/shared/exclusions.ts › isExcluded`).
+- **Differs**: (M39) a node is matched by its text alone: nothing is excluded.
 
 Rules:
 
-- The filter is trimmed. An empty filter matches every node.
+- The filter is trimmed. An empty filter matches every node, excluded nodes too.
+- A node excluded from searches, by an entry of its own or through its database (`tree.excluded`), matches no filter
+  that is not empty, whatever its text. A connection excluded as a whole changes nothing here: its tree is the one
+  being filtered.
 - A node matches when its text contains the filter, both in lower case.
 - The text of a MongoDB database is its name; of a collection, a view, a time series collection or a bucket,
   `<database>.<name>`.
@@ -499,6 +547,18 @@ Examples:
 - `2024` and the namespace `orders:2024:` → matches; `orders:*` and `orders:2024:` → does not.
 - `db1` and the databases `db1`, `db10`, `db15` → all match; `db0` → does not.
 
+Examples with what is excluded:
+
+- `ord` and `shop.orders`, with `exclusions: ["shop.orders"]` → does not; with `exclusions: ["shop"]` → does not
+  either; with `exclusions: ["shop"]` and an empty filter → matches.
+- `arch` and the database `archive`, with `exclusions: ["archive"]` → does not.
+- `fs` and the bucket `fs` of `media`, with `exclusions: ["media.fs.files"]` → does not.
+
+Acceptance:
+
+- [ ] The examples give the results shown.
+- [ ] The examples with what is excluded give the results shown. (differs)
+
 ### `tree.keyboard` — Moving in the tree with the keyboard
 
 Everything the tree island does with the mouse, done with keys.
@@ -508,14 +568,19 @@ Everything the tree island does with the mouse, done with keys.
 - **Function**: `src/features/tree/keyboard.ts › view(state)`
 - **Entry points**: keys, while the tree island has the focus. How the focus moves between the islands is the
   navigation area's.
-- **Uses**: `tree.refresh`, `tree.filter`, `tree.menu-mongodb`, `tree.menu-redis`, `tree.pinned`, `tree.pages`.
+- **Uses**: `tree.refresh`, `tree.filter`, `tree.select`, `tree.menu-mongodb`, `tree.menu-redis`, `tree.pinned`,
+  `tree.pages`.
 - **Ported from**: *New in Datardo*; the keys are those of the tree pattern of the WAI-ARIA Authoring Practices.
+  `Shift+Up` and `Shift+Down`: Mongoster 0.9.0's desktop app (`src/standalone/shell/tree.ts`).
+- **Differs**: (M39) `Shift+Down` and `Shift+Up` move like `Down` and `Up`, and `Escape` does nothing in the tree.
 
 What each key does:
 
 | Key | Does |
 | --- | --- |
 | `Down`, `Up` | Moves to the next or the previous node shown, through the three parts and their headings. |
+| `Shift+Down`, `Shift+Up` | Moves to the next or the previous node of **Databases** of a MongoDB connection, and selects every node from the anchor to it (`tree.select`). |
+| `Escape` | With several nodes selected, leaves only the node with the focus selected. |
 | `Right` | Expands a collapsed node; on an expanded one, moves to the first node under it; nothing on a node with nothing under it. |
 | `Left` | Collapses an expanded node; otherwise moves to the node it is under. |
 | `Home`, `End` | Moves to the first or the last node shown. |
@@ -538,6 +603,73 @@ Acceptance:
       that starts with `r`.
 - [ ] The buttons a node shows on hover are reached through its context menu, where each has an entry.
 - [ ] No key of the tree writes to a deployment: `Delete` does nothing.
+- [ ] After a click on `orders`, with `shop` expanded, `Shift+Down` twice selects `orders` and the two collections
+      after it; `Escape` then leaves the last one selected alone. (differs)
+
+### `tree.select` — Several nodes selected
+
+Selects several databases, collections, views and GridFS buckets of a MongoDB connection, to exclude them from
+searches, or include them again, together.
+
+- **Kind**: View
+- **Engine**: MongoDB
+- **Function**: `src/features/tree/select.ts › view(state)`
+- **Entry points**: `Ctrl+click` and `Shift+click` on a node of **Databases** (`@tree`); `Shift+Down` and `Shift+Up`
+  while the tree island has the focus (`tree.keyboard`).
+- **Offered when**: the connection is a MongoDB connection. A Redis connection has no entry that acts on several
+  nodes: there `Ctrl+click` and `Shift+click` do what a click does *(Datardo's choice)*.
+- **After**: the context menu opened on one of the selected nodes acts on all of them (`tree.menu-mongodb`).
+- **Uses**: `tree.exclude-from-searches`, `tree.menu-mongodb`, `tree.keyboard`, `tree.mongodb`.
+- **Ported from**: tree.exclude of Mongoster 0.9.0, its desktop app (`src/standalone/shell/tree.ts › select`,
+  `selectedWith`; `src/standalone/vscode/tree.ts › nodeArguments`).
+
+What can be selected together: the databases, collections, views, time series collections and GridFS buckets of
+**Databases**, in any mix. The headings, the lines that are not nodes (**Loading…**, **Load more**, **Retry**, the
+messages), the pinned items and the pages are selected one at a time: `Ctrl+click` and `Shift+click` on them do what
+a click does.
+
+How the selection changes:
+
+| Done | Selection | Opens |
+| --- | --- | --- |
+| A click | that node alone, which becomes the anchor | what a click opens (`tree.mongodb`) |
+| `Enter` | the node with the focus alone, which becomes the anchor | what `Enter` opens (`tree.keyboard`) |
+| A key that moves the focus without `Shift` (`Down`, `Up`, `Home`, `End`, letters typed) | unchanged | nothing |
+| `Ctrl+click` | that node added, or removed when it was selected; it becomes the anchor | nothing |
+| `Shift+click` | every node shown from the anchor to that node, in the order of the tree | nothing |
+| `Shift+Down`, `Shift+Up` | the focus moves one node, and the selection is every node from the anchor to it; they stop at the first and the last node of **Databases** | nothing |
+| `Escape` | the node with the focus alone | nothing |
+| A tab becomes active | the node of what it shows alone (`tree.show`) | — |
+
+- With no anchor in **Databases**, `Shift+click` selects that node alone and makes it the anchor; `Shift+Down` and
+  `Shift+Up` take the node they start from as the anchor.
+- A node that stops being shown (its database collapsed, the filter, a refresh where it is gone) leaves the
+  selection.
+- On macOS `Cmd+click` takes the place of `Ctrl+click`.
+
+The context menu:
+
+- Opened on one of several selected nodes (a right click, `Shift+F10`, the menu key or its `…` button), it offers
+  only the entries that act on all of them *(Datardo's choice)*: **Exclude from searches**, when at least one of
+  them is not excluded by an entry of its own, and **Include in searches**, when at least one is; each acts on the
+  selected nodes it changes (`tree.exclude-from-searches`). The other entries act on one node: to use them, click
+  the node alone.
+- Opened on a node that is not selected, it is that node's menu, and the selection does not change
+  (`tree.menu-mongodb`).
+
+Acceptance:
+
+- [ ] `Ctrl+click` on `orders` with `users` selected selects both and opens no tab; `Ctrl+click` on `users` again
+      leaves `orders` alone selected.
+- [ ] With `archive` selected, `Shift+click` on `orders` under `shop` selects `archive`, `crm` and its collections
+      shown, `shop` and the collections shown above `orders`, and `orders`.
+- [ ] A click on `orders` with several nodes selected selects `orders` alone and opens its tab.
+- [ ] A right click on one of 3 selected nodes, none of them excluded, opens a menu with **Exclude from searches**
+      alone; choosing it excludes the three.
+- [ ] A right click on a node outside the selection opens that node's whole menu and keeps the selection.
+- [ ] `Ctrl+click` on a pinned item, on a page or on a node of a Redis connection does what a click does.
+- [ ] The tree says it can have several nodes selected (`aria-multiselectable`), and each selected node says it is
+      selected.
 
 ### `tree.node-states` — Loading, empty and failed nodes
 
@@ -569,6 +701,355 @@ Acceptance:
       authorized on shop to execute command { listCollections: 1, … }**, and the other databases as usual.
 - [ ] An error never shows a connection string or a password (`connection.secrets`).
 
+## Colors and searches
+
+The colors of single databases and collections, and what is excluded from searches, are kept on their connection, in
+its entry of the saved connections ([data](../data.md)), beside its own color: removing the connection removes them,
+and its export in Datardo's format carries them. The connection's own color and the presets are the
+[connection](connection.md) area's (`connection.set-color`, `connection.color-presets`).
+
+### `tree.set-collection-color` — Set the color of a collection, a view or a bucket
+
+Gives one collection its own color, which takes the place of its database's on its icon in the tree and on the icons
+of its tabs, to tell some collections apart inside one connection: those not to touch by hand, those being migrated.
+
+- **Kind**: Operation
+- **Engine**: MongoDB
+- **Function**: `src/features/tree/set-collection-color.ts › plan(context, answers)`
+- **Entry points**: **Set color…** in the context menu of a collection, a view, a time series collection or a GridFS
+  bucket (`@tree-menu`); Go to (**Set collection color…**), for the collection, view or bucket of the active tab.
+- **Offered when**: a collection, a view, a time series collection, a system collection or a bucket, read-only
+  connections included; one node, not several selected (`tree.select`).
+- **Asks**: a list to pick from (`runner.ask`) titled **Color of orders** (**Color of fs** for a bucket), with the
+  placeholder **Shown on its icon in the tree and on its tabs**, or **Shown on its icon in the tree and on its tabs,
+  instead of the color of the database shop** when the database has a color of its own, and the items:
+  1. the eleven presets of `connection.color-presets`, **Red** to **Gray**, each after a circle of its color;
+  2. **None**, *Plain, even in a colored database*;
+  3. **Connection's color**, described with the connection's color (**red**, a custom `#rrggbb`, or **none**); in
+     its place **Database's color**, described with the database's color (or **none**), when the database has a
+     color of its own (`tree.set-database-color`), **None** included;
+  4. **Custom color…**, described with the collection's custom color when it has one, which opens the dialog
+     **Choose a color** (`connection.custom-color`) with that color, or the color the collection shows now.
+
+  The current choice is described **current**: **Connection's color** or **Database's color** when the collection
+  has no color of its own.
+- **Plan**: one app step: `set the color of shop.orders on Local to teal` (`to #1e90ff`, `to none`), or `remove the
+  color of shop.orders on Local` for **Connection's color** and **Database's color**; for a bucket, `the GridFS
+  bucket shop.fs` in place of `shop.orders`. It writes the entry of the collection in `collectionColors` on the
+  connection, under `shop.orders`, or under `shop.fs.files` for the bucket `fs` (`tree.color-of`).
+- **Danger**: None.
+- **Read-only**: Allowed, because it writes nothing to a deployment.
+- **Undo**: Cannot be undone from the undo history; choose the previous color again.
+- **After**: the tree island and the open tabs of the connection take the color at once (`tree.color-of`); nothing
+  is reopened.
+- **Commands**: `tree.set-collection-color`.
+- **Uses**: `tree.color-of`, `connection.color-presets`, `connection.custom-color`, `runner.ask`.
+- **Ported from**: tree.set-collection-color of Mongoster 0.9.0, and **Database's color** from its changes after it
+  (its proposal 0001; `src/extension.ts › askColor`, `changeCollectionColors`; `src/shared/collectionColors.ts ›
+  ownColorOf`, `setCollectionColor`; `src/shared/colors.ts › colorChoices`).
+
+Acceptance:
+
+- [ ] **Teal** on `shop.orders` of Local writes `collectionColors: { "shop.orders": "teal" }` on Local; the icon of
+      `orders` in the tree and the icons of its open collection tab and document tabs turn teal without reopening
+      anything; the names keep their color.
+- [ ] Dismissing the list, or **Cancel** in **Choose a color**, changes nothing.
+- [ ] On the bucket `fs` of `media` the entry is `media.fs.files`: the bucket and its collection `fs.files` show the
+      same color, and setting either sets both.
+- [ ] **None** on `shop.orders` in the teal database `shop` writes `"none"`, and its icon is plain.
+- [ ] With `databaseColors: { shop: "teal" }` the list has **Database's color** described **teal**, and no
+      **Connection's color**; choosing it removes the entry, and the last entry removes `collectionColors`.
+- [ ] **Custom color…** then **Apply** with `#1E90FF` writes `"#1e90ff"`, and **Custom color…** is then described
+      `#1e90ff` and **current**.
+- [ ] On a read-only connection the entry is offered and the color is set; nothing is sent to the server.
+- [ ] **Set collection color…** from Go to, with the collection tab of `shop.orders` active, asks the color of
+      `orders`; with no such tab it is not listed.
+
+### `tree.set-database-color` — Set the color of a database
+
+Gives one database its own color, shown on its icon and on those of its collections, views, buckets or namespaces
+without a color of their own, and on their tabs.
+
+- **Kind**: Operation
+- **Engine**: Any
+- **Function**: `src/features/tree/set-database-color.ts › plan(context, answers)`
+- **Entry points**: **Set color…** in the context menu of a MongoDB database or of a Redis database, `db0` to `db15`
+  or as many as the server has (`@tree-menu`); Go to (**Set database color…**), for the database of the active tab
+  (a collection tab, a GridFS page, a keys tab or a key tab, and the pages opened on one database).
+- **Offered when**: a database of a connection of either engine, read-only connections included; one node, not
+  several selected (`tree.select`).
+- **Asks**: a list to pick from (`runner.ask`) titled **Color of shop** (**Color of db3** for Redis), with the
+  placeholder **Shown on its icon in the tree, and on its collections without a color of their own and their tabs**
+  (Redis: **Shown on its icon in the tree, and on its namespaces and its tabs**), and the items: the eleven presets,
+  **None** (*No color of its own*) and **Custom color…**; the current choice is described **current**, **None** when
+  the database has no color of its own. Mongoster offers **None** and **Connection's color** apart; in Datardo the
+  connection's color never reaches an icon (`tree.color-of`), so the two would look the same, and **None** is the
+  only one *(Datardo's choice)*.
+- **Plan**: one app step: `set the color of the database shop on Local to teal` (`to #1e90ff`), or
+  `remove the color of the database shop on Local`; for Redis `db3` in place of `the database shop`. It writes the
+  entry of the database in `databaseColors` on the connection: under `shop`, or under `3` for `db3`
+  (`tree.color-of`).
+- **Danger**: None.
+- **Read-only**: Allowed, because it writes nothing to a deployment.
+- **Undo**: Cannot be undone from the undo history; choose the previous color again.
+- **After**: the tree island and the open tabs of the connection take the color at once (`tree.color-of`).
+- **Commands**: `tree.set-database-color`.
+- **Uses**: `tree.color-of`, `tree.set-collection-color`, `connection.color-presets`, `connection.custom-color`,
+  `runner.ask`.
+- **Ported from**: tree.set-database-color of Mongoster 0.10.0 (`src/extension.ts`, the
+  `mongoster.setDatabaseColor` handler, `askColor`; `src/shared/collectionColors.ts`). For a Redis database, *new in
+  Datardo*.
+
+Acceptance:
+
+- [ ] **Teal** on `shop` of Local writes `databaseColors: { shop: "teal" }`; the icons of `shop` and of its
+      collections, views and buckets without a color of their own turn teal, and so do the icons of their open tabs;
+      `orders`, which is `#1e90ff`, keeps it.
+- [ ] **Green** on `db3` of Cache local writes `databaseColors: { "3": "green" }`; the icons of `db3`, of its
+      namespaces, of its keys tab and of its key tabs turn green.
+- [ ] **None** removes the entry, and the last entry removes `databaseColors`; an entry `"none"` read from a file of
+      Mongoster is kept, shows as no color, and **None** is described **current**.
+- [ ] Dismissing the list changes nothing.
+- [ ] With no color on `shop`, **Set color…** on `orders` offers **Database's color** described **none**.
+- [ ] On a read-only connection the entry is offered and the color is set; nothing is sent to the server.
+
+### `tree.color-of` — Which color something of a database or a collection takes
+
+The rule every surface of a database or a collection follows: the collection's own color, otherwise its database's
+own, otherwise its connection's; an own **None** is no color. The same module keeps the maps of colors in step when
+one is set, and when Datardo renames or drops what they name.
+
+- **Kind**: Derivation
+- **Engine**: Any
+- **Function**: `src/features/tree/color-of.ts › colorOf(connection, target)`
+- **Uses**: `connection.color-presets`, `tab.groups`.
+- **Ported from**: tree.color-of-collection and tree.collection-color-follows of Mongoster 0.9.0 and 0.10.0
+  (`src/shared/collectionColors.ts › colorOf`, `scopeColor`, `ownColorOf`, `setCollectionColor`,
+  `renameCollectionColor`, `dropCollectionColors`, `readCollectionColors`, `readDatabaseColors`). The color of a Redis
+  database is *new in Datardo*.
+
+What is kept, on the connection's entry of the saved connections (absent when empty):
+
+- `databaseColors`: an object from a database to its color. A MongoDB database by its name (`shop`); a Redis
+  database by its number written in decimal (`"3"`).
+- `collectionColors`: an object from a collection to its color, MongoDB only, keyed by `<database>.<collection>`
+  (`shop.orders`, `media.fs.files`): a database's name has no `.`, so the first one separates the two. A GridFS
+  bucket has no key of its own: it is its `.files` collection's.
+- A color is a preset's name (`red`, `orange`, `yellow`, `green`, `blue`, `purple`, `pink`, `teal`, `indigo`,
+  `brown`, `gray`), a custom color `#rrggbb` in lower case (`connection.color-presets`), or `none`. Reading the file
+  keeps only the entries with a valid key and color, and leaves the others out.
+
+Rules of `colorOf`:
+
+- Input: the connection (its `color`, `databaseColors`, `collectionColors`), and a target: a database, or a
+  collection, view or bucket of a database. Output: no color, or a color with where it comes from: the collection,
+  the database or the connection.
+- The collection's entry wins: a color gives that color, `none` gives no color, whatever the database and the
+  connection have. Without one, the database's entry decides in the same way. Without either, the connection's color
+  applies, or none.
+- For a database, only its own entry and the connection's color count. A namespace or a key of Redis is its
+  database's. A bucket looks up `<bucket>.files`.
+- An icon (below) takes the color only when it comes from the collection or the database: the connection's color
+  alone leaves the tree and the icons of the tabs as they are, since the connection island, the group of tabs and
+  the connection's card already show it (`connection.set-color`). A preset is drawn with the theme's token of its
+  name, so it reads in the dark and the light theme; a custom color is drawn exactly. A color is never the only sign
+  of anything: the name is always beside it.
+
+Where it applies:
+
+- the tree island: the icon of a database's node and of each node under it, collections, views, time series and
+  system collections, buckets and Redis namespaces (`tree.mongodb`, `tree.redis`), and of their pinned items
+  (`tree.pinned`); a node excluded from searches is dimmed instead (`tree.excluded`);
+- the icon, in the tab strip, of the tabs opened on one collection, view or bucket (its collection tab, its GridFS
+  page, its document tabs, a document history, Watch changes and Index advisor on it, a comparison of two
+  collections), and of those opened on one database (Watch changes, Index advisor, the Relationship diagram, a
+  structure comparison, a Redis keys tab or key tab): the color of what they were opened on. A comparison takes the
+  color both sides share, or the only one there is, or none. `tab.groups` says it tab by tab.
+- Not: the tabs of the whole connection (Overview, Monitor, Users and roles, Search documents, whose scope changes
+  in the page, Watch changes and Index advisor on the deployment, Playground, Console, Server, Pub/Sub), and the
+  dot and line of the group of tabs, which stay the connection's.
+
+The changes of the maps, each returning the map unchanged when there is nothing to change and nothing when it is
+left empty:
+
+- `withColor(colors, key, color)`: the entry set to the color, or removed when the color is to follow what is above.
+- `renamedColors(colors, database, from, to)`: the entry of `database.from` moved to `database.to`.
+- `droppedColors(connection, database, collection)`: without the entry of the dropped collection or view; of a
+  dropped bucket, the entries of its `.files` and `.chunks` collections; of a dropped database (no collection), its
+  entry in `databaseColors` and every entry of `collectionColors` that starts with `database.`.
+- They are used by `manage.rename-collection`, `manage.drop-collection`, `manage.drop-database` and
+  `gridfs.drop-bucket`, after the server's step succeeded. A collection renamed or dropped elsewhere (mongosh, a
+  restore that drops, a copy that replaces) keeps its entry, which applies again to a collection of the same name;
+  removing the connection removes all its entries.
+
+Worked examples, on Local, `red`, with `databaseColors: { shop: "teal", archive: "none" }` and `collectionColors: {
+"shop.orders": "#1e90ff", "shop.logs": "none", "media.fs.files": "pink" }`:
+
+| Target | Color | From | Its icon |
+| --- | --- | --- | --- |
+| `shop.orders` | `#1e90ff` | the collection | `#1e90ff` |
+| `shop.users` | teal | the database | teal |
+| `shop.logs` | none | the collection | plain |
+| the database `shop` | teal | the database | teal |
+| `crm.users` | red | the connection | plain |
+| the database `crm` | red | the connection | plain |
+| `archive.old` | none | the database | plain |
+| the bucket `fs` of `media` | pink | the collection `fs.files` | pink |
+| `media.fs.chunks` | red | the connection | plain |
+
+- `renamedColors` of the map above, `shop`, `orders` → `orders_2024`: `"shop.orders_2024": "#1e90ff"`, and no
+  `shop.orders`; `users` → `clients`: the map unchanged.
+- `droppedColors` for the bucket `fs` of `media`: no `media.fs.files`; for the database `shop`: no `shop` in
+  `databaseColors`, and no `shop.orders` nor `shop.logs`; then for `archive`: `databaseColors` left empty, so absent.
+- On Cache local with `databaseColors: { "3": "green" }`: `db3`, its namespace `orders:` and its key `orders:42` →
+  green, from the database; `db0` → the connection's.
+
+Acceptance:
+
+- [ ] The worked examples give the results shown.
+- [ ] An open tab takes a new color of its collection or database at once, and loses it when **Connection's color**
+      is chosen.
+- [ ] A Watch changes tab of `shop.orders` takes `#1e90ff`, one of `shop` teal, one of the whole connection none.
+- [ ] Reading `databaseColors: { "a.b": "red", shop: "lime" }` and `collectionColors: { "orders": "red",
+      "shop.orders": "#ABC" }` keeps `"shop.orders": "#aabbcc"` alone.
+
+### `tree.exclude-from-searches` — Exclude from searches, or include again
+
+Leaves a database, a collection, a view or a GridFS bucket, or a whole connection, out of searches, for what the
+user does not use or does not want searched; or puts it back. The node stays in the tree, dimmed.
+
+- **Kind**: Operation
+- **Engine**: Any
+- **Function**: `src/features/tree/exclude-from-searches.ts › plan(context, answers)`
+- **Entry points**: **Exclude from searches** or **Include in searches** in the context menu of a MongoDB database,
+  collection, view, time series collection or GridFS bucket (`@tree-menu`), on that node, or on the selected nodes
+  when the menu was opened on one of several selected (`tree.select`); in the menu of a connection of either engine
+  (`connection.menu`: `@connection-island`, `@connection-switcher`, `@home`), on the whole connection; Go to
+  (**Exclude from searches**, **Include in searches**), for the collection, view or bucket of the active tab.
+- **Offered when**: **Exclude from searches** on a node that is not excluded by an entry of its own, a collection of
+  an excluded database included; **Include in searches** on a node that is. On a connection, **Exclude from
+  searches** when it is not excluded, **Include in searches** when it is. Read-only connections included. Not on a
+  Redis database or namespace, the headings, the pinned items or the pages.
+- **Plan**: one app step, which writes the connection's entry of the saved connections (`tree.excluded`):
+  - `exclude from searches on Local: the database archive, the collection shop.logs, the GridFS bucket media.fs`,
+    which adds `archive`, `shop.logs` and `media.fs.files` to `exclusions`;
+  - `include in searches on Local: the collection shop.logs`, which removes its key; the last key removes
+    `exclusions`;
+  - `exclude the connection Local from searches`, which writes `excluded: true`; `include the connection Local in
+    searches`, which removes it.
+
+  A view or a time series collection is named `the view` or `the collection`, as its node. With several selected
+  nodes, only those the entry changes are in the step.
+- **Danger**: None.
+- **Read-only**: Allowed, because it writes nothing to a deployment.
+- **Undo**: Cannot be undone from the undo history; **Include in searches** puts it back.
+- **After**: the nodes are dimmed and marked, or plain again, at once (`tree.mongodb`); the filter of the tree
+  follows (`tree.filter`); an open Search documents page leaves them out from its next search, and a search that
+  runs goes on with what it planned (`search.collections`). An excluded connection is marked where the connection
+  area shows it (`connection.menu`), and its tree does not change.
+- **Commands**: `tree.exclude-from-searches`, titled **Exclude from searches** or **Include in searches** as it
+  applies to the active tab.
+- **Uses**: `tree.excluded`, `tree.select`, `tree.menu-mongodb`, `connection.menu`.
+- **Ported from**: tree.exclude of Mongoster 0.9.0 (`src/extension.ts › setExcluded`; `src/shared/exclusions.ts ›
+  exclusionKey`, `bucketExclusionKey`, `setExclusions`; `src/tree.ts › markExcluded`, `ConnectionNode`). The menu of
+  a connection in Datardo is not in the tree, which shows one connection.
+
+Acceptance:
+
+- [ ] **Exclude from searches** on `shop.logs` writes `exclusions: ["shop.logs"]` on Local; `logs` is dimmed, shows
+      **excluded** after its name, and its menu offers **Include in searches** and no **Exclude from searches**.
+- [ ] With `shop.logs` and `archive` selected, **Exclude from searches** writes `exclusions: ["archive",
+      "shop.logs"]`, in one step.
+- [ ] The collections of `archive` show **excluded with its database** and offer **Exclude from searches**; excluding
+      `archive.old` then adds `archive.old`, and including `archive` leaves `archive.old` excluded.
+- [ ] **Exclude from searches** on the bucket `fs` of `media` writes `media.fs.files`; the collection `fs.files` is
+      then excluded too.
+- [ ] With `archive` excluded and `crm` not, both selected, the menu has **Exclude from searches**, which writes
+      `crm` alone, and **Include in searches**, which removes `archive` alone.
+- [ ] **Include in searches** on the last excluded node removes `exclusions` from the connection's entry.
+- [ ] **Exclude from searches** in the menu of the connection Cache local writes `excluded: true` on it; its tree
+      shows nothing dimmed.
+- [ ] A Redis database and a namespace have neither entry.
+- [ ] On a read-only connection the entries are offered and work; nothing is sent to the server.
+
+### `tree.excluded` — What searches leave out
+
+Whether a node is excluded from searches, by an entry of its own or through its database, and what each search does
+with it: what is excluded is left out, unless it is what was asked for by name.
+
+- **Kind**: Derivation
+- **Engine**: Any
+- **Function**: `src/features/tree/excluded.ts › exclusionOf(connection, target)`
+- **Uses**: `tree.color-of` (the key of a collection and of a bucket).
+- **Ported from**: tree.excluded and tree.exclusion-follows of Mongoster 0.9.0 (`src/shared/exclusions.ts ›
+  isExcluded`, `ownExclusion`, `leaveOutExcluded`, `setExclusions`, `renameExclusion`, `dropExclusions`,
+  `readExclusions`).
+
+What is kept, on the connection's entry of the saved connections (absent when empty or false):
+
+- `excluded`: `true` when the whole connection is excluded, of either engine.
+- `exclusions`: a list of keys, MongoDB only: a database by its name (`archive`), a collection, a view or a time
+  series collection by `<database>.<collection>` (`shop.logs`), a GridFS bucket by its `.files` collection
+  (`media.fs.files`), as `collectionColors` keys them (`tree.color-of`). The list is sorted by the code units of its
+  keys *(Datardo's choice)*, without repeats. Reading the file keeps only strings that are a database's name or
+  `<database>.<collection>`.
+
+Rules of `exclusionOf`:
+
+- Input: the connection (`excluded`, `exclusions`) and a target: the connection, a database, or a collection, view
+  or bucket of a database. Output: *own* (it has an entry of its own), *with its database* (a collection, view or
+  bucket of a database that has one), or *not excluded*.
+- A connection is *own* when `excluded` is `true`. That says nothing of what is in it: its databases and collections
+  are excluded only by their own entries *(as Mongoster)*.
+- **Include in searches** is offered on *own* only; *with its database* offers **Exclude from searches**
+  (`tree.exclude-from-searches`).
+
+What each place does with it:
+
+- The tree shows everything, dimmed when *own* or *with its database* (`tree.mongodb`); its filter never matches
+  those (`tree.match`) and does not read the collections of an excluded database (`tree.filter`).
+- Search documents, over every database, leaves out the databases with an entry, and in the others the collections
+  with an entry of their own; over one database, its collections with an entry of their own, even when the database
+  itself is excluded; ticked collections are read whatever their entries. It says how many it left out
+  (`search.collections`).
+- The MCP server's lists of connections, databases and collections leave out what has an entry of its own, as the
+  MCP area says; a tool given a name answers for it.
+- Not left out: Go to, which finds an excluded connection, database or collection by its name
+  (`palette.find-collections`); opening it; a search started on it; backups, exports, scheduled tasks, Watch
+  changes, the Index advisor, the Relationship diagram, comparisons and the Monitor.
+
+The changes of the list, each returning the list unchanged when there is nothing to change and nothing when it is
+left empty: `withExclusions(list, keys, excluded)` adds or removes keys; `renamedExclusions(list, database, from,
+to)` moves the key of a renamed collection; `droppedExclusions(list, database, collection)` removes the key of a
+dropped collection or view, the keys of a dropped bucket's `.files` and `.chunks` collections, or a dropped database's
+key and every key that starts with `database.`. They are used, after the server's step succeeded, by
+`manage.rename-collection`, `manage.drop-collection`, `manage.drop-database` and `gridfs.drop-bucket`; a rename or a
+drop done elsewhere keeps the key, which applies again to a collection of the same name.
+
+Worked examples, with `excluded: true` and `exclusions: ["archive", "media.fs.files", "shop.logs"]`:
+
+| Target | Result |
+| --- | --- |
+| the connection | *own* |
+| the database `archive` | *own* |
+| `archive.old` | *with its database* |
+| `shop.logs` | *own* |
+| `shop.orders` | *not excluded*: the connection's `excluded` does not reach it |
+| the database `shop` | *not excluded* |
+| the bucket `fs` of `media`, and the collection `media.fs.files` | *own* |
+| `media.fs.chunks` | *not excluded* |
+
+- `withExclusions(["shop.logs"], ["archive", "shop.logs"], true)` → `["archive", "shop.logs"]`;
+  `withExclusions(["shop.logs"], ["shop.logs"], false)` → nothing.
+- `renamedExclusions` of the list above, `shop`, `logs` → `logs_old`: `["archive", "media.fs.files",
+  "shop.logs_old"]`.
+- `droppedExclusions` for the database `archive` with `["archive", "archive.old", "shop.logs"]` → `["shop.logs"]`.
+
+Acceptance:
+
+- [ ] The worked examples give the results shown.
+- [ ] Reading `exclusions: ["shop.logs", 3, "shop.logs", ".x", "archive"]` keeps `["archive", "shop.logs"]`.
+
 ## The context menus
 
 ### `tree.menu-mongodb` — The context menu of a MongoDB node
@@ -584,10 +1065,15 @@ GridFS bucket. Each entry starts a feature of another area, which says when it i
   `manage.edit-view`, `manage.edit-validation`, `document.insert`, `playground.open`, `search.show`,
   `relation.diagram`, `index.show`, `watch.show`, `advisor.show`, `user.show`, `transfer.import`,
   `transfer.generate`, `transfer.export`, `transfer.copy-collection`, `compare.show`, `structure.show`,
-  `backup.create`, `backup.restore`, `gridfs.show`, `tree.refresh`.
+  `backup.create`, `backup.restore`, `gridfs.show`, `tree.refresh`, `tree.set-database-color`,
+  `tree.set-collection-color`, `tree.exclude-from-searches`, `tree.select`.
 - **Ported from**: `package.json` of Mongoster, `view/item/context`, with the conditions on `viewItem` (`database`,
   `collection`, `view`, `bucket` and their `.readonly` forms) and the groups that give the order. **Open**,
-  **Pin**, **Refresh** on every node and the menu of the heading are new in Datardo.
+  **Pin**, **Refresh** on every node and the menu of the heading are new in Datardo. **Set color…**, **Exclude from
+  searches** and **Include in searches** (the `.excluded` forms, the group `4_organize`): Mongoster 0.9.0 and
+  0.10.0.
+- **Differs**: (M38) no node has **Set color…**; (M39) no node has **Exclude from searches** or **Include in
+  searches**, and the menu always acts on the node it was opened on.
 
 What it shows, with a line between the groups. In brackets, the feature behind an entry.
 
@@ -595,25 +1081,31 @@ What it shows, with a line between the groups. In brackets, the feature behind a
   collections), **New playground** (`playground.open`); **Back up…** (`backup.create`), **Restore from backup…**
   (`backup.restore`), **Schedule…** (scheduling a backup, of the scheduled tasks' area); **Refresh**
   (`tree.refresh`), **Collapse all**.
-- A database: **Create collection…** (`manage.create-collection`), **New playground**; **Search documents…**
+- A database: **Create collection…** (`manage.create-collection`), **New playground**; **Set color…**
+  (`tree.set-database-color`), **Exclude from searches** or **Include in searches** (`tree.exclude-from-searches`);
+  **Search documents…**
   (`search.show`), **Relationship diagram** (`relation.diagram`); **Back up…**, **Restore from backup…**,
   **Schedule…**; **Manage users and roles** (`user.show`), **Watch changes** (`watch.show`), **Index advisor**
   (`advisor.show`); **Compare structure with…** (`structure.show`), **Upload files to GridFS…** (uploading to a
   bucket, of the GridFS area); **Refresh**; **Drop database…** (`manage.drop-database`).
-- A collection: **Open** (`table.show`), **Pin** or **Unpin** (`nav.pin`); **Insert document**
+- A collection: **Open** (`table.show`), **Pin** or **Unpin** (`nav.pin`); **Set color…**
+  (`tree.set-collection-color`), **Exclude from searches** or **Include in searches**; **Insert document**
   (`document.insert`), **New playground**; **Search documents…**, **Relationship diagram**, **Indexes**
   (`index.show`); **Watch changes**, **Index advisor**; **Import documents…** (`transfer.import`), **Generate test
   documents…** (`transfer.generate`), **Export collection…** (`transfer.export`), **Copy collection to…**
   (`transfer.copy-collection`), **Compare with…** (`compare.show`), **Back up…**, **Restore from backup…**,
   **Schedule…**; **Rename collection…** (renaming a collection, of the area that manages databases and
   collections), **Edit validation rules…** (`manage.edit-validation`); **Drop…** (`manage.drop-collection`).
-- A view: **Open**, **Pin** or **Unpin**; **New playground**; **Search documents…**, **Relationship diagram**;
+- A view: **Open**, **Pin** or **Unpin**; **Set color…**, **Exclude from searches** or **Include in searches**;
+  **New playground**; **Search documents…**, **Relationship diagram**;
   **Export collection…**, **Copy collection to…**, **Compare with…**, **Back up…**, **Schedule…**; **Edit view
   definition…** (`manage.edit-view`); **Drop…**.
 - A time series collection: the entries of a collection, without **Rename collection…**, **Edit validation
   rules…** and **Watch changes**, which MongoDB does not allow on one.
-- A GridFS bucket: **Open GridFS bucket** (`gridfs.show`); **Upload files to GridFS…**; **Delete GridFS bucket…**
-  (deleting a bucket, of the GridFS area).
+- A GridFS bucket: **Open GridFS bucket** (`gridfs.show`); **Set color…**, **Exclude from searches** or **Include
+  in searches**; **Upload files to GridFS…**; **Delete GridFS bucket…** (deleting a bucket, of the GridFS area).
+- Several nodes selected, the menu opened on one of them (`tree.select`): **Exclude from searches** and **Include in
+  searches**, each when it changes one of them, acting on all the selected nodes it changes; no other entry.
 
 Acceptance:
 
@@ -630,6 +1122,13 @@ Acceptance:
 - [ ] A system collection has the entries of a collection.
 - [ ] The menu opens at the node with `Shift+F10`, closes with `Escape`, and gives the focus back to the node.
 - [ ] A menu opened on a node that is not selected does not change the selection or the active tab.
+- [ ] A database, a collection, a view, a time series collection and a bucket have **Set color…**, also on a
+      read-only connection. (differs)
+- [ ] A node with an exclusion of its own has **Include in searches** in place of **Exclude from searches**; a
+      collection of an excluded database has **Exclude from searches**; both stay on a read-only connection. (differs)
+- [ ] With `orders`, `users` and `logs` selected, the menu opened on `users` has only **Exclude from searches**, and
+      choosing it excludes the three; opened on `crm`, which is not selected, it is the whole menu of `crm` and acts
+      on `crm` alone. (differs)
 
 ### `tree.menu-redis` — The context menu of a Redis node
 
@@ -640,13 +1139,16 @@ area, which says when it is offered and what it does.
 - **Engine**: Redis
 - **Function**: `src/features/tree/menu-redis.ts › view(state)`
 - **Entry points**: a right click, `Shift+F10` or the `…` button of a node (`@tree-menu`).
-- **Uses**: `key.show`, `console.show`, `nav.pin`, `tree.refresh`, `tree.namespaces`.
-- **Ported from**: *New in Datardo*.
+- **Uses**: `key.show`, `console.show`, `nav.pin`, `tree.refresh`, `tree.namespaces`, `tree.set-database-color`.
+- **Ported from**: *New in Datardo*. **Set color…** on a database: Mongoster 0.10.0, for its MongoDB
+  databases.
+- **Differs**: (M38) a database has no **Set color…**.
 
 What it shows, with a line between the groups. In brackets, the feature behind an entry.
 
 - The heading **Databases**: **Open console** (`console.show`); **Refresh** (`tree.refresh`), **Collapse all**.
-- A database: **Open keys** (`key.show`), **Open console here** (`console.show`, on that database); **New key…**
+- A database: **Open keys** (`key.show`), **Open console here** (`console.show`, on that database); **Set color…**
+  (`tree.set-database-color`); **New key…**
   (creating a key, of the keys' area); **Import keys…** and **Export keys…** (importing and exporting keys, of the
   keys' area); **Delete keys by pattern…** (deleting by pattern, of the keys' area); **Refresh**.
 - A namespace: **Open keys** (`key.show`), **Pin** or **Unpin** (`nav.pin`); **New key…**, with the name starting
@@ -662,3 +1164,5 @@ Acceptance:
 - [ ] The node **<n> empty databases** has no menu; an empty database under it has the menu of a database.
 - [ ] **Pin** reads **Unpin** on a namespace that is pinned.
 - [ ] The menu opens at the node with `Shift+F10`, closes with `Escape`, and gives the focus back to the node.
+- [ ] A database has **Set color…**, also on a read-only connection; a namespace has none, and neither has **Exclude
+      from searches**. (differs)

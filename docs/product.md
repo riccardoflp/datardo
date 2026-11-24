@@ -4,7 +4,8 @@ Datardo is a desktop client for databases, for developers and the people who loo
 speaks two **engines**, MongoDB and Redis. Its window, its connections, its undo history, its scheduled tasks and its
 MCP server are shared by both, so that another engine can be added later without a second product.
 
-For MongoDB it does everything Mongoster 0.8.0 does: it opens collections in a table, runs
+For MongoDB it does everything Mongoster 0.8.0 does, and from M37 to M42 what 0.9.0 and 0.10.0 added but their color
+themes ([D68](decisions.md#d68--what-of-mongoster-090-and-0100-comes-to-datardo)): it opens collections in a table, runs
 queries and aggregations written in mongosh syntax, edits documents, analyzes schemas, indexes and references, moves
 data in and out, backs up, compares, and watches the server. For Redis it browses keys, shows and edits the values of
 every type, runs commands in a console, follows Pub/Sub channels and shows the state of the server. It runs on

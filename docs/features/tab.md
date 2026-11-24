@@ -21,7 +21,7 @@ The open tabs, in groups, one group for each connection.
 - **Entry points**: the first row of the main island (`@tab-strip`).
 - **Shows**: the groups in their order (`tab.groups`), and in each its tabs in theirs. A tab is:
   - the icon of its kind (a collection, a view, keys, one key, a document, a playground, a console, the icon of its
-    page);
+    page), drawn in the color of the tab (`tab.groups`), or in its usual color when the tab has none;
   - its title (`tab.title`);
   - a close button, shown on the active tab and on the tab under the pointer. A tab with unsaved changes shows a dot
     in its place, which becomes the close button under the pointer.
@@ -38,13 +38,20 @@ The open tabs, in groups, one group for each connection.
   - A screen reader says, for a tab: its title, its kind, its connection, whether it is the active one and whether it
     has unsaved changes (`orders, collection tab, Local, selected`).
   - When the tabs do not fit: `tab.fit`.
-- **Uses**: `tab.groups`, `tab.title`, `tab.activate`, `tab.close`, `tab.menu`, `tab.reorder`, `tab.fit`.
-- **Ported from**: *New in Datardo*.
+- **Uses**: `tab.groups`, `tab.title`, `tab.activate`, `tab.close`, `tab.menu`, `tab.reorder`, `tab.fit`,
+  `tree.color-of`.
+- **Ported from**: *New in Datardo*. The icon of a tab in the color of its collection or database comes from the
+  colors of collections and databases of Mongoster 0.9.0 and 0.10.0 (proposal 0001;
+  `src/connectionColors.ts › paintTab`, `tabIcon`; `src/shared/collectionColors.ts › scopeColor`).
+- **Differs**: (M38) the icon of a tab is drawn the same whatever the color of its database or collection.
 
 Acceptance:
 
 - [ ] With the tabs Home, `orders` and `users` of Local, and the keys tab of Cache local, the strip shows three
   groups in this order: the app's, Local's, Cache local's.
+- [ ] With Local red and the collection `shop.orders` teal, the icon of the tab `orders` is teal, and the icons of the
+  tab `users` (no color of its own, nor of its database) and of Home are in their usual color; the line under
+  Local's group is red. (differs)
 - [ ] A click on `users` makes it active; a click with the middle button on `orders` closes `orders` and leaves
   `users` active.
 - [ ] A document tab edited and not saved shows a dot where its close button is; moving the pointer over it shows the
@@ -108,9 +115,10 @@ The tabs of one connection stay together, under its name and color.
 - **Kind**: Derivation
 - **Engine**: Any
 - **Function**: `src/features/tab/groups.ts › groups(tabs, connections)`
-- **Inputs**: the open tabs, each with its connection or none, in the order they hold; the saved connections with
-  their names and colors; which groups are collapsed.
-- **Output**: the groups in order, each with its label and its tabs.
+- **Inputs**: the open tabs, each with its connection or none and what it shows, in the order they hold; the saved
+  connections with their names, their colors and the colors of their databases and collections (`tree.color-of`);
+  which groups are collapsed.
+- **Output**: the groups in order, each with its label and its tabs, each tab with its color or none.
 - **Rules**:
   - The first group is the app's: the tabs that belong to no connection (Home, Settings, Undo history, Scheduled
     tasks, Log, the connection forms). It has no label and no color.
@@ -126,16 +134,42 @@ The tabs of one connection stay together, under its name and color.
     stronger text color.
   - A group that is collapsed (`tab.collapse-group`) shows its label, the number of its tabs, and no tab; but the
     active tab is never hidden: collapsing its group leaves that one tab shown after the label.
-  - Renaming a connection or changing its color changes its group at once.
+  - The group always takes the connection's own color, for its dot and its line, whatever the colors of the
+    databases and collections of its tabs.
+  - Each tab may take a color of its own, which `tab.strip` draws on its icon, by what it shows. It is the color
+    `tree.color-of` gives for what the tab was opened on, when that color comes from the collection or the
+    database; a color that comes from the connection alone is shown by the group, and the tab takes none:
+
+    | The tab shows | Its color |
+    | --- | --- |
+    | a collection, a view or a bucket, or something of one: a collection tab, the page of a bucket (GridFS), a document tab, the document history page, Watch changes or the Index advisor on one collection | the color of that collection, its own or its database's; a bucket by its `.files` collection |
+    | the comparison of two collections, or the structure comparison of two databases | the color both sides share, or the only color one side has, or none (`tree.color-of`) |
+    | one database, and nothing narrower: Watch changes or the Index advisor on a database, the Relationship diagram; for Redis, the keys tab of a database or of a namespace, and a key tab | the database's own color |
+    | the whole connection: Overview, Monitor, Users and roles, Search documents, Watch changes or the Index advisor on the deployment, a playground tab, the console tab, Pub/Sub, Server | none: the group shows the connection's color |
+    | nothing of a connection: an app tab | none |
+
+    An own **None** of a database or a collection is no color, even in a colored connection: its tabs have none.
+  - Renaming a connection or changing its color changes its group at once; changing the color of a database or a
+    collection (`tree.set-database-color`, `tree.set-collection-color`) changes the color of its open tabs at once.
 - **Worked examples**:
   - opened in this order: Home, `orders` of Local, the keys of Cache local, `users` of Local, Settings → the app's
     group (Home, Settings), Local (`orders`, `users`), Cache local (**Keys**)
   - then every tab of Local closed, and `products` of Local opened → the app's group, Cache local, Local
     (`products`)
   - Local collapsed while **Keys** of Cache local is active → `Local 2`, with no tab; Cache local as before
-  - Local collapsed while its tab `users` is active → `Local 2`, followed by the tab `users` alone
-- **Uses**: `tab.collapse-group`, `nav.current-connection`.
-- **Ported from**: *New in Datardo*.
+  - Local red, the database `shop` teal, the collection `shop.orders` with **None**, the collection `shop.users`
+    with no color of its own: the tab `orders` has none, `users` is teal, the Relationship diagram of `shop` teal,
+    `crm.users` and Monitor none, and the dot and the line of Local's group red
+  - Cache local with no color, its database `db3` pink (kept as `"3"`): the keys tab of `db3` and the key tab of
+    `session:42` in `db3` are pink, the keys tab of `db0` and the console have none
+- **Uses**: `tab.collapse-group`, `nav.current-connection`, `tree.color-of`, `tree.set-database-color`,
+  `tree.set-collection-color`.
+- **Ported from**: *New in Datardo*. Which tab takes which color follows the colors of collections and databases of
+  Mongoster 0.9.0 and 0.10.0 (proposal 0001; `src/shared/collectionColors.ts ›
+  scopeColor`, `colorOf`; the collection, GridFS, document history, search, watch, advisor, diagram, compare and
+  structure tabs). Mongoster's Search documents can be one tab per collection or database; Datardo's is one page
+  tab per connection, so it keeps the connection's color.
+- **Differs**: (M38) a tab has no color of its own: the connection's color is shown by its group only.
 
 Acceptance:
 
@@ -143,6 +177,9 @@ Acceptance:
   end of the strip.
 - [ ] Making a tab of Cache local active does not move its group before Local's.
 - [ ] Setting the color of Local to red turns the dot and the line of its group red without a restart.
+- [ ] Each worked example above gives exactly those colors. (differs)
+- [ ] Giving `shop.orders` the color pink while its collection tab and the document tab `orders · 7` are open turns
+  both pink at once, and leaves the dot and the line of Local's group in Local's color. (differs)
 - [ ] The app's group shows no name; with no tab of the app open, the strip starts with the first connection's
   group.
 - [ ] Disconnecting Local turns the dot of its group into a ring, and its tabs stay.

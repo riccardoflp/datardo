@@ -47,7 +47,12 @@ file, to read elsewhere or to import again.
 - **Read-only**: Allowed, because it writes nothing to a deployment; also on views.
 - **Undo**: Cannot be undone, and needs none: it writes a file, not a deployment.
 - **After**: the notification *Exported \<n\> documents to \<file name\>.* with **Open** (the file, in the system's
-  application for it) and **Reveal** (the file, in the system's file manager).
+  application for it) and **Reveal** (the file, in the system's file manager). The main process opens only the file
+  an export of this session has written: any other path opens nothing, and the error notification says *Datardo
+  opens only a file it has just written: \<path\>*. **Open** hands the file to the system's application only when
+  its extension is its format's own, `.json`, `.jsonl` or `.csv`; a file the user named otherwise in the save dialog
+  (`orders.html`, `orders.hta`), which the system would run or render with the values of the documents in it, is
+  shown in its folder instead *(Datardo's choice)*.
 - **Refuses**: before asking anything, a pipeline whose last stage shown is `$out` or `$merge`: *Export failed: A
   pipeline ending with $out writes to the database and can't be exported. Select an earlier stage to export its
   output.* (`/writes`); a filter, sort, projection or stage that does not parse: *Export failed: \<error\>*
@@ -56,7 +61,12 @@ file, to read elsewhere or to import again.
 - **Uses**: `transfer.csv-write`, `table.columns`, `table.selection`, `query.parse`, `aggregate.show`,
   `runner.progress`, `runner.cancel`, `runner.notify`; `task.run` writes its exports the same way.
 - **Ported from**: Mongoster's card transfer.export; `src/transfer.ts` (`exportDocuments`, `exportSource`,
-  `writeExport`, `FileWriter`), `src/queries.ts` (`buildPipeline`), `src/shared/csv.ts`, `src/shared/columns.ts`.
+  `writeExport`, `FileWriter`), `src/queries.ts` (`buildPipeline`), `src/shared/csv.ts`, `src/shared/columns.ts`; the
+  check of what **Open** hands to the system follows Mongoster 0.9.0's (`src/shared/openable.ts › opensAsData`); the
+  check that the path is the file just written is *New in Datardo*.
+- **Differs**: (M37) **Open** starts the feature again with the path the window gives, and the main process opens
+  any path with any extension (`src/features/transfer/export.ts › shownFile`,
+  `src/main/actions/transfer.ts › openPath`).
 
 Acceptance:
 
@@ -75,6 +85,11 @@ Acceptance:
 - [ ] A CSV file starts with the bytes `EF BB BF` and has the visible columns of the collection tab, in its order.
 - [ ] Every 1,000 documents the status line's **Exporting \<collection\>** says *\<n\> documents*.
 - [ ] **Cancel** removes the partial file and says *Export cancelled.*
+- [ ] **Open** after a JSON export to `orders.json` opens it with the system's application for `.json`; after an
+  export the user saved as `orders.html`, **Open** shows the file selected in the system's file manager and opens it
+  in no program. (differs)
+- [ ] Asked by the window to open a path that no export of this session wrote, the main process opens nothing.
+  (differs)
 - [ ] With the pipeline shown up to a `$merge` stage, nothing is asked and the message names `$merge`.
 - [ ] The export works on a read-only connection.
 

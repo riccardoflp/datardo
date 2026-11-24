@@ -782,15 +782,26 @@ Acceptance:
 
 ### `nav.inspector` — The inspector island
 
-The island at the right of the main island, for the thing selected in the page.
+The island at the right of the main island, for the thing selected in the page, and, beside the table of a
+collection, for the formatting rules that color it.
 
 - **Kind**: View
 - **Engine**: Any
 - **Function**: `src/features/nav/inspector.ts › view(state)`
-- **Entry points**: the island at the right (`@inspector`). What it shows is given by the page of the active tab: a
-  document (`document.inspect`), a key and its value (`key.inspect`), an index, a server operation.
+- **Entry points**: the island at the right (`@inspector`). It has two views. **Selection** shows what the page of
+  the active tab gives for the thing selected: a document (`document.inspect`), a key and its value (`key.inspect`),
+  an index, a server operation. **Formatting** shows the formatting rules of the collection (`table.formatting`), on
+  the pages that offer it: the Documents section of a collection tab, in **Find** and in **Aggregate**, on a
+  connection to MongoDB.
 - **Shows**: a first row with what is selected (`orders · 65f1…a2c`) and the button **Hide inspector**; under it,
-  what the page's feature gives.
+  what the page's feature gives. On a page that offers Formatting, the first row begins with the two views as tabs,
+  **Selection** and **Formatting**, the one shown marked; what is selected is then the first line of the Selection
+  view, under the row.
+- **Switching views**: a click on **Selection** or **Formatting** in the first row; with the focus on them, `Left`
+  and `Right` move between the two and `Enter` or `Space` shows the one focused; **Formatting** in the toolbar of the
+  Documents section; `Ctrl+Shift+F` *(Datardo's choice)*, which goes from either view, or from a hidden island, to
+  Formatting and from Formatting back to Selection; Go to, **Formatting rules** and **Inspect the selection**; and
+  every feature that opens a rule (**Format cells…**, **Color by this field**). Each is `nav.toggle-inspector`.
 - **States**:
   - The page has nothing to inspect (Home, Settings, a playground, a console): the island is not shown, whatever the
     user chose, and **Show inspector** is not offered.
@@ -804,11 +815,27 @@ The island at the right of the main island, for the thing selected in the page.
     does not flicker.
   - Error: the message of the read that failed and **Retry**.
   - Hidden by `nav.layout` in a narrow window: not shown, and back by itself when the window is wider.
-- **Rules**: the island belongs to the window, not to a tab: its width (`nav.resize`) and whether the user hid it are
-  one choice for every tab, remembered across starts, shown by default. What it shows follows the active tab: each
-  tab keeps its own selection.
-- **Uses**: `nav.toggle-inspector`, `nav.resize`, `nav.layout`, `document.inspect`, `key.inspect`.
-- **Ported from**: *New in Datardo*. It takes the place of Mongoster's dialog of a document.
+  - Formatting: the Formatting view of the active tab's collection (`table.formatting`). Selecting rows, with a click
+    or the keys, leaves it shown, so that a rule is tuned while the table changes under it; a feature that asks to
+    inspect something (**Inspect document**, `Enter` on a cell, a double click on a cell that cannot be edited in
+    place) shows the Selection view.
+  - Formatting chosen on a page that does not offer it (a keys tab, the Schema section, Home): the island shows the
+    Selection view, or is not shown when the page has nothing to inspect, and the first row has no tabs; the choice is
+    kept, and the next page that offers Formatting shows it.
+- **Rules**: the island belongs to the window, not to a tab: its width (`nav.resize`), whether the user hid it and the
+  view chosen are one choice for every tab, remembered across starts; shown by default, on the Selection view. What
+  it shows follows the active tab: each tab keeps its own selection, and the Formatting view shows the rules of the
+  active tab's collection. Showing Formatting while the user hid the island shows the island, and that becomes the
+  user's choice, as **Inspect** does; when `nav.layout` leaves it no room, the choice is kept and the view is shown as
+  soon as the window is wide enough.
+- **Uses**: `nav.toggle-inspector`, `nav.resize`, `nav.layout`, `document.inspect`, `key.inspect`,
+  `table.formatting`.
+- **Ported from**: *New in Datardo*. It takes the place of Mongoster's dialog of a document. The Formatting view
+  takes the place of Mongoster's Formatting pane (Mongoster 0.9.0 and 0.10.0, query.format-rules,
+  proposal 0003; `src/webview/formatting.ts`, `src/shared/formatting.ts › readFormattingPane`), by the author's
+  decision of 2026-11-24.
+- **Differs**: (M41) the island has one view, the selection: no **Selection** and **Formatting** tabs in its first
+  row, no `Ctrl+Shift+F`, and no view is remembered.
 
 Acceptance:
 
@@ -821,26 +848,51 @@ Acceptance:
 - [ ] After **Hide inspector**, selecting rows does not bring the island back; **Inspect** on a row does.
 - [ ] The island hidden on a collection tab is hidden on a keys tab too, and after a restart.
 - [ ] A document that takes 2 seconds to read shows the turning sign; one that takes 100 ms does not.
+- [ ] On the Documents section of `shop.orders` the first row reads **Selection** and **Formatting**; on a keys tab
+  and on the Indexes section it has no tabs (differs).
+- [ ] With **Formatting** shown, clicking rows of the table leaves the Formatting view shown; `Enter` on a cell shows
+  the Selection view with that document (differs).
+- [ ] With the focus on **Selection** in the first row, `Right` then `Enter` shows the Formatting view (differs).
+- [ ] With **Formatting** shown, making a keys tab active shows the selected key; coming back to `shop.orders` shows
+  the Formatting view again (differs).
+- [ ] With the island hidden, `Ctrl+Shift+F` on `shop.orders` shows the island on the Formatting view, and it stays
+  shown on the next collection tab; `Ctrl+Shift+F` again shows the Selection view (differs).
+- [ ] A Datardo quit with the Formatting view shown starts with it shown on the first collection tab (differs).
 
 ### `nav.toggle-inspector` — Show or hide the inspector island
 
-Gives the page the room of the inspector island, and back.
+Gives the page the room of the inspector island, and back; and chooses which of its two views it shows, the
+selection or the formatting rules.
 
 - **Kind**: Operation
 - **Engine**: Any
 - **Function**: `src/features/nav/toggle-inspector.ts › plan(context, answers)`
 - **Entry points**: **Hide inspector** in the island's first row (`@inspector`); `Ctrl+Shift+B`; on macOS the
   **View** menu (`@app-menu`); Go to (**Hide inspector** while it is shown, **Show inspector** while it is hidden).
-- **Offered when**: the page of the active tab has something to inspect (`nav.inspector`).
-- **Plan**: one app step: `hide the inspector island` or `show the inspector island`.
+  For the views, on a page that offers Formatting (`nav.inspector`): **Selection** and **Formatting** in the island's
+  first row (`@inspector`); **Formatting** in the toolbar of the Documents section (`@toolbar`), which shows the
+  Selection view when the Formatting view is already shown; `Ctrl+Shift+F`; Go to (**Formatting rules**, and
+  **Inspect the selection** while the Formatting view is shown).
+- **Offered when**: the page of the active tab has something to inspect (`nav.inspector`); the views, on a page that
+  offers Formatting: the Documents section of a collection tab.
+- **Plan**: one app step: `hide the inspector island` or `show the inspector island`; for the views, `show the
+  Formatting view of the inspector island` or `show the selection in the inspector island`, which also shows the
+  island when it is hidden.
 - **Danger**: None.
 - **Read-only**: Allowed, because it writes nothing to a deployment.
 - **Undo**: Cannot be undone: nothing is written to a deployment, so nothing is recorded. The same key puts it back.
 - **After**: the main island takes or gives the room (`nav.layout`); the choice is remembered. Hiding the island
-  while the focus is in it moves the focus to the page. Showing it shows what is selected now.
-- **Commands**: `nav.toggle-inspector`.
-- **Uses**: `nav.inspector`, `nav.layout`.
-- **Ported from**: *New in Datardo*.
+  while the focus is in it moves the focus to the page. Showing it shows what is selected now, or the Formatting view
+  when that is the view chosen and the page offers it. Choosing a view with the keyboard (`Ctrl+Shift+F`, Go to) moves
+  the focus into it: on the rules of the Formatting view, or on the first control of the Selection view; a click on a
+  tab leaves the focus on the tab.
+- **Commands**: `nav.toggle-inspector`, `nav.toggle-inspector:formatting`, `nav.toggle-inspector:selection`.
+- **Uses**: `nav.inspector`, `nav.layout`, `table.formatting`.
+- **Ported from**: *New in Datardo*. Choosing the Formatting view takes the place of opening and closing Mongoster's
+  Formatting pane (Mongoster 0.9.0 and 0.10.0, query.format-rules; the `Formatting` button,
+  `saveFormattingPane`, `mongoster.formattingPane`).
+- **Differs**: (M41) it only hides and shows the island: there are no views to choose, no **Formatting** in the
+  toolbar and no `Ctrl+Shift+F`.
 
 Acceptance:
 
@@ -849,6 +901,13 @@ Acceptance:
 - [ ] `Ctrl+Shift+B` on Home does nothing.
 - [ ] Hiding the island with the focus in it puts the focus on the selected row of the table.
 - [ ] With the island hidden, Go to lists **Show inspector** on a keys tab.
+- [ ] **Formatting** in the toolbar of `shop.orders` shows the Formatting view and is pressed; a second click shows
+  the Selection view (differs).
+- [ ] `Ctrl+Shift+F` on a keys tab and on Home does nothing, and Go to lists no **Formatting rules** there (differs).
+- [ ] `Ctrl+Shift+B` with the Formatting view shown hides the island; again, it shows it on the Formatting view
+  (differs).
+- [ ] Go to › **Formatting rules** with the island hidden shows it on the Formatting view with the focus on the
+  first rule, or on **Add rule…** when there is none (differs).
 
 ## The status line
 
@@ -920,7 +979,7 @@ feature opened it.
 - **Engine**: Any
 - **Function**: `src/features/nav/dialog.ts › view(state)`
 - **Entry points**: opened by the runner for a question (`runner.ask`) or a confirmation (`runner.confirm`), and by a
-  View that is a dialog (`window.about`).
+  View that is a dialog (`window.about`, `connection.custom-color`).
 - **Shows**: over the window, centered, with the rest of the window dimmed: a title, what is asked, and its buttons
   at the bottom right, the one that goes on last. It is at most 560 px wide and 80% of the window's height *(both
   Datardo's choices)*; what does not fit scrolls inside it, and the buttons stay in sight.
@@ -944,6 +1003,7 @@ feature opened it.
   - **A screen reader** is told the title when it opens, and that it is a dialog.
 - **Uses**: `runner.ask`, `runner.confirm`.
 - **Ported from**: *New in Datardo*.
+- **Differs**: (M38) no View opens the dialog **Choose a color** (`connection.custom-color`).
 
 Acceptance:
 

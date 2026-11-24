@@ -28,7 +28,7 @@ code use these words; `catalog.py` reports the words of the **Avoid** column any
 | section bar | The row under the scope bar that lists the sections of the active tab. | the tab strip | — | `SectionBar` |
 | scope bar | The row under the tab strip: Back, Forward, the path of the active tab, Pin, Open on another connection. | the status line | breadcrumb bar | `ScopeBar` |
 | path | In the scope bar, where the active tab is: connection, database, collection; or connection, database, namespace. | the path of a field; a file path | — | `TabPath` |
-| inspector island | The island at the right that shows the thing selected in the page: a document, a key, an index, an operation. | a dialog | details pane | `Inspector` |
+| inspector island | The island at the right that shows the thing selected in the page (a document, a key, an index, an operation) or, beside a collection's table, its formatting rules (the Formatting view). | a dialog | details pane | `Inspector` |
 | status line | The row at the bottom of the window, on its background: connection state, counts, work in progress, Read-only. | the scope bar | status bar | `StatusLine` |
 | Go to | The field of the top bar and the list it opens (`Ctrl+K`): finds collections, keys, pages, connections, saved queries and commands. | Search, which looks inside documents | command bar | `Palette` |
 | command | Something the user can start from Go to or with a key, named by the identifier of its card. | a Redis command; a MongoDB command | — | `Command` |
@@ -63,7 +63,11 @@ code use these words; `catalog.py` reports the words of the **Avoid** column any
 | connected | A connection with an open client. | read-only; current | — | `ConnectionState` |
 | read-only connection | A connection through which Datardo refuses every write. A safeguard of Datardo, not a permission of the server. | a server user with read roles; a view | readonly | `Connection.readOnly` |
 | folder | A group of connections, on Home and in the connection switcher. Removing it keeps its connections. | a folder on disk; a namespace | — | `Connection.folder` |
-| color | One of six colors that marks a connection, its island, its group of tabs and its card. | the syntax colors of the theme | label color | `ConnectionColor` |
+| color | One of eleven presets, or a custom color, that marks a connection (its island, its group of tabs, its card) or, as its own color, a database or a collection (their icons in the tree and on their tabs). | the syntax colors of the theme | label color | `Color`, `ConnectionColor` |
+| preset | One of the eleven named colors, red to gray, drawn with a token of each theme. | a custom color | — | `PresetColor` |
+| custom color | A color the user chooses as `#rrggbb` in **Choose a color**, drawn as it is in both themes. Never a color of a formatting rule. | a preset | — | `HexColor` |
+| own color | The color a database or a collection has itself, which wins over its database's and its connection's; **None** is an own color too. | the connection's color | — | `ownColor` |
+| excluded from searches | A connection, database, collection, view or GridFS bucket the user left out of searches: it stays in the tree, dimmed, and Go to still finds it by its name. | a filter of the tree; a read-only connection | — | `excluded`, `exclusions` |
 | SSH tunnel | The SSH server a connection goes through to reach its host. | TLS | SSH proxy | `SshTunnel`, `SshOptions` |
 | known host | An SSH server key fingerprint the user has confirmed once. | — | trusted host | `KnownHosts` |
 | host key fingerprint | `SHA256:…` of an SSH server's key, shown to be confirmed. | the fingerprint of a document | — | `HostKeyCheck` |
@@ -92,7 +96,8 @@ code use these words; `catalog.py` reports the words of the **Avoid** column any
 | table | The grid of the Documents section: one row per document (or per element of an expanded array), one column per field. Also the grid of a keys tab. | a collection | — | `Table` |
 | row | A document as shown in the table; a sub-row is an element of an expanded array. | a document in the database | — | `Row` |
 | column | A field as shown in the table, with its layout (hidden, order, width, pinned). | a field | — | `Column`, `ColumnLayout` |
-| query bar | The row of the Documents section where the filter, the sort, the projection and the limits are typed and run. | Go to | — | `QueryBar` |
+| query bar | The part of a collection tab where the filter, the sort, the projection and the limits are typed and run, with the buttons that act on the query (Explain, Code, Update many…, Delete many…): above the table, or in the query pane. | Go to | — | `QueryBar` |
+| query pane | The query bar put at the right of the table, inside the main island, with a splitter to change its width; one place and one width for every collection tab. | the inspector island | side panel | `QueryPane` |
 | query | A filter, a sort and a projection, run with `find`. | a pipeline | — | `QueryText`, `ParsedQuery` |
 | filter | The condition that chooses documents, in mongosh syntax. | the filter of the tree | where clause | `filter` |
 | pipeline | The stages of an aggregation. | a query | — | `PipelineStage[]` |
@@ -100,8 +105,18 @@ code use these words; `catalog.py` reports the words of the **Avoid** column any
 | mongosh syntax | How Datardo writes and reads MongoDB values: `ObjectId("…")`, `ISODate("…")`, `/re/i`. | JSON | shell syntax | `src/shared/mongosh` |
 | Extended JSON | MongoDB's JSON with types: *canonical* keeps every type, *relaxed* is easier to read. What crosses from the main process to the window is canonical Extended JSON, so that no type is lost on the way. | JSON | — | `src/shared/ejson` |
 | saved query | A query or pipeline kept under a name: *for me* in Datardo's data, or *in the folder* as a file of the connection's queries folder. | the recent queries | favorite | `SavedQuery` |
-| selection | The rows chosen with Ctrl or Shift and a click, kept by `_id` (or by key name in a keys tab). | the text selected in an editor | — | `Selection` |
+| selection | The rows chosen with Ctrl or Shift and a click, kept by `_id` (or by key name in a keys tab); in the tree, the nodes chosen the same way. | the text selected in an editor | — | `Selection` |
 | column action | **Rename field…**, **Remove field…**, **Convert type…** on a column header. | the column's layout | — | `src/features/field` |
+| conditional formatting | Coloring the rows and cells of the table by formatting rules: by conditions on their documents, or by the values of a field. | the syntax colors of values; a connection's color | — | `TableFormat` |
+| formatting rule | What colors rows or cells of the table: a condition rule or a field rule, optionally named, kept in a formatting scope, in order; the first that gives a color wins. | a filter; validation rules | format rule | `FormatRule` |
+| condition rule | A formatting rule with a condition (a filter), a color and what it colors: the row or one field's cell. | a field rule | — | `ConditionRule` |
+| field rule | A formatting rule that colors by the values of one field, with no condition: true and false, a scale for numbers and dates, or a color per value. | a condition rule on one field's cell | — | `FieldRule` |
+| pinned value | A value of a field rule given a color of its own; no other value of the rule takes it. | a pinned item; a pinned column | — | `FieldRule.pinned` |
+| formatting scope | Where a formatting rule applies: this collection, its database, its connection, or everywhere; the nearest is tried first, and a collection can leave any of them out. | the scope of a page (advisor, search) | — | `FormatScope` |
+| Formatting view | The view of the inspector island that lists a collection's formatting rules, edits them in place and shows the legends. | the selection; the Columns panel | — | `FormattingView` |
+| legend | What a field rule shows for the page: each value with its color and count, or the scale's two ends. | — | — | `Legend` |
+| formatting file | A `.datardo-formatting.json` file of formatting rules, one group per scope, with nothing of a connection in it. | a connections file | — | `FormattingFile` |
+| system database | `admin`, `local` and `config`, the databases MongoDB keeps for itself; a restore never takes them as a target under the backup's name. | a system collection | — | `systemDatabases` |
 | query shape | A query with its literal values replaced by `?`, used to group slow operations. | a query | — | `QueryShape` |
 | reference | A field whose values point to documents of another collection, as found by sampling. | a DBRef only | — | `Reference` |
 | search index | An Atlas Search or Vector Search index, managed with `createSearchIndex`. | an index | — | `SearchIndex` |

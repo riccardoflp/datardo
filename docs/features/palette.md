@@ -408,6 +408,8 @@ macOS is made from it, and the documentation of the keys is generated from it.
   | `nav.switch-connection` | **Switch connection…** | `Ctrl+Shift+O` | `Cmd+Shift+O` |
   | `nav.toggle-explorer` | **Show explorer**, **Hide explorer** | `Ctrl+B` | `Cmd+B` |
   | `nav.toggle-inspector` | **Show inspector**, **Hide inspector** | `Ctrl+Shift+B` | `Cmd+Shift+B` |
+  | `nav.toggle-inspector:formatting` | **Formatting rules** | `Ctrl+Shift+F` | `Cmd+Shift+F` |
+  | `nav.toggle-inspector:selection` | **Inspect the selection** | — | — |
   | `nav.resize:reset` | **Reset island widths** | — | — |
   | `nav.focus-island:next` | **Focus next island** | `F6` | `F6` |
   | `nav.focus-island:previous` | **Focus previous island** | `Shift+F6` | `Shift+F6` |
@@ -447,9 +449,11 @@ macOS is made from it, and the documentation of the keys is generated from it.
 - **Uses**: `palette.key-press`, `palette.run-command`, `window.app-menu`.
 - **Ported from**: *New in Datardo*. For reference, Mongoster's commands and their titles are in the `contributes`
   of its `package.json`; its desktop app opens them with `Ctrl+Shift+P`.
+- **Differs**: (M41) the table has no row for `nav.toggle-inspector:formatting` and `nav.toggle-inspector:selection`.
 
 Acceptance:
 
+- [ ] `Ctrl+Shift+F` starts `nav.toggle-inspector:formatting`, titled **Formatting rules** (differs).
 - [ ] `>` in Go to lists every command of every area by title, each with its key at the right when it has one.
 - [ ] Every command of the table above is listed with exactly that title and that key.
 - [ ] No two rows of that list have the same title, and no two the same key.

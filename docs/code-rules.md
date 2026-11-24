@@ -92,7 +92,8 @@ A change that needs to break a rule changes this page first, in its own commit, 
   bytes. *Source: product promise.* *Enforced: unit tests of `src/shared` on every type; an integration test that
   takes one document of every type through each path.*
 - **R5.6** The MCP server's tools never write, kill an operation or change a server setting, and those that return
-  documents or values are offered only with `datardo.mcp.readData`. *Source:
+  documents or values are offered only with `datardo.mcp.readData`; with it off no tool returns a value in a result,
+  a count or the text of an error, and no tool reads a `system.*` collection the assistant names. *Source:
   [D16](decisions.md#d16--the-mcp-server-is-read-only-local-and-behind-a-token).* *Enforced: a test that lists the
   tools with the setting off, and one that runs every tool against a server whose user can only read.*
 
@@ -252,7 +253,8 @@ Each rule answers a threat of [security.md](security.md).
   the system's browser only when it is `https`. *Answers T7.* *Enforced: a test of the window's options and of the
   policy; ESLint for the options.*
 - **R14.7** The MCP server listens only on `127.0.0.1` and refuses a request without the token, from another host or
-  from another origin, or with a body over 1 MB. *Answers T8.* *Enforced: integration tests of the HTTP server.*
+  from another origin, or with a body over 1 MB, and answers at most 20 messages of a JSON-RPC batch. *Answers T8.*
+  *Enforced: integration tests of the HTTP server.*
 - **R14.8** An SSH server's key is confirmed by the user the first time and checked every time after. *Answers T4.*
   *Enforced: an integration test with a changed key.*
 - **R14.9** Datardo makes no network call the user did not cause or a setting did not allow. The only call it makes
@@ -261,6 +263,14 @@ Each rule answers a threat of [security.md](security.md).
   [D44](decisions.md#d44--datardo-says-when-a-newer-version-exists-and-installs-nothing-by-itself)). *Answers T15.*
   *Enforced: a UI test that counts the requests of a start: one with the setting on, none with it off; review for
   the rest.*
+- **R14.10** The main process opens a file with the system's program only when a step of this session wrote it and
+  its type is one that programs open as data; otherwise it shows the file in its folder. A path the window sends is
+  never opened as it is. *Answers T24.* *Enforced: unit tests of the actions that open a path.*
+- **R14.11** On macOS and Linux the files of the data folder and the temporary copies of GridFS files are readable
+  only by the user (`0600`, folders `0700`), also those an older version made. *Answers T20, T25.* *Enforced: an
+  integration test of the store and of `gridfs.open` on Linux.*
+- **R14.12** The packaged application has the fuses of [platform](platform.md#the-packaged-application). *Answers
+  T23.* *Enforced: a test of the packaged application in the CI that reads its fuses.*
 
 ## R15 — Stored data
 
@@ -295,7 +305,7 @@ Each rule serves [data.md](data.md).
 | `scripts/check.mjs` | R1.1, R2.1, R8.2 |
 | `python scripts/check_catalog.py docs` (catalog.py with `--sources`, `--tests`, `--commands`, `--settings`, for the cards built) | R2.3, R4.2, R7.2 for the documents, R8.4, R10.3, R11.1 |
 | Unit tests (`npm test`) | R4.3 to R4.5, R5.2 to R5.5, R10.10, R14.1 to R14.3, R15.1 to R15.3, and the acceptance lines of the cards |
-| Integration tests (`npm run test:integration`) | R5.5, R5.6, R9.3, R14.7, R14.8, and the acceptance lines that reach a server |
+| Integration tests (`npm run test:integration`) | R5.5, R5.6, R9.3, R14.7, R14.8, R14.11, and the acceptance lines that reach a server |
 | UI tests (`npm run test:ui`) | R10.4 partly, R10.5, R10.8 (`test/ui/polish/steady.spec.ts`), R10.9 (`test/ui/polish/fits.spec.ts`), R14.6, and the acceptance lines that are seen |
 
 The checks start in the first milestone; a rule's check is listed in the [roadmap](roadmap.md) under the milestone

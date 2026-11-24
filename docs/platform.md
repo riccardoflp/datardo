@@ -54,6 +54,35 @@ from the first milestone.
 `DATARDO_DATA` set to a folder makes Datardo use it as its data folder, which keeps a development instance and the
 tests apart from an installed one.
 
+On macOS and Linux the data folder, every folder Datardo makes in it (`state/`, `saved-queries/`, `undo/`, `tasks/`)
+and every file it writes there are readable only by the user: folders with the mode `0700`, files with `0600`, set
+when they are made and not left to the user's `umask`. At each start, before anything is read, the main process sets
+these modes again on the data folder and on what it holds of Datardo's own, so that files and folders an older
+version made with the `umask`'s modes (often `0644` and `0755`) are closed too; a mode that cannot be changed is said
+once in the Log and stops nothing. `chromium/` is Electron's and is left as Electron makes it. On Windows the folder
+is in the user's profile, whose permissions already keep the other users out, and nothing is changed. A folder
+`DATARDO_DATA` names is treated the same way (M37; [security](security.md#what-can-go-wrong), T25).
+
+## The packaged application
+
+The installers carry Electron's binary with its fuses set by `electron-builder.yml` (`electronFuses`), so that the
+installed Datardo cannot be started as something else ([security](security.md#what-can-go-wrong), T23). `npm run dev`
+and the UI tests start the Electron of npm, whose fuses are not touched: Playwright passes it `--inspect`.
+
+| Fuse | Set to | What it means |
+| --- | --- | --- |
+| `runAsNode` | off | `ELECTRON_RUN_AS_NODE` no longer turns the binary into a plain Node.js. The playground's process is a `utilityProcess` (`src/main/playground/launcher.ts`) and the worker threads are Node's `worker_threads` inside the main process: neither needs it |
+| `enableNodeOptionsEnvironmentVariable` | off | `NODE_OPTIONS` (`--require`, `--import` of a file) is ignored |
+| `enableNodeCliInspectArguments` | off | `--inspect`, `--inspect-brk` and `SIGUSR1` open no debugger |
+| `onlyLoadAppFromAsar` | on | the code is loaded only from `app.asar`, never from an `app` folder put beside it; the files of `asarUnpack` are still read from `app.asar.unpacked` |
+| `enableCookieEncryption` | on | what Chromium keeps in its cookie store is encrypted with the keychain's key; Datardo keeps nothing there, but nothing is left in clear text if something does |
+| `enableEmbeddedAsarIntegrityValidation` | left off | validating `app.asar` is worth something only once the application is signed: unsigned, whoever can change `app.asar` can change the fuses too ([D45](decisions.md#d45--the-installers-are-not-signed)) |
+| `grantFileProtocolExtraPrivileges` | left on, Electron's default | the window is loaded from `file://` (`window.loadFile`), as R14.6 allows |
+
+Before a release, on each system, the packaged application is started with these fuses and runs a playground and a
+comparison (its worker thread); `npx @electron/fuses read --app <the packaged binary>` lists the fuses as above
+(M37).
+
 ## Networking
 
 - **MongoDB**: the `mongodb` driver, with its TLS; the CA, the client certificate and its key come from the

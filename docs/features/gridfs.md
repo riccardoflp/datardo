@@ -33,12 +33,15 @@ Lists the files of a bucket, a page at a time, and starts everything that is don
 - **Commands**: `gridfs.show`
 - **Uses**: `gridfs.list`, `gridfs.filter`, `gridfs.size-text`, `gridfs.inspect`, `gridfs.upload`,
   `gridfs.download`, `gridfs.open`, `gridfs.rename`, `gridfs.delete`, `tab.open`, `nav.inspector`,
-  `nav.status-line`.
+  `nav.status-line`, `tree.color-of`.
 - **Ported from**: the GridFS tab, which has no card in Mongoster; `src/gridfs.ts` (`GridFSPanel`),
-  `src/webview/gridfs.ts`, `src/extension.ts` (the command that opens a bucket).
+  `src/webview/gridfs.ts`, `src/extension.ts` (the command that opens a bucket). The tab in the bucket's color:
+  Mongoster 0.9.0 (`src/gridfs.ts › GridFSPanel.color`).
+- **Differs**: (M38) the icon of the tab is drawn in the usual color.
 
 The page opens in a tab of its own (`tab.open`), one per bucket, named after the bucket: asking for a bucket whose
-tab is open shows that tab.
+tab is open shows that tab. The icon of the tab takes the bucket's color, which is that of its `.files` collection,
+or of its database, when one of them has a color of its own (`tree.color-of`).
 
 What it shows, top to bottom:
 
@@ -96,6 +99,9 @@ Acceptance:
 - [ ] The filter `{ length: ` shows `Filter:` and the parser's error in place of the table.
 - [ ] On a read-only connection the page lists and previews the files, downloads one, and shows no **Upload…**,
   **Rename…** or **Delete**.
+- [ ] With `collectionColors: { "shop.fs.files": "pink" }`, the icon of the tab of `fs` is pink; with no entry for
+  it and `databaseColors: { shop: "teal" }`, teal; with neither, in the usual color, whatever the connection's color.
+  Setting the color of the bucket while its tab is open changes the icon at once. (differs)
 
 ### `gridfs.buckets` — The buckets of a database
 
@@ -592,17 +598,25 @@ of files that are safe to hand to the system.
 - **Offered when**: a file. Also on a read-only connection.
 - **Reads**: as `gridfs.download`.
 - **Plan**: one file step and one app step:
-  1. `write <the system's temporary folder>\datardo-gridfs\<folder>\logo.png`. The folder's name is the first 48
+  1. `write <the folder of the copies>\<folder>\logo.png`. The folder of the copies is made at the first **Open**
+     since Datardo started, in the system's temporary folder, with a name nobody can know in advance,
+     `datardo-gridfs-` and six random characters, readable by the user alone (mode `0700` on macOS and Linux; on
+     Windows the temporary folder is the user's own); it is made again, with a new name, when it has gone during the
+     run (a cleanup of the temporary folder). Inside it, the `<folder>` of the file is named with the first 48
      characters of the base64url of the connection's identifier, the database, the bucket and the `_id`, so that
-     opening the same file again replaces its copy and two files with one name do not collide. The copy's name is
-     the file name with each of `\ / : * ? " < > |` replaced by `_`, or `file` when that leaves nothing or only
-     dots.
+     opening the same file again replaces its copy and two files with one name do not collide; it is made with the
+     mode `0700`, and the copy with `0600`.
+     The copy's name is the file name with each of `\ / : * ? " < > |` and each control character (codes 0 to 31)
+     replaced by `_`, or `file` when that leaves nothing or only dots.
   2. `open the copy with the system's application`.
 - **Danger**: None.
 - **Read-only**: Allowed, because it writes nothing to a deployment.
-- **Undo**: Cannot be undone from the undo history: it writes a temporary copy. The copies are deleted when Datardo
-  quits, and those a quit could not delete (a copy still open in its application) when it next starts *(Datardo's
-  choice)*. The app step checks the type of the copy once more before handing it to the system.
+- **Undo**: Cannot be undone from the undo history: it writes a temporary copy. The folder of the copies is deleted
+  when Datardo quits. At the next start Datardo deletes what a quit could not (a copy still open in its
+  application): the folders of the temporary folder named `datardo-gridfs-` and six characters, and the folder
+  `datardo-gridfs` that the versions before wrote, when they belong to the user and are folders, not links
+  *(Datardo's choice)*. The
+  app step checks the type of the copy once more before handing it to the system.
 - **After**: while it runs, the status line shows *Opening logo.png* with the bytes and **Cancel**, as a download.
   Changes made to the copy are not written back to the bucket.
 - **Refuses**: a file deleted meanwhile (`/gone`): *The file no longer exists.*; a type Datardo does not hand to
@@ -614,13 +628,22 @@ of files that are safe to hand to the system.
   read.
 - **Commands**: `gridfs.open`
 - **Uses**: `gridfs.download`, `runner.run`, `runner.progress`, `runner.cancel`, `runner.refuse`.
-- **Ported from**: `src/gridfs.ts` (`open`, `save`); the list of types and the removal of the copies are *New in
-  Datardo*.
+- **Ported from**: `src/gridfs.ts` (`open`, `save`); the folder of the copies that only the user can read, with a
+  name of its own, is Mongoster 0.9.0's (`src/gridfs.ts › folderForOpening`, `openedFileName`). The list of types and
+  the removal of the copies at the next start are *New in Datardo*.
+- **Differs**: (M37) the copies go in the fixed folder `datardo-gridfs` of the system's temporary folder, which every
+  user of the machine can know in advance, with the default modes; control characters are kept in the copy's name.
 
 Acceptance:
 
-- [ ] **Open** on `report.pdf` writes a copy named `report.pdf` under `datardo-gridfs` in the temporary folder and
-  asks the system to open it.
+- [ ] **Open** on `report.pdf` writes a copy named `report.pdf` under a folder `datardo-gridfs-` and six characters
+  in the temporary folder, and asks the system to open it. (differs)
+- [ ] On macOS and Linux that folder and the folder of the file have the mode `0700`, and the copy `0600`. (differs)
+- [ ] Two runs of Datardo use two folders with different names; a folder of that name made beforehand by another
+  user, or a link of that name, is never written to. (differs)
+- [ ] When the folder of the copies was deleted during the run, the next **Open** makes a new one with another name.
+  (differs)
+- [ ] A file named `a\u0007b.pdf` (with the control character 7) is copied as `a_b.pdf`. (differs)
 - [ ] Opening the same file twice writes to the same path; two files named `report.pdf` with different `_id` get
   different folders.
 - [ ] A file named `reports/2026/q1.pdf` is copied as `reports_2026_q1.pdf`.
@@ -629,7 +652,9 @@ Acceptance:
   opened.
 - [ ] **Cancel** leaves no copy and opens nothing.
 - [ ] It works on a read-only connection.
-- [ ] After Datardo quits, the `datardo-gridfs` folder is gone.
+- [ ] After Datardo quits, the folder of the copies is gone. (differs)
+- [ ] At the next start, a folder of copies a quit could not delete is deleted, and so is an old `datardo-gridfs`;
+  a folder `datardo-gridfs-` of another user, or a link of that name, is left alone. (differs)
 
 ### `gridfs.rename` — Rename a file
 
@@ -744,7 +769,11 @@ Drops the two collections of a bucket, with every file in it.
 - **Entry points**: **Delete GridFS bucket…** in the context menu of a bucket (`@tree-menu`).
 - **Offered when**: a bucket, on a connection that is not read-only.
 - **Reads**: `db.fs.files.estimatedDocumentCount()`, for the number of files the confirmation shows.
-- **Plan**: two steps: `db.fs.files.drop()`, then `db.fs.chunks.drop()`.
+- **Plan**: two steps: `db.fs.files.drop()`, then `db.fs.chunks.drop()`. Then, only when Datardo keeps one of them
+  for the bucket or its two collections, an app step: `forget the color, the exclusion from searches and the
+  formatting rules of the GridFS bucket shop.fs`, naming those it has: the color and the exclusion of the bucket
+  (kept for `fs.files`) and of `fs.chunks`, on the connection (`tree.color-of`, `tree.excluded`), and the formatting
+  rules of the two collections (`table.add-format-rule`). It runs only when both drops succeeded.
 - **Danger**: Destructive: two collections are lost for good. **Delete the GridFS bucket Local › shop › fs and its
   1,234 files?** (*its 1 file*) says *Drops fs.files and fs.chunks. This can't be undone.*, asks to type `fs`, and
   has the button **Delete**. Mongoster asks with the button alone.
@@ -756,8 +785,13 @@ Drops the two collections of a bucket, with every file in it.
   shows the bucket.
 - **Refuses**: a read-only connection (`/read-only`): *The connection Production is read-only.*
 - **Commands**: `gridfs.drop-bucket`
-- **Uses**: `runner.confirm`, `runner.run`, `tab.close`, `tree.refresh`.
-- **Ported from**: `src/gridfs.ts` (`dropBucket`); `src/extension.ts` (the command that drops a bucket).
+- **Uses**: `runner.confirm`, `runner.run`, `tab.close`, `tree.refresh`, `tree.color-of`, `tree.excluded`,
+  `table.add-format-rule`.
+- **Ported from**: `src/gridfs.ts` (`dropBucket`); `src/extension.ts` (the command that drops a bucket). The color and
+  the exclusion that go: Mongoster 0.9.0 (tree.collection-color-follows, tree.exclusion-follows; the
+  `mongoster.dropGridFSBucket` handler). The formatting rules that go are Datardo's choice.
+- **Differs**: (M38) the plan has the two drops only: a bucket has no color to forget; (M39) nor an exclusion from
+  searches; (M41) nor formatting rules.
 
 Acceptance:
 
@@ -772,3 +806,8 @@ Acceptance:
 - [ ] The bucket `photos` of the same database is not touched by dropping `fs`.
 - [ ] On a read-only connection the entry is not shown, and the command is refused with *The connection Production
   is read-only.* and the code `gridfs.drop-bucket/read-only`.
+- [ ] Dropping `fs` of `shop`, pink and excluded, shows a third step `forget the color and the exclusion from
+  searches of the GridFS bucket shop.fs`; after it, `collectionColors` and `exclusions` have neither `shop.fs.files`
+  nor `shop.fs.chunks`, and a new bucket `fs` is plain and not excluded. (differs)
+- [ ] Dropping a bucket that has no color, no exclusion and no formatting rule shows the two drops alone.
+- [ ] When a drop fails, the color and the exclusion stay.

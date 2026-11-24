@@ -793,7 +793,8 @@ Applies update operators or an update pipeline to every document matching the fi
 - **Kind**: Operation
 - **Engine**: MongoDB
 - **Function**: `src/features/document/update-many.ts › plan(context, answers)`
-- **Entry points**: **Update many…** in the toolbar of the Documents section (`@toolbar`), with the tooltip *Update
+- **Entry points**: **Update many…** in the query bar, apart at the right of its row of tools (`@query-bar`), with the
+  icon `edit` and the tooltip *Update
   every document matching the filter*; **Update `<n>` documents…** on selected rows (`document.update-selected`). Go
   to: **Update many…**. `Ctrl+Enter` in the form continues (`@form`).
 - **Offered when**: in **Find**, on a collection that can be changed. The filter of the query bar must parse:
@@ -845,10 +846,15 @@ Applies update operators or an update pipeline to every document matching the fi
   `runner.confirm`, `runner.notify`, `undo.note`, `undo.record`, `undo.limits`, `undo.notification`,
   `oplog.publish`, `tree.refresh`, `connection.read-only`.
 - **Ported from**: document.update-many; `src/collectionPanel.ts` (`bulkApply`, `writeMany`, `confirmEmptyFilter`),
-  `src/webview/bulk.ts`, `src/webview/main.ts` (`openBulk`), `src/queries.ts` (`toUpdate`, `toBson`).
+  `src/webview/bulk.ts`, `src/webview/main.ts` (`openBulk`), `src/queries.ts` (`toUpdate`, `toBson`). Its place in the
+  query bar is Mongoster 0.9.0's (commit 98c0cb5).
+- **Differs**: (M40) **Update many…** is in the toolbar of the Documents section (`@toolbar`), as text without an
+  icon.
 
 Acceptance:
 
+- [ ] **Update many…** is at the right end of the query bar's row of tools, apart from **Builder**, **Explain** and
+      **Code**, and follows the query into the query pane when it is at the right (`query.position`). (differs)
 - [ ] With the filter `{ status: "new" }` matching 12 documents, the form says *12 documents match the filter.*
 - [ ] `{ $set: { status: "archived" } }` and **Continue** show the confirmation with
   `db.orders.updateMany({ status: "new" }, { $set: { status: "archived" } })` and the button **Update 12 documents**;
@@ -884,7 +890,8 @@ Deletes every document matching the filter of the query bar.
 - **Kind**: Operation
 - **Engine**: MongoDB
 - **Function**: `src/features/document/delete-many.ts › plan(context, answers)`
-- **Entry points**: **Delete many…** in the toolbar of the Documents section (`@toolbar`), with the tooltip *Delete
+- **Entry points**: **Delete many…** in the query bar, apart at the right of its row of tools (`@query-bar`), with the
+  icon `trash` and the tooltip *Delete
   every document matching the filter*. Go to: **Delete many…**.
 - **Offered when**: as `document.update-many`: in **Find**, on a collection that can be changed, with a filter that
   parses; the query runs first when the filter differs from the last one run.
@@ -923,10 +930,15 @@ Deletes every document matching the filter of the query bar.
   `runner.notify`, `undo.note`, `undo.record`, `undo.limits`, `undo.notification`, `oplog.publish`, `tree.refresh`,
   `connection.read-only`.
 - **Ported from**: document.delete-many; `src/collectionPanel.ts` (`bulkApply`, `writeMany`, `confirmEmptyFilter`),
-  `src/webview/bulk.ts`, `src/webview/main.ts` (`openBulk`).
+  `src/webview/bulk.ts`, `src/webview/main.ts` (`openBulk`). Its place in the query bar is Mongoster 0.9.0's (commit
+  98c0cb5).
+- **Differs**: (M40) **Delete many…** is in the toolbar of the Documents section (`@toolbar`), as text without an
+  icon.
 
 Acceptance:
 
+- [ ] **Delete many…** is at the right end of the query bar's row of tools, after **Update many…**, and follows the
+      query into the query pane when it is at the right (`query.position`). (differs)
 - [ ] With the filter `{ status: "draft" }` matching 4 documents, the confirmation shows
   `db.orders.deleteMany({ status: "draft" })` and *4 documents match the filter.*; **Delete 4 documents** deletes
   them and says *Deleted 4 documents from orders.*

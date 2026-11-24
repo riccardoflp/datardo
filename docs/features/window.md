@@ -266,13 +266,18 @@ The colors of the window: dark, light, or as the system.
   puts it back.
 - **After**: the whole window takes the new colors at once, without a restart: the islands, the editors and their
   syntax colors, the dialogs and notifications that are open, the system's buttons on Windows (`window.frame`), and
-  the dialogs of the system (the file dialogs, the menus). The six colors of connections keep their meaning in both
-  themes.
+  the dialogs of the system (the file dialogs, the menus). The eleven presets of the colors of connections,
+  databases and collections keep their meaning in both themes, each drawn with its token of the theme in use; a
+  custom color is drawn as it is in both (`connection.color-presets`).
 - **Commands**: `window.theme:system`, `window.theme:dark`, `window.theme:light`.
 - **Settings**: `datardo.window.theme`: `system` (the default), `dark` or `light`.
-- **Uses**: `settings.read`, `settings.page`.
+- **Uses**: `settings.read`, `settings.page`, `connection.color-presets`.
 - **Ported from**: *New in Datardo*. For reference, Mongoster's desktop app has the same three choices and their
-  names: `src/standalone/vscode/appearance.ts`, `src/standalone/main.ts` (`buildMenu`).
+  names: `src/standalone/vscode/appearance.ts`, `src/standalone/main.ts` (`buildMenu`). The eleven presets, each
+  with a value for the dark and the light themes, come from Mongoster 0.9.0 (`src/shared/colors.ts ›
+  PRESET_DEFAULTS`); Datardo's tokens are its own. Mongoster 0.9.0's seventeen color themes are not ported: Datardo
+  keeps dark, light and following the system.
+- **Differs**: (M38) the theme has the tokens of six colors of connections, not eleven.
 
 Acceptance:
 
@@ -286,6 +291,8 @@ Acceptance:
 - [ ] The theme is applied before the window is first shown: starting with `light` on a dark system never shows a
   dark frame.
 - [ ] A system file dialog opened from Datardo with `dark` chosen is dark on a light system.
+- [ ] Switching from dark to light turns a teal connection's marks from `#4fd1c5` to `#00706a` at once, and leaves a
+  connection colored `#1e90ff` in `#1e90ff`. (differs)
 
 ### `window.zoom` — Zoom in, zoom out, reset the zoom
 

@@ -23,10 +23,20 @@ describe('settings.read', () => {
 
   it('declares every setting of the table of settings.md with the same default, and no other', () => {
     const page = readFileSync('docs/features/settings.md', 'utf8');
-    const rows = [...page.matchAll(/^\| `(datardo\.[\w.]+)` \| ([^|]+) \|/gmu)].map((match) => [
-      match[1] ?? '',
-      (match[2] ?? '').trim(),
-    ]);
+    // A setting read only by cards not built yet (Specified, Reviewed in the index) is planned: its milestone
+    // declares it, as check_catalog.py leaves it out.
+    const index = readFileSync('docs/features/README.md', 'utf8');
+    const planned = new Set(
+      [...index.matchAll(/^\| \[`([a-z][\w-]*\.[a-z][\w-]*)`\].*\| (Specified|Reviewed) \|$/gmu)].map(
+        (match) => match[1],
+      ),
+    );
+    const rows = [...page.matchAll(/^\| `(datardo\.[\w.]+)` \| ([^|]+) \|(.*)$/gmu)]
+      .filter((match) => {
+        const readers = [...((match[3] ?? '').split('|')[2] ?? '').matchAll(/`([a-z][\w-]*\.[a-z][\w-]*)`/gu)];
+        return readers.length === 0 || readers.some((reader) => !planned.has(reader[1]));
+      })
+      .map((match) => [match[1] ?? '', (match[2] ?? '').trim()]);
     expect(Object.keys(settingsSchema.properties).sort()).toEqual(rows.map(([name]) => name).sort());
     for (const [name, written] of rows) {
       const value = settingsSchema.properties[name ?? '']?.default;

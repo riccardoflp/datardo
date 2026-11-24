@@ -109,8 +109,8 @@ Acceptance:
 
 ### `manage.rename-collection` — Rename a collection
 
-Renames a collection within its database; its open tab, its recent and saved queries, its column layout and its pin
-follow the new name.
+Renames a collection within its database; its open tab, its recent and saved queries, its column layout, its pin, its
+color, its exclusion from searches and its formatting rules follow the new name.
 
 - **Kind**: Operation
 - **Engine**: MongoDB
@@ -125,7 +125,9 @@ follow the new name.
 - **Plan**:
   1. `db.orders.renameCollection("orders_2024")`;
   2. `move what Datardo keeps for shop.orders to shop.orders_2024` (an app step): the recent queries, the saved
-     queries *for me*, the column layout with its expanded columns, and the pin.
+     queries *for me*, the column layout with its expanded columns, and the pin; the collection's color and its
+     exclusion from searches, kept on the connection (`tree.color-of`, `tree.excluded`); and its formatting rules
+     (`table.add-format-rule`).
 - **Danger**: None.
 - **Read-only**: Refused on a read-only connection (`/read-only`), before asking anything.
 - **Undo**: Cannot be undone from the undo history: no document is written. Renaming back undoes it.
@@ -136,9 +138,13 @@ follow the new name.
   (`/read-only`). An error of MongoDB stops the first step, and then the second is not run.
 - **Commands**: `manage.rename-collection`
 - **Uses**: `manage.name-rules`, `saved-query.recent`, `saved-query.save`, `table.columns`, `nav.pin`, `tab.open`,
-  `tab.close`, `tree.refresh`, `relation.detect`.
+  `tab.close`, `tree.refresh`, `relation.detect`, `tree.color-of`, `tree.excluded`, `table.add-format-rule`.
 - **Ported from**: manage.rename-collection; `src/manage.ts`, `src/extension.ts`, `src/collectionPanel.ts`
-  (`moveCollectionState`), `src/queryHistory.ts`.
+  (`moveCollectionState`), `src/queryHistory.ts`. The color, the exclusion and the formatting rules that follow:
+  Mongoster 0.9.0 (tree.collection-color-follows, tree.exclusion-follows; `src/extension.ts`, the
+  `mongoster.renameCollection` handler; `src/collectionPanel.ts › moveCollectionState`, `formattingStateKey`).
+- **Differs**: (M38) the collection's color does not move, since collections have none; (M39) nor does its exclusion
+  from searches; (M41) nor do its formatting rules.
 
 Acceptance:
 
@@ -152,6 +158,13 @@ Acceptance:
 - [ ] A view has no **Rename collection…** in its menu, and the command started on a view is refused with *Views
   cannot be renamed.*
 - [ ] When MongoDB refuses the rename, nothing Datardo keeps is moved.
+- [ ] After renaming the teal `shop.orders` to `orders_2024`, the connection has `"shop.orders_2024": "teal"` and no
+  `shop.orders` in `collectionColors`, and the reopened tab's icon is teal. (differs)
+- [ ] After renaming the excluded `shop.logs` to `logs_old`, `exclusions` holds `shop.logs_old` and not `shop.logs`.
+  (differs)
+- [ ] After a rename, the collection tab under the new name colors its rows by the formatting rules the old name had;
+  the old name has none. (differs)
+- [ ] A collection renamed outside Datardo keeps its color, its exclusion and its formatting rules under the old name.
 
 ### `manage.drop-collection` — Drop a collection or a view
 
@@ -166,7 +179,12 @@ confirmation.
 - **Offered when**: a collection or a view of a connection that is not read-only.
 - **Reads**: for a collection, `db.orders.estimatedDocumentCount()` and `db.orders.getIndexes()`, for the text of
   the confirmation; either number is left out of the text when its read fails.
-- **Plan**: `db.orders.drop()`.
+- **Plan**:
+  1. `db.orders.drop()`;
+  2. only when Datardo keeps one of them for the collection or view: `forget the color, the exclusion from searches
+     and the formatting rules of shop.orders` (an app step), naming those it has: its color and its exclusion, kept
+     on the connection (`tree.color-of`, `tree.excluded`), and its formatting rules (`table.add-format-rule`). It
+     runs only when the drop succeeded.
 - **Danger**: Destructive, for a collection: every document and index of the collection, without a copy. The
   confirmation **Drop collection shop.orders** says *Deletes 1,234 documents and 2 indexes. This cannot be undone.*
   (only *This cannot be undone.* when neither number could be read), asks *Type orders to confirm* and has the
@@ -181,8 +199,13 @@ confirmation.
 - **Refuses**: *The connection Production is read-only.* (`/read-only`). An error of MongoDB stops the step and is
   shown as it is.
 - **Commands**: `manage.drop-collection`
-- **Uses**: `runner.confirm`, `tab.close`, `tree.refresh`, `relation.detect`.
-- **Ported from**: manage.drop-collection; `src/manage.ts`, `src/extension.ts`.
+- **Uses**: `runner.confirm`, `tab.close`, `tree.refresh`, `relation.detect`, `tree.color-of`, `tree.excluded`,
+  `table.add-format-rule`.
+- **Ported from**: manage.drop-collection; `src/manage.ts`, `src/extension.ts`. The color and the exclusion that go:
+  Mongoster 0.9.0 (tree.collection-color-follows, tree.exclusion-follows; the `mongoster.dropCollection` handler).
+  The formatting rules that go are Datardo's choice: Mongoster keeps them.
+- **Differs**: (M38) the plan has one step: collections have no color to forget; (M39) nor an exclusion from
+  searches; (M41) nor formatting rules.
 
 Acceptance:
 
@@ -199,6 +222,13 @@ Acceptance:
   that operation), the open document tabs, and other tabs on it.
 - [ ] On a read-only connection **Drop…** is not shown, and the command is refused with *The connection Production is
   read-only.* without reading the counts.
+- [ ] Dropping the teal and excluded `shop.logs` shows the steps `db.logs.drop()` and `forget the color and the
+  exclusion from searches of shop.logs`; after it, `collectionColors` and `exclusions` have no `shop.logs`, and a new
+  `logs` is plain and not excluded. (differs)
+- [ ] Dropping a collection with formatting rules forgets them: a new collection with the same name has none.
+  (differs)
+- [ ] Dropping a collection that has no color, no exclusion and no formatting rule shows one step.
+- [ ] When MongoDB refuses the drop, the color, the exclusion and the formatting rules stay.
 
 ### `manage.drop-database` — Drop a database
 
@@ -212,7 +242,13 @@ Drops a database with all its collections, after the user types its name.
 - **Offered when**: a database of a connection that is not read-only.
 - **Reads**: the names of the collections and views of the database, as `manage.create-collection`, leaving out
   `system.*`, for the number in the confirmation; the number is left out when the read fails.
-- **Plan**: `db.getSiblingDB("shop").dropDatabase()`.
+- **Plan**:
+  1. `db.getSiblingDB("shop").dropDatabase()`;
+  2. only when Datardo keeps one of them for the database or one of its collections: `forget the colors, the
+     exclusions from searches and the formatting rules of shop and its collections` (an app step), naming those it
+     has: the colors and the exclusions of the database and of its collections, views and buckets, kept on the
+     connection (`tree.color-of`, `tree.excluded`); the formatting rules of its collections (`table.add-format-rule`)
+     and those of the database (`table.format-scopes`). It runs only when the drop succeeded.
 - **Danger**: Destructive: every collection, view, document and index of the database, without a copy. The
   confirmation **Drop database shop** says *Deletes 3 collections with all their documents. This cannot be undone.*
   (only *This cannot be undone.* when the collections could not be listed), asks *Type shop to confirm* and has the
@@ -225,8 +261,13 @@ Drops a database with all its collections, after the user types its name.
 - **Refuses**: *The connection Production is read-only.* (`/read-only`). An error of MongoDB stops the step and is
   shown as it is.
 - **Commands**: `manage.drop-database`
-- **Uses**: `runner.confirm`, `tab.close`, `tree.refresh`, `relation.detect`.
-- **Ported from**: manage.drop-database; `src/manage.ts`, `src/extension.ts`.
+- **Uses**: `runner.confirm`, `tab.close`, `tree.refresh`, `relation.detect`, `tree.color-of`, `tree.excluded`,
+  `table.add-format-rule`, `table.format-scopes`.
+- **Ported from**: manage.drop-database; `src/manage.ts`, `src/extension.ts`. The colors and the exclusions that go:
+  Mongoster 0.9.0 and 0.10.0 (tree.collection-color-follows, tree.exclusion-follows; the `mongoster.dropDatabase`
+  handler). The formatting rules that go are Datardo's choice.
+- **Differs**: (M38) the plan has one step: databases and collections have no color to forget; (M39) nor exclusions
+  from searches; (M41) nor formatting rules of collections; (M42) nor formatting rules of a database.
 
 Acceptance:
 
@@ -241,6 +282,12 @@ Acceptance:
   Relationship diagram).
 - [ ] On a read-only connection **Drop database…** is not shown, and the command is refused with *The connection
   Production is read-only.*
+- [ ] Dropping `shop`, teal, with `shop.orders` `#1e90ff` and `shop.logs` excluded, shows the step `forget the colors
+  and the exclusions from searches of shop and its collections`; after it, `databaseColors`, `collectionColors` and
+  `exclusions` have no `shop` nor any key that starts with `shop.`, and the entries of `crm` stay. (differs)
+- [ ] Dropping a database forgets the formatting rules of its collections. (differs)
+- [ ] Dropping a database forgets the formatting rules of its section **Database shop**; those of the connection and
+  of **Everywhere** stay. (differs)
 
 ### `manage.name-rules` — Valid names of databases and collections
 

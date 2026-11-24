@@ -40,7 +40,9 @@ folder, which `mongorestore` and **Restore from backup…** read back.
   `db.<collection>.find({})` in batches of 1,000, as stored, without decoding them.
 - **Plan**: files only. For an archive, `write <file>.agz`: the gzipped archive of `backup.archive-write`. For a
   folder, `create <folder>`, then per database a subfolder with `write <collection>.metadata.json` and `write
-  <collection>.bson` (a view: the metadata only), or `.metadata.json.gz` and `.bson.gz` (`backup.folder-layout`).
+  <collection>.bson` (a view: the metadata only), or `.metadata.json.gz` and `.bson.gz`; the names of the database and
+  of the collection are percent-encoded as mongodump does, so that every file is inside the backup's folder whatever
+  they are called (`backup.folder-layout`).
 - **Danger**: None. An archive replaces an existing file only after the save dialog's own confirmation; a folder
   backup always writes a new folder.
 - **Read-only**: Allowed, because it writes nothing to a deployment.
@@ -60,7 +62,11 @@ folder, which `mongorestore` and **Restore from backup…** read back.
   `runner.notify`; `task.run` writes its backups the same way, without asking.
 - **Ported from**: Mongoster's card backup.create; `src/backup.ts` (`Backups.backup`, `writeBackup`,
   `backupDatabases`, `backupCollections`, `leaveOutUnsupported`, `backupTotals`, `archiveOf`, `dumpCollection`,
-  `rawDocuments`, `collectionMetadata`, `mongorestoreCommand`, `uniquePath`), `src/archive.ts`.
+  `rawDocuments`, `collectionMetadata`, `mongorestoreCommand`, `uniquePath`), `src/archive.ts`; the encoded names of
+  Mongoster 0.9.0 (`src/backupNames.ts › backupFileName`).
+- **Differs**: (M37) a folder backup names each file and database folder with the name as it is, so a collection
+  named `a/b` or `../x` makes the backup fail or write outside its folder, and one named `con` cannot be written on
+  Windows (`src/features/backup/folder-layout.ts`).
 
 Acceptance:
 
@@ -71,6 +77,10 @@ Acceptance:
   for byte.
 - [ ] A compressed folder backup of `shop.orders` writes `<what>_<date>_<time>/shop/orders.bson.gz` and
   `orders.metadata.json.gz`; an uncompressed one `orders.bson` and `orders.metadata.json`.
+- [ ] A folder backup of a database with the collections `a/b`, `a\b`, `a:b`, `con` and `up/../../../escaped` writes
+  two files per collection, all directly in the database's subfolder (`a%2Fb.bson`, `a%5Cb.bson`, `a%3Ab.bson`,
+  `%63on.bson`, `up%2F..%2F..%2F..%2Fescaped.bson`), and nothing outside the backup's folder, on Windows as on the
+  other systems; `mongorestore --dir` restores them under their names. (differs)
 - [ ] A view gets only its metadata file, in a folder; in an archive it is listed and ended, without documents.
 - [ ] A time series collection is left out, and the result is a warning naming it.
 - [ ] The status line's **Backing up \<what\>** says *\<database\>.\<collection\>: \<n\> documents* every 1,000
@@ -104,9 +114,13 @@ or a collection.
     2. the file, with the filters *mongodump archive* (`agz`, `archive`, `gz`) and *All files*, or the folder; the
        button is **Restore**, and the dialog starts in the folder of the last backup;
     3. with more than one database in the backup: on a connection, **databases**, all checked, each with its number
-       of collections; on a database, **database of the backup**, the one to restore into it;
+       of collections, without those whose name the backup cannot choose as a target: `admin`, `local` and `config`
+       in any case (*a system database*) and the names `manage.name-rules` refuses (*not a valid database name*),
+       listed under the list as *Not offered: \<database\> (\<why\>), …*; with a single one left, the step is
+       skipped. On a database, **database of the backup**, the one to restore into it, whatever its name;
     4. on a connection with one database chosen, **database** (*Database on \<connection\> to restore \<name\>
-       into*): the name to restore it under, its own by default;
+       into*): the name to restore it under, its own by default; empty, with *(its own name isn't proposed:
+       \<why\>)* at the end of the line, when its own is that of a system database or not valid;
     5. for each database with more than one collection, **collections of \<database\>**: all checked, each with the
        size of its file, or *view or metadata only*.
   - On a collection, **BSON file or archive**: a `.bson` or `.bson.gz` file (its `.metadata.json` or
@@ -116,8 +130,10 @@ or a collection.
   - Then **existing collections**: **Add documents** (*documents whose _id already exists are kept and skipped*) or
     **Drop and restore** (*each collection is dropped first, like mongorestore --drop*).
 - **Reads**: the backup's list of collections: the start of an archive (`backup.archive-read`), or the files of a
-  folder (`backup.folder-layout`), with their metadata (options, indexes, type); `listCollections` of each database
-  restored into, for the collections that exist. While it runs: an archive once from start to end, also when its
+  folder (`backup.folder-layout`), with their metadata (options, indexes, type, the collection's name);
+  `listCollections` of each database restored into, for the collections and views that exist; with **Add documents**,
+  `db.<collection>.getIndexes()` of each existing collection whose backup has a TTL index, to tell whether it has the
+  same one. While it runs: an archive once from start to end, also when its
   collections alternate; a folder's `.bson` files one after the other.
 - **Plan**, per collection:
   1. with **Drop and restore**, `db.<collection>.drop()` when it exists;
@@ -127,13 +143,20 @@ or a collection.
   3. `db.<collection>.insertMany([<documents>], { ordered: false, bypassDocumentValidation: true })`, in batches of
      1,000 documents or 8 MB, whichever comes first;
   4. unless cancelled, `db.<collection>.createIndexes([<index>])` for each index of the metadata except `_id_` and a
-     clustered one, without its `v` and `ns`.
+     clustered one, without its `v` and `ns`; and, on a collection that existed and was not dropped, except an index
+     with `expireAfterSeconds`, unless the collection already has one with the same key and the same delay: a TTL
+     index would make the server delete documents the restore did not bring. The TTL indexes of a collection the
+     restore creates, or drops first, are created.
 - **Danger**: Confirm: **Restore \<n\> collections into \<connection\> › \<databases\>?**, with *From \<path\>.*,
   then *Existing collections with the same names are dropped first, with their documents and indexes: this can't be
-  undone.* or *Documents are added; those whose _id already exists are skipped.*, and with **Add documents** the line
-  about undo below; button **Restore**. Destructive with **Drop and restore** when at least one of the collections
-  exists: their documents and indexes are lost, and the user types the name of what is restored into: the collection
-  when there is one, the database when they are all in one, otherwise the connection.
+  undone.* or *Documents are added; those whose _id already exists are skipped.*; with **Drop and restore**, when the
+  backup has a view whose name is now a collection's, *The backup has a view in place of this collection, which is
+  dropped with its documents: \<database\>.\<collection\>.* (*these collections, which are dropped with their
+  documents: …* for several); when databases were left out at step 3, *Not restored: \<database\> (\<why\>), ….*;
+  with **Add documents** the line about undo below; button **Restore**. Destructive with **Drop and restore** when at
+  least one of the collections exists: their documents and indexes are lost, also those of a collection that a view
+  of the backup replaces, and the user types the name of what is restored into: the collection when there is one,
+  the database when they are all in one, otherwise the connection.
 - **Read-only**: Refused on a read-only connection: *The connection \<name\> is read-only: nothing can be restored
   into it.* (`/read-only`).
 - **Undo**: With **Add documents**, recorded in the undo history (`undo.record`), one operation per collection,
@@ -147,13 +170,19 @@ or a collection.
 - **After**: the tree and the open pages of the restored collections read again. *Restored \<n\> documents and \<k\>
   indexes in \<c\> collections into \<connection\> › \<databases\> in \<s\> s.*, followed, when they apply, by *\<k\>
   skipped (their _id already existed)*, *\<f\> failed: \<first error\>*, *Index not created —
-  \<collection\>.\<index\>: \<error\>*, *Not restored: \<database\>.\<collection\> (\<why\>)* (then it is a warning),
-  and *Undo from the Undo history, one operation per collection* when more than one was recorded; **Undo** in the
-  notification when exactly one was (`undo.notification`).
+  \<collection\>.\<index\>: \<error\>* (for a TTL index kept off an existing collection: *a TTL index
+  (expireAfterSeconds) would make the server delete documents that were already in the collection; create it from
+  the Indexes section if it's wanted*), *Not restored: \<database\>.\<collection\> (\<why\>), \<database\>
+  (\<why\>)* with the collections not restored and the databases left out (then it is a warning), and *Undo from the
+  Undo history, one operation per collection* when more than one was recorded; **Undo** in the notification when
+  exactly one was (`undo.notification`).
 - **Refuses**: an archive that can't be read: *Can't read \<file\>: \<error\>* (`/unreadable`); one without
   collections: *\<file\> has no collections to restore.* (`/empty`); a folder without backup files: *No backup found
   in \<folder\>: expected \<collection\>.bson and \<collection\>.metadata.json files (mongodump), or a folder of them
-  per database.* (`/no-backup`). Not restored, and said in the result: a time series collection (*a time series
+  per database.* (`/no-backup`); on a connection, a backup of several databases none of which can be restored under
+  its name: *Nothing of \<file\> is restored under the names it gives: \<database\> (\<why\>), …. To restore one of
+  them, use Restore from backup… on the database to restore it into.* (`/system-databases`). Not restored, and said
+  in the result: a time series collection (*a time series
   collection (use mongorestore)*) and, with **Add documents**, a view that exists (*a view that already exists*). A
   damaged or cut archive, or any error: *Restore into \<where\> failed: \<error\>*, followed by *Restored before the
   error: \<summary\>.* when something was.
@@ -161,11 +190,19 @@ or a collection.
 - **Commands**: `backup.restore`.
 - **Settings**: `datardo.undo.enabled`, `datardo.undo.maxDocumentsPerOperation`.
 - **Uses**: `backup.archive-read`, `backup.folder-layout`, `transfer.copy-collection` (the options copied),
+  `manage.name-rules` (the names of databases),
   `undo.record`, `undo.note`, `undo.limits`, `undo.notification`, `connection.read-only`, `runner.ask`,
   `runner.confirm`, `runner.progress`, `runner.cancel`, `tree.refresh`.
 - **Ported from**: Mongoster's card backup.restore; `src/backup.ts` (`Backups.restore`, `CollectionRestore`,
   `scanBackup`, `scanDatabase`, `scanArchive`, `readBson`, `readMetadata`), `src/archive.ts`, `src/copy.ts`
-  (`COPIED_OPTIONS`), `src/history.ts`.
+  (`COPIED_OPTIONS`), `src/history.ts`; the databases left out, the TTL indexes kept off and the collections a view
+  replaces from Mongoster 0.9.0 (`src/backup.ts › refusedDatabase`, `collectionsReplacedByViews`,
+  `CollectionRestore`; `src/backupNames.ts`).
+- **Differs**: (M37) on a connection every database of a backup is offered and restored under its own name, `admin`,
+  `local` and `config` included; with **Add documents** every index of the backup is created, TTL indexes included,
+  on a collection that was already there; the confirmation of **Drop and restore** does not name the collections a
+  view of the backup replaces; a folder's file names are taken as the collections' names as they are
+  (`src/features/backup/restore.ts`, `src/features/backup/restoring/choose.ts`).
 
 Acceptance:
 
@@ -190,6 +227,28 @@ Acceptance:
   no index is created for the collection being restored.
 - [ ] On a read-only connection the entry is not offered; started from Go to it says *The connection \<name\> is
   read-only: nothing can be restored into it.*
+- [ ] A folder backup whose collections are called `a/b`, `con` and `up/../../../escaped` lists them under those names
+  and restores them into collections of those names; a folder written before the names were encoded, with
+  `a:b.bson`, restores `a:b`. (differs)
+- [ ] With **Add documents**, a backup whose metadata has a TTL index `at_ttl` for the existing collection `orders`
+  creates its other indexes, keeps the documents that were there, and ends with the warning *Index not created —
+  orders.at_ttl: a TTL index (expireAfterSeconds) would make the server delete documents that were already in the
+  collection; create it from the Indexes section if it's wanted*. (differs)
+- [ ] The same backup creates `at_ttl` on a collection that did not exist, with **Drop and restore**, and, without a
+  warning, when `orders` already has a TTL index on the same key with the same delay.
+- [ ] On a connection, a backup with the databases `admin`, `shop` and `logs` offers `logs` and `shop` with *Not
+  offered: admin (a system database)*; the confirmation and the result say *Not restored: admin (a system database)*.
+  (differs)
+- [ ] On a connection, a backup with the databases `admin` and `shop` does not ask which: it asks for the
+  **database** with `shop`, and says *Not restored: admin (a system database)*; a backup with `Config` and `local`
+  only is refused with *Nothing of \<file\> is restored under the names it gives: Config (a system database), local
+  (a system database). …* and asks nothing more. (differs)
+- [ ] On a connection, a backup of the only database `admin` asks for the **database** with an empty field and
+  *(its own name isn't proposed: a system database)*: nothing is restored until a name is typed. (differs)
+- [ ] **Restore from backup…** on the database `scratch` restores the `admin` database of a backup into `scratch`.
+- [ ] With **Drop and restore**, a backup with the view `orders` on a database where `orders` is a collection says in
+  the confirmation *The backup has a view in place of this collection, which is dropped with its documents:
+  shop.orders.*, and asks to type the name. (differs)
 - [ ] With the undo history off for the connection and **Add documents**, the confirmation says *The undo history is
   off for this connection: this can't be undone.*
 - [ ] On a connection that publishes for redis-oplog, a restore sends no event.
@@ -260,18 +319,22 @@ one pass.
     left out, and databases and collections are sorted by name.
   - Then: a namespace header without `EOF` starts a block; the documents until the next terminator belong to it, each
     given byte for byte. Blocks of different collections may alternate. An `EOF` header ends a collection: the CRC-64
-    of all its documents, over all its blocks, must equal its `CRC`, otherwise *\<file\> is damaged: the checksum of
-    \<database\>.\<collection\> doesn't match its documents.*
+    of all its documents, over all its blocks, must equal its `CRC`, when the header has one, otherwise *\<file\> is
+    damaged: the checksum of \<database\>.\<collection\> doesn't match its documents.* A file that ends between two
+    blocks, without the `EOF` header of a collection, is not reported: that collection's checksum is never checked.
   - A document whose size is below 5 bytes or above 48 MB: *\<file\> is not a mongodump archive (invalid document at
     byte \<n\>).* The end of the file inside the list: *\<file\> is truncated: it ends in its list of collections.*;
     inside a block: *\<file\> is truncated: \<database\>.\<collection\> is incomplete.*; inside a document: *\<file\>
     is truncated: its last document is incomplete.*
   - The documents are given as they are read: a restore has inserted those that came before the EOF header of a
-    damaged collection.
+    damaged collection, and they stay. The checksum is a CRC against damage by accident, checked at each collection's
+    end, after its documents were inserted: it tells a damaged file, not a file someone changed on purpose, who can
+    write the matching CRC or leave it out.
   - The bytes read from the file (compressed) are counted, for the progress.
 - **Uses**: `backup.restore`, `task.run`.
-- **Ported from**: Mongoster's card backup.archive-read; `src/archive.ts` (`readArchiveCollections`, `readArchive`,
-  `parseArchive`, `bsonFrames`), `src/backup.ts` (`scanArchive`), `test/unit/archive.test.ts`.
+- **Ported from**: Mongoster's card backup.archive-read, as Mongoster 0.9.0 words what the checksum checks;
+  `src/archive.ts` (`readArchiveCollections`, `readArchive`, `parseArchive`, `bsonFrames`), `src/backup.ts`
+  (`scanArchive`), `test/unit/archive.test.ts`.
 
 Examples:
 
@@ -290,6 +353,8 @@ Acceptance:
 - [ ] A gzipped archive named with the extension `.archive` and a plain one named `.agz` are both read.
 - [ ] One changed byte in a document of `shop.things` gives *\<file\> is damaged: the checksum of shop.things doesn't
   match its documents.* at the end of that collection.
+- [ ] An `EOF` header without `CRC` ends its collection without a check; an archive whose last collection has no
+  `EOF` header, the file ending after a terminator, gives every document of it and no error.
 
 ### `backup.folder-layout` — Backup folders and their files
 
@@ -299,20 +364,37 @@ What a backup folder holds and how a folder is recognized as one, the same as `m
 - **Kind**: Derivation
 - **Engine**: MongoDB
 - **Function**: `src/features/backup/folder-layout.ts › collectionMetadata(collection, indexes)` (writing),
-  `scanBackup(entries)` (reading), `mongorestoreCommand(path, format)` and `uniquePath(path, existing)`.
-- **Inputs**: for writing, a collection's name, type, options, UUID and indexes; for reading, the names of the files
-  and folders of a folder.
-- **Output**: the metadata of a collection; the databases and collections of a backup folder; the command that
-  restores a backup; a path that replaces nothing.
+  `scanBackup(entries)` (reading), `mongorestoreCommand(path, format)` and `uniquePath(path, existing)`; with
+  `backupFileName(name)` (a name as a file's or a folder's), `backupCollectionName(fileName, metadataName)` and
+  `backupDatabaseName(folderName)` (back) in the same module.
+- **Inputs**: for writing, a collection's name, type, options, UUID and indexes, and its database's name; for
+  reading, the names of the files and folders of a folder, and the `collectionName` of each metadata file.
+- **Output**: the metadata of a collection; the names of its files and of its database's folder; the databases and
+  collections of a backup folder; the command that restores a backup; a path that replaces nothing.
 - **Rules**:
   - A backup is a folder with one subfolder per database. Each collection has `<name>.bson`, its documents as stored
     one after the other, and `<name>.metadata.json`; compressed, `<name>.bson.gz` and `<name>.metadata.json.gz`. A
     view has only the metadata.
+  - `<name>`, and the subfolder's name, is the collection's or the database's name as `backupFileName` gives it:
+    letters, digits, `_`, `-` and `.` are kept, every other byte of its UTF-8 is `%XX` with upper-case hexadecimal
+    digits (`%` itself too); a dot at either end is `%2E`; the first letter of a name Windows reserves (`con`, `prn`,
+    `aux`, `nul`, `com0`–`com9`, `lpt0`–`lpt9`, in any case, alone or before a dot) is encoded. A result longer than
+    238 characters is cut to its first 208 (never inside a `%XX`), followed by `%24` and the SHA-1 of the name in
+    base64url (27 characters), as mongodump does: with `.metadata.json.gz` the file name stays within 255 bytes. So no
+    name leaves its folder or names a device, and `mongorestore` decodes them.
   - The metadata is canonical Extended JSON with the keys in mongodump's order: `options` (when there are any),
     `indexes` (without `ns`; none for a view), `uuid` (hexadecimal, when known), `collectionName`, `type`.
   - Reading a folder: if it holds files named `<name>.bson`, `<name>.bson.gz`, `<name>.metadata.json` or
     `<name>.metadata.json.gz` itself, it is the folder of one database named after it; otherwise each subfolder
-    holding such files is a database. `system.*` files are left out; collections and databases are sorted by name.
+    holding such files is a database. Collections whose name starts with `system.` are left out, whatever their file
+    is called; collections and databases are sorted by name.
+  - The collection of a file (`backupCollectionName`): a `<name>` without `%` is the collection's name (also in
+    backups written before the names were encoded). With a `%`, the `collectionName` of its metadata is the name when
+    `<name>` is that name as it is (an earlier backup of a collection with a `%` in its name), encoded as above,
+    percent-encoded in another way (mongodump), or cut with the hash of that name; otherwise, and without metadata,
+    `<name>` is percent-decoded, or kept as it is when it cannot be.
+  - The database of a folder (`backupDatabaseName`): its name, decoded only when it is exactly what `backupFileName`
+    gives for the decoded name; any other folder (mongodump's, an earlier backup's) keeps its name.
   - A new backup folder or the output of a scheduled task never replaces something: when the name exists, `_2`,
     `_3`… is added before the extension.
   - The command to restore: `mongorestore --gzip --archive="<file>"` for an archive, `mongorestore --gzip --dir
@@ -320,7 +402,10 @@ What a backup folder holds and how a folder is recognized as one, the same as `m
 - **Uses**: `backup.create`, `backup.restore`, `backup.archive-write`, `task.run`.
 - **Ported from**: Mongoster's card backup.folder-layout; `src/backup.ts` (`collectionMetadata`, `scanBackup`,
   `scanDatabase`, `mongorestoreCommand`, `uniquePath`), `test/integration/scheduledTasks.test.ts`,
-  `test/integration/backup.test.ts`.
+  `test/integration/backup.test.ts`; the encoded names of Mongoster 0.9.0 (`src/backupNames.ts › backupFileName`,
+  `backupCollectionName`, `backupDatabaseName`; `test/unit/backupNames.test.ts`).
+- **Differs**: (M37) names are written and read as they are: the file of the collection `a/b` is `a/b.bson`, in a
+  folder `a`, and a file name is always taken as the collection's name (`src/features/backup/folder-layout.ts`).
 
 Examples:
 
@@ -333,6 +418,14 @@ Examples:
 | `shop-orders-20261101` existing | the next is `shop-orders-20261101_2`, then `shop-orders-20261101_3` |
 | `nightly.agz` existing | the next is `nightly_2.agz` |
 | a capped collection `events` with one index besides `_id_` | `{ "options": { "capped": true, … }, "indexes": [ … ], "uuid": "…", "collectionName": "events", "type": "collection" }` |
+| the collections `a/b`, `../x`, `con`, `nul.txt`, `%2e%2e` and `été` | the files `a%2Fb`, `%2E.%2Fx`, `%63on`, `%6Eul.txt`, `%252e%252e` and `%C3%A9t%C3%A9` (`.bson`, `.metadata.json`) |
+| the collections `console` and `fs.files` | `console` and `fs.files`, as they are |
+| a collection name of 300 letters `a` | `a` 208 times, then `%24` and 27 characters of base64url: 238 characters |
+| `a%2Fb.bson` with the `collectionName` `a/b` | the collection `a/b` |
+| `a%2Fb.bson` with the `collectionName` `a%2Fb` (an earlier backup) | the collection `a%2Fb` |
+| `a%2Fb.bson` without metadata | `a/b`; `100%.bson` without metadata → `100%` |
+| `shop/system.views.bson`, and `shop/system%2Eviews.bson` | left out |
+| the folders `%6Eul` and `50%` | the databases `nul` and `50%` |
 
 Acceptance:
 
@@ -340,3 +433,8 @@ Acceptance:
 - [ ] A folder written by Datardo is restored by `mongorestore --dir`, and compressed by `mongorestore --gzip --dir`.
 - [ ] The metadata of a view has `options` with `viewOn` and `pipeline`, an empty `indexes` and the type `view`.
 - [ ] The metadata of a collection without options has no `options` key.
+- [ ] No name of a collection or a database gives a file or a folder outside the backup's folder, a name with `/`,
+  `\`, `:` or a control character, or a name Windows reserves; two different names never give the same file.
+  (differs)
+- [ ] A folder written by mongodump with collections whose names hold `/` or `%`, and a folder written by Datardo
+  before the names were encoded, are read with the collections' own names. (differs)

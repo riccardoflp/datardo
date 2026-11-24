@@ -4,7 +4,8 @@ built.
 The catalog describes every feature before its code exists. A card's elements, refusal codes, test, commands and
 settings are required of the sources once the index marks it *Built* (at the end of its milestone); until then they
 are left out of these checks. Everything else catalog.py checks applies to every card, built or not. A source that
-carries an element or a code that no card lists is always a problem.
+carries an element or a code that no card lists is a problem, unless the **Differs** line of a card changed after it
+was built names it as what the code still does.
 
 Usage: python scripts/check_catalog.py docs
 """
@@ -54,6 +55,11 @@ def names_to_leave_out(docs: Path) -> list[str]:
         names |= {f"{card['id']}@{place}" for place in card["places"]}
         names |= {f"{card['id']}/{reason}" for reason in card["reasons"]}
         names |= set(card["commands"])
+        # A card that Differs says in that line what the built code still does: the places and codes it names there
+        # are the code's until the milestone that changes the card is done.
+        differs = card["texts"].get("Differs", "")
+        names |= {f"{card['id']}@{place}" for place in catalog.PLACE.findall(differs)}
+        names |= {f"{card['id']}/{reason}" for reason in catalog.REASON.findall(differs)}
     # A place drawn by an area of which nothing is built yet (`@tree`, `@tree-menu`, `@home`) cannot carry its
     # elements: they are checked once that area is.
     built_areas = {name.split(".", 1)[0] for name in built}

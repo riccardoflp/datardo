@@ -599,11 +599,19 @@ Saves the diagram as a picture, with the boxes where they are on the page.
 - **Danger**: None.
 - **Read-only**: Allowed, because it writes nothing to a deployment.
 - **Undo**: Cannot be undone: nothing is written to a deployment; the file can be deleted.
-- **After**: a notification *Saved the diagram of shop to C:\Users\ada\shop-diagram.svg.* with **Open**
-  (`@notification`), which opens the file with the system's program for it. When the file cannot be written, an
+- **After**: a notification *Saved the diagram of shop to C:\Users\ada\shop-diagram.svg.* with **Reveal**
+  (`@notification`), which shows the file in its folder, in the system's file manager: an SVG opened by its program,
+  a browser, runs the scripts it may hold, and the diagram's text comes from the database. The main process shows
+  only the file this feature has just written: a path it did not write in this session is not shown, and the error
+  notification says *Datardo shows only a file it has just written: <path>*. When the file cannot be written, an
   error notification *Diagram not saved: <the system's message>*.
 - **Uses**: `relation.diagram`, `relation.layout`, `runner.ask`, `runner.notify`.
-- **Ported from**: `src/relations.ts › DiagramPanel.saveSvg`; `src/shared/relations.ts › toSvg`.
+- **Ported from**: `src/relations.ts › DiagramPanel.saveSvg`; `src/shared/relations.ts › toSvg`; the file shown in
+  its folder from Mongoster 0.9.0 (`src/shared/openable.ts › opensAsData`, which leaves `.svg` out). The button is
+  named **Reveal**, as Datardo's other notifications name showing a file in its folder *(Datardo's choice; Mongoster
+  keeps the name Open)*.
+- **Differs**: (M37) the notification's button is **Open**, which opens the file with the system's program for it,
+  and the main process opens whatever path the window gives it (`src/main/actions/relation.ts › openFile`).
 
 The picture:
 
@@ -620,7 +628,10 @@ The picture:
 Acceptance:
 
 - [ ] **Save SVG…** on the diagram of `shop` proposes `shop-diagram.svg`; saving writes the file and the notification
-  says *Saved the diagram of shop to <path>.* with **Open**.
+  says *Saved the diagram of shop to <path>.* with **Reveal**, which shows the file selected in the system's file
+  manager and opens it in no other program. (differs)
+- [ ] Asked by the window to show a path that no **Save SVG…** of this session wrote, the main process shows nothing
+  and opens nothing. (differs)
 - [ ] Closing the dialog writes nothing and says nothing.
 - [ ] The file opens in a browser and shows the same boxes at the same places relative to each other as the page,
   with a box that was dragged where it was dragged.

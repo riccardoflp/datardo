@@ -183,8 +183,11 @@ What it is for, in one or two sentences, from the user's side.
 - **Commands**: the commands that start it, and nothing else in backticks: `area.action`.
 - **Settings**: the `datardo.*` settings that change what it does.
 - **Uses**: other features, by identifier.
-- **Ported from**: where Mongoster 0.8.0 does this, for whoever builds it: Mongoster's card by name, without
-  backticks (document.delete), and its files (`src/collectionPanel.ts`). *New in Datardo* when it does not.
+- **Ported from**: where Mongoster does this, for whoever builds it: Mongoster's card by name, without backticks
+  (document.delete), and its files (`src/collectionPanel.ts`); 0.8.0 unless the card names the later version that
+  brought it (0.9.0 or 0.10.0). *New in Datardo* when it does not.
+- **Differs**: only on a card built by an earlier milestone and changed since: what the code built today does that
+  the card no longer says, with the milestone that changes it: `(M38) …`.
 
 Acceptance:
 
@@ -197,6 +200,14 @@ worked examples (input → output). For an algorithm, name a published one and s
 
 A **View** card says what the page shows, in which order and in which states (loading, empty, error, read-only), and
 names in **Uses** the features its controls start.
+
+### A card that changes after it was built
+
+A card the index marks *Built* is changed in place, never copied: its lines say what Datardo will do, its **Differs**
+line says what the code does today, and each acceptance line the code does not meet yet ends with *(differs)*. The
+index then shows it *Differs*. The milestone that changes it lists it in its **Features** with *(changed)* before
+it, beside the milestone that built it ([roadmap](roadmap.md)); when that milestone is done, the **Differs** line and
+the marks go and the card is *Built* again.
 
 ### What makes an acceptance line good
 

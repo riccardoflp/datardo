@@ -188,6 +188,7 @@ Acceptance:
 | `datardo.tab.restore` | on | on, off | Whether the tabs open at quit come back at the next start. | `tab.restore` | **New** |
 | `datardo.runner.systemNotifications` | on | on, off | Whether long work that ends while the window is not in front shows a notification of the system. | `runner.notify` | **New** |
 | `datardo.query.timeLimitSeconds` | 60 | 1 to 3,600 | How long the server may work on one query before it is stopped. | `query.run` | **New**: fixed at 60 |
+| `datardo.query.position` | `top` | `top`, `right` | Where a collection tab puts its query: above the table, or in the query pane at its right. One place for every collection tab. | `query.position` | `mongoster.queryBar.position` (0.9.0) |
 | `datardo.relation.detect` | on | on, off | Whether references between collections are found when a database is opened. | `relation.detect` | `mongoster.references.detect` |
 | `datardo.undo.enabled` | on | on, off | Whether writes to documents and keys are kept in the undo history. | `undo.record` | `mongoster.history.enabled` |
 | `datardo.undo.maxSizeMb` | 100 | 0 or more | The most disk space the undo history takes, in MB. | `undo.limits` | `mongoster.history.maxSizeMB` |
@@ -198,16 +199,16 @@ Acceptance:
 | `datardo.task.keepRunningInTray` | off | on, off | Whether closing the window keeps Datardo in the tray while a scheduled task is enabled. | `task.tray` | `mongoster.scheduledTasks.keepRunningInTray` |
 | `datardo.mcp.enabled` | off | on, off | Whether the MCP server runs. | `mcp.server` | `mongoster.mcp.enabled` |
 | `datardo.mcp.port` | 37018 | 1024 to 65535 | The port of the MCP server on 127.0.0.1. | `mcp.server` | `mongoster.mcp.port` (37017) |
-| `datardo.mcp.readData` | on | on, off | Whether the tools of the MCP server may return documents and the values of keys. | `mcp.read-data` | `mongoster.mcp.readDocuments` |
+| `datardo.mcp.readData` | on | on, off | Whether the tools of the MCP server may return documents and the values of keys. Off, the tools that return them and `explain_query` are not offered, `count_documents` gives only totals, and what could quote a value (commands, validators, view pipelines, partial filters, saved queries, a server's error) is reduced to its shape or its code. | `mcp.read-data` | `mongoster.mcp.readDocuments` |
 | `datardo.key.separator` | `:` | text | The text key names are split at to make namespaces. | `tree.namespaces`, `key.pattern` | **New** |
 | `datardo.console.historySize` | 500 | 0 to 5,000 | How many commands of the console are remembered for each connection. | `console.history` | **New** |
 
 Their titles in the Settings page, by group: **Window**: Theme, Zoom, Check for a newer version. **Tabs**: Restore
-tabs at start. **Notifications**: Notify when long work ends. **Queries**: Time limit of a query, in seconds.
-**Relationships**: Find references between collections. **Undo history**: Keep the undo history, Disk space, in MB,
-Days to keep, Operations to keep, Documents or keys in one operation, Data in one operation, in MB. **Scheduled
-tasks**: Keep running in the tray. **MCP server**: Run the MCP server, Port, Let assistants read data. **Redis
-keys**: Separator of namespaces. **Redis console**: Commands remembered.
+tabs at start. **Notifications**: Notify when long work ends. **Queries**: Time limit of a query, in seconds, Place of
+the query. **Relationships**: Find references between collections. **Undo history**: Keep the undo history, Disk
+space, in MB, Days to keep, Operations to keep, Documents or keys in one operation, Data in one operation, in MB.
+**Scheduled tasks**: Keep running in the tray. **MCP server**: Run the MCP server, Port, Let assistants read data.
+**Redis keys**: Separator of namespaces. **Redis console**: Commands remembered.
 
 ### Settings of Mongoster that have no place
 
@@ -274,6 +275,7 @@ holds the exact rule; this table is for reviewing them at once. Every other numb
 | `tree.keyboard` | what was typed is remembered for 1 second |
 | `tree.node-states` | *Loading…* after 200 ms |
 | `query.run` | the time limit can be set from 1 to 3,600 seconds |
+| `query.position` | a splitter 8 px wide between the table and the query pane |
 | `undo.record`, `undo.revert` | 1,000 keys or commands in a pipeline |
 | `undo.kept` | two expiry times within 1,000 ms count as the same |
 | `undo.details` | the first 100 keys |

@@ -1,18 +1,23 @@
 # Roadmap
 
-Every milestone, M0 to M36, is done; a new one is planned here first. A milestone is taken by reading its section,
-then every card it lists, in order; nothing outside it is built without asking. The
+M0 to M36 are done; M37 to M42 are planned, and M37 is the next. A new milestone is planned here first. A milestone is
+taken by reading its section, then every card it lists, in order; nothing outside it is built without asking. The
 [index of the catalog](features/README.md) shows each card's milestone and status.
 
 The milestones come in three stages. **M0 to M12** make a MongoDB client that browses, queries and edits documents
 safely. **M13 to M18** add Redis: keys, values, the console, the server, Pub/Sub. **M19 to M35** bring the rest of
 what Mongoster does, by how often it is used; **M36** makes the window steady and gives it the colors of the sketch.
-Each milestone ends with something that runs.
+**M37 to M42** bring what Mongoster 0.9.0 and 0.10.0 added after 0.8.0, adapted to Datardo
+([D68](decisions.md#d68--what-of-mongoster-090-and-0100-comes-to-datardo)): the fixes of its security audit first,
+then the colors of collections and databases, exclusions from searches, the query beside the results and conditional
+formatting. Each milestone ends with something that runs.
 
 In each list of **Features** the cards are in the order to build them: what a card uses inside the milestone comes
-before it. A card often names a feature of a later milestone (a menu entry, a button that opens another page): build
-the card without that part, and finish it in the milestone that brings the feature; each milestone lists these under
-**Not in this milestone**. The lists and the links are written by `python scripts/roadmap.py docs` from the catalog.
+before it. An item marked *(changed)* is a card an earlier milestone built, whose **Differs** line says what this one
+changes ([feature contract](feature-contract.md#a-card-that-changes-after-it-was-built)). A card often names a
+feature of a later milestone (a menu entry, a button that opens another page): build the card without that part, and
+finish it in the milestone that brings the feature; each milestone lists these under **Not in this milestone**. The
+lists and the links are written by `python scripts/roadmap.py docs` from the catalog.
 
 ## M0 — The workshop
 
@@ -139,6 +144,7 @@ its zoom; it remembers where it was, runs as one instance, can sit in the tray, 
 - Named by cards above and built in M6: `connection.disconnect`.
 - Named by cards above and built in M26: `task.show`, `task.tray`.
 - Named by cards above and built in M29: `mcp.server`.
+- Named by cards above and built in M38: `connection.color-presets`.
 
 ## M2 — Islands to get around
 
@@ -225,6 +231,7 @@ dialogs behave in one way.
 - Named by cards above and built in M14: `value.format`.
 - Named by cards above and built in M26: `task.show`.
 - Named by cards above and built in M34: `search.show`.
+- Named by cards above and built in M41: `table.formatting`.
 
 ## M3 — The runner and the settings
 
@@ -360,6 +367,7 @@ at the next start.
 - Named by cards above and built in M9: `query.run`.
 - Named by cards above and built in M20: `saved-query.recent`.
 - Named by cards above and built in M28: `playground.save`.
+- Named by cards above and built in M38: `tree.set-collection-color`, `tree.set-database-color`, `tree.color-of`.
 
 ## M5 — Go to and Home
 
@@ -429,6 +437,8 @@ saved connections by folder and the places used last.
 - Named by cards above and built in M14: `value.format`.
 - Named by cards above and built in M28: `playground.open-file`.
 - Named by cards above and built in M33: `gridfs.show`.
+- Named by cards above and built in M38: `connection.color-presets`.
+- Named by cards above and built in M39: `tree.exclude-from-searches`, `tree.excluded`.
 
 ## M6 — Connect to MongoDB and to Redis
 
@@ -526,6 +536,9 @@ the secret storage, connects and disconnects, makes it read-only, and sees its O
 - Named by cards above and built in M29: `mcp.server`.
 - Named by cards above and built in M30: `monitor.show`.
 - Named by cards above and built in M35: `structure.apply`.
+- Named by cards above and built in M38: `connection.color-presets`, `connection.custom-color`.
+- Named by cards above and built in M39: `tree.exclude-from-searches`.
+- Named by cards above and built in M42: `table.format-scopes`.
 
 ## M7 — Connections, organized and shared
 
@@ -603,6 +616,8 @@ connection.
 ### Not in this milestone
 
 - Named by cards above and built in M11: `oplog.publish`.
+- Named by cards above and built in M38: `connection.color-presets`, `connection.custom-color`, `tree.color-of`.
+- Named by cards above and built in M39: `tree.excluded`.
 
 ## M8 — The tree
 
@@ -687,6 +702,8 @@ from the keyboard.
 - Named by cards above and built in M33: `gridfs.show`.
 - Named by cards above and built in M34: `relation.detect`, `relation.diagram`, `search.show`.
 - Named by cards above and built in M35: `compare.show`, `structure.show`.
+- Named by cards above and built in M38: `tree.set-collection-color`, `tree.set-database-color`, `tree.color-of`.
+- Named by cards above and built in M39: `tree.select`, `tree.exclude-from-searches`, `tree.excluded`.
 
 ## M9 — Query a collection
 
@@ -763,9 +780,12 @@ colors, autocomplete, the query builder, a count, a time limit and Cancel.
 - Aggregate: M19.
 - Named by cards above and built in M10: `table.show`, `table.columns`, `table.arrange-columns`, `table.paging`,
   `table.page-window`.
+- Named by cards above and built in M12: `document.update-many`, `document.delete-many`.
 - Named by cards above and built in M19: `aggregate.show`, `aggregate.run`.
-- Named by cards above and built in M20: `saved-query.recent`.
-- Named by cards above and built in M23: `schema.analyze`.
+- Named by cards above and built in M20: `saved-query.show`, `saved-query.recent`.
+- Named by cards above and built in M23: `explain.show`, `schema.analyze`.
+- Named by cards above and built in M24: `codegen.show`.
+- Named by cards above and built in M40: `query.position`.
 
 ## M10 — The table of documents
 
@@ -849,6 +869,8 @@ several formats, paging.
 - Named by cards above and built in M25: `transfer.export`.
 - Named by cards above and built in M27: `history.show`, `watch.show`.
 - Named by cards above and built in M34: `relation.follow`.
+- Named by cards above and built in M41: `table.format-table`, `table.formatting`, `table.add-format-rule`.
+- Named by cards above and built in M42: `table.color-by-field`, `table.format-scopes`.
 
 ## M11 — What every write does: the undo history and redis-oplog
 
@@ -1632,6 +1654,10 @@ collection.
 
 - Named by cards above and built in M23: `schema.analyze`.
 - Named by cards above and built in M34: `relation.detect`.
+- Named by cards above and built in M38: `tree.color-of`.
+- Named by cards above and built in M39: `tree.excluded`.
+- Named by cards above and built in M41: `table.add-format-rule`.
+- Named by cards above and built in M42: `table.format-scopes`.
 
 ## M22 — Indexes
 
@@ -2081,8 +2107,8 @@ reading data.
    the Model Context Protocol. *Derivation.*
 4. [`mcp.arguments`](features/mcp.md#mcparguments--read-the-arguments-of-a-tool) — Read the arguments of a tool.
    *Derivation.*
-5. [`mcp.refuse-write-stages`](features/mcp.md#mcprefuse-write-stages--refuse-pipelines-with-out-or-merge) — Refuse
-   pipelines with $out or $merge. *Derivation.*
+5. [`mcp.refuse-write-stages`](features/mcp.md#mcprefuse-write-stages--refuse-pipelines-that-write-are-not-a-plain-read-or-read-a-system-collection)
+   — Refuse pipelines that write, are not a plain read, or read a system collection. *Derivation.*
 6. [`mcp.data-tools`](features/mcp.md#mcpdata-tools--explore-the-connections-and-read-documents) — Explore the
    connections and read documents. *Read.*
 7. [`mcp.debugging-tools`](features/mcp.md#mcpdebugging-tools--follow-what-an-application-writes) — Follow what an
@@ -2137,6 +2163,7 @@ reading data.
 
 - Named by cards above and built in M30: `advisor.show`, `monitor.show`.
 - Named by cards above and built in M34: `relation.detect`, `search.show`.
+- Named by cards above and built in M39: `tree.excluded`.
 
 ## M30 — Slow queries and the Index advisor
 
@@ -2394,7 +2421,9 @@ bucket is created and dropped.
 
 ### Not in this milestone
 
-- Nothing that its cards name.
+- Named by cards above and built in M38: `tree.color-of`.
+- Named by cards above and built in M39: `tree.excluded`.
+- Named by cards above and built in M41: `table.add-format-rule`.
 
 ## M34 — Search documents and relations
 
@@ -2467,7 +2496,7 @@ collections are found by sampling, drawn as a relationship diagram, and followed
 
 ### Not in this milestone
 
-- Nothing that its cards name.
+- Named by cards above and built in M39: `tree.excluded`.
 
 ## M35 — Compare collections and structures
 
@@ -2575,6 +2604,466 @@ tests.
 - [x] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
       the keyboard alone (QA15, QA16).
 - [x] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
+      and this milestone's **Status** is *done*.
+
+### Not in this milestone
+
+- Nothing that its cards name.
+
+## M37 — The fixes of Mongoster's security audit
+
+**Goal**: What Mongoster 0.9.0 fixed after an audit of its MCP server, its backups, GridFS and its desktop app is
+fixed in Datardo too: the MCP server answers small batches, never reads a `system.*` collection nor a stage that is
+not a plain read, and with `datardo.mcp.readData` off gives no value at all; backups write any name safely and a
+restore never revives a system database or a TTL index on existing documents; the window can no longer have any file
+opened; the data folder and the temporary copies are the user's alone; the packaged application cannot be started as
+plain Node.js.
+**Depends on**: M36.
+**Status**: planned
+
+### Features
+
+20 changed cards, in the order to build them. A changed card was built by an earlier milestone: its **Differs** line
+says what changes, and its acceptance lines marked *(differs)* are this milestone's tests; the other lines must keep
+passing.
+
+1. *(changed)* [`mcp.output-limits`](features/mcp.md#mcpoutput-limits--bound-what-a-tool-returns-and-how-long-it-runs)
+   — Bound what a tool returns and how long it runs. *Derivation.*
+2. *(changed)* [`connection.import`](features/connection.md#connectionimport--import-connections) — Import
+   connections. *Operation.*
+3. *(changed)* [`gridfs.open`](features/gridfs.md#gridfsopen--open-a-file-with-the-systems-application) — Open a file
+   with the system's application. *Operation.*
+4. *(changed)* [`relation.export-svg`](features/relation.md#relationexport-svg--save-the-diagram-as-an-svg-image) —
+   Save the diagram as an SVG image. *Operation.*
+5. *(changed)* [`transfer.export`](features/transfer.md#transferexport--export-documents-to-a-file) — Export documents
+   to a file. *Operation.*
+6. *(changed)* [`backup.folder-layout`](features/backup.md#backupfolder-layout--backup-folders-and-their-files) —
+   Backup folders and their files. *Derivation.*
+7. *(changed)* [`backup.create`](features/backup.md#backupcreate--back-up-a-connection-a-database-or-a-collection) —
+   Back up a connection, a database or a collection. *Operation.*
+8. *(changed)* [`backup.restore`](features/backup.md#backuprestore--restore-from-a-backup) — Restore from a backup.
+   *Operation.*
+9. *(changed)* [`mcp.read-data`](features/mcp.md#mcpread-data--the-tools-offered-without-reading-data) — The tools
+   offered without reading data. *Derivation.*
+10. *(changed)* [`mcp.protocol`](features/mcp.md#mcpprotocol--answer-a-message-of-the-model-context-protocol) — Answer
+    a message of the Model Context Protocol. *Derivation.*
+11. *(changed)* [`mcp.arguments`](features/mcp.md#mcparguments--read-the-arguments-of-a-tool) — Read the arguments of
+    a tool. *Derivation.*
+12. *(changed)* [`mcp.refuse-write-stages`](features/mcp.md#mcprefuse-write-stages--refuse-pipelines-that-write-are-not-a-plain-read-or-read-a-system-collection)
+    — Refuse pipelines that write, are not a plain read, or read a system collection. *Derivation.*
+13. *(changed)* [`mcp.data-tools`](features/mcp.md#mcpdata-tools--explore-the-connections-and-read-documents) —
+    Explore the connections and read documents. *Read.*
+14. *(changed)* [`mcp.debugging-tools`](features/mcp.md#mcpdebugging-tools--follow-what-an-application-writes) —
+    Follow what an application writes. *Read.*
+15. *(changed)* [`mcp.performance-tools`](features/mcp.md#mcpperformance-tools--find-what-makes-a-database-slow) —
+    Find what makes a database slow. *Read.*
+16. *(changed)* [`mcp.deployment-tools`](features/mcp.md#mcpdeployment-tools--read-the-state-of-the-deployment) — Read
+    the state of the deployment. *Read.*
+17. *(changed)* [`mcp.data-model-tools`](features/mcp.md#mcpdata-model-tools--answer-quick-questions-about-the-data-model)
+    — Answer quick questions about the data model. *Read.*
+18. *(changed)* [`mcp.tab-tools`](features/mcp.md#mcptab-tools--open-datardos-tabs-for-the-user) — Open Datardo's tabs
+    for the user. *Read.*
+19. *(changed)* [`mcp.log`](features/mcp.md#mcplog--the-mcp-server-in-the-log) — The MCP server in the Log.
+    *Derivation.*
+20. *(changed)* [`mcp.server`](features/mcp.md#mcpserver--run-the-mcp-server-on-127001) — Run the MCP server on
+    127.0.0.1. *Operation.*
+
+### Beyond the cards
+
+- **Modules**: `src/features/mcp`, `src/main/mcp` (the batch), `src/features/backup` (the names of
+  `backup.folder-layout`), `src/main/actions` (what may be opened, R14.10), `src/storage` (the modes, R14.11),
+  `src/main/gridfs.ts` (the private folder), `electron-builder.yml` (the fuses).
+- **Code rules checked from now**: R14.10, R14.11, R14.12; R5.6 and R14.7 as reworded.
+- **Decisions**: D68, D73; relies on D16, D18, D42, D45.
+- **Threats**: T5, T8, T9, T20 as rewritten; T23, T24, T25 new.
+- **Stored data**: no format changes; the modes of [data](data.md#how-it-is-written), and backup folders with encoded
+  names, those written before still read.
+- **Settings**: the description of `datardo.mcp.readData` in `resources/settings.schema.json`.
+
+### Exit criteria
+
+- [ ] A JSON-RPC batch of 21 messages gets 400 and none of them runs; `find_documents` with a `skip` of 1,000,001 is
+      refused; `aggregate` with `$out` inside a `$facet` and with `$lookup` from `system.users` are refused, without a
+      command reaching the server.
+- [ ] With `datardo.mcp.readData` off, no tool's answer holds a value of a document: a test runs every tool on a
+      collection whose every value is a marker string and finds the marker nowhere.
+- [ ] A folder backup of the collections `a/b`, `con` and `..x` is restored by `mongorestore --dir` with their names,
+      and a folder written before M37 is still restored by Datardo.
+- [ ] On Linux, after a start, every file of the data folder has the mode 0600 and every folder 0700, also those made
+      0644 by hand before; the packaged application started with `ELECTRON_RUN_AS_NODE=1` opens its window instead of
+      running as Node.js.
+- [ ] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
+      `npm run test:integration`, `npm run test:ui`; `catalog.py --tests` reports none missing for these cards.
+- [ ] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
+      the keyboard alone (QA15, QA16).
+- [ ] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
+      and this milestone's **Status** is *done*.
+
+### Not in this milestone
+
+- Named by cards above and built in M38: `tree.color-of`.
+- Named by cards above and built in M39: `tree.excluded`.
+
+## M38 — The colors of collections and databases
+
+**Goal**: A connection takes one of eleven colors or a custom one; a MongoDB database, a Redis database and a
+collection, view or bucket can have a color of their own, shown on their icons in the tree and on their tabs, kept
+with the connection, carried by its export and moved or forgotten by a rename or a drop; Compass's teal, iris, pink
+and gray come in as themselves; a list of connection strings takes the names of its `// name` comments.
+**Depends on**: M37.
+**Status**: planned
+
+### Features
+
+5 new cards and 27 changed, in the order to build them. A changed card was built by an earlier milestone: its
+**Differs** line says what changes, and its acceptance lines marked *(differs)* are this milestone's tests; the other
+lines must keep passing.
+
+1. *(changed)* [`connection.read-list`](features/connection.md#connectionread-list--read-a-list-of-connection-strings)
+   — Read a list of connection strings. *Derivation.*
+2. *(changed)* [`nav.dialog`](features/nav.md#navdialog--how-every-dialog-behaves) — How every dialog behaves. *View.*
+3. [`connection.color-presets`](features/connection.md#connectioncolor-presets--the-preset-colors-and-custom-colors) —
+   The preset colors and custom colors. *Derivation.*
+4. *(changed)* [`connection.color-from-compass`](features/connection.md#connectioncolor-from-compass--the-closest-color-of-a-compass-connection)
+   — The closest color of a Compass connection. *Derivation.*
+5. *(changed)* [`connection.read-compass`](features/connection.md#connectionread-compass--read-a-mongodb-compass-export)
+   — Read a MongoDB Compass export. *Derivation.*
+6. *(changed)* [`window.theme`](features/window.md#windowtheme--choose-the-theme) — Choose the theme. *Operation.*
+7. *(changed)* [`connection.read-file`](features/connection.md#connectionread-file--read-a-connections-file) — Read a
+   connections file. *Derivation.*
+8. *(changed)* [`connection.write-file`](features/connection.md#connectionwrite-file--write-a-connections-file) —
+   Write a connections file. *Derivation.*
+9. *(changed)* [`tab.groups`](features/tab.md#tabgroups--the-groups-of-the-strip) — The groups of the strip.
+   *Derivation.*
+10. [`tree.color-of`](features/tree.md#treecolor-of--which-color-something-of-a-database-or-a-collection-takes) —
+    Which color something of a database or a collection takes. *Derivation.*
+11. *(changed)* [`gridfs.drop-bucket`](features/gridfs.md#gridfsdrop-bucket--delete-a-bucket) — Delete a bucket.
+    *Operation.*
+12. *(changed)* [`manage.rename-collection`](features/manage.md#managerename-collection--rename-a-collection) — Rename
+    a collection. *Operation.*
+13. *(changed)* [`manage.drop-collection`](features/manage.md#managedrop-collection--drop-a-collection-or-a-view) —
+    Drop a collection or a view. *Operation.*
+14. *(changed)* [`manage.drop-database`](features/manage.md#managedrop-database--drop-a-database) — Drop a database.
+    *Operation.*
+15. *(changed)* [`gridfs.show`](features/gridfs.md#gridfsshow--the-page-of-a-bucket) — The page of a bucket. *View.*
+16. *(changed)* [`tab.strip`](features/tab.md#tabstrip--the-tab-strip) — The tab strip. *View.*
+17. *(changed)* [`tree.pinned`](features/tree.md#treepinned--pinned-items) — Pinned items. *View.*
+18. *(changed)* [`connection.duplicate`](features/connection.md#connectionduplicate--duplicate-a-connection) —
+    Duplicate a connection. *Operation.*
+19. *(changed)* [`connection.set-color`](features/connection.md#connectionset-color--set-the-color-of-a-connection) —
+    Set the color of a connection. *Operation.*
+20. *(changed)* [`connection.secrets`](features/connection.md#connectionsecrets--keep-the-secrets-of-a-connection) —
+    Keep the secrets of a connection. *Operation.*
+21. *(changed)* [`connection.import`](features/connection.md#connectionimport--import-connections) — Import
+    connections. *Operation.*
+22. *(changed)* [`connection.export`](features/connection.md#connectionexport--export-connections) — Export
+    connections. *Operation.*
+23. *(changed)* [`home.card`](features/home.md#homecard--a-connection-card) — A connection card. *View.*
+24. [`tree.set-collection-color`](features/tree.md#treeset-collection-color--set-the-color-of-a-collection-a-view-or-a-bucket)
+    — Set the color of a collection, a view or a bucket. *Operation.*
+25. [`tree.set-database-color`](features/tree.md#treeset-database-color--set-the-color-of-a-database) — Set the color
+    of a database. *Operation.*
+26. *(changed)* [`tree.menu-mongodb`](features/tree.md#treemenu-mongodb--the-context-menu-of-a-mongodb-node) — The
+    context menu of a MongoDB node. *View.*
+27. *(changed)* [`tree.mongodb`](features/tree.md#treemongodb--the-mongodb-nodes) — The MongoDB nodes. *View.*
+28. *(changed)* [`tree.menu-redis`](features/tree.md#treemenu-redis--the-context-menu-of-a-redis-node) — The context
+    menu of a Redis node. *View.*
+29. *(changed)* [`tree.redis`](features/tree.md#treeredis--the-redis-nodes) — The Redis nodes. *View.*
+30. *(changed)* [`tree.show`](features/tree.md#treeshow--the-tree-island) — The tree island. *View.*
+31. *(changed)* [`connection.form`](features/connection.md#connectionform--the-connection-form) — The connection form.
+    *View.*
+32. [`connection.custom-color`](features/connection.md#connectioncustom-color--choose-a-custom-color) — Choose a
+    custom color. *View.*
+
+### Beyond the cards
+
+- **Modules**: `src/features/connection`, `src/features/tree`, `src/ui/theme` (the tokens of the five new presets in
+  both themes, D69), `src/ui/shell` (the icons of the tree and of the tabs).
+- **Decisions**: D69; relies on D65 (the tokens), D34.
+- **Stored data**: the optional fields `databaseColors`, `collectionColors` and a custom `color` of `connections.json`
+  ([data](data.md#the-data-folder)), recorded in `test/fixtures/stored/connections/v1/`.
+
+### Exit criteria
+
+- [ ] Each of the eleven presets passes R10.10 against the canvas, an island, a raised surface, a hovered row and a
+      selected row, in both themes: `test/unit/theme/contrast.test.ts`.
+- [ ] A connections file exported by Mongoster 0.10.0 with colored databases and collections is imported with every
+      color; exported again by Datardo and read by Mongoster 0.10.0, it keeps them.
+- [ ] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
+      `npm run test:integration`, `npm run test:ui`; `catalog.py --tests` reports none missing for these cards.
+- [ ] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
+      the keyboard alone (QA15, QA16).
+- [ ] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
+      and this milestone's **Status** is *done*.
+
+### Not in this milestone
+
+- Named by cards above and built in M39: `tree.select`, `tree.exclude-from-searches`, `tree.excluded`.
+- Named by cards above and built in M41: `table.add-format-rule`.
+- Named by cards above and built in M42: `table.format-scopes`.
+
+## M39 — Exclude from searches, and several nodes selected
+
+**Goal**: A connection, a database, a collection, a view or a bucket can be left out of searches: it stays in the
+tree, dimmed, and the tree's filter, Search documents and the lists of the MCP server skip it, while naming it still
+finds it; several nodes of the tree are selected with `Ctrl`, `Shift` and the arrows to exclude or include them
+together.
+**Depends on**: M38.
+**Status**: planned
+
+### Features
+
+3 new cards and 21 changed, in the order to build them. A changed card was built by an earlier milestone: its
+**Differs** line says what changes, and its acceptance lines marked *(differs)* are this milestone's tests; the other
+lines must keep passing.
+
+1. [`tree.excluded`](features/tree.md#treeexcluded--what-searches-leave-out) — What searches leave out. *Derivation.*
+2. *(changed)* [`connection.read-file`](features/connection.md#connectionread-file--read-a-connections-file) — Read a
+   connections file. *Derivation.*
+3. *(changed)* [`connection.write-file`](features/connection.md#connectionwrite-file--write-a-connections-file) —
+   Write a connections file. *Derivation.*
+4. *(changed)* [`tree.match`](features/tree.md#treematch--whether-a-node-matches-the-filter) — Whether a node matches
+   the filter. *Derivation.*
+5. *(changed)* [`mcp.data-tools`](features/mcp.md#mcpdata-tools--explore-the-connections-and-read-documents) — Explore
+   the connections and read documents. *Read.*
+6. *(changed)* [`search.collections`](features/search.md#searchcollections--read-the-collections-a-search-reads) —
+   Read the collections a search reads. *Read.*
+7. *(changed)* [`gridfs.drop-bucket`](features/gridfs.md#gridfsdrop-bucket--delete-a-bucket) — Delete a bucket.
+   *Operation.*
+8. *(changed)* [`manage.rename-collection`](features/manage.md#managerename-collection--rename-a-collection) — Rename
+   a collection. *Operation.*
+9. *(changed)* [`manage.drop-collection`](features/manage.md#managedrop-collection--drop-a-collection-or-a-view) —
+   Drop a collection or a view. *Operation.*
+10. *(changed)* [`manage.drop-database`](features/manage.md#managedrop-database--drop-a-database) — Drop a database.
+    *Operation.*
+11. *(changed)* [`tree.filter`](features/tree.md#treefilter--filter-the-tree) — Filter the tree. *View.*
+12. *(changed)* [`connection.duplicate`](features/connection.md#connectionduplicate--duplicate-a-connection) —
+    Duplicate a connection. *Operation.*
+13. *(changed)* [`connection.secrets`](features/connection.md#connectionsecrets--keep-the-secrets-of-a-connection) —
+    Keep the secrets of a connection. *Operation.*
+14. *(changed)* [`connection.import`](features/connection.md#connectionimport--import-connections) — Import
+    connections. *Operation.*
+15. *(changed)* [`connection.export`](features/connection.md#connectionexport--export-connections) — Export
+    connections. *Operation.*
+16. [`tree.exclude-from-searches`](features/tree.md#treeexclude-from-searches--exclude-from-searches-or-include-again)
+    — Exclude from searches, or include again. *Operation.*
+17. *(changed)* [`connection.menu`](features/connection.md#connectionmenu--the-menu-of-a-connection) — The menu of a
+    connection. *View.*
+18. *(changed)* [`home.card`](features/home.md#homecard--a-connection-card) — A connection card. *View.*
+19. *(changed)* [`search.show`](features/search.md#searchshow--the-search-documents-page) — The Search documents page.
+    *View.*
+20. *(changed)* [`tree.show`](features/tree.md#treeshow--the-tree-island) — The tree island. *View.*
+21. *(changed)* [`tree.mongodb`](features/tree.md#treemongodb--the-mongodb-nodes) — The MongoDB nodes. *View.*
+22. *(changed)* [`tree.keyboard`](features/tree.md#treekeyboard--moving-in-the-tree-with-the-keyboard) — Moving in the
+    tree with the keyboard. *View.*
+23. [`tree.select`](features/tree.md#treeselect--several-nodes-selected) — Several nodes selected. *View.*
+24. *(changed)* [`tree.menu-mongodb`](features/tree.md#treemenu-mongodb--the-context-menu-of-a-mongodb-node) — The
+    context menu of a MongoDB node. *View.*
+
+### Beyond the cards
+
+- **Modules**: `src/features/tree`, `src/features/search`, `src/features/mcp`, `src/ui/shell` (the selection of the
+  tree).
+- **Decisions**: D70.
+- **Stored data**: the optional fields `excluded` and `exclusions` of `connections.json`, recorded with the fixture of
+  M38.
+
+### Exit criteria
+
+- [ ] Search documents on a connection of 40 databases, 3 of them excluded, reads the other 37 and says *3 excluded*;
+      `list_databases` of the MCP server leaves the 3 out, and `find_documents` on one of them still answers.
+- [ ] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
+      `npm run test:integration`, `npm run test:ui`; `catalog.py --tests` reports none missing for these cards.
+- [ ] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
+      the keyboard alone (QA15, QA16).
+- [ ] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
+      and this milestone's **Status** is *done*.
+
+### Not in this milestone
+
+- Named by cards above and built in M41: `table.add-format-rule`.
+- Named by cards above and built in M42: `table.format-scopes`.
+
+## M40 — The query beside the results
+
+**Goal**: The query bar of a collection tab, or the stages of a pipeline, can sit in a pane at the right of the table
+instead of above it, one choice for every tab; the query bar is reordered with icons, and a cell dragged from the
+table can go to Sort and Project.
+**Depends on**: M39.
+**Status**: planned
+
+### Features
+
+1 new card and 10 changed, in the order to build them. A changed card was built by an earlier milestone: its
+**Differs** line says what changes, and its acceptance lines marked *(differs)* are this milestone's tests; the other
+lines must keep passing.
+
+1. *(changed)* [`query.add-sort`](features/query.md#queryadd-sort--add-a-field-to-the-sort) — Add a field to the sort.
+   *Derivation.*
+2. *(changed)* [`query.add-projection`](features/query.md#queryadd-projection--add-a-field-to-the-projection) — Add a
+   field to the projection. *Derivation.*
+3. *(changed)* [`aggregate.move-stage`](features/aggregate.md#aggregatemove-stage--move-a-stage) — Move a stage.
+   *Operation.*
+4. *(changed)* [`query.builder`](features/query.md#querybuilder--the-query-builder) — The query builder. *View.*
+5. *(changed)* [`document.update-many`](features/document.md#documentupdate-many--update-many) — Update many.
+   *Operation.*
+6. *(changed)* [`document.delete-many`](features/document.md#documentdelete-many--delete-many) — Delete many.
+   *Operation.*
+7. [`query.position`](features/query.md#queryposition--put-the-query-above-or-beside-the-results) — Put the query
+   above or beside the results. *Operation.*
+8. *(changed)* [`query.drag`](features/query.md#querydrag--drag-a-field-or-a-value-into-the-bar) — Drag a field or a
+   value into the bar. *View.*
+9. *(changed)* [`aggregate.show`](features/aggregate.md#aggregateshow--the-pipeline-editor) — The pipeline editor.
+   *View.*
+10. *(changed)* [`query.bar`](features/query.md#querybar--the-query-bar) — The query bar. *View.*
+11. *(changed)* [`table.show`](features/table.md#tableshow--the-documents-section) — The Documents section. *View.*
+
+### Beyond the cards
+
+- **Modules**: `src/features/query`, `src/features/aggregate`, `src/ui/pages/collection` (the query pane and its
+  splitter).
+- **Decisions**: D71; leaves Q142 open.
+- **Stored data**: the optional field `queryPaneWidth` of `window.json`.
+- **Settings**: `datardo.query.position`.
+
+### Exit criteria
+
+- [ ] With the explorer hidden in a window 1,280 pixels wide, the query pane shows at 380 pixels; with it shown, the
+      query stays above and its toggle says why: `test/ui/collection/query-pane.spec.ts`.
+- [ ] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
+      `npm run test:integration`, `npm run test:ui`; `catalog.py --tests` reports none missing for these cards.
+- [ ] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
+      the keyboard alone (QA15, QA16).
+- [ ] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
+      and this milestone's **Status** is *done*.
+
+### Not in this milestone
+
+- Named by cards above and built in M41: `table.format-table`, `table.formatting`.
+- Named by cards above and built in M42: `table.format-scopes`.
+
+## M41 — Conditional formatting
+
+**Goal**: The rows or the cells of a collection's table are colored by conditions written as filters, as in a
+spreadsheet; the rules are listed, added, edited, named, reordered, turned off and removed in a Formatting view of the
+inspector island, while the table changes beside it, and every table can be shown without colors.
+**Depends on**: M40.
+**Status**: planned
+
+### Features
+
+6 new cards and 11 changed, in the order to build them. A changed card was built by an earlier milestone: its
+**Differs** line says what changes, and its acceptance lines marked *(differs)* are this milestone's tests; the other
+lines must keep passing.
+
+1. *(changed)* [`palette.commands`](features/palette.md#palettecommands--every-command-with-its-title-and-its-key) —
+   Every command, with its title and its key. *Derivation.*
+2. [`table.match`](features/table.md#tablematch--whether-a-document-matches-a-filter) — Whether a document matches a
+   filter. *Derivation.*
+3. [`table.format-table`](features/table.md#tableformat-table--what-colors-each-row-and-cell) — What colors each row
+   and cell. *Derivation.*
+4. *(changed)* [`table.rows`](features/table.md#tablerows--the-rows-of-the-table) — The rows of the table.
+   *Derivation.*
+5. *(changed)* [`connection.remove`](features/connection.md#connectionremove--remove-a-connection) — Remove a
+   connection. *Operation.*
+6. *(changed)* [`gridfs.drop-bucket`](features/gridfs.md#gridfsdrop-bucket--delete-a-bucket) — Delete a bucket.
+   *Operation.*
+7. *(changed)* [`manage.rename-collection`](features/manage.md#managerename-collection--rename-a-collection) — Rename
+   a collection. *Operation.*
+8. *(changed)* [`manage.drop-collection`](features/manage.md#managedrop-collection--drop-a-collection-or-a-view) —
+   Drop a collection or a view. *Operation.*
+9. *(changed)* [`manage.drop-database`](features/manage.md#managedrop-database--drop-a-database) — Drop a database.
+   *Operation.*
+10. *(changed)* [`nav.toggle-inspector`](features/nav.md#navtoggle-inspector--show-or-hide-the-inspector-island) —
+    Show or hide the inspector island. *Operation.*
+11. [`table.add-format-rule`](features/table.md#tableadd-format-rule--add-a-condition-rule) — Add a condition rule.
+    *Operation.*
+12. *(changed)* [`table.column-menu`](features/table.md#tablecolumn-menu--the-context-menu-of-a-column-header) — The
+    context menu of a column header. *View.*
+13. [`table.edit-format-rule`](features/table.md#tableedit-format-rule--edit-name-turn-off-reorder-and-remove-formatting-rules)
+    — Edit, name, turn off, reorder and remove formatting rules. *Operation.*
+14. [`table.toggle-formatting`](features/table.md#tabletoggle-formatting--hide-and-show-formatting) — Hide and show
+    formatting. *Operation.*
+15. *(changed)* [`nav.inspector`](features/nav.md#navinspector--the-inspector-island) — The inspector island. *View.*
+16. [`table.formatting`](features/table.md#tableformatting--the-formatting-view-of-the-inspector-island) — The
+    Formatting view of the inspector island. *View.*
+17. *(changed)* [`table.show`](features/table.md#tableshow--the-documents-section) — The Documents section. *View.*
+
+### Beyond the cards
+
+- **Modules**: `src/shared` or `src/features/table` (the matcher, pure), `src/features/table`, `src/ui/shell` (the
+  views of the inspector island).
+- **Decisions**: D72.
+- **Stored data**: the new file of the formatting rules ([data](data.md#the-data-folder)) at version 1, and the
+  optional field `inspectorView` of `window.json`.
+
+### Exit criteria
+
+- [ ] `table.match` gives MongoDB's answer for every operator it supports: a test runs each worked example against a
+      real server's `find` and compares.
+- [ ] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
+      `npm run test:integration`, `npm run test:ui`; `catalog.py --tests` reports none missing for these cards.
+- [ ] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
+      the keyboard alone (QA15, QA16).
+- [ ] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
+      and this milestone's **Status** is *done*.
+
+### Not in this milestone
+
+- Named by cards above and built in M42: `table.format-field`, `table.color-by-field`, `table.edit-field-rule`,
+  `table.format-scopes`, `table.move-format-rule`, `table.export-formatting`, `table.import-formatting`.
+
+## M42 — Formatting by a field's values, beyond one collection
+
+**Goal**: A field colors the table by its values with no condition to write (booleans, scales, one color per value
+with pinned values and palettes); rules apply to a collection, a database, a connection or everywhere; they are moved
+and copied between these, and exported to a file and imported from one.
+**Depends on**: M41.
+**Status**: planned
+
+### Features
+
+8 new cards and 3 changed, in the order to build them. A changed card was built by an earlier milestone: its
+**Differs** line says what changes, and its acceptance lines marked *(differs)* are this milestone's tests; the other
+lines must keep passing.
+
+1. [`table.format-field`](features/table.md#tableformat-field--the-color-a-field-rule-gives-a-value) — The color a
+   field rule gives a value. *Derivation.*
+2. [`table.format-scopes`](features/table.md#tableformat-scopes--the-rules-a-collection-tab-uses) — The rules a
+   collection tab uses. *Derivation.*
+3. [`table.formatting-file`](features/table.md#tableformatting-file--the-file-of-formatting-rules) — The file of
+   formatting rules. *Derivation.*
+4. *(changed)* [`manage.drop-database`](features/manage.md#managedrop-database--drop-a-database) — Drop a database.
+   *Operation.*
+5. [`table.edit-field-rule`](features/table.md#tableedit-field-rule--edit-a-field-rule) — Edit a field rule.
+   *Operation.*
+6. [`table.color-by-field`](features/table.md#tablecolor-by-field--color-by-this-field) — Color by this field.
+   *Operation.*
+7. [`table.move-format-rule`](features/table.md#tablemove-format-rule--move-or-copy-a-rule-to-another-section) — Move
+   or copy a rule to another section. *Operation.*
+8. [`table.export-formatting`](features/table.md#tableexport-formatting--export-formatting-rules-to-a-file) — Export
+   formatting rules to a file. *Operation.*
+9. [`table.import-formatting`](features/table.md#tableimport-formatting--import-formatting-rules-from-a-file) — Import
+   formatting rules from a file. *Operation.*
+10. *(changed)* [`table.show`](features/table.md#tableshow--the-documents-section) — The Documents section. *View.*
+11. *(changed)* [`table.column-menu`](features/table.md#tablecolumn-menu--the-context-menu-of-a-column-header) — The
+    context menu of a column header. *View.*
+
+### Beyond the cards
+
+- **Modules**: `src/features/table`.
+- **Decisions**: D72.
+- **Stored data**: the rules of a database, of a connection and of everywhere, in the file of M41.
+
+### Exit criteria
+
+- [ ] A file of formatting rules exported by Datardo and imported again adds nothing; one exported by Mongoster 0.10.0
+      imports with its field rules, pinned values and palettes.
+- [ ] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
+      `npm run test:integration`, `npm run test:ui`; `catalog.py --tests` reports none missing for these cards.
+- [ ] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
+      the keyboard alone (QA15, QA16).
+- [ ] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
       and this milestone's **Status** is *done*.
 
 ### Not in this milestone

@@ -16,7 +16,8 @@ of its own and Redis added. The product is described in [docs/product.md](docs/p
   ([architecture](docs/architecture.md#who-may-use-whom)).
 - **Dependencies** are those of decision D22. Adding one is a decision, written in
   [docs/decisions.md](docs/decisions.md) in the same commit.
-- **Mongoster may be read and ported.** It is the same author's (version 0.8.0; ask for the path of its checkout).
+- **Mongoster may be read and ported.** It is the same author's (version 0.8.0, then 0.9.0 and 0.10.0, which M37 to M42
+  bring; ask for the path of its checkout).
   Cards say where it does the same thing (**Ported from**). Port behavior and pure code, reshaped to these rules;
   never its host classes, its `vscode` calls or its plain-DOM views.
 - **The words are the glossary's** ([docs/glossary.md](docs/glossary.md)), in the code as in the text of the

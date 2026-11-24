@@ -32,21 +32,48 @@ query bar. The table under it shows the output.
   `saved-query.save`, `saved-query.show`, `table.show`, `transfer.export`.
 - **Ported from**: the Aggregate mode of the collection tab: `src/webview/pipeline.ts` (`PipelineEditor`),
   `src/shared/pipeline.ts`, `src/collectionPanel.ts` (`html`, the `aggregate-only` rows), `src/webview/main.ts`
-  (`setMode`, `runAggregate`).
+  (`setMode`, `runAggregate`). The toolbar in two groups with icons, and the stages one under the other in the query
+  pane, are Mongoster 0.9.0's: `src/queryBarHtml.ts` (the `pipeline-actions` row), `src/webview/pipeline.ts`
+  (`setTextMode`, the `stage-add` button), `media/webview.css` (`body.query-side .stages`, `.stage`, `.stage-arrow`,
+  `.pipeline-text`, `.pipeline-actions`); CHANGELOG 0.9.0, **Query above or beside the results**.
+- **Differs**: (M40) The toolbar is one row of text buttons without icons, **Run**, **Clear**, **Explain**, **Save as
+  view…**, **Edit as text**, **Copy**, **Code**; **+** is a text button; the cards are always left to right, above
+  the table.
 
 What it shows, top to bottom:
 
 1. **The stage list**: one card per stage, left to right, with an arrow between two cards, then the button **+**
-   (**Add a stage at the end**). A card has, in order: its number, a button (**Show the output up to this stage**); the
-   name of the stage, a text field with the templates as suggestions; the checkbox **Enabled (uncheck to skip this
-   stage)**; the marks **writes** and **must be first** when they apply; **Move left**, **Move right** and **Remove
-   stage**; and the body, in Datardo's editor, in mongosh syntax with its syntax colors. A card is as wide as its
-   longest line, from 280 to 640 px, and its body grows to 220 px before it scrolls.
+   (the icon `add`, with the tooltip and the name **Add a stage at the end**). A card has, in order: its number, a
+   button (**Show the output up to this stage**); the name of the stage, a text field with the templates as
+   suggestions; the checkbox **Enabled (uncheck to skip this stage)**; the marks **writes** and **must be first** when
+   they apply; **Move left**, **Move right** and **Remove stage**; and the body, in Datardo's editor, in mongosh syntax
+   with its syntax colors. A card is as wide as its longest line, from 280 to 640 px, and its body grows to 220 px
+   before it scrolls.
 2. **The text**, in place of the stage list after **Edit as text**: the whole pipeline in one editor.
-3. **The toolbar**: **Run**, **Clear**, **Explain**, **Save as view…**, **Edit as text** (which reads **Edit as
-   stages** while the text is shown), **Copy**, **Code**.
+3. **The toolbar**, in two groups, each button with a Codicon before its name
+   ([D23](../decisions.md#d23--codicons-for-every-icon)):
+   - **Run** (icon `play`, tooltip *Run the whole pipeline (Ctrl+Enter in a stage)*), **Edit as text** (icon `json`,
+     tooltip *Edit or paste the whole pipeline as text*), which reads **Edit as stages** while the text is shown and
+     keeps its icon, and **Clear** (icon `clear-all`, tooltip *Remove all stages*);
+   - **Explain** (icon `telescope`, tooltip *Show how MongoDB runs the pipeline (up to the stage shown)*), **Code**
+     (icon `code`, tooltip *The pipeline as code for mongosh, Node.js, Python, Java, C# or Go*), **Copy** (icon
+     `copy`, tooltip *Copy the pipeline (mongosh syntax)*) and **Save as view…** (icon `save-as`, tooltip *Create a
+     view with the pipeline up to the stage shown*).
 4. **The line of what the table shows**: *2 of 3 stages enabled*, or *Output of stage 2 ($group) ·* and the link
    **show full pipeline**.
+
+In the query pane at the right of the table (`query.position`), the same parts, in the same order, are laid out for a
+narrow column:
+
+- the cards are one under the other, each as wide as the pane: the width from 280 to 640 px by the longest line is
+  for the cards above the table only. The arrow between two cards points down, and **+** is under the last card. A
+  body grows to 220 px before it scrolls, as above the table. On a card, **Move left** and **Move right** read **Move
+  up** and **Move down** (`aggregate.move-stage`);
+- the text is as wide as the pane and at least 240 px high (Mongoster's), and grows with its lines without a limit:
+  the pane scrolls;
+- each group of the toolbar has a line of its own, under the stages;
+- the conditions offered while a cell or a header is dragged (`aggregate.drop-condition`) go two by two, as over
+  **Filter** (`query.drag`).
 
 Acceptance:
 
@@ -68,6 +95,16 @@ Acceptance:
       copied (`table.copy-as`) and exported.
 - [ ] Every control of the editor can be reached and used with the keyboard, and each has a name a screen reader
       says: the number of stage 2 is **Show the output up to this stage**.
+- [ ] The toolbar reads, from the left, **Run**, **Edit as text**, **Clear**, then apart **Explain**, **Code**,
+      **Copy**, **Save as view…**, with the icons `play`, `json`, `clear-all`, `telescope`, `code`, `copy`, `save-as`;
+      **Edit as text** keeps the icon `json` when it reads **Edit as stages**. (differs)
+- [ ] With the query in a pane 380 px wide, the three stages `$match`, `$group`, `$sort` are three cards one under the
+      other, each as wide as the pane, with an arrow pointing down between two of them and **+** under the third; a
+      `$match` whose body is one short line is as wide as a `$lookup` of four lines. (differs)
+- [ ] In the query pane, **Edit as text** shows the text as wide as the pane and at least 240 px high; a pipeline of
+      60 lines shows all its lines, and the pane scrolls. (differs)
+- [ ] In the query pane, **Run**, **Edit as text** and **Clear** are on one line, and **Explain**, **Code**, **Copy**
+      and **Save as view…** on the next. (differs)
 
 ### `aggregate.add-stage` — Add a stage
 
@@ -200,7 +237,9 @@ Changes the place of a stage among the others.
 - **Kind**: Operation
 - **Engine**: MongoDB
 - **Function**: `src/features/aggregate/move-stage.ts › plan(context, answers)`
-- **Entry points**: **Move left** and **Move right** on the card (`@list`) and in its context menu (`@item-menu`).
+- **Entry points**: **Move left** and **Move right** on the card (`@list`) and in its context menu (`@item-menu`). In
+  the query pane (`query.position`), where the cards are one under the other, they read **Move up** and **Move down**
+  *(Datardo's choice)*, on the card and in its menu.
 - **Offered when**: the stage list is shown. **Move left** is disabled on the first stage, **Move right** on the last.
 - **Plan**: one app step, `move stage 2 ($group) of the pipeline of orders to place 1`.
 - **Danger**: None
@@ -209,11 +248,17 @@ Changes the place of a stage among the others.
 - **After**: the whole pipeline is shown, and a mark of error is removed. Nothing runs.
 - **Commands**: `aggregate.move-stage:left`, `aggregate.move-stage:right`, which move the stage whose body has the
   focus.
-- **Ported from**: `src/webview/pipeline.ts` (`move` in `card`).
+- **Ported from**: `src/webview/pipeline.ts` (`move` in `card`). Mongoster 0.9.0 keeps **Move left** and **Move
+  right** in its query pane too; the names **Move up** and **Move down** there are *New in Datardo*.
+- **Differs**: (M40) The buttons always read **Move left** and **Move right**: there is no query pane.
 
 Acceptance:
 
 - [ ] **Move right** on stage 1 of `$match`, `$sort`, `$limit` gives `$sort`, `$match`, `$limit`.
+- [ ] With the query in the query pane, the buttons of a card and the entries of its menu read **Move up** and **Move
+      down**, and **Move down** on stage 1 of `$match`, `$sort`, `$limit` gives `$sort`, `$match`, `$limit`; the
+      commands `aggregate.move-stage:left` and `aggregate.move-stage:right` move the stage the same way in both
+      places. (differs)
 - [ ] **Move left** on stage 1 and **Move right** on the last stage are disabled.
 - [ ] Moving a stage while stage 2 is shown ends that: the line reads *3 of 3 stages enabled*.
 - [ ] Moving `$search` from place 1 to place 2 shows **must be first** on its card; moving it back removes the mark.

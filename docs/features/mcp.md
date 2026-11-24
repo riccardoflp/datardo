@@ -7,9 +7,9 @@ what it writes in the Log, and the tools, one card per group. The tools for Mong
 bounds they have in Mongoster; the tools for Redis are new, and all start with `redis_`.
 
 Every card of this area keeps the promise of the product: no tool writes, kills an operation, changes the profiler or
-a server setting, runs a command the assistant writes, or returns a connection string or a password; and documents,
-field values and the values of Redis keys go to the AI only with `datardo.mcp.readData` on. Each group card has an
-acceptance line for it.
+a server setting, runs a command the assistant writes, reads a `system.*` collection the assistant names, or returns a
+connection string or a password; and documents, field values and the values of Redis keys go to the AI only with
+`datardo.mcp.readData` on, in no result, count or error text. Each group card has an acceptance line for it.
 
 The default port is 37018 *(Datardo's choice, so that Mongoster's server on 37017 can run beside it)*. Datardo runs
 as one instance with one window (`window.single-instance`), so one server listens and the tabs the AI opens appear in
@@ -42,8 +42,11 @@ can call its tools.
   either starts or stops the server again at once.
 - **Uses**: `mcp.access-token`, `mcp.protocol`, `mcp.read-data`, `mcp.log`, `mcp.status`, `mcp.change-port`,
   `connection.secrets`, `settings.read`, `runner.notify`.
-- **Ported from**: Mongoster's card mcp.server (`src/mcpServer.ts › McpServer.restart`, `› start`, `› handle`). The
-  route `/mcp/release` and the header by which its windows recognized each other are not ported.
+- **Ported from**: Mongoster's card mcp.server (`src/mcpServer.ts › McpServer.restart`, `› start`, `› handle`); the
+  limit of a batch from Mongoster 0.9.0 (`src/mcp/http.ts › handleRequest`, `MAX_BATCH`). The route `/mcp/release`,
+  the proof of the token it takes in 0.9.0 and the header by which its windows recognized each other are not ported.
+- **Differs**: (M37) a JSON array of any length is answered, every message of it run (`src/main/mcp/http.ts ›
+  answerBody`).
 
 Acceptance:
 
@@ -56,8 +59,10 @@ Acceptance:
   gets 403 `Forbidden origin`; a path other than `/mcp` gets 404 `Not found`; a missing or wrong token gets 401
   (`mcp.access-token`); a method other than POST gets 405 `Method not allowed` with `Allow: POST`; a body over 1 MB
   gets 413 `Request too large`; a body that is not JSON gets 400 with the JSON-RPC error -32700 `Parse error`.
-- [ ] A JSON array of messages is answered with the array of their answers; a request with only notifications gets 202
-  with no body.
+- [ ] A JSON array of at most 20 messages is answered with the array of their answers; a request with only
+  notifications gets 202 with no body.
+- [ ] A JSON array of more than 20 messages gets 400 with the JSON-RPC error -32600 `Too many requests in one batch:
+  at most 20` and `id: null`; none of its messages runs, and the Log has no line for it. (differs)
 - [ ] Mongoster's server on port 37017 and Datardo's on 37018 run at the same time, each with its own token.
 - [ ] A port used by another program: the server does not start, the Log says `Not started: Port 37018 is used by
   another program.`, and Datardo shows, once per port, the warning *Datardo's MCP server is not running. Port 37018 is
@@ -219,30 +224,56 @@ Acceptance:
 ### `mcp.read-data` — The tools offered without reading data
 
 `datardo.mcp.readData` decides whether the AI may read documents, field values and the values of Redis keys. Turned
-off, the tools that return them are not offered, and the others leave the values out: the AI sees the structure, the
-statistics, the names of keys and the query shapes, and opens tabs where the user sees the data.
+off, the tools that return them are not offered, and the tools that stay give no value by another way: the AI sees
+the structure, the statistics, the names of keys and the query shapes, and opens tabs where the user sees the data.
 
 - **Kind**: Derivation
 - **Engine**: Any
-- **Function**: `src/features/mcp/read-data.ts › offeredTools(tools, settings)`
+- **Function**: `src/features/mcp/read-data.ts › offeredTools(tools, settings)`, with `shapeOf`, `validatorShape`
+  and `errorText` in the same module.
 - **Settings**: `datardo.mcp.readData` (default on).
 - **Uses**: `mcp.protocol`; used by every group of tools.
 - **Ported from**: Mongoster's card mcp.read-documents (`src/mcpTools.ts › mcpTools`, `src/shared/mcp.ts ›
-  McpTool.documents`).
+  McpTool.documents`); what the tools that stay leave out, from Mongoster 0.9.0 (`src/mcp/context.ts ›
+  safeErrorText`, `errorCode`, `shape`, `schemaShape`, `validatorShape`; `src/mcp/data.ts`, `src/mcp/topology.ts ›
+  formatShardingStatus`).
+- **Differs**: (M37) with the setting off `explain_query` is offered; `count_documents` counts any filter; validators,
+  view pipelines and partial filter expressions are given with their values (`collection_options`,
+  `collection_stats`, `describe_collection`); `sharding_status` gives the details of its events and the text of what
+  it could not read; a server's error reaches the AI with its text (`src/features/mcp/read-data.ts ›
+  hiddenWithoutReadData`).
 
 Rules:
 
 - Input: the 42 tools of the groups (32 for MongoDB and Datardo's own state, 10 for Redis), and the setting, read
   again at every request: no restart is needed.
-- On (the default): all 42 tools are listed and can be called.
-- Off: these seven are neither listed by `tools/list` nor callable: `find_documents`, `aggregate`, `distinct_values`,
-  `watch_changes`, `write_history`, `datardo_write_details`, `redis_read_value`. The other 35 stay.
-- Off: four of the tools that stay write `?` where a value would be. `current_operations` gives the command of each
-  operation as its query shape (`find shop.orders: { status: ?, total: { $gt: ? } }`). `list_saved_queries` gives the
-  saved and recent queries with their literal values as `?`; names, descriptions and files stay. `datardo_writes`
-  gives the title of each operation without the `_id` values and filters it carries (`Delete document`, not `Delete
-  document ObjectId("…")`). `redis_slow_log` gives each command with its name and `?` for every argument (`HSET ? ?
-  ?`).
+- On (the default): all 42 tools are listed and can be called, and return what their cards say.
+- Off: these eight are neither listed by `tools/list` nor callable: `find_documents`, `aggregate`, `distinct_values`,
+  `explain_query`, `watch_changes`, `write_history`, `datardo_write_details`, `redis_read_value`. The other 34 stay.
+  `explain_query` goes because its plan quotes the bounds of the query, a failed explain the values it failed on, and
+  documents examined against returned is a count per filter.
+- Off, `count_documents` gives only a collection's total: a filter that is not empty is refused before anything is
+  sent, because a count per filter tells the values one question at a time (`{ email: /^a/ }`).
+- Off: these tools that stay write `?` where a value would be, the field names and operators kept.
+  `current_operations` gives the command of each operation as its query shape (`find shop.orders: { status: ?, total:
+  { $gt: ? } }`). `list_saved_queries` gives the saved and recent queries with their literal values as `?`; names,
+  descriptions and files stay. `datardo_writes` gives the title of each operation without the `_id` values and
+  filters it carries (`Delete document`, not `Delete document ObjectId("…")`). `redis_slow_log` gives each command
+  with its name and `?` for every argument (`HSET ? ? ?`). A view's pipeline (`collection_options`,
+  `collection_stats`) and the partial filter expression of an index (`describe_collection`, `collection_stats`) are
+  given as their shapes.
+- Off, a validator is given as field names and types: of a `$jsonSchema` the `properties`, `patternProperties`,
+  `bsonType`, `type`, `required` and the sizes (`minItems`, `maxItems`, `minLength`, `maxLength`, `minProperties`,
+  `maxProperties`, `uniqueItems`) stay, and `items`, `allOf`, `anyOf`, `oneOf`, `not` and `additionalProperties` are
+  followed inside; `enum`, `pattern`, bounds (`minimum`, `maximum`…), `description` and any other keyword become `?`. A
+  query validator is given as its shape.
+- Off, `sharding_status` leaves out the details of the recent events (they quote chunk ranges, which are shard key
+  values) and, of what it could not read, the server's text; the zones stay as names, as they are with the setting on.
+- Off, the text of a MongoDB server's error is replaced by its code and code name, in every tool, because the server
+  quotes the values it failed on: `server error 241 (ConversionFailure); its text is left out because
+  datardo.mcp.readData is off`. Errors that are not the server's (the network, a time limit of Datardo's, a filter
+  that cannot be parsed, a refusal of `mcp.arguments`) keep their text, and so do Redis errors, which quote no value
+  of a key *(Datardo's choice)*.
 - The names of databases, collections, fields, indexes and keys are structure, not data: they are returned with the
   setting off.
 - `tools/list` declares `listChanged: false`: a client that listed the tools before the setting changed keeps its list
@@ -251,26 +282,44 @@ Rules:
 Worked examples (the setting off):
 
 - `tools/call` of `find_documents` → error -32602 `Unknown tool: find_documents`.
-- `tools/call` of `redis_read_value` → error -32602 `Unknown tool: redis_read_value`.
-- `count_documents` with `{ status: "active" }` → `shop.orders: 2 documents match { status: "active" }.` (a number,
-  and the filter the AI wrote).
+- `tools/call` of `redis_read_value` or `explain_query` → error -32602 `Unknown tool: redis_read_value`.
+- `count_documents` with `{ status: "active" }` → `A filter is refused because datardo.mcp.readData is off: counting
+  what matches a filter tells the values of the documents. Call it without a filter for the total, or use open_query
+  to show the user the matching documents.`; with no filter, or `{}` → `shop.orders has 2 documents.` and the
+  estimate.
 - `slow_queries` → shapes such as `find shop.orders: { a: ?, s: ? } · sort { b: 1 }`, never the values of the queries.
 - `redis_scan_keys` with the pattern `orders:*` → the names and types of the keys; `redis_key_details` of `orders:42`
   → its type, encoding, size and expiry.
 - A running `update` with `{ $set: { email: "ada@example.com" } }` in `current_operations` → `update shop.users:
   { _id: ? } · { $set: { email: ? } }`.
+- The validator `{ $jsonSchema: { required: ["plan"], properties: { plan: { bsonType: "string", enum: ["free",
+  "pro"] } } } }` → `{ $jsonSchema: { required: ["plan"], properties: { plan: { bsonType: "string", enum: ? } } } }`.
+- The view pipeline `[ { $match: { status: "paid" } } ]` → `[ { $match: { status: ? } } ]`.
+- A command the server refuses with `{ code: 241, codeName: "ConversionFailure", errmsg: "Failed to parse number
+  'ada@example.com' …" }` → `server error 241 (ConversionFailure); its text is left out because datardo.mcp.readData
+  is off`.
 
 Acceptance:
 
-- [ ] With the setting off, the seven tools above are missing from `tools/list` and a call to any of them is refused as
-  an unknown tool.
+- [ ] With the setting off, the eight tools above are missing from `tools/list` and a call to any of them is refused
+  as an unknown tool. (differs)
 - [ ] Tools offered with the setting off: `describe_collection` (types and how often fields are present, index
-  definitions), `count_documents`, `explain_query` (numbers and the explain of a query the AI wrote), `slow_queries`
-  and `index_advice` (query shapes, values as `?`), the deployment tools, the Redis tools other than
-  `redis_read_value`, and the tools that open tabs (the AI gets a sentence, the user the data).
+  definitions), `count_documents` (the total only), `slow_queries` and `index_advice` (query shapes, values as `?`),
+  the deployment tools, the Redis tools other than `redis_read_value`, and the tools that open tabs (the AI gets a
+  sentence, the user the data).
+- [ ] With the setting off, `count_documents` with a filter that is not empty is refused with the sentence above
+  before anything is sent to MongoDB; with no filter, or `{}`, it gives the total and the estimate. (differs)
+- [ ] With the setting off, `collection_options` gives `Validator ($jsonSchema; field names and types only,
+  datardo.mcp.readData is off): …` and `Pipeline (values replaced by ?, datardo.mcp.readData is off): …`, and
+  `describe_collection` lists an index as `- active: { status: 1 } partial { status: ? }`. (differs)
+- [ ] With the setting off, a tool whose command the server refuses gives `server error <code> (<code name>); its
+  text is left out because datardo.mcp.readData is off`; a refusal of Datardo's own (`filter: …`, a collection that
+  does not exist) and a network error keep their text. (differs)
 - [ ] With the setting off, no tool returns a field value of a document, a value of a Redis key, or a value of a
-  query or a command the AI did not write.
-- [ ] Turning the setting on makes the seven tools callable at the next request, without restarting the server.
+  query or a command the AI did not write: not in a result, not in a count, and not in the text of an error. (differs)
+- [ ] With the setting on, every tool returns its full commands, validators, pipelines, queries, titles and error
+  texts.
+- [ ] Turning the setting on makes the eight tools callable at the next request, without restarting the server.
 
 ### `mcp.protocol` — Answer a message of the Model Context Protocol
 
@@ -281,9 +330,13 @@ The JSON-RPC 2.0 messages the server understands, and how a tool's success or fa
 - **Function**: `src/features/mcp/protocol.ts › answer(message, tools, info)`
 - **Uses**: `mcp.read-data`, `mcp.log`.
 - **Ported from**: Mongoster's card mcp.protocol (`src/shared/mcp.ts › handleMessage`, `src/mcpServer.ts ›
-  INSTRUCTIONS`).
+  INSTRUCTIONS`); the batches of at most 20 messages from Mongoster 0.9.0 (`src/mcp/http.ts › handleRequest`).
+- **Differs**: (M37) a tool that fails gives the server's error text whatever `datardo.mcp.readData` says.
 
 Rules:
+
+- A body is one message, or a JSON array of at most 20 messages, each answered as below and the answers given back
+  as an array in the same order, without those of notifications; more than 20 are refused as a whole by `mcp.server`.
 
 - A message that is not an object gets -32600 `Invalid request` with `id: null`. A message without `jsonrpc: "2.0"`
   or a string `method` gets -32600 when it has an `id`, nothing when it is a notification. A notification (no `id`)
@@ -301,8 +354,8 @@ Rules:
 - `tools/call`: an unknown name gets -32602 `Unknown tool: <name>`; arguments that are not an object get -32602
   `The arguments must be an object`; a required argument absent, null or `""` gives the result
   `Missing argument: connection.` (`Missing arguments: database, collection.` for several) with `isError: true`; a
-  tool that fails gives its message as the result with `isError: true`; otherwise the result is
-  `{ content: [{ type: "text", text }] }`.
+  tool that fails gives its message as the result with `isError: true` (a server's error as `mcp.read-data` says);
+  otherwise the result is `{ content: [{ type: "text", text }] }`.
 - Any other method gets -32601 `Method not found: <method>`.
 - Each `tools/call` that reaches a known tool is passed to the Log with its outcome: `ok`, `error: <message>` or
   `missing <keys>`.
@@ -319,6 +372,8 @@ Acceptance:
 
 - [ ] Every failure of a tool reaches the model as a result with `isError: true` and a sentence it can act on, not as
   a protocol error.
+- [ ] With `datardo.mcp.readData` off, a tool that failed on a server's error gives `server error <code> (<code
+  name>); its text is left out because datardo.mcp.readData is off` as its result, with `isError: true`. (differs)
 - [ ] Every tool is announced with `readOnlyHint: true` and `destructiveHint: false`.
 - [ ] Each worked example above gives its answer.
 - [ ] The instructions name no tool that `tools/list` does not offer with `datardo.mcp.readData` on.
@@ -334,7 +389,9 @@ arguments, with the refusals the model sees.
   `timeArg` and `resumeToken`.
 - **Uses**: `mcp.refuse-write-stages`, `query.parse`, `connection.connect`.
 - **Ported from**: Mongoster's card mcp.arguments (`src/mcp/context.ts › toolContext`, `src/shared/mcp.ts ›
-  stringArg`, `› intArg`, `› boolArg`, `src/mcp/changes.ts › parseTime`, `› resumeToken`).
+  stringArg`, `› intArg`, `› boolArg`, `src/mcp/changes.ts › parseTime`, `› resumeToken`); the refusal of the
+  `system.*` collections from Mongoster 0.9.0 (`src/mcp/context.ts › refuseSystemCollection`).
+- **Differs**: (M37) a `system.*` collection is read like any other (`src/features/mcp/arguments.ts › toolTarget`).
 
 Rules:
 
@@ -349,6 +406,12 @@ Rules:
   is refused: `<connection> is not connected and needs the user to connect it in Datardo.`
 - MongoDB: `database` and `collection` must exist: `<database>.<collection> doesn't exist on <connection>: use
   list_collections.` `collection` without `database` gives `collection needs database.`
+- MongoDB: a `collection` whose name starts with `system.` is refused in every database, by every tool that takes a
+  collection, whatever `datardo.mcp.readData` says, before anything is sent: `<database>.<collection> is a system
+  collection: Datardo's MCP server doesn't read the system.* collections (users, profiler, views…).` The tools that
+  need one read it by themselves (`slow_queries` the profiler).
+- Asked for by name, a connection, a database or a collection excluded from searches (`tree.excluded`) answers like
+  any other: only the lists of `mcp.data-tools` leave them out.
 - Redis: `database` is a whole number, the index of the database (`0` for `db0`); left out, it is the database of the
   connection string, else 0. An index the server does not have: `<connection> has no database <n>.` `key` is the name
   of a key; a name that is not valid UTF-8 is written and read with `\x` and two hexadecimal digits for each such byte,
@@ -379,10 +442,15 @@ Worked examples:
   the redis_ tools (redis_scan_keys, redis_key_details).`
 - `redis_key_details` with `{ connection: "Cache local", database: 16 }` on a server with 16 databases → `Cache local
   has no database 16.`
+- `describe_collection` with `{ database: "admin", collection: "system.users" }` → `admin.system.users is a system
+  collection: Datardo's MCP server doesn't read the system.* collections (users, profiler, views…).`
 
 Acceptance:
 
 - [ ] A connection is found by id before name, and a name used twice is refused with the ids to choose from.
+- [ ] `find_documents`, `count_documents`, `describe_collection`, `collection_stats`, `watch_changes`,
+  `write_history`, `open_query` and every other tool that takes a collection refuse `system.users`, `system.profile`
+  and `system.views` with the sentence above, with `datardo.mcp.readData` on or off, and send nothing. (differs)
 - [ ] Every refusal above reaches the model as a result with `isError: true` and the exact sentence.
 - [ ] No tool for one engine sends anything to a deployment of the other.
 - [ ] A tool never opens a dialog in the window to connect: what only the user can answer is refused with the sentence
@@ -395,10 +463,13 @@ A result must not flood the model's context, and a query or a command must not r
 - **Kind**: Derivation
 - **Engine**: Any
 - **Function**: `src/features/mcp/output-limits.ts › truncated(text, max)`, with the constants `MAX_OUTPUT`,
-  `MAX_TIME_MS` and `COUNT_CAP`.
+  `MAX_TIME_MS`, `COUNT_CAP`, `SKIP_MAX` and `MAX_BATCH`.
 - **Uses**: nothing; used by every group of tools.
 - **Ported from**: Mongoster's card mcp.output-limits (`src/shared/mcp.ts › truncate`, `src/mcp/context.ts`,
-  `src/mcp/changes.ts › clipped`).
+  `src/mcp/changes.ts › clipped`); `SKIP_MAX` and `MAX_BATCH` from Mongoster 0.9.0 (`src/mcp/context.ts`,
+  `src/mcp/http.ts`).
+- **Differs**: (M37) `find_documents` takes any `skip` up to 9,007,199,254,740,991, and a batch has no limit
+  (`src/features/mcp/data-tools.ts`, `src/main/mcp/http.ts`).
 
 Rules:
 
@@ -410,6 +481,10 @@ Rules:
   choice, the same time)* and then gives up with `<connection> did not answer within 30 s.`
 - `COUNT_CAP` is 100,000: counts stop there unless `exact` is asked (`count_documents`), and the text says
   `at least 100,000 documents`.
+- `SKIP_MAX` is 1,000,000: the largest `skip` of `find_documents`, so that a call cannot make the server walk a
+  collection for nothing; past it, `skip must be between 0 and 1000000.`
+- `MAX_BATCH` is 20: the messages of one JSON-RPC batch, each of which may run a command for `MAX_TIME_MS`
+  (`mcp.server`).
 - The tools' own bounds for MongoDB: documents and results 1 to 100 (default 20); distinct values 1 to 500 (default
   50), each cut at 300 characters; a value in a change or an oplog entry cut at 1,500 characters with
   `… (<n> more characters)`; 400 field lines in `describe_collection`; 300 characters of a running operation's
@@ -436,12 +511,15 @@ Acceptance:
 - [ ] Every query or command a tool sends to MongoDB carries `maxTimeMS: 30000`.
 - [ ] A Redis server that does not answer makes the tool fail after 30 seconds with the sentence above, and the next
   call of a tool works again.
+- [ ] `find_documents` with `skip: 1000000` runs; with `skip: 1000001` it is refused with `skip must be between 0 and
+  1000000.` and sends nothing. (differs)
 - [ ] Each worked example above gives its result.
 
-### `mcp.refuse-write-stages` — Refuse pipelines with $out or $merge
+### `mcp.refuse-write-stages` — Refuse pipelines that write, are not a plain read, or read a system collection
 
-Pipelines are the one way a read of MongoDB could write: a pipeline with `$out` or `$merge` is refused before anything
-is sent.
+Pipelines are the one way a read of MongoDB could write, stay open, or reach what the collection does not hold: a
+pipeline with `$out` or `$merge`, with a stage that is not a plain read of the collection, or that joins a `system.*`
+collection is refused before anything is sent.
 
 - **Kind**: Derivation
 - **Engine**: MongoDB
@@ -449,14 +527,30 @@ is sent.
 - **Uses**: `mcp.arguments`, `aggregate.run` (how a pipeline's text is read into stages); used by `aggregate`,
   `explain_query`, `open_aggregation` and `open_explain`.
 - **Ported from**: Mongoster's card mcp.refuse-write-stages (`src/mcp/context.ts › toolContext`,
-  `src/shared/pipeline.ts › isWriteStage`).
+  `src/shared/pipeline.ts › isWriteStage`); the nested pipelines, the stages that are not a plain read and the joined
+  system collections from Mongoster 0.9.0 (`src/shared/pipeline.ts › notPlainReadStage`, `joinedCollections`,
+  `NOT_PLAIN_READ_STAGES`; `src/mcp/context.ts › isSystemCollection`).
+- **Differs**: (M37) only the stages at the top of the pipeline are looked at, and only for `$out` and `$merge`: a
+  `$currentOp`, a `$changeStream`, a `$merge` inside a `$facet` or a `$lookup` of `system.users` is sent to the server
+  (`src/features/mcp/refuse-write-stages.ts › writeStageOf`).
 
 Rules:
 
 - The `pipeline` argument is mongosh text, read into stages as the pipeline editor reads it.
 - No stage: `The pipeline is empty.`
+- The stages are looked for at the top of the pipeline and in the nested pipelines: the facets of `$facet`, the
+  `pipeline` of `$lookup` and of `$unionWith`, to any depth up to 20. A pipeline nested deeper, which no real read
+  needs, is refused: `Pipeline: The pipeline is nested too deeply`.
 - A stage named `$out` or `$merge` (spaces around the name ignored): `<stage> writes to the database: Datardo's MCP
   server only reads.`
+- A stage that is not a plain read of the collection, `$changeStream`, `$changeStreamSplitLargeEvent`, `$currentOp`,
+  `$listSessions`, `$listLocalSessions`, `$queryStats`, `$listSampledQueries` or `$planCacheStats`: `<stage> is
+  refused: Datardo's MCP server runs only pipelines that read the collection (watch_changes follows the changes,
+  current_operations lists the operations, slow_queries gives the query shapes).`
+- A `$lookup` or `$graphLookup` whose `from`, or a `$unionWith` whose collection (the string, or its `coll`), starts
+  with `system.`: `The pipeline reads <collection>: Datardo's MCP server doesn't read the system.* collections (users,
+  profiler, views…).`
+- These refusals hold whatever `datardo.mcp.readData` says.
 - Text that cannot be read: `Pipeline: <the parser's message>`.
 - Otherwise the stages are built into the pipeline sent to MongoDB, or put in the collection tab.
 - `watch_changes`' `filter` is only ever a `$match` of the change stream, so it cannot add a stage.
@@ -468,13 +562,24 @@ Worked examples:
 - `[]` → `The pipeline is empty.`
 - `[ { $match: { status: "paid" } }, { $group: { _id: "$city", n: { $sum: 1 } } } ]` → two stages, `$match` and
   `$group`.
+- `[ { $facet: { a: [ { $out: "copy" } ] } } ]` → the refusal for `$out`.
+- `[ { $lookup: { from: "x", as: "y", pipeline: [ { $unionWith: { coll: "z", pipeline: [ { $merge: { into: "w" } } ]
+  } } ] } } ]` → the refusal for `$merge`.
+- `[ { $currentOp: { allUsers: true } } ]` → `$currentOp is refused: …`
+- `[ { $lookup: { from: "system.users", localField: "a", foreignField: "user", as: "u" } } ]` on the `admin`
+  database → `The pipeline reads system.users: …`
+- `[ { $unionWith: "system.profile" } ]` → `The pipeline reads system.profile: …`
 
 Acceptance:
 
-- [ ] No tool sends, explains or opens in a tab a pipeline that contains `$out` or `$merge`.
+- [ ] No tool sends, explains or opens in a tab a pipeline that contains `$out` or `$merge`, at any depth. (differs)
 - [ ] `{ " $out ": "copy" }` as a stage is refused like `$out`.
-- [ ] A `$lookup` whose inner pipeline has `$merge` is refused by the server, and the tool gives the server's message
-  with `isError: true`; nothing is written.
+- [ ] No tool sends, explains or opens in a tab a pipeline with `$changeStream`, `$changeStreamSplitLargeEvent`,
+  `$currentOp`, `$listSessions`, `$listLocalSessions`, `$queryStats`, `$listSampledQueries` or `$planCacheStats`, at
+  any depth. (differs)
+- [ ] No tool reads a `system.*` collection as the source of a `$lookup`, `$graphLookup` or `$unionWith`, at any
+  depth. (differs)
+- [ ] Each worked example above gives its result, and the refused ones send nothing and open no tab. (differs)
 
 ### `mcp.log` — The MCP server in the Log
 
@@ -487,12 +592,17 @@ page.
 - **Entry points**: the Log page filtered by the source **MCP** (`runner.log`); **Show the log** in the dialog of
   `mcp.setup` (`@dialog`), which opens it so.
 - **Uses**: `runner.log`, `mcp.server`, `mcp.protocol`.
-- **Ported from**: Mongoster's card mcp.log (`src/mcpServer.ts › McpServer.log`, `› logOnce`, `› summary`).
+- **Ported from**: Mongoster's card mcp.log (`src/mcpServer.ts › McpServer.log`, `› logOnce`, `› summary`); the
+  error cut to one line from Mongoster 0.9.0 (`src/shared/mcp.ts › logText`).
+- **Differs**: (M37) the message of an error is written whole, its line breaks included (`src/features/mcp/log.ts ›
+  outcomeText`).
 
 Rules:
 
 - Each call of a known tool is one line: its name, its arguments as JSON on one line (cut at 300 characters with `…`),
   an arrow and the outcome: `ok`, `error: <message>` or `missing <keys>`.
+- The message of an error is cut at 300 characters with `…`, and its line breaks become spaces, so that a long or
+  many-line error of the server neither floods the Log nor passes for other lines.
 - The server's state is one line when it changes, and not again while the server tries the port every 3 seconds:
   `Listening on <url>`, `Stopped`, `Not started: <why>`, `New access token: the old one no longer works`.
 - The Log gives each line its time and its source, as it does for every line.
@@ -506,10 +616,13 @@ Worked examples:
 - `list_databases` without arguments → `list_databases {} → missing connection`.
 - `aggregate` with `$out` → `aggregate {…} → error: $out writes to the database: Datardo's MCP server only reads.`
 - A filter of 500 characters → the first 300 characters of the JSON, then `…`.
+- A failed call whose error is 1,000 characters on three lines → `… → error: ` and the first 300 characters of the
+  error on one line, then `…`.
 
 Acceptance:
 
-- [ ] Each worked example above gives its line, under the source **MCP**.
+- [ ] Each worked example above gives its line, under the source **MCP**. (differs)
+- [ ] No line the MCP server writes in the Log has a line break, whatever the server's error says. (differs)
 - [ ] A port still taken after ten tries is logged once as `Not started: Port 37018 is used by another program.`
 - [ ] A request with a wrong token leaves no line.
 - [ ] The Log filtered by **MCP** shows no line of a feature the user started in the window.
@@ -527,29 +640,36 @@ documents found with a query or an aggregation.
 - **Reads**: the saved connections of both engines (names, ids, engines, folders, read-only, connected),
   `listDatabases`, `listCollections`, `estimatedDocumentCount`, a `$sample`, `listIndexes`, `$listSearchIndexes`,
   `find`, `countDocuments` and `aggregate`.
-- **Settings**: `datardo.mcp.readData` hides `find_documents` and `aggregate`.
+- **Settings**: `datardo.mcp.readData` hides `find_documents` and `aggregate`, and off makes `describe_collection`
+  give a partial filter expression as its shape.
 - **Uses**: `mcp.arguments`, `mcp.output-limits`, `mcp.refuse-write-stages`, `mcp.read-data`, `schema.analyze`,
-  `query.parse`.
+  `query.parse`, `tree.excluded`.
 - **Ported from**: Mongoster's card mcp.data-tools (`src/mcpTools.ts › mcpTools`, `› flattenFields`,
-  `src/mcp/context.ts`).
+  `src/mcp/context.ts`); the bound of `skip`, the `system.*` collections refused and the partial filters as shapes
+  from Mongoster 0.9.0; the lists without what is excluded from searches from Mongoster 0.9.0 (`src/mcpTools.ts`,
+  `src/shared/exclusions.ts › ownExclusion`).
+- **Differs**: (M37) `find_documents` takes any `skip`; a `system.*` collection is described, found and aggregated;
+  `describe_collection` gives a partial filter expression with its values whatever `datardo.mcp.readData` says.
+  (M39) the three lists give every connection, database and collection, since nothing can be excluded from searches
+  yet.
 
 The tools:
 
 | Tool | Arguments | Returns | Without `readData` |
 | --- | --- | --- | --- |
-| `list_connections` | none | JSON, for the connections of both engines: `name`, `id`, `engine` (`mongodb` or `redis`), `folder` when set, `readOnly: true` on a read-only connection, `connected`; `No connections are saved in Datardo.` | offered |
-| `list_databases` | `connection` | JSON: `name`, `sizeOnDisk`, `empty` of each database | offered |
-| `list_collections` | `connection`, `database` | JSON sorted by name: `name`, `type`, `viewOn` for a view; `<database> has no collections.` | offered |
-| `describe_collection` | `connection`, `database`, `collection`, `sample` (1 to 1000, default 200) | the estimated count, the indexes with their options, the search indexes when the server has them, and each field of a random sample with its types and how often it is present | offered |
-| `find_documents` | `connection`, `database`, `collection`, `filter`, `sort`, `projection`, `skip` (default 0), `limit` (1 to 100, default 20) | how many match and the documents in mongosh syntax | hidden |
+| `list_connections` | none | JSON, for the connections of both engines: `name`, `id`, `engine` (`mongodb` or `redis`), `folder` when set, `readOnly: true` on a read-only connection, `connected`, of the connections not excluded from searches; `No connections are saved in Datardo.`, or `The user excluded every connection saved in Datardo from searches.` | offered |
+| `list_databases` | `connection` | JSON: `name`, `sizeOnDisk`, `empty` of each database not excluded from searches | offered |
+| `list_collections` | `connection`, `database` | JSON sorted by name: `name`, `type`, `viewOn` for a view, of the collections without an exclusion of their own; `<database> has no collections.`, or `The user excluded every collection of <database> from searches.` | offered |
+| `describe_collection` | `connection`, `database`, `collection`, `sample` (1 to 1000, default 200) | the estimated count, the indexes with their options, the search indexes when the server has them, and each field of a random sample with its types and how often it is present | offered; a partial filter expression as its shape |
+| `find_documents` | `connection`, `database`, `collection`, `filter`, `sort`, `projection`, `skip` (0 to 1,000,000, default 0), `limit` (1 to 100, default 20) | how many match and the documents in mongosh syntax | hidden |
 | `aggregate` | `connection`, `database`, `collection`, `pipeline`, `limit` (1 to 100, default 20) | the first results in mongosh syntax | hidden |
 
 Acceptance:
 
 - [ ] The promise: `list_connections` never returns a connection string, a password, an SSH passphrase or the name of
   the user a connection signs in with, and none of these tools writes: they send only `listDatabases`,
-  `listCollections`, `$sample`, `listIndexes`, `$listSearchIndexes`, `find`, `count`, and `aggregate` without `$out`
-  or `$merge`.
+  `listCollections`, `$sample`, `listIndexes`, `$listSearchIndexes`, `find`, `count`, and `aggregate` without `$out`,
+  `$merge` or the other stages of `mcp.refuse-write-stages`, and never on a `system.*` collection. (differs)
 - [ ] `list_connections` with a MongoDB connection Local and a Redis connection Cache local lists both, each with its
   `engine`.
 - [ ] `describe_collection` starts with `shop.orders: about 1,234 documents, 200 documents sampled.` (`unknown number
@@ -565,6 +685,15 @@ Acceptance:
 - [ ] Values keep their BSON type in the text: `ObjectId("…")`, `ISODate("…")`, `NumberLong(…)`, `Decimal128(…)`.
 - [ ] A view can be described, found and aggregated like a collection.
 - [ ] `list_databases` on a Redis connection is refused with the sentence of `mcp.arguments`.
+- [ ] With the connection Staging excluded from searches, `list_connections` leaves it out; with the database `logs`
+  of Local excluded, `list_databases` of Local leaves it out; with `shop.audit` excluded, `list_collections` of `shop`
+  leaves out `audit` and keeps the others, and with `shop` excluded it still lists every collection of `shop` that
+  has no exclusion of its own. (differs)
+- [ ] With every connection excluded, `list_connections` says `The user excluded every connection saved in Datardo
+  from searches.`; with every collection of `shop` excluded, `list_collections` says `The user excluded every
+  collection of shop from searches.` (differs)
+- [ ] What is excluded still answers when it is named: `list_databases` of Staging, `describe_collection` of
+  `shop.audit` and `find_documents` on a collection of `logs` answer as if nothing were excluded (`mcp.arguments`).
 
 ### `mcp.debugging-tools` — Follow what an application writes
 
@@ -584,7 +713,10 @@ the writes made from Datardo itself, to documents and to keys, with what was the
   the values out of the titles `datardo_writes` returns; `datardo.undo.enabled` is reported by `datardo_writes`.
 - **Uses**: `mcp.arguments`, `mcp.output-limits`, `mcp.read-data`, `undo.record`, `undo.limits`, `undo.show`.
 - **Ported from**: Mongoster's card mcp.debugging-tools (`src/mcp/changes.ts › changesTools`, `src/mcp/workspace.ts ›
-  workspaceTools`), where the last two tools are named mongoster_writes and mongoster_write_details.
+  workspaceTools`), where the last two tools are named mongoster_writes and mongoster_write_details; the `system.*`
+  collections left out from Mongoster 0.9.0 (`src/mcp/changes.ts`).
+- **Differs**: (M37) `write_history` lists the writes to the `system.*` collections with the others, and
+  `watch_changes` and `write_history` take a `system.*` collection as their `collection`.
 
 The tools:
 
@@ -614,6 +746,10 @@ Acceptance:
 - [ ] `write_history` starts with `Writes to shop.orders (_id "w1", since …), newest first: 3 operations.`, lists the
   operations of a transaction under one heading (`transaction, lsid …, txnNumber …`), and ends with
   `Oplog window: <first> → <last> (3.2 h).`
+- [ ] `write_history` never shows a write to a `system.*` collection (a user created in `admin.system.users`,
+  `system.views` changed by a view's creation), with or without `collection`, and the count of its head leaves them out;
+  `watch_changes` and `write_history` refuse a `system.*` collection as their `collection` (`mcp.arguments`).
+  (differs)
 - [ ] `write_history` refusals: a mongos (`<connection> is a sharded cluster (mongos): the oplog is on each shard. …`),
   a standalone server (`The oplog exists only on replica sets: <connection> is a standalone server. …`), missing roles
   (`Not authorized to read the oplog of <connection>: …`), `since is after until.`, and a read over 30 s that found
@@ -647,13 +783,16 @@ drop, and the size of a collection and of its indexes.
 - **Reads**: `explain("executionStats")`, `profile: -1` (the level, without changing it), `system.profile`,
   `getLog: "global"`, `currentOp`, `listIndexes`, `$indexStats`, `$collStats`, `estimatedDocumentCount`.
 - **Refuses**: missing roles, saying which (`Not authorized to <action>: the user needs the <role> role (…)`).
-- **Settings**: `datardo.mcp.readData` hides none of them; off, `current_operations` writes each command as its query
-  shape.
+- **Settings**: `datardo.mcp.readData` hides `explain_query`; off, `current_operations` writes each command as its
+  query shape, and `collection_stats` a view's pipeline and the partial filter expressions as their shapes.
 - **Uses**: `mcp.arguments`, `mcp.output-limits`, `mcp.refuse-write-stages`, `mcp.read-data`, `explain.show` (the
   summary and the suggested index), `advisor.show` (the advice).
-- **Ported from**: Mongoster's card mcp.performance-tools (`src/mcp/performance.ts › performanceTools`).
+- **Ported from**: Mongoster's card mcp.performance-tools (`src/mcp/performance.ts › performanceTools`); what
+  `datardo.mcp.readData` hides from Mongoster 0.9.0.
+- **Differs**: (M37) `explain_query` is offered with `datardo.mcp.readData` off, and `collection_stats` gives a view's
+  pipeline with its values (`src/features/mcp/performance-tools.ts`).
 
-The tools (all offered with `datardo.mcp.readData` off):
+The tools (all but `explain_query` offered with `datardo.mcp.readData` off):
 
 | Tool | Arguments | Returns |
 | --- | --- | --- |
@@ -687,6 +826,11 @@ Acceptance:
 - [ ] `index_advice` on a view answers that a view has no indexes of its own; with no advice it says
   `No advice: no missing, redundant, unused or hidden index found.`; indexes whose statistics started less than 24 hours
   ago are counted apart, not called unused.
+- [ ] `explain_query` is not offered with `datardo.mcp.readData` off: its plan quotes the bounds of the query, a failed
+  explain the values it failed on, and documents examined against returned is a count per filter (`mcp.read-data`).
+  (differs)
+- [ ] `collection_stats` on a view with `datardo.mcp.readData` off gives `… is a view on orders with the pipeline [ {
+  $match: { status: ? } } ] …`. (differs)
 
 ### `mcp.deployment-tools` — Read the state of the deployment
 
@@ -703,9 +847,13 @@ problem is the MongoDB deployment rather than the data.
   `balancerCollectionStatus`, `getShardMap` and the `config` database.
 - **Refuses**: a database that does not exist (`The database <name> doesn't exist on <connection>: use
   list_databases.`).
-- **Settings**: none: `datardo.mcp.readData` hides none of them and changes none.
-- **Uses**: `mcp.arguments`, `mcp.output-limits`, `monitor.show` (the same readings).
-- **Ported from**: Mongoster's card mcp.deployment-tools (`src/mcp/topology.ts › topologyTools`).
+- **Settings**: `datardo.mcp.readData` hides none of them; off, `sharding_status` leaves out what quotes shard key
+  values.
+- **Uses**: `mcp.arguments`, `mcp.output-limits`, `mcp.read-data`, `monitor.show` (the same readings).
+- **Ported from**: Mongoster's card mcp.deployment-tools (`src/mcp/topology.ts › topologyTools`); what
+  `datardo.mcp.readData` hides from Mongoster 0.9.0 (`src/mcp/topology.ts › formatShardingStatus`).
+- **Differs**: (M37) `sharding_status` gives the details of its events and the server's text of what it could not
+  read whatever `datardo.mcp.readData` says (`src/features/mcp/tool/sharding.ts › eventLines`).
 
 The tools (all offered with `datardo.mcp.readData` off):
 
@@ -729,6 +877,10 @@ Acceptance:
 - [ ] `sharding_status` on a server that is not a mongos says what it is (`… is a standalone server: it is not a
   sharded cluster.`, `… is a replica set member, not a mongos: it is not a sharded cluster (use
   replica_set_status).`).
+- [ ] With `datardo.mcp.readData` off, `sharding_status` gives the zones by name, as with it on, the recent events
+  without their details, adding `(the events' details are left out: they quote shard key values and
+  datardo.mcp.readData is off)`, and of what could not be read only what it was and the role it needs, without the
+  server's text (`mcp.read-data`). (differs)
 - [ ] `database_stats` with `limit: 2` on a deployment with five databases lists the two largest and says that three
   more are not listed.
 
@@ -747,21 +899,25 @@ saved, and whether a MongoDB connection publishes for redis-oplog.
   collection of a database, `listCollections`, `config.collections`; the user's saved and recent queries and the files
   of the connection's queries folder; the linked connection of the MongoDB connection, and with `check` a `PING` to
   it.
-- **Settings**: `datardo.mcp.readData` hides `distinct_values`, and off writes `?` for the values in what
-  `list_saved_queries` returns.
+- **Settings**: `datardo.mcp.readData` hides `distinct_values`, and off makes `count_documents` refuse a filter,
+  `collection_options` give the validator and a view's pipeline without their values, and `list_saved_queries` write
+  `?` for the values of the queries.
 - **Uses**: `mcp.arguments`, `mcp.output-limits`, `mcp.read-data`, `relation.detect`, `saved-query.save`,
   `saved-query.recent`, `oplog.publish`, `connection.link-redis`.
 - **Ported from**: Mongoster's card mcp.data-model-tools (`src/mcp/data.ts › dataTools`, `src/mcp/workspace.ts ›
-  workspaceTools`).
+  workspaceTools`); what `datardo.mcp.readData` hides from Mongoster 0.9.0 (`src/mcp/data.ts`, `› optionsText`).
+- **Differs**: (M37) with `datardo.mcp.readData` off, `count_documents` counts any filter and `collection_options`
+  gives the validator and a view's pipeline with their values (`src/features/mcp/data-model-tools.ts`,
+  `src/features/mcp/tool/collection-options.ts`).
 
 The tools:
 
 | Tool | Arguments | Returns | Without `readData` |
 | --- | --- | --- | --- |
-| `count_documents` | `connection`, `database`, `collection`, `filter`, `exact` (default false) | the count, stopping at 100,000 unless `exact`; with no filter also the estimate from the metadata | offered |
+| `count_documents` | `connection`, `database`, `collection`, `filter`, `exact` (default false) | the count, stopping at 100,000 unless `exact`; with no filter also the estimate from the metadata | the total only: a filter is refused |
 | `distinct_values` | `connection`, `database`, `collection`, `field` (a field path), `filter`, `limit` (1 to 500, default 50) | the values most frequent first with how many documents have each, their types when mixed, the number of distinct values, and the documents with null and without the field | hidden |
 | `describe_relations` | `connection`, `database`, `collection`, `sample` (1 to 2000, default 100) | the fields that reference other collections (`orders.customerId → customers._id (one per document; 20 of 20 sampled values found, 100%)`), DBRefs and views; with `collection`, only those from and to it | offered |
-| `collection_options` | `connection`, `database`, `collection` | the kind (collection, capped, clustered, view, time series), validator with its level and action, a view's source and pipeline, capped size, time series options, clustered index, `expireAfterSeconds`, collation, pre- and post-images, shard key | offered |
+| `collection_options` | `connection`, `database`, `collection` | the kind (collection, capped, clustered, view, time series), validator with its level and action, a view's source and pipeline, capped size, time series options, clustered index, `expireAfterSeconds`, collation, pre- and post-images, shard key | offered; the validator as field names and types, a view's pipeline as its shape |
 | `list_saved_queries` | `connection`, `database`, `collection` | the saved queries, those in the queries folder first with their file, then those for me, and the recent ones, newest first, as written | offered, values as `?` |
 | `redis_oplog_status` | `connection`, `database`, `collection`, `check` (default false) | whether the connection publishes, the name of its linked connection, the channel prefix, namespaces and patterns published, the channels of a collection, the last publishing error, and with `check` whether Redis answers | offered |
 
@@ -794,6 +950,12 @@ Acceptance:
   not published (no pattern matches).`
 - [ ] With `datardo.mcp.readData` off, a saved filter `{ status: "paid", total: { $gt: 100 } }` is returned as
   `filter: { status: ?, total: { $gt: ? } }` (`mcp.read-data`).
+- [ ] With `datardo.mcp.readData` off, `count_documents` with a filter that is not empty is refused before anything
+  is sent, with `A filter is refused because datardo.mcp.readData is off: …`; with no filter, or `{}`, it gives the
+  total and the estimate (`mcp.read-data`). (differs)
+- [ ] With `datardo.mcp.readData` off, `collection_options` gives `Validator ($jsonSchema; field names and types
+  only, datardo.mcp.readData is off): …` and `Pipeline (values replaced by ?, datardo.mcp.readData is off): …`
+  (`mcp.read-data`). (differs)
 
 ### `mcp.redis-key-tools` — Read the keys of a Redis server
 
@@ -952,7 +1114,10 @@ the Server page; and the undo history.
   `search.show`, `watch.show`, `monitor.show`, `undo.show`, `key.show`, `key.scan`, `key.open`, `server.show`,
   `server.slow-log`, `window.tray`.
 - **Ported from**: Mongoster's card mcp.tab-tools (`src/mcpTools.ts › mcpTools`, `src/mcp/workspace.ts ›
-  workspaceTools`); the three tools for Redis are *New in Datardo*.
+  workspaceTools`); the three tools for Redis are *New in Datardo*; the pipelines and the `system.*` collections
+  refused as in Mongoster 0.9.0.
+- **Differs**: (M37) `open_aggregation` and `open_explain` refuse only `$out` and `$merge` at the top of a pipeline,
+  and the tools open a `system.*` collection like any other.
 
 The tools (all offered with `datardo.mcp.readData` off):
 
@@ -976,6 +1141,9 @@ Acceptance:
   with their own confirmations.
 - [ ] A pipeline with `$out` or `$merge` is refused and no tab opens (`mcp.refuse-write-stages`); a collection that does
   not exist is refused before anything opens.
+- [ ] A pipeline refused by `mcp.refuse-write-stages` at any depth (`$currentOp`, a `$merge` inside a `$facet`, a
+  `$lookup` of `system.users`), and a `system.*` collection given to `open_query`, `open_aggregation`, `open_search`,
+  `open_watch` or `open_explain`, are refused and no tab opens. (differs)
 - [ ] `open_explain` with both a pipeline and `filter`, `sort` or `projection` is refused with
   `Give either filter/sort/projection or pipeline, not both.`; with a pipeline it answers `Opened shop.orders on Local
   in Aggregate mode with 2 stages ($match, $group) and its explain plan.`

@@ -553,23 +553,154 @@ MILESTONES = [
                "`test/unit/theme/contrast.test.ts`.",
                "Datardo shows Inter and JetBrains Mono with no network, and their notices are in the installer."],
          notin=[]),
+    dict(n=37, title="The fixes of Mongoster's security audit",
+         goal="What Mongoster 0.9.0 fixed after an audit of its MCP server, its backups, GridFS and its desktop app "
+              "is fixed in Datardo too: the MCP server answers small batches, never reads a `system.*` collection "
+              "nor a stage that is not a plain read, and with `datardo.mcp.readData` off gives no value at all; "
+              "backups write any name safely and a restore never revives a system database or a TTL index on "
+              "existing documents; the window can no longer have any file opened; the data folder and the "
+              "temporary copies are the user's alone; the packaged application cannot be started as plain Node.js.",
+         depends=[36], cards=[],
+         changes=[("mcp", ["server", "protocol", "arguments", "output-limits", "refuse-write-stages", "read-data",
+                           "log", "data-tools", "debugging-tools", "performance-tools", "deployment-tools",
+                           "data-model-tools", "tab-tools"]),
+                  ("backup", ["folder-layout", "create", "restore"]), ("connection", ["import"]),
+                  ("gridfs", ["open"]), ("relation", ["export-svg"]), ("transfer", ["export"])],
+         beyond=["**Modules**: `src/features/mcp`, `src/main/mcp` (the batch), `src/features/backup` (the names of "
+                 "`backup.folder-layout`), `src/main/actions` (what may be opened, R14.10), `src/storage` (the "
+                 "modes, R14.11), `src/main/gridfs.ts` (the private folder), `electron-builder.yml` (the fuses).",
+                 "**Code rules checked from now**: R14.10, R14.11, R14.12; R5.6 and R14.7 as reworded.",
+                 "**Decisions**: D68, D73; relies on D16, D18, D42, D45.",
+                 "**Threats**: T5, T8, T9, T20 as rewritten; T23, T24, T25 new.",
+                 "**Stored data**: no format changes; the modes of [data](data.md#how-it-is-written), and backup "
+                 "folders with encoded names, those written before still read.",
+                 "**Settings**: the description of `datardo.mcp.readData` in `resources/settings.schema.json`."],
+         exit=["A JSON-RPC batch of 21 messages gets 400 and none of them runs; `find_documents` with a `skip` of "
+               "1,000,001 is refused; `aggregate` with `$out` inside a `$facet` and with `$lookup` from "
+               "`system.users` are refused, without a command reaching the server.",
+               "With `datardo.mcp.readData` off, no tool's answer holds a value of a document: a test runs every "
+               "tool on a collection whose every value is a marker string and finds the marker nowhere.",
+               "A folder backup of the collections `a/b`, `con` and `..x` is restored by `mongorestore --dir` with "
+               "their names, and a folder written before M37 is still restored by Datardo.",
+               "On Linux, after a start, every file of the data folder has the mode 0600 and every folder 0700, "
+               "also those made 0644 by hand before; the packaged application started with "
+               "`ELECTRON_RUN_AS_NODE=1` opens its window instead of running as Node.js."],
+         notin=[]),
+    dict(n=38, title="The colors of collections and databases",
+         goal="A connection takes one of eleven colors or a custom one; a MongoDB database, a Redis database and a "
+              "collection, view or bucket can have a color of their own, shown on their icons in the tree and on "
+              "their tabs, kept with the connection, carried by its export and moved or forgotten by a rename or "
+              "a drop; Compass's teal, iris, pink and gray come in as themselves; a list of connection strings "
+              "takes the names of its `// name` comments.",
+         depends=[37], cards=[("connection", ["color-presets", "custom-color"]),
+                              ("tree", ["set-collection-color", "set-database-color", "color-of"])],
+         changes=[("connection", ["form", "duplicate", "set-color", "secrets", "import", "export", "read-file",
+                                  "read-list", "read-compass", "write-file", "color-from-compass"]),
+                  ("tree", ["show", "pinned", "mongodb", "redis", "menu-mongodb", "menu-redis"]),
+                  ("tab", ["strip", "groups"]), ("home", ["card"]), ("window", ["theme"]),
+                  ("manage", ["rename-collection", "drop-collection", "drop-database"]),
+                  ("gridfs", ["show", "drop-bucket"]), ("nav", ["dialog"])],
+         beyond=["**Modules**: `src/features/connection`, `src/features/tree`, `src/ui/theme` (the tokens of the "
+                 "five new presets in both themes, D69), `src/ui/shell` (the icons of the tree and of the tabs).",
+                 "**Decisions**: D69; relies on D65 (the tokens), D34.",
+                 "**Stored data**: the optional fields `databaseColors`, `collectionColors` and a custom `color` of "
+                 "`connections.json` ([data](data.md#the-data-folder)), recorded in "
+                 "`test/fixtures/stored/connections/v1/`."],
+         exit=["Each of the eleven presets passes R10.10 against the canvas, an island, a raised surface, a hovered "
+               "row and a selected row, in both themes: `test/unit/theme/contrast.test.ts`.",
+               "A connections file exported by Mongoster 0.10.0 with colored databases and collections is imported "
+               "with every color; exported again by Datardo and read by Mongoster 0.10.0, it keeps them."],
+         notin=[]),
+    dict(n=39, title="Exclude from searches, and several nodes selected",
+         goal="A connection, a database, a collection, a view or a bucket can be left out of searches: it stays in "
+              "the tree, dimmed, and the tree's filter, Search documents and the lists of the MCP server skip it, "
+              "while naming it still finds it; several nodes of the tree are selected with `Ctrl`, `Shift` and the "
+              "arrows to exclude or include them together.",
+         depends=[38], cards=[("tree", ["exclude-from-searches", "excluded", "select"])],
+         changes=[("connection", ["duplicate", "menu", "secrets", "import", "export", "read-file", "write-file"]),
+                  ("tree", ["show", "mongodb", "filter", "match", "keyboard", "menu-mongodb"]),
+                  ("search", ["show", "collections"]), ("mcp", ["data-tools"]), ("home", ["card"]),
+                  ("manage", ["rename-collection", "drop-collection", "drop-database"]),
+                  ("gridfs", ["drop-bucket"])],
+         beyond=["**Modules**: `src/features/tree`, `src/features/search`, `src/features/mcp`, `src/ui/shell` (the "
+                 "selection of the tree).",
+                 "**Decisions**: D70.",
+                 "**Stored data**: the optional fields `excluded` and `exclusions` of `connections.json`, recorded "
+                 "with the fixture of M38."],
+         exit=["Search documents on a connection of 40 databases, 3 of them excluded, reads the other 37 and says "
+               "*3 excluded*; `list_databases` of the MCP server leaves the 3 out, and `find_documents` on one of "
+               "them still answers."],
+         notin=[]),
+    dict(n=40, title="The query beside the results",
+         goal="The query bar of a collection tab, or the stages of a pipeline, can sit in a pane at the right of the "
+              "table instead of above it, one choice for every tab; the query bar is reordered with icons, and a "
+              "cell dragged from the table can go to Sort and Project.",
+         depends=[39], cards=[("query", ["position"])],
+         changes=[("query", ["bar", "builder", "drag", "add-sort", "add-projection"]),
+                  ("aggregate", ["show", "move-stage"]), ("document", ["update-many", "delete-many"]),
+                  ("table", ["show"])],
+         beyond=["**Modules**: `src/features/query`, `src/features/aggregate`, `src/ui/pages/collection` (the query "
+                 "pane and its splitter).",
+                 "**Decisions**: D71; leaves Q142 open.",
+                 "**Stored data**: the optional field `queryPaneWidth` of `window.json`.",
+                 "**Settings**: `datardo.query.position`."],
+         exit=["With the explorer hidden in a window 1,280 pixels wide, the query pane shows at 380 pixels; with it "
+               "shown, the query stays above and its toggle says why: `test/ui/collection/query-pane.spec.ts`."],
+         notin=[]),
+    dict(n=41, title="Conditional formatting",
+         goal="The rows or the cells of a collection's table are colored by conditions written as filters, as in a "
+              "spreadsheet; the rules are listed, added, edited, named, reordered, turned off and removed in a "
+              "Formatting view of the inspector island, while the table changes beside it, and every table can be "
+              "shown without colors.",
+         depends=[40], cards=[("table", ["match", "format-table", "formatting", "add-format-rule",
+                                         "edit-format-rule", "toggle-formatting"])],
+         changes=[("table", ["show", "rows", "column-menu"]), ("nav", ["inspector", "toggle-inspector"]),
+                  ("manage", ["rename-collection", "drop-collection", "drop-database"]),
+                  ("gridfs", ["drop-bucket"]), ("connection", ["remove"]), ("palette", ["commands"])],
+         beyond=["**Modules**: `src/shared` or `src/features/table` (the matcher, pure), `src/features/table`, "
+                 "`src/ui/shell` (the views of the inspector island).",
+                 "**Decisions**: D72.",
+                 "**Stored data**: the new file of the formatting rules ([data](data.md#the-data-folder)) at "
+                 "version 1, and the optional field `inspectorView` of `window.json`."],
+         exit=["`table.match` gives MongoDB's answer for every operator it supports: a test runs each worked example "
+               "against a real server's `find` and compares."],
+         notin=[]),
+    dict(n=42, title="Formatting by a field's values, beyond one collection",
+         goal="A field colors the table by its values with no condition to write (booleans, scales, one color per "
+              "value with pinned values and palettes); rules apply to a collection, a database, a connection or "
+              "everywhere; they are moved and copied between these, and exported to a file and imported from one.",
+         depends=[41], cards=[("table", ["format-field", "color-by-field", "edit-field-rule", "format-scopes",
+                                         "move-format-rule", "export-formatting", "import-formatting",
+                                         "formatting-file"])],
+         changes=[("table", ["show", "column-menu"]), ("manage", ["drop-database"])],
+         beyond=["**Modules**: `src/features/table`.",
+                 "**Decisions**: D72.",
+                 "**Stored data**: the rules of a database, of a connection and of everywhere, in the file of M41."],
+         exit=["A file of formatting rules exported by Datardo and imported again adds nothing; one exported by "
+               "Mongoster 0.10.0 imports with its field rules, pinned values and palettes."],
+         notin=[]),
 ]
 
 HEAD = """# Roadmap
 
-Every milestone, M0 to M36, is done; a new one is planned here first. A milestone is taken by reading its section,
-then every card it lists, in order; nothing outside it is built without asking. The
+M0 to M36 are done; M37 to M42 are planned, and M37 is the next. A new milestone is planned here first. A milestone is
+taken by reading its section, then every card it lists, in order; nothing outside it is built without asking. The
 [index of the catalog](features/README.md) shows each card's milestone and status.
 
 The milestones come in three stages. **M0 to M12** make a MongoDB client that browses, queries and edits documents
 safely. **M13 to M18** add Redis: keys, values, the console, the server, Pub/Sub. **M19 to M35** bring the rest of
 what Mongoster does, by how often it is used; **M36** makes the window steady and gives it the colors of the sketch.
-Each milestone ends with something that runs.
+**M37 to M42** bring what Mongoster 0.9.0 and 0.10.0 added after 0.8.0, adapted to Datardo
+([D68](decisions.md#d68--what-of-mongoster-090-and-0100-comes-to-datardo)): the fixes of its security audit first,
+then the colors of collections and databases, exclusions from searches, the query beside the results and conditional
+formatting. Each milestone ends with something that runs.
 
 In each list of **Features** the cards are in the order to build them: what a card uses inside the milestone comes
-before it. A card often names a feature of a later milestone (a menu entry, a button that opens another page): build
-the card without that part, and finish it in the milestone that brings the feature; each milestone lists these under
-**Not in this milestone**. The lists and the links are written by `python scripts/roadmap.py docs` from the catalog.
+before it. An item marked *(changed)* is a card an earlier milestone built, whose **Differs** line says what this one
+changes ([feature contract](feature-contract.md#a-card-that-changes-after-it-was-built)). A card often names a
+feature of a later milestone (a menu entry, a button that opens another page): build the card without that part, and
+finish it in the milestone that brings the feature; each milestone lists these under **Not in this milestone**. The
+lists and the links are written by `python scripts/roadmap.py docs` from the catalog.
 
 ## M0 — The workshop
 
@@ -671,18 +802,32 @@ def main() -> int:
 
     taken: dict[str, int] = {}
     chosen: dict[int, list[str]] = {}
+    changed: dict[int, list[str]] = {}
+
+    # A card a milestone names one by one is never taken by another milestone that takes its whole area.
+    named: dict[str, int] = {}
     for milestone in MILESTONES:
-        ids: list[str] = []
         for spec in milestone["cards"]:
+            if not isinstance(spec, str) and spec[1] not in ("except", "rest"):
+                for name in spec[1]:
+                    named[f"{spec[0]}.{name}"] = milestone["n"]
+
+    def expand(specs: list, number: int) -> list[str]:
+        ids: list[str] = []
+        whole = lambda area: [identifier for identifier in by_area[area] if named.get(identifier, number) == number]
+        for spec in specs:
             if isinstance(spec, str):
-                ids += by_area[spec]
+                ids += whole(spec)
             elif spec[1] == "except":
-                ids += [identifier for identifier in by_area[spec[0]]
-                        if identifier.split(".", 1)[1] not in spec[2]]
+                ids += [identifier for identifier in whole(spec[0]) if identifier.split(".", 1)[1] not in spec[2]]
             elif spec[1] == "rest":
-                ids += [identifier for identifier in by_area[spec[0]] if identifier not in taken]
+                ids += [identifier for identifier in whole(spec[0]) if identifier not in taken]
             else:
                 ids += [f"{spec[0]}.{name}" for name in spec[1]]
+        return ids
+
+    for milestone in MILESTONES:
+        ids = expand(milestone["cards"], milestone["n"])
         for identifier in ids:
             if identifier not in by_id:
                 raise SystemExit(f"M{milestone['n']}: no card {identifier}")
@@ -690,6 +835,16 @@ def main() -> int:
                 raise SystemExit(f"{identifier} is in M{taken[identifier]} and M{milestone['n']}")
             taken[identifier] = milestone["n"]
         chosen[milestone["n"]] = ids
+        # Cards an earlier milestone built, whose behavior this one changes.
+        changes = expand(milestone.get("changes", []), milestone["n"])
+        for identifier in changes:
+            if identifier not in by_id:
+                raise SystemExit(f"M{milestone['n']}: no card {identifier}")
+            if identifier not in taken or taken[identifier] >= milestone["n"]:
+                raise SystemExit(f"M{milestone['n']} changes {identifier}, which no earlier milestone builds")
+            if changes.count(identifier) > 1:
+                raise SystemExit(f"M{milestone['n']} changes {identifier} twice")
+        changed[milestone["n"]] = changes
     missing = [identifier for identifier in by_id if identifier not in taken]
     if missing:
         raise SystemExit("in no milestone: " + ", ".join(missing))
@@ -704,7 +859,7 @@ def main() -> int:
     out = [head]
     for milestone in MILESTONES:
         number = milestone["n"]
-        ids = chosen[number]
+        ids = chosen[number] + changed[number]
         inside = set(ids)
         # What a card uses inside the milestone comes first; ties and cycles go by kind, then by the catalog's order.
         rank = lambda identifier: (KIND_ORDER.get(by_id[identifier]["kind"], 9), order[identifier])
@@ -731,14 +886,23 @@ def main() -> int:
         if not done:
             out.append(wrap("No card: this milestone changes how the window looks and behaves, not what a feature "
                             "does; its exit criteria are its tests.", "", ""))
-        else:
+        elif not changed[number]:
             out.append(f"{len(done)} cards, in the order to build them; each card's acceptance lines are this "
                        "milestone's tests.\n")
+        else:
+            new = len(chosen[number])
+            counts = (f"{new} new {'card' if new == 1 else 'cards'} and {len(changed[number])} changed" if new
+                      else f"{len(changed[number])} changed cards")
+            out.append(wrap(f"{counts}, in the order to build them. A changed card was built by an earlier milestone: its **Differs** "
+                            "line says what changes, and its acceptance lines marked *(differs)* are this "
+                            "milestone's tests; the other lines must keep passing.", "", "") + "\n")
         for position, identifier in enumerate(done, start=1):
             card = by_id[identifier]
             link = f"[`{identifier}`](features/{card['file']}#{catalog.anchor(card['heading'])})"
-            out.append(wrap(f"{link} — {card['title']}. *{card['kind']}.*", f"{position}. ",
-                            " " * (len(str(position)) + 2)))
+            # The mark stays on the line of the link, where catalog.py reads it.
+            mark = "*(changed)*\x01" if identifier in changed[number] else ""
+            out.append(wrap(f"{mark}{link} — {card['title']}. *{card['kind']}.*", f"{position}. ",
+                            " " * (len(str(position)) + 2)).replace("\x01", " "))
         out.append("\n### Beyond the cards\n")
         for line in milestone["beyond"]:
             out.append(wrap(line, "- ", "  "))

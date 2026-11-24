@@ -1,6 +1,6 @@
 # The catalog of features
 
-Every feature, one card each, 642 in all. The template and the rules of the cards are in the
+Every feature, one card each, 665 in all. The template and the rules of the cards are in the
 feature contract. This index is written by `catalog.py --index`: change a status here in the commit that
 earns it, and run the script again after adding or renaming a card; the statuses are kept. A card with a
 **Differs** line is *Differs*; when the line goes, it becomes *Documented*. The milestone is the roadmap's.
@@ -13,7 +13,7 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [chart.md](chart.md) | Charts | 7 |
 | [codegen.md](codegen.md) | Code generation | 11 |
 | [compare.md](compare.md) | Compare | 7 |
-| [connection.md](connection.md) | Connections | 39 |
+| [connection.md](connection.md) | Connections | 41 |
 | [console.md](console.md) | Console | 19 |
 | [document.md](document.md) | Documents | 19 |
 | [explain.md](explain.md) | Explain | 6 |
@@ -31,7 +31,7 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [palette.md](palette.md) | Go to | 10 |
 | [playground.md](playground.md) | Playgrounds | 14 |
 | [pubsub.md](pubsub.md) | Pub/Sub | 18 |
-| [query.md](query.md) | The query bar | 19 |
+| [query.md](query.md) | The query bar | 20 |
 | [relation.md](relation.md) | References | 14 |
 | [runner.md](runner.md) | The runner | 10 |
 | [saved-query.md](saved-query.md) | Recent and saved queries | 17 |
@@ -41,10 +41,10 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [settings.md](settings.md) | Settings | 5 |
 | [structure.md](structure.md) | Structure | 7 |
 | [tab.md](tab.md) | The tab strip | 15 |
-| [table.md](table.md) | The table of the Documents section | 23 |
+| [table.md](table.md) | The table of the Documents section | 37 |
 | [task.md](task.md) | Scheduled tasks | 13 |
 | [transfer.md](transfer.md) | Transfer | 8 |
-| [tree.md](tree.md) | Tree | 18 |
+| [tree.md](tree.md) | Tree | 24 |
 | [undo.md](undo.md) | Undo history | 17 |
 | [user.md](user.md) | Users and roles | 16 |
 | [value.md](value.md) | Values | 33 |
@@ -69,11 +69,11 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`aggregate.show`](aggregate.md#aggregateshow--the-pipeline-editor) | The pipeline editor | View | M19 | Built |
+| [`aggregate.show`](aggregate.md#aggregateshow--the-pipeline-editor) | The pipeline editor | View | M19, M40 (changed) | Differs |
 | [`aggregate.add-stage`](aggregate.md#aggregateadd-stage--add-a-stage) | Add a stage | Operation | M19 | Built |
 | [`aggregate.stage-template`](aggregate.md#aggregatestage-template--templates-of-the-common-stages) | Templates of the common stages | Derivation | M19 | Built |
 | [`aggregate.remove-stage`](aggregate.md#aggregateremove-stage--remove-a-stage) | Remove a stage | Operation | M19 | Built |
-| [`aggregate.move-stage`](aggregate.md#aggregatemove-stage--move-a-stage) | Move a stage | Operation | M19 | Built |
+| [`aggregate.move-stage`](aggregate.md#aggregatemove-stage--move-a-stage) | Move a stage | Operation | M19, M40 (changed) | Differs |
 | [`aggregate.toggle-stage`](aggregate.md#aggregatetoggle-stage--disable-or-enable-a-stage) | Disable or enable a stage | Operation | M19 | Built |
 | [`aggregate.clear`](aggregate.md#aggregateclear--remove-all-stages) | Remove all stages | Operation | M19 | Built |
 | [`aggregate.show-stage`](aggregate.md#aggregateshow-stage--show-the-output-after-a-stage) | Show the output after a stage | Operation | M19 | Built |
@@ -94,11 +94,11 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`backup.create`](backup.md#backupcreate--back-up-a-connection-a-database-or-a-collection) | Back up a connection, a database or a collection | Operation | M25 | Built |
-| [`backup.restore`](backup.md#backuprestore--restore-from-a-backup) | Restore from a backup | Operation | M25 | Built |
+| [`backup.create`](backup.md#backupcreate--back-up-a-connection-a-database-or-a-collection) | Back up a connection, a database or a collection | Operation | M25, M37 (changed) | Differs |
+| [`backup.restore`](backup.md#backuprestore--restore-from-a-backup) | Restore from a backup | Operation | M25, M37 (changed) | Differs |
 | [`backup.archive-write`](backup.md#backuparchive-write--writing-a-mongodump-archive) | Writing a mongodump archive | Derivation | M25 | Built |
 | [`backup.archive-read`](backup.md#backuparchive-read--reading-a-mongodump-archive) | Reading a mongodump archive | Derivation | M25 | Built |
-| [`backup.folder-layout`](backup.md#backupfolder-layout--backup-folders-and-their-files) | Backup folders and their files | Derivation | M25 | Built |
+| [`backup.folder-layout`](backup.md#backupfolder-layout--backup-folders-and-their-files) | Backup folders and their files | Derivation | M25, M37 (changed) | Differs |
 
 ## Charts
 
@@ -146,14 +146,14 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | --- | --- | --- | --- | --- |
 | [`connection.add`](connection.md#connectionadd--add-a-connection) | Add a connection | Operation | M6 | Built |
 | [`connection.edit`](connection.md#connectionedit--edit-a-connection) | Edit a connection | Operation | M6 | Built |
-| [`connection.form`](connection.md#connectionform--the-connection-form) | The connection form | View | M6 | Built |
+| [`connection.form`](connection.md#connectionform--the-connection-form) | The connection form | View | M6, M38 (changed) | Differs |
 | [`connection.read-form`](connection.md#connectionread-form--what-the-form-says-checked) | What the form says, checked | Derivation | M6 | Built |
 | [`connection.redis-string`](connection.md#connectionredis-string--a-redis-connection-string-read-and-written) | A Redis connection string, read and written | Derivation | M6 | Built |
 | [`connection.string-secrets`](connection.md#connectionstring-secrets--the-secrets-in-and-out-of-a-connection-string) | The secrets in and out of a connection string | Derivation | M6 | Built |
 | [`connection.test`](connection.md#connectiontest--test-the-connection) | Test the connection | Read | M6 | Built |
 | [`connection.save`](connection.md#connectionsave--save-the-connection-form) | Save the connection form | Operation | M6 | Built |
 | [`connection.copy-string`](connection.md#connectioncopy-string--copy-the-connection-string) | Copy the connection string | Read | M7 | Built |
-| [`connection.duplicate`](connection.md#connectionduplicate--duplicate-a-connection) | Duplicate a connection | Operation | M7 | Built |
+| [`connection.duplicate`](connection.md#connectionduplicate--duplicate-a-connection) | Duplicate a connection | Operation | M7, M38 (changed), M39 (changed) | Differs |
 | [`connection.connect`](connection.md#connectionconnect--connect-a-connection) | Connect a connection | Operation | M6 | Built |
 | [`connection.server-info`](connection.md#connectionserver-info--what-the-server-is) | What the server is | Read | M6 | Built |
 | [`connection.disconnect`](connection.md#connectiondisconnect--disconnect) | Disconnect | Operation | M6 | Built |
@@ -162,27 +162,29 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [`connection.ssh-tunnel-target`](connection.md#connectionssh-tunnel-target--where-the-ssh-tunnel-leads) | Where the SSH tunnel leads | Derivation | M7 | Built |
 | [`connection.trust-host-key`](connection.md#connectiontrust-host-key--confirm-the-host-key-of-an-ssh-server) | Confirm the host key of an SSH server | Operation | M7 | Built |
 | [`connection.overview`](connection.md#connectionoverview--the-overview-page-of-a-connection) | The Overview page of a connection | View | M6 | Built |
-| [`connection.menu`](connection.md#connectionmenu--the-menu-of-a-connection) | The menu of a connection | View | M6 | Built |
+| [`connection.menu`](connection.md#connectionmenu--the-menu-of-a-connection) | The menu of a connection | View | M6, M39 (changed) | Differs |
 | [`connection.folder-menu`](connection.md#connectionfolder-menu--the-menu-of-a-folder) | The menu of a folder | View | M7 | Built |
-| [`connection.set-color`](connection.md#connectionset-color--set-the-color-of-a-connection) | Set the color of a connection | Operation | M7 | Built |
+| [`connection.set-color`](connection.md#connectionset-color--set-the-color-of-a-connection) | Set the color of a connection | Operation | M7, M38 (changed) | Differs |
+| [`connection.color-presets`](connection.md#connectioncolor-presets--the-preset-colors-and-custom-colors) | The preset colors and custom colors | Derivation | M38 | Specified |
+| [`connection.custom-color`](connection.md#connectioncustom-color--choose-a-custom-color) | Choose a custom color | View | M38 | Specified |
 | [`connection.move-to-folder`](connection.md#connectionmove-to-folder--move-a-connection-to-a-folder) | Move a connection to a folder | Operation | M7 | Built |
 | [`connection.rename-folder`](connection.md#connectionrename-folder--rename-a-folder) | Rename a folder | Operation | M7 | Built |
 | [`connection.remove-folder`](connection.md#connectionremove-folder--remove-a-folder-keeping-its-connections) | Remove a folder, keeping its connections | Operation | M7 | Built |
-| [`connection.remove`](connection.md#connectionremove--remove-a-connection) | Remove a connection | Operation | M6 | Built |
+| [`connection.remove`](connection.md#connectionremove--remove-a-connection) | Remove a connection | Operation | M6, M41 (changed) | Differs |
 | [`connection.read-only`](connection.md#connectionread-only--make-a-connection-read-only) | Make a connection read-only | Operation | M6 | Built |
 | [`connection.allow-changes`](connection.md#connectionallow-changes--allow-changes-through-a-read-only-connection) | Allow changes through a read-only connection | Operation | M6 | Built |
 | [`connection.link-redis`](connection.md#connectionlink-redis--link-a-redis-connection-to-a-mongodb-connection) | Link a Redis connection to a MongoDB connection | Operation | M7 | Built |
 | [`connection.unlink-redis`](connection.md#connectionunlink-redis--remove-the-link-to-a-redis-connection) | Remove the link to a Redis connection | Operation | M7 | Built |
-| [`connection.secrets`](connection.md#connectionsecrets--keep-the-secrets-of-a-connection) | Keep the secrets of a connection | Operation | M6 | Built |
-| [`connection.import`](connection.md#connectionimport--import-connections) | Import connections | Operation | M7 | Built |
-| [`connection.export`](connection.md#connectionexport--export-connections) | Export connections | Operation | M7 | Built |
-| [`connection.read-file`](connection.md#connectionread-file--read-a-connections-file) | Read a connections file | Derivation | M7 | Built |
-| [`connection.read-list`](connection.md#connectionread-list--read-a-list-of-connection-strings) | Read a list of connection strings | Derivation | M7 | Built |
-| [`connection.read-compass`](connection.md#connectionread-compass--read-a-mongodb-compass-export) | Read a MongoDB Compass export | Derivation | M7 | Built |
-| [`connection.write-file`](connection.md#connectionwrite-file--write-a-connections-file) | Write a connections file | Derivation | M7 | Built |
+| [`connection.secrets`](connection.md#connectionsecrets--keep-the-secrets-of-a-connection) | Keep the secrets of a connection | Operation | M6, M38 (changed), M39 (changed) | Differs |
+| [`connection.import`](connection.md#connectionimport--import-connections) | Import connections | Operation | M7, M37 (changed), M38 (changed), M39 (changed) | Differs |
+| [`connection.export`](connection.md#connectionexport--export-connections) | Export connections | Operation | M7, M38 (changed), M39 (changed) | Differs |
+| [`connection.read-file`](connection.md#connectionread-file--read-a-connections-file) | Read a connections file | Derivation | M7, M38 (changed), M39 (changed) | Differs |
+| [`connection.read-list`](connection.md#connectionread-list--read-a-list-of-connection-strings) | Read a list of connection strings | Derivation | M7, M38 (changed) | Differs |
+| [`connection.read-compass`](connection.md#connectionread-compass--read-a-mongodb-compass-export) | Read a MongoDB Compass export | Derivation | M7, M38 (changed) | Differs |
+| [`connection.write-file`](connection.md#connectionwrite-file--write-a-connections-file) | Write a connections file | Derivation | M7, M38 (changed), M39 (changed) | Differs |
 | [`connection.encryption`](connection.md#connectionencryption--encrypt-the-passwords-of-a-file-as-compass-does) | Encrypt the passwords of a file as Compass does | Derivation | M7 | Built |
 | [`connection.tls-in-uri`](connection.md#connectiontls-in-uri--tls-settings-in-and-out-of-a-mongodb-connection-string) | TLS settings in and out of a MongoDB connection string | Derivation | M6 | Built |
-| [`connection.color-from-compass`](connection.md#connectioncolor-from-compass--the-closest-color-of-a-compass-connection) | The closest color of a Compass connection | Derivation | M7 | Built |
+| [`connection.color-from-compass`](connection.md#connectioncolor-from-compass--the-closest-color-of-a-compass-connection) | The closest color of a Compass connection | Derivation | M7, M38 (changed) | Differs |
 
 ## Console
 
@@ -228,8 +230,8 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [`document.delete`](document.md#documentdelete--delete-a-document) | Delete a document | Operation | M12 | Built |
 | [`document.delete-selected`](document.md#documentdelete-selected--delete-the-selected-rows) | Delete the selected rows | Operation | M12 | Built |
 | [`document.update-selected`](document.md#documentupdate-selected--update-the-selected-rows) | Update the selected rows | Operation | M12 | Built |
-| [`document.update-many`](document.md#documentupdate-many--update-many) | Update many | Operation | M12 | Built |
-| [`document.delete-many`](document.md#documentdelete-many--delete-many) | Delete many | Operation | M12 | Built |
+| [`document.update-many`](document.md#documentupdate-many--update-many) | Update many | Operation | M12, M40 (changed) | Differs |
+| [`document.delete-many`](document.md#documentdelete-many--delete-many) | Delete many | Operation | M12, M40 (changed) | Differs |
 | [`document.restore-version`](document.md#documentrestore-version--restore-a-version-from-the-document-history) | Restore a version from the document history | Operation | M12 | Built |
 
 ## Explain
@@ -262,7 +264,7 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`gridfs.show`](gridfs.md#gridfsshow--the-page-of-a-bucket) | The page of a bucket | View | M33 | Built |
+| [`gridfs.show`](gridfs.md#gridfsshow--the-page-of-a-bucket) | The page of a bucket | View | M33, M38 (changed) | Differs |
 | [`gridfs.buckets`](gridfs.md#gridfsbuckets--the-buckets-of-a-database) | The buckets of a database | Derivation | M33 | Built |
 | [`gridfs.list`](gridfs.md#gridfslist--a-page-of-the-files-of-a-bucket) | A page of the files of a bucket | Read | M33 | Built |
 | [`gridfs.filter`](gridfs.md#gridfsfilter--the-filter-of-the-files) | The filter of the files | Derivation | M33 | Built |
@@ -274,11 +276,11 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [`gridfs.upload`](gridfs.md#gridfsupload--upload-files-to-a-bucket) | Upload files to a bucket | Operation | M33 | Built |
 | [`gridfs.create-bucket`](gridfs.md#gridfscreate-bucket--create-a-bucket-by-uploading-to-it) | Create a bucket by uploading to it | Operation | M33 | Built |
 | [`gridfs.download`](gridfs.md#gridfsdownload--download-a-file) | Download a file | Operation | M33 | Built |
-| [`gridfs.open`](gridfs.md#gridfsopen--open-a-file-with-the-systems-application) | Open a file with the system's application | Operation | M33 | Built |
+| [`gridfs.open`](gridfs.md#gridfsopen--open-a-file-with-the-systems-application) | Open a file with the system's application | Operation | M33, M37 (changed) | Differs |
 | [`gridfs.rename`](gridfs.md#gridfsrename--rename-a-file) | Rename a file | Operation | M33 | Built |
 | [`gridfs.edit-metadata`](gridfs.md#gridfsedit-metadata--edit-the-files-document-of-a-file) | Edit the files document of a file | Operation | M33 | Built |
 | [`gridfs.delete`](gridfs.md#gridfsdelete--delete-a-file) | Delete a file | Operation | M33 | Built |
-| [`gridfs.drop-bucket`](gridfs.md#gridfsdrop-bucket--delete-a-bucket) | Delete a bucket | Operation | M33 | Built |
+| [`gridfs.drop-bucket`](gridfs.md#gridfsdrop-bucket--delete-a-bucket) | Delete a bucket | Operation | M33, M38 (changed), M39 (changed), M41 (changed) | Differs |
 
 ## Document history
 
@@ -303,7 +305,7 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [`home.jump-back-in`](home.md#homejump-back-in--jump-back-in) | Jump back in | View | M5 | Built |
 | [`home.forget-recent`](home.md#homeforget-recent--remove-a-recent-place) | Remove a recent place | Operation | M5 | Built |
 | [`home.connections`](home.md#homeconnections--the-connection-cards-by-folder) | The connection cards, by folder | View | M5 | Built |
-| [`home.card`](home.md#homecard--a-connection-card) | A connection card | View | M5 | Built |
+| [`home.card`](home.md#homecard--a-connection-card) | A connection card | View | M5, M38 (changed), M39 (changed) | Differs |
 | [`home.address`](home.md#homeaddress--the-address-of-a-connection-without-credentials) | The address of a connection, without credentials | Derivation | M5 | Built |
 | [`home.filter`](home.md#homefilter--filter-the-cards-by-text-and-by-engine) | Filter the cards by text and by engine | Derivation | M5 | Built |
 | [`home.card-menu`](home.md#homecard-menu--the-menu-of-a-connection) | The menu of a connection | View | M5 | Built |
@@ -370,9 +372,9 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | --- | --- | --- | --- | --- |
 | [`manage.create-database`](manage.md#managecreate-database--create-a-database) | Create a database | Operation | M21 | Built |
 | [`manage.create-collection`](manage.md#managecreate-collection--create-a-collection) | Create a collection | Operation | M21 | Built |
-| [`manage.rename-collection`](manage.md#managerename-collection--rename-a-collection) | Rename a collection | Operation | M21 | Built |
-| [`manage.drop-collection`](manage.md#managedrop-collection--drop-a-collection-or-a-view) | Drop a collection or a view | Operation | M21 | Built |
-| [`manage.drop-database`](manage.md#managedrop-database--drop-a-database) | Drop a database | Operation | M21 | Built |
+| [`manage.rename-collection`](manage.md#managerename-collection--rename-a-collection) | Rename a collection | Operation | M21, M38 (changed), M39 (changed), M41 (changed) | Differs |
+| [`manage.drop-collection`](manage.md#managedrop-collection--drop-a-collection-or-a-view) | Drop a collection or a view | Operation | M21, M38 (changed), M39 (changed), M41 (changed) | Differs |
+| [`manage.drop-database`](manage.md#managedrop-database--drop-a-database) | Drop a database | Operation | M21, M38 (changed), M39 (changed), M41 (changed), M42 (changed) | Differs |
 | [`manage.name-rules`](manage.md#managename-rules--valid-names-of-databases-and-collections) | Valid names of databases and collections | Derivation | M21 | Built |
 | [`manage.read-options`](manage.md#manageread-options--the-options-of-a-collection-or-a-view) | The options of a collection or a view | Read | M21 | Built |
 | [`manage.definition`](manage.md#managedefinition--the-definition-section-of-a-view) | The Definition section of a view | View | M21 | Built |
@@ -385,25 +387,25 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`mcp.server`](mcp.md#mcpserver--run-the-mcp-server-on-127001) | Run the MCP server on 127.0.0.1 | Operation | M29 | Built |
+| [`mcp.server`](mcp.md#mcpserver--run-the-mcp-server-on-127001) | Run the MCP server on 127.0.0.1 | Operation | M29, M37 (changed) | Differs |
 | [`mcp.status`](mcp.md#mcpstatus--the-state-of-the-mcp-server-in-the-top-bar) | The state of the MCP server in the top bar | View | M29 | Built |
 | [`mcp.access-token`](mcp.md#mcpaccess-token--generate-a-new-access-token) | Generate a new access token | Operation | M29 | Built |
 | [`mcp.setup`](mcp.md#mcpsetup--set-up-the-mcp-server-for-ai-assistants) | Set up the MCP server for AI assistants… | Operation | M29 | Built |
 | [`mcp.change-port`](mcp.md#mcpchange-port--change-mcp-server-port) | Change MCP server port… | Operation | M29 | Built |
-| [`mcp.read-data`](mcp.md#mcpread-data--the-tools-offered-without-reading-data) | The tools offered without reading data | Derivation | M29 | Built |
-| [`mcp.protocol`](mcp.md#mcpprotocol--answer-a-message-of-the-model-context-protocol) | Answer a message of the Model Context Protocol | Derivation | M29 | Built |
-| [`mcp.arguments`](mcp.md#mcparguments--read-the-arguments-of-a-tool) | Read the arguments of a tool | Derivation | M29 | Built |
-| [`mcp.output-limits`](mcp.md#mcpoutput-limits--bound-what-a-tool-returns-and-how-long-it-runs) | Bound what a tool returns and how long it runs | Derivation | M29 | Built |
-| [`mcp.refuse-write-stages`](mcp.md#mcprefuse-write-stages--refuse-pipelines-with-out-or-merge) | Refuse pipelines with $out or $merge | Derivation | M29 | Built |
-| [`mcp.log`](mcp.md#mcplog--the-mcp-server-in-the-log) | The MCP server in the Log | Derivation | M29 | Built |
-| [`mcp.data-tools`](mcp.md#mcpdata-tools--explore-the-connections-and-read-documents) | Explore the connections and read documents | Read | M29 | Built |
-| [`mcp.debugging-tools`](mcp.md#mcpdebugging-tools--follow-what-an-application-writes) | Follow what an application writes | Read | M29 | Built |
-| [`mcp.performance-tools`](mcp.md#mcpperformance-tools--find-what-makes-a-database-slow) | Find what makes a database slow | Read | M29 | Built |
-| [`mcp.deployment-tools`](mcp.md#mcpdeployment-tools--read-the-state-of-the-deployment) | Read the state of the deployment | Read | M29 | Built |
-| [`mcp.data-model-tools`](mcp.md#mcpdata-model-tools--answer-quick-questions-about-the-data-model) | Answer quick questions about the data model | Read | M29 | Built |
+| [`mcp.read-data`](mcp.md#mcpread-data--the-tools-offered-without-reading-data) | The tools offered without reading data | Derivation | M29, M37 (changed) | Differs |
+| [`mcp.protocol`](mcp.md#mcpprotocol--answer-a-message-of-the-model-context-protocol) | Answer a message of the Model Context Protocol | Derivation | M29, M37 (changed) | Differs |
+| [`mcp.arguments`](mcp.md#mcparguments--read-the-arguments-of-a-tool) | Read the arguments of a tool | Derivation | M29, M37 (changed) | Differs |
+| [`mcp.output-limits`](mcp.md#mcpoutput-limits--bound-what-a-tool-returns-and-how-long-it-runs) | Bound what a tool returns and how long it runs | Derivation | M29, M37 (changed) | Differs |
+| [`mcp.refuse-write-stages`](mcp.md#mcprefuse-write-stages--refuse-pipelines-that-write-are-not-a-plain-read-or-read-a-system-collection) | Refuse pipelines that write, are not a plain read, or read a system collection | Derivation | M29, M37 (changed) | Differs |
+| [`mcp.log`](mcp.md#mcplog--the-mcp-server-in-the-log) | The MCP server in the Log | Derivation | M29, M37 (changed) | Differs |
+| [`mcp.data-tools`](mcp.md#mcpdata-tools--explore-the-connections-and-read-documents) | Explore the connections and read documents | Read | M29, M37 (changed), M39 (changed) | Differs |
+| [`mcp.debugging-tools`](mcp.md#mcpdebugging-tools--follow-what-an-application-writes) | Follow what an application writes | Read | M29, M37 (changed) | Differs |
+| [`mcp.performance-tools`](mcp.md#mcpperformance-tools--find-what-makes-a-database-slow) | Find what makes a database slow | Read | M29, M37 (changed) | Differs |
+| [`mcp.deployment-tools`](mcp.md#mcpdeployment-tools--read-the-state-of-the-deployment) | Read the state of the deployment | Read | M29, M37 (changed) | Differs |
+| [`mcp.data-model-tools`](mcp.md#mcpdata-model-tools--answer-quick-questions-about-the-data-model) | Answer quick questions about the data model | Read | M29, M37 (changed) | Differs |
 | [`mcp.redis-key-tools`](mcp.md#mcpredis-key-tools--read-the-keys-of-a-redis-server) | Read the keys of a Redis server | Read | M29 | Built |
 | [`mcp.redis-server-tools`](mcp.md#mcpredis-server-tools--read-the-state-of-a-redis-server) | Read the state of a Redis server | Read | M29 | Built |
-| [`mcp.tab-tools`](mcp.md#mcptab-tools--open-datardos-tabs-for-the-user) | Open Datardo's tabs for the user | Read | M29 | Built |
+| [`mcp.tab-tools`](mcp.md#mcptab-tools--open-datardos-tabs-for-the-user) | Open Datardo's tabs for the user | Read | M29, M37 (changed) | Differs |
 
 ## Monitor
 
@@ -460,10 +462,10 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [`nav.path`](nav.md#navpath--the-path-of-the-active-tab) | The path of the active tab | View | M2 | Built |
 | [`nav.copy-path`](nav.md#navcopy-path--copy-the-path) | Copy the path | Operation | M2 | Built |
 | [`nav.open-on-another-connection`](nav.md#navopen-on-another-connection--open-on-another-connection) | Open on another connection | Operation | M2 | Built |
-| [`nav.inspector`](nav.md#navinspector--the-inspector-island) | The inspector island | View | M2 | Built |
-| [`nav.toggle-inspector`](nav.md#navtoggle-inspector--show-or-hide-the-inspector-island) | Show or hide the inspector island | Operation | M2 | Built |
+| [`nav.inspector`](nav.md#navinspector--the-inspector-island) | The inspector island | View | M2, M41 (changed) | Differs |
+| [`nav.toggle-inspector`](nav.md#navtoggle-inspector--show-or-hide-the-inspector-island) | Show or hide the inspector island | Operation | M2, M41 (changed) | Differs |
 | [`nav.status-line`](nav.md#navstatus-line--the-status-line) | The status line | View | M2 | Built |
-| [`nav.dialog`](nav.md#navdialog--how-every-dialog-behaves) | How every dialog behaves | View | M2 | Built |
+| [`nav.dialog`](nav.md#navdialog--how-every-dialog-behaves) | How every dialog behaves | View | M2, M38 (changed) | Differs |
 | [`nav.empty`](nav.md#navempty--the-window-with-no-connection) | The window with no connection | View | M2 | Built |
 
 ## redis-oplog
@@ -489,7 +491,7 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [`palette.find-keys`](palette.md#palettefind-keys--the-keys-of-the-current-redis-connection-for-go-to) | The keys of the current Redis connection for Go to | Read | M5 | Built |
 | [`palette.rank`](palette.md#paletterank--how-go-to-ranks-what-it-finds) | How Go to ranks what it finds | Derivation | M5 | Built |
 | [`palette.open-result`](palette.md#paletteopen-result--open-a-result) | Open a result | Operation | M5 | Built |
-| [`palette.commands`](palette.md#palettecommands--every-command-with-its-title-and-its-key) | Every command, with its title and its key | Derivation | M5 | Built |
+| [`palette.commands`](palette.md#palettecommands--every-command-with-its-title-and-its-key) | Every command, with its title and its key | Derivation | M5, M41 (changed) | Differs |
 | [`palette.run-command`](palette.md#paletterun-command--run-a-command) | Run a command | Operation | M5 | Built |
 | [`palette.key-press`](palette.md#palettekey-press--which-command-a-key-starts) | Which command a key starts | Derivation | M5 | Built |
 
@@ -539,7 +541,8 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`query.bar`](query.md#querybar--the-query-bar) | The query bar | View | M9 | Built |
+| [`query.bar`](query.md#querybar--the-query-bar) | The query bar | View | M9, M40 (changed) | Differs |
+| [`query.position`](query.md#queryposition--put-the-query-above-or-beside-the-results) | Put the query above or beside the results | Operation | M40 | Specified |
 | [`query.mode`](query.md#querymode--switch-between-find-and-aggregate) | Switch between Find and Aggregate | Derivation | M9 | Built |
 | [`query.run`](query.md#queryrun--run-the-query) | Run the query | Read | M9 | Built |
 | [`query.count`](query.md#querycount--count-the-matching-documents) | Count the matching documents | Read | M9 | Built |
@@ -548,16 +551,16 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [`query.parse`](query.md#queryparse--read-mongosh-syntax-into-values) | Read mongosh syntax into values | Derivation | M9 | Built |
 | [`query.format`](query.md#queryformat--write-values-as-mongosh-syntax) | Write values as mongosh syntax | Derivation | M9 | Built |
 | [`query.highlight`](query.md#queryhighlight--the-syntax-colors-of-mongosh-text) | The syntax colors of mongosh text | Derivation | M9 | Built |
-| [`query.builder`](query.md#querybuilder--the-query-builder) | The query builder | View | M9 | Built |
+| [`query.builder`](query.md#querybuilder--the-query-builder) | The query builder | View | M9, M40 (changed) | Differs |
 | [`query.builder-filter`](query.md#querybuilder-filter--the-filter-of-the-builders-rows) | The filter of the builder's rows | Derivation | M9 | Built |
 | [`query.builder-rows`](query.md#querybuilder-rows--the-builders-rows-of-a-filter) | The builder's rows of a filter | Derivation | M9 | Built |
 | [`query.autocomplete`](query.md#queryautocomplete--suggestions-while-typing) | Suggestions while typing | View | M9 | Built |
 | [`query.suggestions`](query.md#querysuggestions--what-is-suggested-where-the-cursor-is) | What is suggested where the cursor is | Derivation | M9 | Built |
 | [`query.field-hints`](query.md#queryfield-hints--the-fields-and-frequent-values-of-a-collection) | The fields and frequent values of a collection | Read | M9 | Built |
-| [`query.drag`](query.md#querydrag--drag-a-field-or-a-value-into-the-bar) | Drag a field or a value into the bar | View | M9 | Built |
+| [`query.drag`](query.md#querydrag--drag-a-field-or-a-value-into-the-bar) | Drag a field or a value into the bar | View | M9, M40 (changed) | Differs |
 | [`query.add-condition`](query.md#queryadd-condition--add-a-condition-to-the-filter) | Add a condition to the filter | Derivation | M9 | Built |
-| [`query.add-sort`](query.md#queryadd-sort--add-a-field-to-the-sort) | Add a field to the sort | Derivation | M9 | Built |
-| [`query.add-projection`](query.md#queryadd-projection--add-a-field-to-the-projection) | Add a field to the projection | Derivation | M9 | Built |
+| [`query.add-sort`](query.md#queryadd-sort--add-a-field-to-the-sort) | Add a field to the sort | Derivation | M9, M40 (changed) | Differs |
+| [`query.add-projection`](query.md#queryadd-projection--add-a-field-to-the-projection) | Add a field to the projection | Derivation | M9, M40 (changed) | Differs |
 
 ## References
 
@@ -571,7 +574,7 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [`relation.diagram`](relation.md#relationdiagram--the-relationship-diagram-page) | The Relationship diagram page | View | M34 | Built |
 | [`relation.layout`](relation.md#relationlayout--where-the-boxes-of-the-diagram-go) | Where the boxes of the diagram go | Derivation | M34 | Built |
 | [`relation.export-mermaid`](relation.md#relationexport-mermaid--copy-the-diagram-as-mermaid) | Copy the diagram as Mermaid | Operation | M34 | Built |
-| [`relation.export-svg`](relation.md#relationexport-svg--save-the-diagram-as-an-svg-image) | Save the diagram as an SVG image | Operation | M34 | Built |
+| [`relation.export-svg`](relation.md#relationexport-svg--save-the-diagram-as-an-svg-image) | Save the diagram as an SVG image | Operation | M34, M37 (changed) | Differs |
 | [`relation.follow`](relation.md#relationfollow--go-from-here-the-references-of-a-document) | Go from here: the references of a document | View | M34 | Built |
 | [`relation.targets`](relation.md#relationtargets--where-a-reference-leads) | Where a reference leads | Derivation | M34 | Built |
 | [`relation.referrers`](relation.md#relationreferrers--which-documents-refer-to-a-document) | Which documents refer to a document | Derivation | M34 | Built |
@@ -630,8 +633,8 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`search.show`](search.md#searchshow--the-search-documents-page) | The Search documents page | View | M34 | Built |
-| [`search.collections`](search.md#searchcollections--read-the-collections-a-search-reads) | Read the collections a search reads | Read | M34 | Built |
+| [`search.show`](search.md#searchshow--the-search-documents-page) | The Search documents page | View | M34, M39 (changed) | Differs |
+| [`search.collections`](search.md#searchcollections--read-the-collections-a-search-reads) | Read the collections a search reads | Read | M34, M39 (changed) | Differs |
 | [`search.scan`](search.md#searchscan--read-the-documents-of-the-collections-and-find-the-matches) | Read the documents of the collections and find the matches | Read | M34 | Built |
 | [`search.text`](search.md#searchtext--what-the-typed-text-looks-for) | What the typed text looks for | Derivation | M34 | Built |
 | [`search.match`](search.md#searchmatch--the-values-of-a-document-that-match) | The values of a document that match | Derivation | M34 | Built |
@@ -686,9 +689,9 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`tab.strip`](tab.md#tabstrip--the-tab-strip) | The tab strip | View | M4 | Built |
+| [`tab.strip`](tab.md#tabstrip--the-tab-strip) | The tab strip | View | M4, M38 (changed) | Differs |
 | [`tab.title`](tab.md#tabtitle--the-title-of-a-tab) | The title of a tab | Derivation | M4 | Built |
-| [`tab.groups`](tab.md#tabgroups--the-groups-of-the-strip) | The groups of the strip | Derivation | M4 | Built |
+| [`tab.groups`](tab.md#tabgroups--the-groups-of-the-strip) | The groups of the strip | Derivation | M4, M38 (changed) | Differs |
 | [`tab.collapse-group`](tab.md#tabcollapse-group--collapse-or-expand-a-group) | Collapse or expand a group | Operation | M4 | Built |
 | [`tab.fit`](tab.md#tabfit--how-the-tabs-share-the-strip) | How the tabs share the strip | Derivation | M4 | Built |
 | [`tab.menu`](tab.md#tabmenu--the-context-menu-of-a-tab) | The context menu of a tab | View | M4 | Built |
@@ -706,10 +709,10 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`table.show`](table.md#tableshow--the-documents-section) | The Documents section | View | M10 | Built |
+| [`table.show`](table.md#tableshow--the-documents-section) | The Documents section | View | M10, M40 (changed), M41 (changed), M42 (changed) | Differs |
 | [`table.detect-columns`](table.md#tabledetect-columns--the-columns-of-a-page-of-documents) | The columns of a page of documents | Derivation | M10 | Built |
 | [`table.cell-text`](table.md#tablecell-text--how-a-value-is-written-in-a-cell) | How a value is written in a cell | Derivation | M10 | Built |
-| [`table.rows`](table.md#tablerows--the-rows-of-the-table) | The rows of the table | Derivation | M10 | Built |
+| [`table.rows`](table.md#tablerows--the-rows-of-the-table) | The rows of the table | Derivation | M10, M41 (changed) | Differs |
 | [`table.expand`](table.md#tableexpand--expand-a-field-into-columns-or-sub-rows) | Expand a field into columns or sub-rows | Operation | M10 | Built |
 | [`table.collapse`](table.md#tablecollapse--collapse-an-expanded-field) | Collapse an expanded field | Operation | M10 | Built |
 | [`table.columns`](table.md#tablecolumns--the-columns-layout) | The columns' layout | View | M10 | Built |
@@ -727,8 +730,22 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [`table.copy-path`](table.md#tablecopy-path--copy-a-field-path) | Copy a field path | Operation | M10 | Built |
 | [`table.row-menu`](table.md#tablerow-menu--the-context-menu-of-a-row) | The context menu of a row | View | M10 | Built |
 | [`table.cell-menu`](table.md#tablecell-menu--the-context-menu-of-a-cell) | The context menu of a cell | View | M10 | Built |
-| [`table.column-menu`](table.md#tablecolumn-menu--the-context-menu-of-a-column-header) | The context menu of a column header | View | M10 | Built |
+| [`table.column-menu`](table.md#tablecolumn-menu--the-context-menu-of-a-column-header) | The context menu of a column header | View | M10, M41 (changed), M42 (changed) | Differs |
 | [`table.refresh`](table.md#tablerefresh--refresh-the-documents) | Refresh the documents | Read | M10 | Built |
+| [`table.match`](table.md#tablematch--whether-a-document-matches-a-filter) | Whether a document matches a filter | Derivation | M41 | Specified |
+| [`table.format-table`](table.md#tableformat-table--what-colors-each-row-and-cell) | What colors each row and cell | Derivation | M41 | Specified |
+| [`table.formatting`](table.md#tableformatting--the-formatting-view-of-the-inspector-island) | The Formatting view of the inspector island | View | M41 | Specified |
+| [`table.add-format-rule`](table.md#tableadd-format-rule--add-a-condition-rule) | Add a condition rule | Operation | M41 | Specified |
+| [`table.edit-format-rule`](table.md#tableedit-format-rule--edit-name-turn-off-reorder-and-remove-formatting-rules) | Edit, name, turn off, reorder and remove formatting rules | Operation | M41 | Specified |
+| [`table.toggle-formatting`](table.md#tabletoggle-formatting--hide-and-show-formatting) | Hide and show formatting | Operation | M41 | Specified |
+| [`table.format-field`](table.md#tableformat-field--the-color-a-field-rule-gives-a-value) | The color a field rule gives a value | Derivation | M42 | Specified |
+| [`table.color-by-field`](table.md#tablecolor-by-field--color-by-this-field) | Color by this field | Operation | M42 | Specified |
+| [`table.edit-field-rule`](table.md#tableedit-field-rule--edit-a-field-rule) | Edit a field rule | Operation | M42 | Specified |
+| [`table.format-scopes`](table.md#tableformat-scopes--the-rules-a-collection-tab-uses) | The rules a collection tab uses | Derivation | M42 | Specified |
+| [`table.move-format-rule`](table.md#tablemove-format-rule--move-or-copy-a-rule-to-another-section) | Move or copy a rule to another section | Operation | M42 | Specified |
+| [`table.export-formatting`](table.md#tableexport-formatting--export-formatting-rules-to-a-file) | Export formatting rules to a file | Operation | M42 | Specified |
+| [`table.import-formatting`](table.md#tableimport-formatting--import-formatting-rules-from-a-file) | Import formatting rules from a file | Operation | M42 | Specified |
+| [`table.formatting-file`](table.md#tableformatting-file--the-file-of-formatting-rules) | The file of formatting rules | Derivation | M42 | Specified |
 
 ## Scheduled tasks
 
@@ -752,7 +769,7 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`transfer.export`](transfer.md#transferexport--export-documents-to-a-file) | Export documents to a file | Operation | M25 | Built |
+| [`transfer.export`](transfer.md#transferexport--export-documents-to-a-file) | Export documents to a file | Operation | M25, M37 (changed) | Differs |
 | [`transfer.csv-write`](transfer.md#transfercsv-write--documents-as-csv) | Documents as CSV | Derivation | M25 | Built |
 | [`transfer.import`](transfer.md#transferimport--import-documents-from-a-file) | Import documents from a file | Operation | M25 | Built |
 | [`transfer.import-files`](transfer.md#transferimport-files--what-an-import-file-holds) | What an import file holds | Derivation | M25 | Built |
@@ -765,24 +782,30 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`tree.show`](tree.md#treeshow--the-tree-island) | The tree island | View | M8 | Built |
-| [`tree.pinned`](tree.md#treepinned--pinned-items) | Pinned items | View | M8 | Built |
+| [`tree.show`](tree.md#treeshow--the-tree-island) | The tree island | View | M8, M38 (changed), M39 (changed) | Differs |
+| [`tree.pinned`](tree.md#treepinned--pinned-items) | Pinned items | View | M8, M38 (changed) | Differs |
 | [`tree.pages`](tree.md#treepages--pages-of-the-connection) | Pages of the connection | View | M8 | Built |
-| [`tree.mongodb`](tree.md#treemongodb--the-mongodb-nodes) | The MongoDB nodes | View | M8 | Built |
+| [`tree.mongodb`](tree.md#treemongodb--the-mongodb-nodes) | The MongoDB nodes | View | M8, M38 (changed), M39 (changed) | Differs |
 | [`tree.list-databases`](tree.md#treelist-databases--list-the-databases) | List the databases | Read | M8 | Built |
 | [`tree.list-collections`](tree.md#treelist-collections--list-the-collections-of-a-database) | List the collections of a database | Read | M8 | Built |
 | [`tree.count`](tree.md#treecount--counts-and-sizes-beside-the-nodes) | Counts and sizes beside the nodes | Read | M8 | Built |
-| [`tree.redis`](tree.md#treeredis--the-redis-nodes) | The Redis nodes | View | M8 | Built |
+| [`tree.redis`](tree.md#treeredis--the-redis-nodes) | The Redis nodes | View | M8, M38 (changed) | Differs |
 | [`tree.redis-databases`](tree.md#treeredis-databases--list-the-redis-databases) | List the Redis databases | Read | M8 | Built |
 | [`tree.scan-namespaces`](tree.md#treescan-namespaces--scan-the-keys-of-a-database-for-its-namespaces) | Scan the keys of a database for its namespaces | Read | M8 | Built |
 | [`tree.namespaces`](tree.md#treenamespaces--namespaces-from-key-names) | Namespaces from key names | Derivation | M8 | Built |
 | [`tree.refresh`](tree.md#treerefresh--refresh-the-tree) | Refresh the tree | Read | M8 | Built |
-| [`tree.filter`](tree.md#treefilter--filter-the-tree) | Filter the tree | View | M8 | Built |
-| [`tree.match`](tree.md#treematch--whether-a-node-matches-the-filter) | Whether a node matches the filter | Derivation | M8 | Built |
-| [`tree.keyboard`](tree.md#treekeyboard--moving-in-the-tree-with-the-keyboard) | Moving in the tree with the keyboard | View | M8 | Built |
+| [`tree.filter`](tree.md#treefilter--filter-the-tree) | Filter the tree | View | M8, M39 (changed) | Differs |
+| [`tree.match`](tree.md#treematch--whether-a-node-matches-the-filter) | Whether a node matches the filter | Derivation | M8, M39 (changed) | Differs |
+| [`tree.keyboard`](tree.md#treekeyboard--moving-in-the-tree-with-the-keyboard) | Moving in the tree with the keyboard | View | M8, M39 (changed) | Differs |
+| [`tree.select`](tree.md#treeselect--several-nodes-selected) | Several nodes selected | View | M39 | Specified |
 | [`tree.node-states`](tree.md#treenode-states--loading-empty-and-failed-nodes) | Loading, empty and failed nodes | View | M8 | Built |
-| [`tree.menu-mongodb`](tree.md#treemenu-mongodb--the-context-menu-of-a-mongodb-node) | The context menu of a MongoDB node | View | M8 | Built |
-| [`tree.menu-redis`](tree.md#treemenu-redis--the-context-menu-of-a-redis-node) | The context menu of a Redis node | View | M8 | Built |
+| [`tree.set-collection-color`](tree.md#treeset-collection-color--set-the-color-of-a-collection-a-view-or-a-bucket) | Set the color of a collection, a view or a bucket | Operation | M38 | Specified |
+| [`tree.set-database-color`](tree.md#treeset-database-color--set-the-color-of-a-database) | Set the color of a database | Operation | M38 | Specified |
+| [`tree.color-of`](tree.md#treecolor-of--which-color-something-of-a-database-or-a-collection-takes) | Which color something of a database or a collection takes | Derivation | M38 | Specified |
+| [`tree.exclude-from-searches`](tree.md#treeexclude-from-searches--exclude-from-searches-or-include-again) | Exclude from searches, or include again | Operation | M39 | Specified |
+| [`tree.excluded`](tree.md#treeexcluded--what-searches-leave-out) | What searches leave out | Derivation | M39 | Specified |
+| [`tree.menu-mongodb`](tree.md#treemenu-mongodb--the-context-menu-of-a-mongodb-node) | The context menu of a MongoDB node | View | M8, M38 (changed), M39 (changed) | Differs |
+| [`tree.menu-redis`](tree.md#treemenu-redis--the-context-menu-of-a-redis-node) | The context menu of a Redis node | View | M8, M38 (changed) | Differs |
 
 ## Undo history
 
@@ -894,7 +917,7 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [`window.size`](window.md#windowsize--minimize-maximize-and-restore-the-window) | Minimize, maximize and restore the window | Operation | M1 | Built |
 | [`window.remember`](window.md#windowremember--remember-the-size-the-place-and-the-maximized-state) | Remember the size, the place and the maximized state | Operation | M1 | Built |
 | [`window.placement`](window.md#windowplacement--where-the-window-opens) | Where the window opens | Derivation | M1 | Built |
-| [`window.theme`](window.md#windowtheme--choose-the-theme) | Choose the theme | Operation | M1 | Built |
+| [`window.theme`](window.md#windowtheme--choose-the-theme) | Choose the theme | Operation | M1, M38 (changed) | Differs |
 | [`window.zoom`](window.md#windowzoom--zoom-in-zoom-out-reset-the-zoom) | Zoom in, zoom out, reset the zoom | Operation | M1 | Built |
 | [`window.full-screen`](window.md#windowfull-screen--full-screen) | Full screen | Operation | M1 | Built |
 | [`window.single-instance`](window.md#windowsingle-instance--one-instance-one-window) | One instance, one window | Operation | M1 | Built |

@@ -11,6 +11,8 @@ The roadmap is the first `*roadmap*.md` of the docs folder, unless `--roadmap` n
 (`## M1 — …`), every card not yet built (Specified, Reviewed) or that Differs must start an item of exactly one
 milestone's `### Features` list, or of the `## Not planned` section; an item written as a planned name in italics
 (`*area.action*`) whose card exists is reported, to be turned into a link. The index then shows each card's milestone.
+A card built in one milestone may be changed by later ones: their items start with `*(changed)*`, and the index shows
+every milestone of the card.
 
 The checks of the rules a project may pick (the rules to offer of the code rules) run only when asked:
 
@@ -68,7 +70,7 @@ TO_PLAN = {"Specified", "Reviewed", "Differs"}
 NUMBERED = re.compile(r"^\d+[-_.]")
 MILESTONE = re.compile(r"^## (M\d+)\b")
 IDENT = r"[a-z][a-z0-9-]*\.[a-z][a-z0-9-]*"
-ITEM_CARD = re.compile(r"^\s*(?:\d+[.)]|[-*+])\s+(?:\[\s*)?`(" + IDENT + r")`")
+ITEM_CARD = re.compile(r"^\s*(?:\d+[.)]|[-*+])\s+(\*\(changed\)\*\s+)?(?:\[\s*)?`(" + IDENT + r")`")
 ITEM_PLANNED = re.compile(r"^\s*(?:\d+[.)]|[-*+])\s+[*_](" + IDENT + r")[*_]")
 CARD_LINK = re.compile(r"\[`(" + IDENT + r")`\]\(([^)\s]*)\)")
 REQUIRED = {
@@ -348,7 +350,7 @@ def read_roadmap(roadmap: Path) -> tuple[dict[str, list[str]], dict[str, list[st
             continue
         card = ITEM_CARD.match(line)
         if card:
-            planned.setdefault(card.group(1), []).append(section)
+            planned.setdefault(card.group(2), []).append(section + (" (changed)" if card.group(1) else ""))
         name = ITEM_PLANNED.match(line)
         if name:
             italic.setdefault(name.group(1), []).append(f"{roadmap.name}:{number}")
@@ -564,7 +566,7 @@ def main() -> int:
                 if identifier in ignored:
                     continue
                 places = planned.get(identifier, [])
-                if len(places) > 1:
+                if len([place for place in places if not place.endswith("(changed)")]) > 1:
                     print(f"TWICE IN THE ROADMAP {identifier}: {', '.join(places)}")
                     problems += 1
                 elif not places and statuses[identifier] in TO_PLAN:

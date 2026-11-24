@@ -101,10 +101,14 @@ MongoDB, its redis-oplog link, then tested and saved.
   (PEM)**, **Choose the SSH private key** or **Choose the queries folder**, with the button **Choose** (the
   certificates are filtered to `pem`, `crt`, `cer`, `key`, or all files).
 - **Uses**: `connection.read-form`, `connection.test`, `connection.save`, `connection.redis-string`,
-  `connection.string-secrets`, `connection.secrets`, `connection.link-redis`, `connection.add`, `oplog.publish`.
+  `connection.string-secrets`, `connection.secrets`, `connection.link-redis`, `connection.add`, `oplog.publish`,
+  `connection.color-presets`, `connection.custom-color`.
 - **Ported from**: connection.form (`src/connectionEditor.ts`, `src/webview/connectionEditor.ts`,
   `media/connectionEditor.css`, `src/shared/messages.ts`). The fields of Redis, **Password** of the connection
-  string, **Folder**, **Color**, **Read-only**, **Queries folder** and **Save and connect** are new in Datardo.
+  string, **Folder**, **Color**, **Read-only**, **Queries folder** and **Save and connect** are new in Datardo. The
+  eleven presets and **Custom color…** of **Color** follow connection.set-color of Mongoster 0.9.0.
+- **Differs**: (M38) **Color** offers **None** and six colors; it has no **Pink**, **Teal**, **Indigo**, **Brown**,
+  **Gray** and no **Custom color…**.
 
 What it shows, in this order:
 
@@ -119,8 +123,10 @@ What it shows, in this order:
      ACL user; alone, the password of `requirepass`) and **Database opened first** (`0`). **Connection string**: one
      field with the placeholder `redis://user@host:6379/0 (rediss:// for TLS)`, and **Password**. Each way shows what
      the other holds (`connection.redis-string`).
-4. **Folder** (the folders in use, or a new name; empty for none), **Color** (**None**, **Red**, **Orange**,
-   **Yellow**, **Green**, **Blue**, **Purple**), the checkbox **Read-only** with the hint *Datardo refuses every
+4. **Folder** (the folders in use, or a new name; empty for none), **Color** (**None**, then the eleven presets of
+   `connection.color-presets` in their order, **Red** to **Gray**, each after a swatch of its color, then **Custom
+   color…**, which opens the dialog **Choose a color** (`connection.custom-color`) and, once a custom color is
+   chosen, shows it as its swatch and its `#rrggbb`), the checkbox **Read-only** with the hint *Datardo refuses every
    write through this connection.* and, for MongoDB, **Queries folder** with **Browse…**, the folder on disk where
    the connection's saved queries in the folder are kept.
 5. The section **TLS / SSL**, with a checkbox and the hint *Encrypts the connection. Without certificates the
@@ -179,6 +185,10 @@ Acceptance:
       **Save** reads **Saving…**.
 - [ ] With no keychain on the system, the form shows above the buttons *Passwords are not saved on this computer: no
       keychain is available.* (`connection.secrets`).
+- [ ] **Color** lists **None**, **Red**, **Orange**, **Yellow**, **Green**, **Blue**, **Purple**, **Pink**, **Teal**,
+      **Indigo**, **Brown**, **Gray** and **Custom color…**; choosing **Custom color…** and applying `#1e90ff` in
+      **Choose a color** shows `#1e90ff` in **Color**, and **Save** saves that color; **Cancel** in the dialog leaves
+      **Color** as it was. (differs)
 
 ### `connection.read-form` — What the form says, checked
 
@@ -504,8 +514,11 @@ Saves a copy of a connection, with everything it has, under a new name.
 - **After**: the copy appears beside the original on the Home page and in the connection switcher, not connected. A
   notification says **Connection <name> (2) added**, with **Edit connection…** (`connection.edit`).
 - **Commands**: `connection.duplicate`.
-- **Uses**: `connection.secrets`, `connection.edit`, `connection.menu`, `runner.notify`.
+- **Uses**: `connection.secrets`, `connection.edit`, `connection.menu`, `runner.notify`, `tree.color-of`,
+  `tree.excluded`.
 - **Ported from**: *New in Datardo*.
+- **Differs**: (M38) the copy has no colors of databases and collections, since a connection keeps none; (M39) nor
+  what is excluded from searches.
 
 Acceptance:
 
@@ -513,6 +526,9 @@ Acceptance:
 - [ ] The copy has the engine, the connection string with its password, the TLS settings, the SSH tunnel with its
       password or passphrase, the folder, the color, read-only, the queries folder and, for MongoDB, the same
       linked connection.
+- [ ] The copy has the colors of the databases and collections of the original (`tree.color-of`) and, when the
+      original is excluded from searches, is excluded too, with the same databases and collections excluded
+      (`tree.excluded`). (differs)
 - [ ] The copy has a new id, an empty undo history, no pins and no open tabs.
 - [ ] The secrets are copied in the main process: the window process never receives them.
 - [ ] Changing or removing the copy changes nothing of the original.
@@ -899,17 +915,23 @@ The entries offered on a saved connection, the same wherever the connection is s
 - **Uses**: `connection.connect`, `connection.disconnect`, `connection.reconnect`, `connection.overview`,
   `connection.edit`, `connection.duplicate`, `connection.copy-string`, `connection.move-to-folder`,
   `connection.set-color`, `connection.read-only`, `connection.allow-changes`, `connection.link-redis`,
-  `connection.unlink-redis`, `backup.create`, `backup.restore`, `task.edit`, `connection.remove`.
+  `connection.unlink-redis`, `tree.exclude-from-searches`, `backup.create`, `backup.restore`, `task.edit`,
+  `connection.remove`.
 - **Ported from**: the context menu of a connection in Mongoster (`package.json`, `view/item/context` with `viewItem
   =~ /^connection/`). Its entries that open a page are in **Pages of** the connection, in the tree island; those
-  that create, back up and restore are in the tree island's own menu.
+  that create, back up and restore are in the tree island's own menu. **Exclude from searches** and **Include in
+  searches** come from tree.exclude of Mongoster 0.9.0 (`package.json`, `mongoster.exclude`, `mongoster.include`),
+  which offers them on the connection's node of its tree.
+- **Differs**: (M39) the menu has no **Exclude from searches** and no **Include in searches**.
 
 What it shows, in this order, with a line between the groups:
 
 1. **Connect** when the connection is not connected, **Disconnect** when it is connected, connecting or
    reconnecting; **Reconnect** as well when it is reconnecting or failed. **Open overview**.
 2. **Edit connection…**, **Duplicate**, **Copy connection string**.
-3. **Move to folder…**, **Set color…**, **Make read-only** or, on a read-only connection, **Allow changes**; **Stop
+3. **Move to folder…**, **Set color…**, **Exclude from searches** or, on a connection excluded from searches,
+   **Include in searches**, which belong to the tree area (`tree.exclude-from-searches@connection-island`,
+   `@home`, `@connection-switcher`), **Make read-only** or, on a read-only connection, **Allow changes**; **Stop
    keeping undo history** or **Keep undo history**, which belong to the undo area; for a MongoDB connection, **Link
    a Redis connection…** and, when one is linked, **Unlink <name of the Redis connection>**.
 4. For a MongoDB connection, **Back up…** and, unless it is read-only, **Restore from backup…**, which belong to the
@@ -929,6 +951,8 @@ Acceptance:
       connection neither.
 - [ ] Every entry can be reached with the keyboard: `Shift+F10` on a card or a line opens the menu, the arrows move,
       `Enter` chooses, `Escape` closes.
+- [ ] A MongoDB connection and a Redis connection both show **Exclude from searches** after **Set color…**; once
+      excluded, the menu shows **Include in searches** in its place, also on a read-only connection. (differs)
 
 ### `connection.folder-menu` — The menu of a folder
 
@@ -956,7 +980,7 @@ Acceptance:
 
 ### `connection.set-color` — Set the color of a connection
 
-Marks everything of a connection with one of six colors, for example red for production.
+Marks everything of a connection with one of eleven preset colors or a custom one, for example red for production.
 
 - **Kind**: Operation
 - **Engine**: Any
@@ -966,28 +990,167 @@ Marks everything of a connection with one of six colors, for example red for pro
   current connection.
 - **Asks**: a list to pick from titled **Color of <name>**, with the placeholder **Shown on its island, its group of
   tabs and its card, e.g. red for production**, and the items **Red**, **Orange**, **Yellow**, **Green**, **Blue**,
-  **Purple** (each after a circle of the color) and **None**; the current one is described **current**.
-- **Plan**: `set the color of <name> to <color>`, or `remove the color of <name>`: an app step.
+  **Purple**, **Pink**, **Teal**, **Indigo**, **Brown**, **Gray** (each after a swatch of its color), **None** and
+  **Custom color…**, described with the custom color in use (`#1e90ff`) when there is one; the current one is
+  described **current**. **Custom color…** then opens the dialog **Choose a color** (`connection.custom-color`).
+- **Plan**: `set the color of <name> to <color>` (`set the color of Local to teal`, or `… to #1e90ff` for a custom
+  color), or `remove the color of <name>`: an app step.
 - **Danger**: None.
 - **Read-only**: Allowed, because it writes nothing to a deployment.
 - **Undo**: Cannot be undone from the undo history; choose the previous color again.
 - **After**: the connection island, the connection's group of tabs, its card on the Home page and its line in the
   connection switcher change at once.
 - **Commands**: `connection.set-color`.
-- **Uses**: `connection.menu`, `runner.ask`.
+- **Uses**: `connection.menu`, `connection.color-presets`, `connection.custom-color`, `tree.color-of`,
+  `tab.groups`, `runner.ask`.
 - **Ported from**: connection.set-color (`src/extension.ts`, `src/connections.ts`, `src/connectionColors.ts`,
-  `src/tree.ts`).
+  `src/tree.ts`); the eleven presets and **Custom color…** from connection.set-color of Mongoster 0.9.0 (proposal
+  0001, revision 2; `src/shared/colors.ts › PRESET_COLORS`, `colorChoices`, `src/extension.ts › askColor`).
+  Mongoster shows a custom color as its nearest preset where VS Code takes only theme colors; Datardo draws every
+  color itself, so a custom color is exact everywhere.
+- **Differs**: (M38) the list offers six colors and **None**: no **Pink**, **Teal**, **Indigo**, **Brown**, **Gray**
+  and no **Custom color…**.
 
 Acceptance:
 
-- [ ] Dismissing the list changes nothing.
+- [ ] Dismissing the list changes nothing; dismissing the dialog **Choose a color** of **Custom color…** changes
+      nothing either. (differs)
 - [ ] Choosing **Red** for Local shows red on the connection island while Local is current, on the heading of its
       group of tabs, on its card and on its line in the connection switcher, without reopening anything.
-- [ ] Every open tab of the connection, whatever its kind, takes the color at once, a playground tab included.
+- [ ] The list shows the eleven presets in the order **Red**, **Orange**, **Yellow**, **Green**, **Blue**,
+      **Purple**, **Pink**, **Teal**, **Indigo**, **Brown**, **Gray**, then **None** and **Custom color…**; on a
+      connection colored `#1e90ff`, **Custom color…** is described `#1e90ff · current`. (differs)
+- [ ] Applying `#1e90ff` in **Choose a color** colors Local with exactly `#1e90ff` on the connection island, the dot
+      and the line of its group of tabs, its card and its line in the connection switcher, in the dark and in the
+      light theme. (differs)
+- [ ] Every open tab of the connection, whatever its kind, takes the color at once, a playground tab included: the
+      dot and the line of its group are the connection's color (`tab.groups`).
+- [ ] The icon of a tab takes a color only from its database's or its collection's own color (`tree.color-of`): the
+      tab of `shop.orders`, whose database is teal, stays teal when Local's color changes, and the tab of
+      `crm.users`, with no color of its own, keeps its icon as it is. (differs)
 - [ ] **None** removes the color everywhere; a connection without a color has the neutral mark of the theme.
-- [ ] The color is drawn with the theme's token of that name, so it is readable in the dark and in the light theme;
-      it is never the only sign of anything: the name is always beside it.
-- [ ] The color does not change the tree island's nodes or the syntax colors.
+- [ ] A preset is drawn with the theme's token of that name (`connection.color-presets`), so it is readable in the
+      dark and in the light theme; it is never the only sign of anything: the name is always beside it.
+- [ ] The color does not change the tree island's nodes or the syntax colors: a node's icon takes a color only from
+      a database's or a collection's own color (`tree.color-of`).
+
+### `connection.color-presets` — The preset colors and custom colors
+
+The eleven colors offered wherever something is colored, a color of the user's own as `#rrggbb`, how a color read
+from a text is told, and the preset nearest to a custom color, which a Compass file needs.
+
+- **Kind**: Derivation
+- **Engine**: Any
+- **Function**: `src/features/connection/color-presets.ts › readColor(value)`, `› nearestPreset(color)` and `›
+  colorLabel(color)`
+- **Uses**: `window.theme`.
+- **Ported from**: connection.nearest-preset and the colors of connection.set-color in Mongoster 0.9.0 (proposal
+  0001, revision 2; `src/shared/colors.ts › PRESET_COLORS`, `normalizeHex`, `isColor`, `readColor`,
+  `nearestPreset`, `colorLabel`, `PRESET_DEFAULTS`). Mongoster needs the nearest preset wherever VS Code takes only
+  theme colors; Datardo draws every color itself and needs it only to write a Compass file
+  (`connection.color-from-compass`). The tokens are Datardo's.
+
+Rules:
+
+- A color is a preset or a custom color. The presets, in the order every list shows them: `red`, `orange`,
+  `yellow`, `green`, `blue`, `purple`, `pink`, `teal`, `indigo`, `brown`, `gray`, shown as **Red**, **Orange**,
+  **Yellow**, **Green**, **Blue**, **Purple**, **Pink**, **Teal**, **Indigo**, **Brown**, **Gray**. A custom color
+  is kept as `#` and six hexadecimal digits in lower case, and shown as it is kept (`#12abef`).
+- Reading a color (`readColor`), from a field, a file or a setting: the text is trimmed and its case ignored; a
+  preset's name is that preset; `#rrggbb` and `#rgb`, with or without `#`, are a custom color, `#rgb` doubling each
+  digit; anything else, and what is not a text, is no color.
+- A preset is drawn with its token of the theme in use, `--color-connection-<name>`; a custom color is drawn as it
+  is, in both themes. The tokens *(the five last are Datardo's choice)*:
+
+  | Preset | Dark | Light |
+  | --- | --- | --- |
+  | red | `#ff7a7a` | `#bb2828` |
+  | orange | `#ffa45c` | `#a94e08` |
+  | yellow | `#f2c35b` | `#7f5300` |
+  | green | `#5bd38c` | `#17703e` |
+  | blue | `#7db8ff` | `#1d55c2` |
+  | purple | `#c4a7ff` | `#7136c8` |
+  | pink | `#f58cc3` | `#a8245c` |
+  | teal | `#4fd1c5` | `#00706a` |
+  | indigo | `#9fa8ff` | `#4041b5` |
+  | brown | `#d4a373` | `#7a4a24` |
+  | gray | `#a9b0bb` | `#5b6270` |
+
+- Each token is at least 4.5:1 against every surface of its theme (canvas, island, raised, hover, selected), as
+  R10.10 holds text. A custom color is not held to a ratio: a color is never the only sign of anything, its name is
+  always beside it.
+- The nearest preset (`nearestPreset`): a preset is itself. For a custom color, with its channels from 0 to 1: when
+  the largest and the smallest differ by less than 0.12, gray; otherwise its hue is taken, and a color whose largest
+  channel is under 0.65 with a hue from 10° to 45° is brown; otherwise the preset of the nearest hue, red 0°, orange
+  30°, yellow 55°, green 125°, teal 170°, blue 215°, purple 280°, pink 330°, the distance going round the circle;
+  and blue with a hue of 220° or more and a largest channel under 0.8 is indigo.
+
+Examples:
+
+- `readColor`: `' Teal '` → teal; `'#1E90FF'` → `#1e90ff`; `'abc'` → `#aabbcc`; `'#12345'` → none; `'chartreuse'` →
+  none; `7` → none.
+- `nearestPreset`: `#ff0000` → red; `#ffa500` → orange; `#20b2aa` → teal; `#1e90ff` → blue; `#5c6bc0` → indigo;
+  `#4b0082` → purple; `#ff69b4` → pink; `#8b4513` → brown; `#808080` → gray; `#12abef` → blue.
+- `colorLabel`: pink → **Pink**; `#12abef` → `#12abef`.
+
+Acceptance:
+
+- [ ] Each example above gives exactly that result.
+- [ ] `tokens.css` has the eleven tokens with the values of the table in each theme, and the contrast check of
+      R10.10 finds every one at least 4.5:1 on canvas, island, raised, hover and selected.
+- [ ] A connection colored teal shows `#4fd1c5` in the dark theme and `#00706a` in the light one; one colored
+      `#12abef` shows `#12abef` in both.
+
+### `connection.custom-color` — Choose a custom color
+
+The dialog **Choose a color**, opened by **Custom color…**: a color of the user's own, as `#rrggbb`, for a
+connection, a database or a collection.
+
+- **Kind**: View
+- **Engine**: Any
+- **Function**: `src/features/connection/custom-color.ts › view(state)`
+- **Entry points**: **Custom color…**, the last item of the list of `connection.set-color`, `tree.set-database-color`
+  and `tree.set-collection-color`; **Custom color…** of **Color** in the connection form (`@form`). Its controls are
+  in the dialog (`@dialog`).
+- **Shows**, in a dialog (`nav.dialog`) titled **Choose a color**, under the line **Color of <name>** (the
+  connection, the database or the collection):
+  1. the system's color picker, and beside it the field **Color**, with the placeholder `#rrggbb`;
+  2. the eleven presets as swatches, in their order (`connection.color-presets`), each named **Red** to **Gray** to a
+     screen reader and when the pointer rests on it;
+  3. a preview: the dot and the band of a card, and the icon of a tab, in the color chosen, on the island's surface;
+  4. the buttons **Cancel** and **Apply**.
+- **States**:
+  - It starts on the color in use: a custom color in the picker and the field, a preset with its swatch selected;
+    else, for a database or a collection, the color it follows (`tree.color-of`); else blue.
+  - The picker and the field follow each other. The field takes what `readColor` reads: `#rrggbb`, `#rgb`, any case,
+    or a preset's name. A swatch chooses the preset itself, which stays drawn with its token in each theme, not its
+    value: the field then shows the preset's name (`teal`) and the picker its value in the theme in use.
+  - While the field reads as no color, **Apply** is disabled and the field shows under it **Enter a color as
+    #rrggbb**.
+  - **Apply**, or `Enter` in the field, closes the dialog and gives the color to the feature that opened it, which
+    writes it as its card says. **Cancel** and `Esc` close it and nothing is written.
+  - `Tab` goes from the picker to the field, the swatches, **Cancel** and **Apply**; the arrows move between the
+    swatches, and `Space` or `Enter` chooses one.
+- **Uses**: `nav.dialog`, `runner.ask`, `connection.color-presets`, `connection.set-color`, `connection.form`,
+  `tree.set-database-color`, `tree.set-collection-color`, `tree.color-of`.
+- **Ported from**: connection.custom-color of Mongoster 0.9.0 (proposal 0001, revision 2; `src/colorPicker.ts ›
+  pickCustomColor`, `src/webview/colorPicker.ts`, `media/colorPicker.css`, `src/shared/colors.ts › readColor`).
+  Mongoster opens a tab; Datardo a dialog. Mongoster's line **Shown as <preset> in the tree, on tab icons and on the
+  names of editor tabs, which take only the presets.** is left out: Datardo draws a custom color exactly everywhere.
+
+Acceptance:
+
+- [ ] **Custom color…** on Local, colored red, opens **Choose a color** with **Color of Local**, the swatch **Red**
+      selected and the field `red`.
+- [ ] Typing `#1E90FF` in the field moves the picker and the preview to that color; **Apply** colors Local
+      `#1e90ff` and closes the dialog.
+- [ ] Typing `#abc` and pressing `Enter` applies `#aabbcc`.
+- [ ] Choosing the swatch **Teal** and **Apply** gives Local the preset teal, which shows `#4fd1c5` in the dark theme
+      and `#00706a` in the light one.
+- [ ] Typing `#12345` disables **Apply** and shows **Enter a color as #rrggbb**.
+- [ ] **Cancel** and `Esc` leave the color as it was.
+- [ ] On a collection with no color of its own, in a database with none, of a connection colored red, the dialog
+      starts on **Red**; with no color anywhere, on **Blue**.
 
 ### `connection.move-to-folder` — Move a connection to a folder
 
@@ -1088,14 +1251,16 @@ Removes a saved connection, with its secrets and everything Datardo keeps for it
   <name> from the undo history` (`undo.forget-connection`); `delete the <n> queries saved for me on <name>`;
   `delete the <n> pins of <name>`; `delete what Datardo remembers of <name>`, which is its file of `state/` (the
   recent queries, the columns' layouts, the console's history, the targets of the playgrounds, the last folders
-  used); for a Redis connection, `unlink <MongoDB connection> from <name>` for each one that publishes through it;
-  `remove the connection <name>`. All app steps; a step with nothing to delete is left out.
-- **Danger**: Confirm: **Remove connection "<name>"?**, with the detail **Deleted with it:** and the list of what
-  is, each on its line and only when there is some: **its connection string and passwords**, **<n> queries saved
-  for me**, **<n> pins**, **<n> operations of the undo history**, **what Datardo remembers of it (recent queries,
-  the layout of the columns, the history of the console)**; then **This cannot be undone. The files of its queries
-  folder, its backups, its exports and its scheduled tasks are kept.** and, for a Redis connection that others
-  publish through, **<names> will no longer publish their writes for redis-oplog.**; the button is **Remove**.
+  used); `delete the <n> formatting rules of <name>`, those of its section **Connection \<name\>**, of its databases
+  and of its collections (`table.format-scopes`); for a Redis connection, `unlink <MongoDB connection> from <name>`
+  for each one that publishes through it; `remove the connection <name>`. All app steps; a step with nothing to
+  delete is left out.
+- **Danger**: Confirm: **Remove connection "<name>"?**, with the detail **Deleted with it:** and the list of what is,
+  each on its line and only when there is some: **its connection string and passwords**, **<n> queries saved for me**,
+  **<n> pins**, **<n> operations of the undo history**, **<n> formatting rules**, **what Datardo remembers of it
+  (recent queries, the layout of the columns, the history of the console)**; then **This cannot be undone. The files
+  of its queries folder, its backups, its exports and its scheduled tasks are kept.** and, for a Redis connection that
+  others publish through, **<names> will no longer publish their writes for redis-oplog.**; the button is **Remove**.
 - **Read-only**: Allowed, because it writes nothing to a deployment.
 - **Undo**: Cannot be undone: the secrets and Datardo's data of the connection are deleted; the confirmation says
   so.
@@ -1106,10 +1271,12 @@ Removes a saved connection, with its secrets and everything Datardo keeps for it
 - **Commands**: `connection.remove`.
 - **Uses**: `connection.disconnect`, `connection.secrets`, `connection.unlink-redis`, `connection.menu`,
   `tab.connection-gone`, `tab.close`, `undo.forget-connection`, `saved-query.save`, `nav.pin`, `task.run`,
-  `runner.confirm`.
+  `table.format-scopes`, `runner.confirm`.
 - **Ported from**: connection.remove (`src/extension.ts`, `src/connections.ts › ConnectionManager.remove`,
   `src/history.ts › UndoHistory.clear`, `src/redisOplog.ts`). Mongoster left the state it kept for the
-  connection's collections behind, and its collection tabs open; Datardo deletes the one and closes the others.
+  connection's collections behind, and its collection tabs open; Datardo deletes the one and closes the others. It
+  also left the formatting rules of the connection (Mongoster 0.10.0); Datardo deletes them.
+- **Differs**: (M41) there are no formatting rules to delete.
 
 Acceptance:
 
@@ -1125,6 +1292,9 @@ Acceptance:
 - [ ] Afterwards the secret storage has no value of the connection; the data folder has no file of `state/` and no
       file of `saved-queries/` named after its id; the pins hold none of its items; the undo history lists none of
       its operations and has none of their files.
+- [ ] A connection with 2 rules in its section **Connection Local** and 3 rules of its collections lists **5
+      formatting rules**; afterwards `formatting.json` holds none of them, and the rules of **Everywhere** stay.
+      (differs)
 - [ ] Every tab of the connection closes, the collection tabs, keys tabs, document tabs and playground tabs
       included, and a page that compares it with another connection.
 - [ ] Kept: the files of its queries folder, the backups and the exports it wrote, the known hosts, and its
@@ -1313,17 +1483,24 @@ and cannot go.
   `connection.export`, `connection.string-secrets`. The access token of the MCP server is kept in the same storage
   (`mcp.server`).
 - **Ported from**: connection.secrets (`src/connections.ts › ConnectionManager`, `src/transport.ts`,
-  `src/standalone/vscode/storage.ts`).
+  `src/standalone/vscode/storage.ts`). The colors of databases and collections and the exclusions from searches
+  are kept on the connection as Mongoster 0.9.0 keeps them (`src/shared/collectionColors.ts`,
+  `src/shared/exclusions.ts`).
+- **Differs**: (M38) the saved connections keep no colors of databases and collections, and the color is one of six;
+  (M39) they keep nothing excluded from searches.
 
 What is kept where:
 
 - In the secret storage, under the id of the connection: the connection string with its password and its secret
   options; the key password of the client certificate; the password of the SSH tunnel; the passphrase of the SSH
   private key. For Redis the password is the one of the connection string.
-- In Datardo's saved connections, which are not secret: the id, the name, the engine, the folder, the color,
-  read-only, whether the undo history is kept, the queries folder, the paths of the certificate and key files, the
-  two TLS exceptions, the SSH server, port, user and kind of authentication, the id of the linked connection and
-  what `oplog.publish` keeps about what is published. The known hosts are kept apart, and are not secret.
+- In Datardo's saved connections, which are not secret: the id, the name, the engine, the folder, the color (a
+  preset or a custom `#rrggbb`: `connection.color-presets`), the colors of its databases and of its collections,
+  views and buckets (`tree.color-of`), whether it is excluded from searches and which of its databases and
+  collections are (`tree.excluded`), read-only, whether the undo history is kept, the queries folder, the paths of
+  the certificate and key files, the two TLS exceptions, the SSH server, port, user and kind of authentication, the
+  id of the linked connection and what `oplog.publish` keeps about what is published. The known hosts are kept
+  apart, and are not secret.
 
 Acceptance:
 
@@ -1396,19 +1573,51 @@ either engine, from a file or the clipboard.
   **Could not import the connections: <reason>**, with the reasons of `connection.read-file`.
 - **Commands**: `connection.import`.
 - **Uses**: `connection.read-file`, `connection.read-list`, `connection.read-compass`, `connection.encryption`,
-  `connection.secrets`, `connection.read-only`, `connection.link-redis`, `connection.folder-menu`, `runner.ask`,
+  `connection.secrets`, `connection.read-only`, `connection.link-redis`, `connection.folder-menu`,
+  `connection.string-secrets`, `connection.redis-string`, `tree.color-of`, `tree.excluded`, `runner.ask`,
   `runner.notify`.
 - **Ported from**: connection.import (`src/connectionsTransfer.ts › importConnections`, `readSource`, `parse`,
   `askFolder`, `summary`; `src/shared/connectionsFile.ts`). Lists with Redis lines, Datardo's own format and the
-  Redis connection made for a redis-oplog link are new in Datardo.
+  Redis connection made for a redis-oplog link are new in Datardo. What the detail says beyond the host, the colors
+  of databases and collections and the exclusions come from connection.import of Mongoster 0.9.0
+  (`src/shared/connectionsFile.ts › securityNotes`, `urlHost`; `src/connectionsTransfer.ts › summary`, and the
+  **Replace** of `importConnections`). The queries folder in the detail is new in Datardo, which keeps one per
+  connection.
+- **Differs**: (M37) the detail of an item names only **TLS**, **SSH <user>@<host>** and **redis-oplog**: not the
+  invalid certificates and host names allowed, a proxy, the SSH port, the host redis-oplog publishes to, the undo
+  history left off or the queries folder; (M38) it does not count the colors of databases and collections, a custom
+  color is not read, and **Replace** carries no such color; (M39) it says nothing of the exclusions from searches,
+  and **Replace** carries none.
 
 Acceptance:
 
 - [ ] Each item shows the name, the engine, the host and, for a name already used, **✓ already exists**, or **✓
       already exists (same connection string)** when the saved connection string is the same; its detail lists the
-      folder, the color, **read-only**, **TLS**, **SSH <user>@<host>**, **redis-oplog** and the notes (**no
-      password**, **no SSH password**, **passwords not imported (encrypted)**, **In-Use Encryption settings not
-      imported**…).
+      folder, the color, **<n> database color(s)**, **<n> collection color(s)**, **excluded from searches**, **<n>
+      database(s) or collection(s) excluded from searches**, **read-only**, what the connection does beyond its
+      host (below) and the notes (**no password**, **no SSH password**, **passwords not imported (encrypted)**,
+      **In-Use Encryption settings not imported**…). (differs)
+- [ ] What the connection does beyond its host, since the file may come from someone else, in this order and each
+      only when it applies: **TLS**; **invalid certificates allowed** and **invalid host names allowed**, from the
+      TLS settings or from the options `tlsInsecure`, `tlsAllowInvalidCertificates` and `tlsAllowInvalidHostnames`
+      left in the connection string; **proxy <host>[:<port>]**, from `proxyHost` and `proxyPort`; **SSH
+      <user>@<host>[:<port>]**, the port only when it is not 22; **redis-oplog → <host>:<port>**, the Redis server
+      the writes would be published to; **no undo history**; **queries folder <path>**. (differs)
+- [ ] An entry `Prod` of a Datardo file with `"uri":
+      "mongodb://ada@db1/app?proxyHost=socks.example.com&proxyPort=1080&tlsInsecure=true"`, `"ssh": { "host": "jump",
+      "port": 2200, "username": "me", "auth": "password" }`, `"noHistory": true`, `"queriesFolder": "/home/eve/.ssh"`
+      and a `redisOplog` linked to an entry with `"uri": "rediss://cache.example.com:6380"` has the detail `MongoDB ·
+      db1 · invalid certificates allowed · invalid host names allowed · proxy socks.example.com:1080 · SSH
+      me@jump:2200 · redis-oplog → cache.example.com:6380 · no undo history · queries folder /home/eve/.ssh · no
+      password · no SSH password`. (differs)
+- [ ] No password is ever part of the detail: a Mongoster file's Redis address `redis://:s3cret@cache:6379/0` shows
+      as **redis-oplog → cache:6379**, and one whose host cannot be read as **redis-oplog → a host that could not be
+      read**. (differs)
+- [ ] A Datardo file entry with `"color": "#1E90FF"`, `"databaseColors": { "shop": "teal" }`,
+      `"collectionColors": { "shop.orders": "none", "shop.logs": "#12abef" }`, `"excluded": true` and
+      `"exclusions": ["archive"]` has in its detail `#1e90ff`, **1 database color**, **2 collection colors**,
+      **excluded from searches** and **1 database or collection excluded from searches**, and is imported with
+      them. (differs)
 - [ ] Connections already there with the same name and the same connection string start unchecked; all others start
       checked.
 - [ ] **Skip** leaves out the chosen connections whose name is taken; **Keep both** adds them as `name (2)`, `name
@@ -1416,6 +1625,10 @@ Acceptance:
 - [ ] **Replace** gives the existing connection the imported connection string, TLS settings, SSH tunnel, redis-oplog
       settings and color, and the chosen folder; it stays read-only if it was, and becomes read-only if the imported
       one is. A file without passwords therefore replaces the saved password with none.
+- [ ] With **Replace**, the colors of databases, the colors of collections and the databases and collections
+      excluded from searches are replaced by the file's, each kept when the file has none (a Compass file or a list
+      never has them); the connection stays excluded from searches if it was, and becomes excluded if the imported
+      one is. (differs)
 - [ ] A connection is never replaced by one of the other engine: with **Replace**, an imported Redis connection
       whose name belongs to a MongoDB connection is added as `name (2)`.
 - [ ] Started on a folder, every imported connection goes to that folder without asking; **Folders from the file**
@@ -1465,7 +1678,11 @@ without their passwords.
   `connection.folder-menu`, `runner.ask`, `runner.confirm`, `runner.notify`.
 - **Ported from**: connection.export (`src/connectionsTransfer.ts › exportConnections`, `portable`, `askPassphrase`;
   `src/shared/connectionsFile.ts › serializeConnections`, `Encrypter`). Datardo's own format takes the place of
-  Mongoster's.
+  Mongoster's. The colors of databases and collections, the custom colors and the exclusions from searches, with
+  their notes, come from connection.export of Mongoster 0.9.0 (`src/connectionsTransfer.ts › portable`,
+  `src/shared/connectionsFile.ts › serializeConnections`).
+- **Differs**: (M38) Datardo's format writes no colors of databases and collections and the notes say nothing of
+  them; (M39) it writes no exclusions from searches, and no note says that the other formats left them out.
 
 Acceptance:
 
@@ -1485,6 +1702,13 @@ Acceptance:
       was/were left out (a connection string can't hold one)**, **folders, colors, read-only and redis-oplog were
       left out**, **the TLS certificate files of <n> Redis connection(s) were left out (a redis:// connection string
       can't hold them)**.
+- [ ] Datardo's format carries the color of each connection, a custom `#rrggbb` included, the colors of its
+      databases and collections, and what is excluded from searches; importing the file gives them back
+      (`connection.write-file`). (differs)
+- [ ] The Compass format adds, as they apply, the notes **colors of databases and collections were left out (Compass
+      doesn't have them)** and **exclusions from searches were left out (Compass doesn't have them)**; the list
+      counts the colors of databases and collections in **folders, colors, read-only and redis-oplog were left out**
+      and adds **exclusions from searches were left out**. (differs)
 - [ ] No secret passes through the window process: the questions carry names and choices, and the main process
       reads the secrets and writes the file.
 
@@ -1498,18 +1722,25 @@ Tells the format of the text to import, and reads Datardo's and Mongoster's own 
 - **Engine**: Any
 - **Function**: `src/features/connection/read-file.ts › connectionsFromText(text, passphrase)`
 - **Uses**: `connection.read-list`, `connection.read-compass`, `connection.encryption`,
-  `connection.color-from-compass`, `connection.string-secrets`, `connection.redis-string`.
+  `connection.color-from-compass`, `connection.color-presets`, `connection.string-secrets`,
+  `connection.redis-string`, `tree.color-of`, `tree.excluded`.
 - **Ported from**: connection.read-file (`src/shared/connectionsFile.ts › parseConnections`, `detectFormat`,
   `isEncrypted`, `fromMongoster`, `plain`, `parseJson`, `decryptSecrets`, `missingSecrets`, `lacksPassword`,
   `withPassword`, `colorFrom`). The format **Datardo Connections**, the engine of an entry and the Redis entries
-  are new in Datardo.
+  are new in Datardo. The custom colors, `databaseColors`, `collectionColors`, `excluded` and `exclusions` come
+  from connection.read-file of Mongoster 0.9.0 (`src/shared/connectionsFile.ts › fromMongoster`,
+  `src/shared/collectionColors.ts › readDatabaseColors`, `readCollectionColors`, `src/shared/exclusions.ts ›
+  readExclusions`); the colors of Redis databases are new in Datardo.
+- **Differs**: (M38) a custom color `#rrggbb` of a Datardo or Mongoster entry is taken to the nearest of six colors,
+  and `databaseColors` and `collectionColors` are not read; (M39) `excluded` and `exclusions` are not read.
 
 Rules:
 
 - Input: the text of a file or of the clipboard, and the passphrase when there is one. Output: the format
-  (`compass`, `datardo`, `mongoster`, `list`), the connections (name, engine, connection string, folder, color,
-  read-only, whether the undo history is kept, queries folder, TLS, SSH, the redis-oplog link and settings, notes)
-  and how many entries were skipped.
+  (`compass`, `datardo`, `mongoster`, `list`), the connections (name, engine, connection string, folder, color, the
+  colors of databases and of collections, whether it is excluded from searches and what of it is, read-only,
+  whether the undo history is kept, queries folder, TLS, SSH, the redis-oplog link and settings, notes) and how many
+  entries were skipped.
 - A text that does not start with `{` (after a byte order mark and spaces) is a list (`connection.read-list`).
 - JSON whose `type` is `Compass Connections` is Compass's (`connection.read-compass`), `Datardo Connections`
   Datardo's, `Mongoster Connections` Mongoster's; another JSON is refused with **This JSON file is neither a Compass
@@ -1525,11 +1756,19 @@ Rules:
 - An entry that is not an object, or whose `uri` is not a connection string of its engine with a host
   (`mongodb://` or `mongodb+srv://`; `redis://` or `rediss://`), is skipped and counted.
 - An entry gives: the name (trimmed; the host part of the connection string when empty), the folder (trimmed), the
-  color (`connection.color-from-compass`), `readOnly` and `noHistory` only when `true`, `queriesFolder`; `tls` with
+  color (`connection.color-from-compass`, which keeps a custom color in these two formats), `databaseColors` and,
+  on a MongoDB entry, `collectionColors` (below), `excluded` only when `true` and, on a MongoDB entry, `exclusions`
+  (below), `readOnly` and `noHistory` only when `true`, `queriesFolder`; `tls` with
   `caFile`, `certificateKeyFile`, the key password only with a certificate file, the two `allowInvalid…` only when
   `true`; `ssh` only with a host, `auth` `privateKey` or `agent` or else `password`, port 22 left out, the password
   for password authentication, the key file and passphrase for a key. A Redis entry whose `uri` starts with
   `rediss://` has TLS on, also without `tls`.
+- `databaseColors` and `collectionColors`, objects, keep only their valid entries: a key that names a database
+  (`databaseColors`) or a collection as `database.collection` (`collectionColors`), as `tree.color-of` writes them,
+  and a value that `readColor` reads (`connection.color-presets`), or `none`. An object left empty, and a value that
+  is not an object, give nothing.
+- `exclusions`, an array, keeps only the texts that are a database's name or a `database.collection`, as
+  `tree.excluded` writes them, sorted and without repeats; left empty, or not an array, it gives nothing.
 - `redisOplog`, on a MongoDB entry only, with `prefix`, and `namespaces` and `scope` as trimmed non-empty strings.
   In a Datardo file it is read only with a `connection`, the `id` of a Redis entry of the same file; when no entry
   has that id, the link is left out with the note **redis-oplog link not imported: its Redis connection is not in
@@ -1560,6 +1799,14 @@ Examples:
   local, Redis, TLS on, database 1.
 - A Datardo entry `{ "name": "Odd", "engine": "postgres", "uri": "postgres://h" }` → skipped (1).
 - A Datardo entry with `"engine": "redis"` and `"uri": "mongodb://h"` → skipped (1).
+- A Datardo or Mongoster entry `{ "name": "Shop", "uri": "mongodb://db1/shop", "color": "#1E90FF",
+  "databaseColors": { "shop": "teal", "a.b": "red" }, "collectionColors": { "shop.orders": "none",
+  "shop.fs.files": "pink", "nodot": "red", "shop.logs": "chartreuse" }, "excluded": true, "exclusions":
+  ["shop.logs", "archive", "archive", 7] }` → color `#1e90ff`, database colors `{ "shop": "teal" }`, collection
+  colors `{ "shop.orders": "none", "shop.fs.files": "pink" }`, excluded, exclusions `["archive", "shop.logs"]`.
+  (differs)
+- A Mongoster file of an earlier version, without these fields → no colors of databases or collections and nothing
+  excluded, as before.
 
 ### `connection.read-list` — Read a list of connection strings
 
@@ -1570,7 +1817,9 @@ Reads a text with one connection string per line, of either engine, with or with
 - **Function**: `src/features/connection/read-list.ts › connectionsFromList(text)`
 - **Uses**: `connection.tls-in-uri`, `connection.redis-string`.
 - **Ported from**: connection.read-list (`src/shared/connectionsFile.ts › parseList`, `isConnectionString`,
-  `hostOf`, `tlsFromUri`, `missingSecrets`). The Redis lines are new in Datardo.
+  `hostOf`, `tlsFromUri`, `missingSecrets`). The Redis lines are new in Datardo. The name taken from the `//`
+  comment above a line comes from connection.read-list of Mongoster 0.9.0 (`parseList`).
+- **Differs**: (M38) a line with no name of its own is named after its host, also under a `// name` comment.
 
 Rules:
 
@@ -1580,8 +1829,11 @@ Rules:
   one whose connection string has no host right after the scheme. The scheme gives the engine.
 - The connection string runs from the scheme to the first space, without trailing `"`, `'`, `` ` ``, `,`, `;`.
 - The name is what comes before it, without trailing spaces, `=`, `:`, `,`, `;`, `|`, quotes and without leading
-  quotes; without a name, the host part of the connection string, credentials left out: for Redis the host and the
-  port (`cache:6379`).
+  quotes; without a name, the text of a `//` comment on the line right above, trimmed and without the `//`; without
+  either, the host part of the connection string, credentials left out: for Redis the host and the port
+  (`cache:6379`).
+- A `//` comment names only the line right below it: an empty line, a `#` comment, another `//` comment or a line
+  that is not a connection in between forgets it, and an empty `//` names nothing.
 - MongoDB: TLS certificate files in the connection string move to the TLS settings (`connection.tls-in-uri`).
 - Redis: the line is read as `connection.redis-string` says; `rediss://` turns TLS on. A line it refuses is skipped
   and counted.
@@ -1600,6 +1852,11 @@ Examples:
 - `Cache = redis://:s3cret@cache:6379/2` → Redis, name `Cache`, host `cache`, password `s3cret`, database 2.
 - `rediss://ada@cache.example.com:6380` → Redis, name `cache.example.com:6380`, TLS on, note **no password**.
 - `redis://cache/orders` → skipped (1).
+- `// Production` then `mongodb+srv://ada@cluster0.x.mongodb.net/shop` on the next line → name `Production`.
+  (differs)
+- `// Sessions` then `rediss://cache.example.com:6380/2` → Redis, name `Sessions`. (differs)
+- `// Reports` then `Main = mongodb://r1/db` → `Main`; `// Old`, an empty line, then `mongodb://h1/db` → `h1`;
+  `//` alone then `mongodb://h2/db` → `h2`; `// A`, `// B`, then `mongodb://h3/db` → `B`. (differs)
 
 ### `connection.read-compass` — Read a MongoDB Compass export
 
@@ -1611,7 +1868,10 @@ Reads the connections of the file Compass writes with **Export saved connections
 - **Uses**: `connection.encryption`, `connection.tls-in-uri`, `connection.color-from-compass`,
   `connection.string-secrets`.
 - **Ported from**: connection.read-compass (`src/shared/connectionsFile.ts › fromCompass`, `decryptSecrets`,
-  `withPassword`, `setUriParams`, `tlsFromUri`, `colorFrom`, `missingSecrets`).
+  `withPassword`, `setUriParams`, `tlsFromUri`, `colorFrom`, `missingSecrets`); the eleven presets from
+  connection.color-from-compass of Mongoster 0.9.0.
+- **Differs**: (M38) the color is the closest of six: Compass's teal, iris, pink and gray become green, blue, purple
+  and no color.
 
 Rules:
 
@@ -1622,8 +1882,9 @@ Rules:
   `tlsCertificateKeyFilePassword` and `proxyPassword` as options of it, `awsSessionToken` as
   `AWS_SESSION_TOKEN:<token>` in `authMechanismProperties`, replacing an older one.
 - Then the TLS files move out of the connection string (`connection.tls-in-uri`).
-- The name is the `name` of `favorite`, trimmed, or the host part; the color is the closest of the six
-  (`connection.color-from-compass`).
+- The name is the `name` of `favorite`, trimmed, or the host part; the color is one of the eleven presets, never a
+  custom color (`connection.color-from-compass`). A Compass file has no colors of databases or collections and
+  nothing excluded from searches.
 - `sshTunnel` with a host: with a `mongodb+srv://` connection string it is left out with the note **SSH tunnel not
   imported: a mongodb+srv:// connection string can't go through one**; otherwise port (22 left out), user, and
   `privateKey` authentication when `identityKeyFile` is set (its first element when it is an array, with the
@@ -1659,10 +1920,15 @@ Gives the text of an exported file, in Datardo's format, in Compass's, or as a l
 - **Engine**: Any
 - **Function**: `src/features/connection/write-file.ts › connectionsToText(connections, format, secrets, passphrase)`
 - **Uses**: `connection.encryption`, `connection.tls-in-uri`, `connection.color-from-compass`,
-  `connection.string-secrets`.
+  `connection.string-secrets`, `tree.color-of`, `tree.excluded`.
 - **Ported from**: connection.write-file (`src/shared/connectionsFile.ts › serializeConnections`, `tlsIntoUri`,
   `withPassword`, `urlPassword`, `setUriParams`, `Encrypter`). Datardo's format takes the place of Mongoster's;
-  taking every secret out of the connection string is new.
+  taking every secret out of the connection string is new. The custom colors, `databaseColors`,
+  `collectionColors`, `excluded`, `exclusions` and their notes come from connection.write-file of Mongoster 0.9.0
+  (`serializeConnections`).
+- **Differs**: (M38) Datardo's format writes no `databaseColors` and `collectionColors` and the color is one of six;
+  the other formats write no note about the colors of databases and collections; (M39) Datardo's format writes no
+  `excluded` and `exclusions`, and the other formats no note about them.
 
 Rules:
 
@@ -1674,8 +1940,12 @@ Rules:
   of `connection.string-secrets`; `include` then puts them back in place.
 - **Datardo**: `{ "type": "Datardo Connections", "version": 1, "secrets": "removed" | "included" | "encrypted",
   "connections": [...] }`, two-space indented; each entry has `id`, `name`, `engine`, `uri`, and when set `folder`,
-  `color`, `readOnly`, `noHistory`, `queriesFolder`, `tls`, `ssh`, and on a MongoDB entry with a linked connection
-  `redisOplog` (`connection`, the `id` of the Redis entry, plus the settings of `oplog.publish`). The secrets taken
+  `color`, `databaseColors`, `collectionColors` (MongoDB only), `excluded`, `exclusions` (MongoDB only),
+  `readOnly`, `noHistory`, `queriesFolder`, `tls`, `ssh`, and on a MongoDB entry with a linked connection
+  `redisOplog` (`connection`, the `id` of the Redis entry, plus the settings of `oplog.publish`). `color` is a
+  preset's name or a custom `#rrggbb`; the maps of colors are written as `tree.color-of` keeps them, each value a
+  preset's name, a `#rrggbb` or `none`; `excluded` is `true`, and `exclusions` the keys `tree.excluded` keeps,
+  sorted. The secrets taken
   out are the password and the secret options of the connection string, the `certificateKeyFilePassword` of `tls`,
   and the `password` and `passphrase` of `ssh`; `include` puts them back in place, `encrypt` writes them as one
   `secrets` string per entry (`{"secrets":{ password, tlsCertificateKeyFilePassword, proxyPassword,
@@ -1687,13 +1957,18 @@ Rules:
   string; `include` puts the password and the key password in the connection string and `password` and
   `identityKeyPassphrase` in `sshTunnel`; `encrypt` writes `connectionSecrets` (`password`,
   `tlsCertificateKeyFilePassword`, `proxyPassword`, `awsSessionToken`, `sshTunnelPassword`, `sshTunnelPassphrase`);
-  `remove` drops them. An agent tunnel is written without authentication. Folders, read-only, the undo history
-  setting, the queries folder and redis-oplog are left out.
+  `remove` drops them. An agent tunnel is written without authentication. The color is written as Compass's code
+  (`connection.color-from-compass`), a custom color as the code of its nearest preset. Folders, read-only, the undo
+  history setting, the queries folder and redis-oplog are left out; so are the colors of databases and collections,
+  with the note **colors of databases and collections were left out (Compass doesn't have them)**, and what is
+  excluded from searches, with the note **exclusions from searches were left out (Compass doesn't have them)**.
 - **List**: a first line `# Connections exported from Datardo: name = connection string`, with ` (without
   passwords)` for `remove`, then `<name> = <connection string>` per connection, with new lines and `=` of the name
   turned into spaces. For MongoDB the TLS settings are in the connection string, the key password only with
   `include`; for Redis the scheme says whether TLS is on, and the certificate files are left out. `remove` takes
-  the secrets out. SSH tunnels, folders, colors, read-only and redis-oplog are left out.
+  the secrets out. SSH tunnels, folders, colors (of connections, databases and collections), read-only and
+  redis-oplog are left out, with the note **folders, colors, read-only and redis-oplog were left out**; what is
+  excluded from searches too, with the note **exclusions from searches were left out**.
 
 Examples:
 
@@ -1713,6 +1988,14 @@ Examples:
     **folders, colors, read-only and redis-oplog were left out**.
   - List, `include` → `Cache = redis://:r3dis@cache`.
 - `mongodb://ada:pw@h/?proxyHost=p&proxyPassword=pp`, Datardo, `remove` → `"uri": "mongodb://ada@h/?proxyHost=p"`.
+- `Shop`, MongoDB, `mongodb://db1/shop`, colored `#1e90ff`, the database `shop` teal, the collection `shop.orders`
+  with **None**, `shop.logs` excluded from searches, and the connection excluded too (differs):
+  - Datardo → `"color": "#1e90ff"`, `"databaseColors": { "shop": "teal" }`, `"collectionColors": { "shop.orders":
+    "none" }`, `"excluded": true`, `"exclusions": ["shop.logs"]`.
+  - Compass → `favorite: { name: "Shop", color: "color3" }`, notes **colors of databases and collections were left
+    out (Compass doesn't have them)**, **exclusions from searches were left out (Compass doesn't have them)**.
+  - List → `Shop = mongodb://db1/shop`, notes **folders, colors, read-only and redis-oplog were left out**,
+    **exclusions from searches were left out**.
 - Every format read back with `connection.read-file` gives the same connections, less what the format leaves out.
 
 ### `connection.encryption` — Encrypt the passwords of a file as Compass does
@@ -1787,26 +2070,37 @@ Examples:
 
 ### `connection.color-from-compass` — The closest color of a Compass connection
 
-Turns the color of a connection in a file into one of Datardo's six, and back into Compass's codes.
+Turns the color of a connection in a file into one of Datardo's eleven presets, or keeps a custom color of Datardo's
+and Mongoster's own formats, and turns a color back into Compass's codes.
 
 - **Kind**: Derivation
 - **Engine**: Any
-- **Function**: `src/features/connection/color-from-compass.ts › colorFrom(value)` and `› compassColor(color)`
-- **Ported from**: connection.color-from-compass (`src/shared/connectionsFile.ts › colorFrom`, `TO_COMPASS`).
+- **Function**: `src/features/connection/color-from-compass.ts › colorFrom(value, keepCustom)` and `›
+  compassColor(color)`
+- **Uses**: `connection.color-presets`.
+- **Ported from**: connection.color-from-compass (`src/shared/connectionsFile.ts › colorFrom`, `TO_COMPASS`), as
+  Mongoster 0.9.0 has it (proposal 0001, revision 2; `FROM_COMPASS`, `TO_COMPASS`, `compassColor`).
+- **Differs**: (M38) only six colors: `color2` and `teal` give green, `color4` and `iris` blue, `color7` and `pink`
+  purple, `color10` none; a hex color is always taken to the closest of the six, and export writes only six codes.
 
 Rules:
 
-- Datardo's six names (`red`, `orange`, `yellow`, `green`, `blue`, `purple`), in any case and with spaces around,
-  are kept.
-- Compass's codes: `color1`, `color2`, `teal` → green; `color3`, `color4`, `iris` → blue; `color5`, `color7`, `pink`
-  → purple; `color6` → red; `color8` → orange; `color9` → yellow; `color10` (gray) → none.
-- A hex color (`#rgb`, `#rrggbb`, with or without `#`), from older Compass: none when it is gray (the difference
-  between the largest and smallest channel under 0.12), else the color whose hue is closest: red 0°, orange 30°,
-  yellow 55°, green 125°, blue 215°, purple 280°.
+- Datardo's eleven preset names (`connection.color-presets`), in any case and with spaces around, are kept.
+- Compass's codes and names, in any case: `color1` → green, `color2` → teal, `color3` → blue, `color4` and `iris` →
+  indigo, `color5` → purple, `color6` → red, `color7` → pink, `color8` → orange, `color9` → yellow, `color10` →
+  gray.
+- A hex color (`#rgb`, `#rrggbb`, with or without `#`, as `readColor` reads it): with `keepCustom`, which Datardo's
+  and Mongoster's formats use, it is kept as a custom color, `#rrggbb` in lower case; otherwise, from Compass's
+  format (older Compass wrote hex colors), it is its nearest preset (`nearestPreset`).
 - Anything else, or not a string: none.
-- Export to Compass: red `color6`, orange `color8`, yellow `color9`, green `color1`, blue `color3`, purple `color5`.
+- Export to Compass (`compassColor`): red `color6`, orange `color8`, yellow `color9`, green `color1`, blue `color3`,
+  purple `color5`, pink `color7`, teal `color2`, indigo `color4`, gray `color10`; brown, which Compass lacks,
+  `color8`; a custom color as the code of its nearest preset.
 
 Examples:
 
-- `color3` → blue; `color10` → none; `' Blue '` → blue; `#ff0000` → red; `#00f` → blue; `ffa500` → orange;
-  `#808080` → none; `#xyz` → none; `3` → none.
+- `color3` → blue; `color2` → teal; `iris` → indigo; `color7` → pink; `color10` → gray; `' Blue '` → blue; `#ff0000`
+  → red; `#00f` → blue; `ffa500` → orange; `#808080` → gray; `#xyz` → none; `3` → none. (differs)
+- With `keepCustom`: `#12ABEF` → `#12abef`; `color4` → indigo. (differs)
+- Export: teal → `color2`; brown → `color8`; `#12abef` → `color3`; `#5c6bc0` → `color4`. (differs)
+- Every preset but brown written to Compass and read back is itself; brown comes back orange.
