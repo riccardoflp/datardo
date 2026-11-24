@@ -15,6 +15,7 @@ import { keysExtras } from './keys/keys-state';
 import { ServerInspector } from './server/server-inspector';
 import { ServerPage } from './server/server-page';
 import { serverExtras } from './server/server-state';
+import { useServerTab } from './server/server-store';
 import { useKeysTab } from './keys/keys-store';
 import { ValueItemInspector } from './value/value-inspector';
 import { valueExtras } from './value/value-state';
@@ -26,6 +27,7 @@ import { useConsoleTab } from './console/console-store';
 import { GridFsInspector } from './gridfs/gridfs-inspector';
 import { GridFsPage } from './gridfs/gridfs-page';
 import { gridFsExtras } from './gridfs/gridfs-state';
+import { useGridFsTab } from './gridfs/gridfs-store';
 import { HistoryInspector, historyExtras } from './history/history-inspector';
 import { HistoryPage } from './history/history-page';
 import { useHistoryChanges } from './history/history-store';
@@ -136,12 +138,15 @@ export function extrasKey(shows: { readonly kind: string; readonly page?: string
 
 /**
  * Draws the shell again whenever what a page keeps in the window changes: what a tab adds to it is drawn from that (the
- * key selected in a keys tab, the item of a value, the string selected in a console's output, the history, Watch changes).
+ * key selected in a keys tab, the item of a value, the string selected in a console's output, the row of the Server
+ * page, the file of a bucket, the history, Watch changes).
  */
 export function usePageStores(): void {
   useKeysTab(undefined);
   useValueTab(undefined);
+  useServerTab(undefined);
   useConsoleTab(undefined);
+  useGridFsTab(undefined);
   useHistoryChanges();
   useWatchChanges();
   usePubSubTab(undefined);

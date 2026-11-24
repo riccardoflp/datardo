@@ -49,6 +49,18 @@ function sameBounds(a: Rectangle, b: Rectangle): boolean {
   return a.x === b.x && a.y === b.y && a.width === b.width && a.height === b.height;
 }
 
+function samePlacement(a: Placement | undefined, b: Placement | undefined): boolean {
+  return (
+    a !== undefined &&
+    b !== undefined &&
+    a.left === b.left &&
+    a.top === b.top &&
+    a.width === b.width &&
+    a.height === b.height &&
+    a.maximized === b.maximized
+  );
+}
+
 /**
  * Gives the window exactly the bounds it was left with (`window.remember`). With a scaling that is not a whole number,
  * Windows rounds the size of a window without a frame up by a pixel or two each time it is set, so a window opened
@@ -85,6 +97,8 @@ export class WindowHost {
   private window: BrowserWindow | undefined;
   private tray: TrayIcon | undefined;
   private rememberTimer: ReturnType<typeof setTimeout> | undefined;
+  /** The placement the window opened with or last saved: a `move` or `resize` that leaves it as it is saves nothing. */
+  private known: Placement | undefined;
   private quitting = false;
   private closing = false;
 
@@ -119,6 +133,7 @@ export class WindowHost {
     const window = new BrowserWindow(windowOptions(setup.preload, frame(setup.platform, theme), placement));
     placeExactly(window, { x: placement.left, y: placement.top, width: placement.width, height: placement.height });
     this.window = window;
+    this.known = this.placementNow();
     if (setup.platform !== 'macos') {
       window.removeMenu();
     }
@@ -178,6 +193,7 @@ export class WindowHost {
   async remember(): Promise<void> {
     const saved = this.placementNow();
     if (saved !== undefined) {
+      this.known = saved;
       await this.need().start(intent('window.remember', { ...saved }));
     }
   }
@@ -280,6 +296,10 @@ export class WindowHost {
   }
 
   private rememberSoon(): void {
+    // X11 sends a `move` when the window is created, where it already is: that is not a move to remember.
+    if (samePlacement(this.placementNow(), this.known)) {
+      return;
+    }
     if (this.rememberTimer !== undefined) {
       clearTimeout(this.rememberTimer);
     }

@@ -16,7 +16,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createServer as createTlsServer, type Server } from 'node:tls';
 import { createClient } from 'redis';
-import { expectAccessible, firstWindow } from '../app';
+import { expectAccessible, firstWindow, keepsSecrets, noKeychain } from '../app';
 
 const tlsFolder = join(import.meta.dirname, '..', '..', 'fixtures', 'tls');
 const caFile = join(tlsFolder, 'ca.pem');
@@ -245,6 +245,7 @@ async function expectNoPasswordInFiles(): Promise<void> {
 test('adds, tests, saves and connects a MongoDB replica set and a Redis server with their passwords', async () => {
   test.setTimeout(120_000);
   const first = await launch();
+  test.skip(!(await keepsSecrets(first.window)), noKeychain);
   await addMongo(first.window);
   await expect(first.window.getByRole('region', { name: 'Connection', exact: true })).toContainText('Replica');
   await start(first.window, 'connection.overview', await idOf(first.window, 'Replica'));

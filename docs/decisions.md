@@ -1556,3 +1556,9 @@ Raised while the catalog was written; each names the cards that hold the current
   could instead be part of the pager row, which is always shown, and the table would gain its height. Should the
   selection bar move to the pager row? Until the author answers, it stays where its card puts it
   (`table.selection-bar`).
+- **Q141** — On a Linux desktop that Chromium does not know, such as Hyprland, Electron picks the `basic_text`
+  backend of `safeStorage` even when a secret service such as gnome-keyring answers on D-Bus: Datardo then says
+  it has no keychain and saves no password (D26), although the system has one. Datardo could start Electron with
+  `--password-store=gnome-libsecret` on Linux when `XDG_CURRENT_DESKTOP` is not one Chromium knows and a secret
+  service answers. Should it? Until the author answers, Datardo leaves Chromium's choice as it is
+  (`connection.secrets`).

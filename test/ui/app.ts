@@ -27,6 +27,21 @@ export async function firstWindow(app: ElectronApplication): Promise<Page> {
   return window;
 }
 
+/**
+ * Why a test that finds saved secrets at the next start is skipped: Playwright starts Electron with
+ * `--password-store=basic`, which on Linux is no keychain, so Datardo keeps the secrets in memory only (D26).
+ */
+export const noKeychain = 'No keychain: on Linux Playwright starts Electron with --password-store=basic (D26).';
+
+/** Whether Datardo writes the secrets it is given, so that it has them at its next start (D26). */
+export async function keepsSecrets(window: Page): Promise<boolean> {
+  return window.evaluate(async () => {
+    const bridge = (globalThis as unknown as { datardo: { state: () => Promise<unknown> } }).datardo;
+    const state = (await bridge.state()) as { connections: { keychain: boolean } };
+    return state.connections.keychain;
+  });
+}
+
 /** Starts Datardo from `out/`, as `npm run build` wrote it. */
 export async function startApp(environment: Readonly<Record<string, string>> = {}): Promise<StartedApp> {
   const dataFolder = await mkdtemp(join(tmpdir(), 'datardo-ui-'));
@@ -62,6 +77,9 @@ const accessibilityTags = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa
  * Electron does not allow, so axe-core is evaluated in the window itself.
  */
 export async function expectAccessible(window: Page, disabledRules: readonly string[] = []): Promise<void> {
+  // A read in progress dims what it leaves shown (R10.8): the check is of the page once its reads have come, which on a
+  // loaded machine can take longer than the 200 ms before the dimming.
+  await expect(window.locator('[aria-busy="true"]')).toHaveCount(0, { timeout: 15_000 });
   const source = await readFile(createRequire(import.meta.url).resolve('axe-core/axe.min.js'), 'utf8');
   await window.evaluate(source);
   const violations = await window.evaluate(

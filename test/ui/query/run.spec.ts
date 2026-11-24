@@ -7,7 +7,7 @@ import { _electron as electron, expect, test, type ElectronApplication, type Pag
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { firstWindow, type StartedApp } from '../app';
+import { firstWindow, keepsSecrets, noKeychain, type StartedApp } from '../app';
 import {
   addMongo,
   documentsOf,
@@ -192,6 +192,7 @@ test.describe('query.restore', () => {
   test('a tab opens at the next start with the query last run, not a text typed and not run, and runs it', async () => {
     test.setTimeout(180_000);
     const first = await launch();
+    test.skip(!(await keepsSecrets(first)), noKeychain);
     await addMongo(first, mongo.uri());
     await openCollection(first, 'shop', 'orders');
     await expect(documentRows(first)).toHaveCount(3);

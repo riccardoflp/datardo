@@ -60,6 +60,10 @@ read-only connection', …) })`. `catalog.py --tests test` reports a card with n
 - UI tests run at a fixed window size (1440 × 900), with the bundled fonts, animations off, and the data folder of
   `DATARDO_DATA` in a temporary folder. Screenshots are compared only for the shell's layout, in both themes.
 - Recorded replies of servers (`test/fixtures/replies/`) say in their name the server version they came from.
+- On Linux the UI tests run on an X server of their own (`xvfb-run`) at a scale of 1: without `WAYLAND_DISPLAY` and
+  `GDK_SCALE`, which would open the window on the desktop or make it smaller than the tests expect. Playwright starts
+  Electron with `--password-store=basic`, so there Datardo has no keychain (D26): the tests that find saved secrets
+  at the next start are skipped and say so.
 
 ## From a card to a test
 

@@ -277,6 +277,9 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
 - What a read of a key tab's toolbar refuses, said under the toolbar, can be read in the light theme.
 - The window opens again with exactly the size it was left with when Windows scales the display by a fraction such as
   125%, instead of growing by a few pixels at each start.
+- On Linux the Log no longer shows two lines of `window.remember` at each start, when the window has not moved.
+- A file selected in a bucket and a row selected on the Server page show in the inspector at once, instead of only
+  once something else in the window was drawn again.
 - A menu of the tree taller than the window scrolls, instead of leaving its first entries out of reach.
 - A table of the Server page with a horizontal scroll bar and few rows shows its last row, instead of hiding it under
   the header.
