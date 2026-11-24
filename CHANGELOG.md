@@ -239,6 +239,11 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
   run after a confirmation, and never on a read-only connection.
 - The MCP server offers `sharding_status`: the shards, the balancer, the sharded collections and the recent events of
   a cluster, read through its mongos.
+- The query of a collection tab can sit at the right of the results, in a pane you resize with its splitter (drag,
+  arrow keys, `Home`, `End`, double click). Choose it with the toggle in the query bar, from Go to, or with **Place of
+  the query** in Settings; the place and the width are remembered, and a tab too narrow keeps the query above and says
+  why. In the pane the stages of a pipeline are laid one under the other, moved with **Move up** and **Move down**.
+- A cell dragged from the table can be dropped on **Sort** and **Project** too.
 
 ### Changed
 
@@ -250,6 +255,9 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
 - The MCP indicator of the top bar is a pill, and the section of a collection tab that is shown is underlined in the
   accent.
 - The title bar drawn by the system takes the color of the new canvas.
+- **Explain**, **Code**, **Update many…** and **Delete many…** moved from the table's toolbar into the query bar. The
+  buttons of the query bar, the builder, the pipeline and the table's toolbar have icons, and in a narrow tab some show
+  their icon alone.
 
 ### Fixed
 
@@ -286,5 +294,27 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
 
 ### Security
 
+- The MCP server refuses a batch of more than 20 messages, a `skip` above 1,000,000, any `system.*` collection a tool
+  is given, and pipelines that write or are not a plain read (`$currentOp`, `$changeStream`…) at any depth, with joins
+  of `system.*` collections, before anything is sent; `write_history` never shows writes to `system.*` collections.
+- With `datardo.mcp.readData` off, `explain_query` is no longer offered, `count_documents` gives only totals,
+  validators, view pipelines and partial filters are given without their values, `sharding_status` leaves out the
+  details of its events, and a server's error is reduced to its code. The MCP server's errors are written on one line
+  in the Log, cut at 300 characters.
+- The list of an import says what each connection weakens or where else it connects: invalid certificates or host
+  names allowed, a proxy, the SSH port, the Redis server of redis-oplog, no undo history, the queries folder.
+- A folder backup writes any name of a database or a collection as mongodump does (`a/b`, `con`, `..x`), and still
+  reads folders written before. A restore never offers a system database or an invalid name, never creates a backup's
+  TTL index on a collection that was already there, and names the collections a view would replace and what it leaves
+  out.
+- **Open** after an export opens only the file just written, and only a `.json`, `.jsonl` or `.csv`; any other file is
+  shown in its folder. The notification of **Save SVG…** has **Reveal**, which shows the diagram in its folder instead
+  of opening it. The window can no longer ask for any other file to be opened.
+- Copies of GridFS files go in a folder of Datardo's own with a random name, readable only by you and deleted at quit;
+  control characters in their names are replaced.
+- On macOS and Linux the files of the data folder are readable only by you (0600, folders 0700), also those an older
+  version wrote.
+- The installed Datardo cannot be started as a plain Node.js, with `NODE_OPTIONS`, with a debugger, or with an `app`
+  folder beside `app.asar`.
 - The text of a step, in a confirmation and in the Log, hides the passwords of `ACL SETUSER` and of every `CONFIG SET`
   parameter that holds one, as the Redis console does.

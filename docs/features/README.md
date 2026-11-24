@@ -69,11 +69,11 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`aggregate.show`](aggregate.md#aggregateshow--the-pipeline-editor) | The pipeline editor | View | M19, M40 (changed) | Differs |
+| [`aggregate.show`](aggregate.md#aggregateshow--the-pipeline-editor) | The pipeline editor | View | M19, M40 (changed) | Built |
 | [`aggregate.add-stage`](aggregate.md#aggregateadd-stage--add-a-stage) | Add a stage | Operation | M19 | Built |
 | [`aggregate.stage-template`](aggregate.md#aggregatestage-template--templates-of-the-common-stages) | Templates of the common stages | Derivation | M19 | Built |
 | [`aggregate.remove-stage`](aggregate.md#aggregateremove-stage--remove-a-stage) | Remove a stage | Operation | M19 | Built |
-| [`aggregate.move-stage`](aggregate.md#aggregatemove-stage--move-a-stage) | Move a stage | Operation | M19, M40 (changed) | Differs |
+| [`aggregate.move-stage`](aggregate.md#aggregatemove-stage--move-a-stage) | Move a stage | Operation | M19, M40 (changed) | Built |
 | [`aggregate.toggle-stage`](aggregate.md#aggregatetoggle-stage--disable-or-enable-a-stage) | Disable or enable a stage | Operation | M19 | Built |
 | [`aggregate.clear`](aggregate.md#aggregateclear--remove-all-stages) | Remove all stages | Operation | M19 | Built |
 | [`aggregate.show-stage`](aggregate.md#aggregateshow-stage--show-the-output-after-a-stage) | Show the output after a stage | Operation | M19 | Built |
@@ -94,11 +94,11 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`backup.create`](backup.md#backupcreate--back-up-a-connection-a-database-or-a-collection) | Back up a connection, a database or a collection | Operation | M25, M37 (changed) | Differs |
-| [`backup.restore`](backup.md#backuprestore--restore-from-a-backup) | Restore from a backup | Operation | M25, M37 (changed) | Differs |
+| [`backup.create`](backup.md#backupcreate--back-up-a-connection-a-database-or-a-collection) | Back up a connection, a database or a collection | Operation | M25, M37 (changed) | Built |
+| [`backup.restore`](backup.md#backuprestore--restore-from-a-backup) | Restore from a backup | Operation | M25, M37 (changed) | Built |
 | [`backup.archive-write`](backup.md#backuparchive-write--writing-a-mongodump-archive) | Writing a mongodump archive | Derivation | M25 | Built |
 | [`backup.archive-read`](backup.md#backuparchive-read--reading-a-mongodump-archive) | Reading a mongodump archive | Derivation | M25 | Built |
-| [`backup.folder-layout`](backup.md#backupfolder-layout--backup-folders-and-their-files) | Backup folders and their files | Derivation | M25, M37 (changed) | Differs |
+| [`backup.folder-layout`](backup.md#backupfolder-layout--backup-folders-and-their-files) | Backup folders and their files | Derivation | M25, M37 (changed) | Built |
 
 ## Charts
 
@@ -230,8 +230,8 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [`document.delete`](document.md#documentdelete--delete-a-document) | Delete a document | Operation | M12 | Built |
 | [`document.delete-selected`](document.md#documentdelete-selected--delete-the-selected-rows) | Delete the selected rows | Operation | M12 | Built |
 | [`document.update-selected`](document.md#documentupdate-selected--update-the-selected-rows) | Update the selected rows | Operation | M12 | Built |
-| [`document.update-many`](document.md#documentupdate-many--update-many) | Update many | Operation | M12, M40 (changed) | Differs |
-| [`document.delete-many`](document.md#documentdelete-many--delete-many) | Delete many | Operation | M12, M40 (changed) | Differs |
+| [`document.update-many`](document.md#documentupdate-many--update-many) | Update many | Operation | M12, M40 (changed) | Built |
+| [`document.delete-many`](document.md#documentdelete-many--delete-many) | Delete many | Operation | M12, M40 (changed) | Built |
 | [`document.restore-version`](document.md#documentrestore-version--restore-a-version-from-the-document-history) | Restore a version from the document history | Operation | M12 | Built |
 
 ## Explain
@@ -276,7 +276,7 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [`gridfs.upload`](gridfs.md#gridfsupload--upload-files-to-a-bucket) | Upload files to a bucket | Operation | M33 | Built |
 | [`gridfs.create-bucket`](gridfs.md#gridfscreate-bucket--create-a-bucket-by-uploading-to-it) | Create a bucket by uploading to it | Operation | M33 | Built |
 | [`gridfs.download`](gridfs.md#gridfsdownload--download-a-file) | Download a file | Operation | M33 | Built |
-| [`gridfs.open`](gridfs.md#gridfsopen--open-a-file-with-the-systems-application) | Open a file with the system's application | Operation | M33, M37 (changed) | Differs |
+| [`gridfs.open`](gridfs.md#gridfsopen--open-a-file-with-the-systems-application) | Open a file with the system's application | Operation | M33, M37 (changed) | Built |
 | [`gridfs.rename`](gridfs.md#gridfsrename--rename-a-file) | Rename a file | Operation | M33 | Built |
 | [`gridfs.edit-metadata`](gridfs.md#gridfsedit-metadata--edit-the-files-document-of-a-file) | Edit the files document of a file | Operation | M33 | Built |
 | [`gridfs.delete`](gridfs.md#gridfsdelete--delete-a-file) | Delete a file | Operation | M33 | Built |
@@ -387,25 +387,25 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`mcp.server`](mcp.md#mcpserver--run-the-mcp-server-on-127001) | Run the MCP server on 127.0.0.1 | Operation | M29, M37 (changed) | Differs |
+| [`mcp.server`](mcp.md#mcpserver--run-the-mcp-server-on-127001) | Run the MCP server on 127.0.0.1 | Operation | M29, M37 (changed) | Built |
 | [`mcp.status`](mcp.md#mcpstatus--the-state-of-the-mcp-server-in-the-top-bar) | The state of the MCP server in the top bar | View | M29 | Built |
 | [`mcp.access-token`](mcp.md#mcpaccess-token--generate-a-new-access-token) | Generate a new access token | Operation | M29 | Built |
 | [`mcp.setup`](mcp.md#mcpsetup--set-up-the-mcp-server-for-ai-assistants) | Set up the MCP server for AI assistants… | Operation | M29 | Built |
 | [`mcp.change-port`](mcp.md#mcpchange-port--change-mcp-server-port) | Change MCP server port… | Operation | M29 | Built |
-| [`mcp.read-data`](mcp.md#mcpread-data--the-tools-offered-without-reading-data) | The tools offered without reading data | Derivation | M29, M37 (changed) | Differs |
-| [`mcp.protocol`](mcp.md#mcpprotocol--answer-a-message-of-the-model-context-protocol) | Answer a message of the Model Context Protocol | Derivation | M29, M37 (changed) | Differs |
-| [`mcp.arguments`](mcp.md#mcparguments--read-the-arguments-of-a-tool) | Read the arguments of a tool | Derivation | M29, M37 (changed) | Differs |
-| [`mcp.output-limits`](mcp.md#mcpoutput-limits--bound-what-a-tool-returns-and-how-long-it-runs) | Bound what a tool returns and how long it runs | Derivation | M29, M37 (changed) | Differs |
-| [`mcp.refuse-write-stages`](mcp.md#mcprefuse-write-stages--refuse-pipelines-that-write-are-not-a-plain-read-or-read-a-system-collection) | Refuse pipelines that write, are not a plain read, or read a system collection | Derivation | M29, M37 (changed) | Differs |
-| [`mcp.log`](mcp.md#mcplog--the-mcp-server-in-the-log) | The MCP server in the Log | Derivation | M29, M37 (changed) | Differs |
+| [`mcp.read-data`](mcp.md#mcpread-data--the-tools-offered-without-reading-data) | The tools offered without reading data | Derivation | M29, M37 (changed) | Built |
+| [`mcp.protocol`](mcp.md#mcpprotocol--answer-a-message-of-the-model-context-protocol) | Answer a message of the Model Context Protocol | Derivation | M29, M37 (changed) | Built |
+| [`mcp.arguments`](mcp.md#mcparguments--read-the-arguments-of-a-tool) | Read the arguments of a tool | Derivation | M29, M37 (changed) | Built |
+| [`mcp.output-limits`](mcp.md#mcpoutput-limits--bound-what-a-tool-returns-and-how-long-it-runs) | Bound what a tool returns and how long it runs | Derivation | M29, M37 (changed) | Built |
+| [`mcp.refuse-write-stages`](mcp.md#mcprefuse-write-stages--refuse-pipelines-that-write-are-not-a-plain-read-or-read-a-system-collection) | Refuse pipelines that write, are not a plain read, or read a system collection | Derivation | M29, M37 (changed) | Built |
+| [`mcp.log`](mcp.md#mcplog--the-mcp-server-in-the-log) | The MCP server in the Log | Derivation | M29, M37 (changed) | Built |
 | [`mcp.data-tools`](mcp.md#mcpdata-tools--explore-the-connections-and-read-documents) | Explore the connections and read documents | Read | M29, M37 (changed), M39 (changed) | Differs |
-| [`mcp.debugging-tools`](mcp.md#mcpdebugging-tools--follow-what-an-application-writes) | Follow what an application writes | Read | M29, M37 (changed) | Differs |
-| [`mcp.performance-tools`](mcp.md#mcpperformance-tools--find-what-makes-a-database-slow) | Find what makes a database slow | Read | M29, M37 (changed) | Differs |
-| [`mcp.deployment-tools`](mcp.md#mcpdeployment-tools--read-the-state-of-the-deployment) | Read the state of the deployment | Read | M29, M37 (changed) | Differs |
-| [`mcp.data-model-tools`](mcp.md#mcpdata-model-tools--answer-quick-questions-about-the-data-model) | Answer quick questions about the data model | Read | M29, M37 (changed) | Differs |
+| [`mcp.debugging-tools`](mcp.md#mcpdebugging-tools--follow-what-an-application-writes) | Follow what an application writes | Read | M29, M37 (changed) | Built |
+| [`mcp.performance-tools`](mcp.md#mcpperformance-tools--find-what-makes-a-database-slow) | Find what makes a database slow | Read | M29, M37 (changed) | Built |
+| [`mcp.deployment-tools`](mcp.md#mcpdeployment-tools--read-the-state-of-the-deployment) | Read the state of the deployment | Read | M29, M37 (changed) | Built |
+| [`mcp.data-model-tools`](mcp.md#mcpdata-model-tools--answer-quick-questions-about-the-data-model) | Answer quick questions about the data model | Read | M29, M37 (changed) | Built |
 | [`mcp.redis-key-tools`](mcp.md#mcpredis-key-tools--read-the-keys-of-a-redis-server) | Read the keys of a Redis server | Read | M29 | Built |
 | [`mcp.redis-server-tools`](mcp.md#mcpredis-server-tools--read-the-state-of-a-redis-server) | Read the state of a Redis server | Read | M29 | Built |
-| [`mcp.tab-tools`](mcp.md#mcptab-tools--open-datardos-tabs-for-the-user) | Open Datardo's tabs for the user | Read | M29, M37 (changed) | Differs |
+| [`mcp.tab-tools`](mcp.md#mcptab-tools--open-datardos-tabs-for-the-user) | Open Datardo's tabs for the user | Read | M29, M37 (changed) | Built |
 
 ## Monitor
 
@@ -541,8 +541,8 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`query.bar`](query.md#querybar--the-query-bar) | The query bar | View | M9, M40 (changed) | Differs |
-| [`query.position`](query.md#queryposition--put-the-query-above-or-beside-the-results) | Put the query above or beside the results | Operation | M40 | Specified |
+| [`query.bar`](query.md#querybar--the-query-bar) | The query bar | View | M9, M40 (changed) | Built |
+| [`query.position`](query.md#queryposition--put-the-query-above-or-beside-the-results) | Put the query above or beside the results | Operation | M40 | Built |
 | [`query.mode`](query.md#querymode--switch-between-find-and-aggregate) | Switch between Find and Aggregate | Derivation | M9 | Built |
 | [`query.run`](query.md#queryrun--run-the-query) | Run the query | Read | M9 | Built |
 | [`query.count`](query.md#querycount--count-the-matching-documents) | Count the matching documents | Read | M9 | Built |
@@ -551,16 +551,16 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [`query.parse`](query.md#queryparse--read-mongosh-syntax-into-values) | Read mongosh syntax into values | Derivation | M9 | Built |
 | [`query.format`](query.md#queryformat--write-values-as-mongosh-syntax) | Write values as mongosh syntax | Derivation | M9 | Built |
 | [`query.highlight`](query.md#queryhighlight--the-syntax-colors-of-mongosh-text) | The syntax colors of mongosh text | Derivation | M9 | Built |
-| [`query.builder`](query.md#querybuilder--the-query-builder) | The query builder | View | M9, M40 (changed) | Differs |
+| [`query.builder`](query.md#querybuilder--the-query-builder) | The query builder | View | M9, M40 (changed) | Built |
 | [`query.builder-filter`](query.md#querybuilder-filter--the-filter-of-the-builders-rows) | The filter of the builder's rows | Derivation | M9 | Built |
 | [`query.builder-rows`](query.md#querybuilder-rows--the-builders-rows-of-a-filter) | The builder's rows of a filter | Derivation | M9 | Built |
 | [`query.autocomplete`](query.md#queryautocomplete--suggestions-while-typing) | Suggestions while typing | View | M9 | Built |
 | [`query.suggestions`](query.md#querysuggestions--what-is-suggested-where-the-cursor-is) | What is suggested where the cursor is | Derivation | M9 | Built |
 | [`query.field-hints`](query.md#queryfield-hints--the-fields-and-frequent-values-of-a-collection) | The fields and frequent values of a collection | Read | M9 | Built |
-| [`query.drag`](query.md#querydrag--drag-a-field-or-a-value-into-the-bar) | Drag a field or a value into the bar | View | M9, M40 (changed) | Differs |
+| [`query.drag`](query.md#querydrag--drag-a-field-or-a-value-into-the-bar) | Drag a field or a value into the bar | View | M9, M40 (changed) | Built |
 | [`query.add-condition`](query.md#queryadd-condition--add-a-condition-to-the-filter) | Add a condition to the filter | Derivation | M9 | Built |
-| [`query.add-sort`](query.md#queryadd-sort--add-a-field-to-the-sort) | Add a field to the sort | Derivation | M9, M40 (changed) | Differs |
-| [`query.add-projection`](query.md#queryadd-projection--add-a-field-to-the-projection) | Add a field to the projection | Derivation | M9, M40 (changed) | Differs |
+| [`query.add-sort`](query.md#queryadd-sort--add-a-field-to-the-sort) | Add a field to the sort | Derivation | M9, M40 (changed) | Built |
+| [`query.add-projection`](query.md#queryadd-projection--add-a-field-to-the-projection) | Add a field to the projection | Derivation | M9, M40 (changed) | Built |
 
 ## References
 
@@ -574,7 +574,7 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [`relation.diagram`](relation.md#relationdiagram--the-relationship-diagram-page) | The Relationship diagram page | View | M34 | Built |
 | [`relation.layout`](relation.md#relationlayout--where-the-boxes-of-the-diagram-go) | Where the boxes of the diagram go | Derivation | M34 | Built |
 | [`relation.export-mermaid`](relation.md#relationexport-mermaid--copy-the-diagram-as-mermaid) | Copy the diagram as Mermaid | Operation | M34 | Built |
-| [`relation.export-svg`](relation.md#relationexport-svg--save-the-diagram-as-an-svg-image) | Save the diagram as an SVG image | Operation | M34, M37 (changed) | Differs |
+| [`relation.export-svg`](relation.md#relationexport-svg--save-the-diagram-as-an-svg-image) | Save the diagram as an SVG image | Operation | M34, M37 (changed) | Built |
 | [`relation.follow`](relation.md#relationfollow--go-from-here-the-references-of-a-document) | Go from here: the references of a document | View | M34 | Built |
 | [`relation.targets`](relation.md#relationtargets--where-a-reference-leads) | Where a reference leads | Derivation | M34 | Built |
 | [`relation.referrers`](relation.md#relationreferrers--which-documents-refer-to-a-document) | Which documents refer to a document | Derivation | M34 | Built |
@@ -769,7 +769,7 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`transfer.export`](transfer.md#transferexport--export-documents-to-a-file) | Export documents to a file | Operation | M25, M37 (changed) | Differs |
+| [`transfer.export`](transfer.md#transferexport--export-documents-to-a-file) | Export documents to a file | Operation | M25, M37 (changed) | Built |
 | [`transfer.csv-write`](transfer.md#transfercsv-write--documents-as-csv) | Documents as CSV | Derivation | M25 | Built |
 | [`transfer.import`](transfer.md#transferimport--import-documents-from-a-file) | Import documents from a file | Operation | M25 | Built |
 | [`transfer.import-files`](transfer.md#transferimport-files--what-an-import-file-holds) | What an import file holds | Derivation | M25 | Built |

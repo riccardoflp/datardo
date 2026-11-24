@@ -2619,7 +2619,7 @@ restore never revives a system database or a TTL index on existing documents; th
 opened; the data folder and the temporary copies are the user's alone; the packaged application cannot be started as
 plain Node.js.
 **Depends on**: M36.
-**Status**: planned
+**Status**: done
 
 ### Features
 
@@ -2682,21 +2682,21 @@ passing.
 
 ### Exit criteria
 
-- [ ] A JSON-RPC batch of 21 messages gets 400 and none of them runs; `find_documents` with a `skip` of 1,000,001 is
+- [x] A JSON-RPC batch of 21 messages gets 400 and none of them runs; `find_documents` with a `skip` of 1,000,001 is
       refused; `aggregate` with `$out` inside a `$facet` and with `$lookup` from `system.users` are refused, without a
       command reaching the server.
-- [ ] With `datardo.mcp.readData` off, no tool's answer holds a value of a document: a test runs every tool on a
+- [x] With `datardo.mcp.readData` off, no tool's answer holds a value of a document: a test runs every tool on a
       collection whose every value is a marker string and finds the marker nowhere.
-- [ ] A folder backup of the collections `a/b`, `con` and `..x` is restored by `mongorestore --dir` with their names,
+- [x] A folder backup of the collections `a/b`, `con` and `..x` is restored by `mongorestore --dir` with their names,
       and a folder written before M37 is still restored by Datardo.
-- [ ] On Linux, after a start, every file of the data folder has the mode 0600 and every folder 0700, also those made
+- [x] On Linux, after a start, every file of the data folder has the mode 0600 and every folder 0700, also those made
       0644 by hand before; the packaged application started with `ELECTRON_RUN_AS_NODE=1` opens its window instead of
       running as Node.js.
-- [ ] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
+- [x] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
       `npm run test:integration`, `npm run test:ui`; `catalog.py --tests` reports none missing for these cards.
-- [ ] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
+- [x] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
       the keyboard alone (QA15, QA16).
-- [ ] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
+- [x] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
       and this milestone's **Status** is *done*.
 
 ### Not in this milestone
@@ -2890,7 +2890,7 @@ lines must keep passing.
 instead of above it, one choice for every tab; the query bar is reordered with icons, and a cell dragged from the
 table can go to Sort and Project.
 **Depends on**: M39.
-**Status**: planned
+**Status**: done
 
 ### Features
 
@@ -2928,13 +2928,13 @@ lines must keep passing.
 
 ### Exit criteria
 
-- [ ] With the explorer hidden in a window 1,280 pixels wide, the query pane shows at 380 pixels; with it shown, the
+- [x] With the explorer hidden in a window 1,280 pixels wide, the query pane shows at 380 pixels; with it shown, the
       query stays above and its toggle says why: `test/ui/collection/query-pane.spec.ts`.
-- [ ] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
+- [x] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
       `npm run test:integration`, `npm run test:ui`; `catalog.py --tests` reports none missing for these cards.
-- [ ] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
+- [x] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
       the keyboard alone (QA15, QA16).
-- [ ] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
+- [x] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
       and this milestone's **Status** is *done*.
 
 ### Not in this milestone
