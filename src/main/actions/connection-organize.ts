@@ -8,7 +8,8 @@ import { readFile, stat } from 'node:fs/promises';
 import { basename, join } from 'node:path';
 import type { AreaActions } from '.';
 import type { AppAction } from '../../runner/ports';
-import { connectionColors, type ConnectionColor, type SavedConnection } from '../../shared/connection';
+import { colorOfText } from '../../shared/color';
+import type { SavedConnection } from '../../shared/connection';
 import type { Json } from '../../shared/engine-request';
 import { connectionId, type ConnectionId } from '../../shared/ids';
 import { connectionsFromText, importFilters, largestFile } from '../../features/connection/read-file';
@@ -78,11 +79,10 @@ const duplicate: AppAction = (args) => {
   return Promise.resolve();
 };
 
-/** `connection.set-color` `{ connection, color }`: `null` takes the color away. */
+/** `connection.set-color` `{ connection, color }`: a preset or `#rrggbb`; `null` takes the color away. */
 const setColor: AppAction = (args) => {
   const { color: _old, ...connection } = needConnection(idField(args, 'connection'));
-  const given = jsonFields(args)['color'];
-  const color = connectionColors.find((each): each is ConnectionColor => each === given);
+  const color = colorOfText(jsonFields(args)['color']);
   writeConnection(color === undefined ? connection : { ...connection, color });
   return Promise.resolve();
 };

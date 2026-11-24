@@ -24,7 +24,10 @@ body {
   outline-offset: var(--focus-width);
 }
 
-/* The color of a connection (connection.set-color): drawn with the token of its name. */
+/*
+ * A color of a connection, a database or a collection (connection.color-presets): a preset is drawn with the token of
+ * its name; a custom color (data-color='custom') is given as --connection-color by the element itself.
+ */
 [data-color='red'] {
   --connection-color: var(--color-connection-red);
 }
@@ -47,4 +50,24 @@ body {
 
 [data-color='purple'] {
   --connection-color: var(--color-connection-purple);
+}
+
+[data-color='pink'] {
+  --connection-color: var(--color-connection-pink);
+}
+
+[data-color='teal'] {
+  --connection-color: var(--color-connection-teal);
+}
+
+[data-color='indigo'] {
+  --connection-color: var(--color-connection-indigo);
+}
+
+[data-color='brown'] {
+  --connection-color: var(--color-connection-brown);
+}
+
+[data-color='gray'] {
+  --connection-color: var(--color-connection-gray);
 }

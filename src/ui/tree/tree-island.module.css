@@ -201,3 +201,8 @@
   margin: var(--space-1) 0;
   background: var(--color-border);
 }
+
+/* The color of a node's icon (tree.color-of): its collection's or its database's own; the name keeps its color. */
+.icon[data-color] {
+  color: var(--connection-color);
+}

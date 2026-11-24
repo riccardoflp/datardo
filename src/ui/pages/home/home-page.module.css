@@ -267,30 +267,6 @@
   outline: var(--focus-width) solid var(--color-focus);
 }
 
-[data-color='red'] {
-  --connection-color: var(--color-connection-red, var(--color-danger));
-}
-
-[data-color='orange'] {
-  --connection-color: var(--color-connection-orange, var(--color-warning));
-}
-
-[data-color='yellow'] {
-  --connection-color: var(--color-connection-yellow, var(--color-warning));
-}
-
-[data-color='green'] {
-  --connection-color: var(--color-connection-green, var(--color-success));
-}
-
-[data-color='blue'] {
-  --connection-color: var(--color-connection-blue, var(--color-accent));
-}
-
-[data-color='purple'] {
-  --connection-color: var(--color-connection-purple, var(--color-accent));
-}
-
 .band {
   flex: none;
   width: var(--space-1);

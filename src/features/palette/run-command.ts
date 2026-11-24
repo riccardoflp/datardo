@@ -35,6 +35,7 @@ import { isOffered as isAdvisorOffered } from '../advisor/commands';
 import { isOffered as isManageOffered } from '../manage/commands';
 import { isGridFsCommandOffered } from '../gridfs/commands';
 import { isOffered as isUserOffered } from '../user/commands';
+import { isOffered as isTreeOffered } from '../tree/commands';
 import { canGo } from '../nav/back';
 import { isOffered as isCopyPathOffered } from '../nav/copy-path';
 import { pinOfTab } from '../nav/pin';
@@ -137,6 +138,9 @@ function isOfferedByItsArea(state: AppState, id: string): boolean | undefined {
   }
   if (id.startsWith('user.')) {
     return isUserOffered(state, id);
+  }
+  if (id.startsWith('tree.set-')) {
+    return isTreeOffered(state, id);
   }
   if (id.startsWith('index.')) {
     return isIndexOffered(state, id);

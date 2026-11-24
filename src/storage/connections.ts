@@ -1,9 +1,11 @@
 /**
  * `connections.json`: the saved connections, with nothing secret (data.md; connection.secrets). A field Datardo does
- * not know is kept and written back, on each connection and at the top of the file.
+ * not know is kept and written back, on each connection and at the top of the file. The color is a preset's name or a
+ * custom `#rrggbb`, and `databaseColors` and `collectionColors` keep only their valid entries (`tree.color-of`): all
+ * three are optional fields of version 1, absent when empty, so a file of an earlier Datardo reads as nothing colored.
  */
-import type { ConnectionColor, SavedConnection, SshSettings, TlsSettings } from '../shared/connection';
-import { connectionColors } from '../shared/connection';
+import { colorMapOf, colorOfText } from '../shared/color';
+import type { SavedConnection, SshSettings, TlsSettings } from '../shared/connection';
 import type { Json } from '../shared/engine-request';
 import type { ConnectionId } from '../shared/ids';
 import type { JsonObject, StoredFile } from './store';
@@ -27,6 +29,8 @@ const knownFields = new Set([
   'hosts',
   'folder',
   'color',
+  'databaseColors',
+  'collectionColors',
   'readOnly',
   'keepsUndo',
   'tls',
@@ -100,7 +104,6 @@ export function connectionOf(object: JsonObject): SavedConnection {
   if (engine !== 'mongodb' && engine !== 'redis') {
     throw new Error(`A connection has the engine ${engine}.`);
   }
-  const color = text(object, 'color');
   return {
     id: required(object, 'id') as ConnectionId,
     name: required(object, 'name'),
@@ -109,10 +112,9 @@ export function connectionOf(object: JsonObject): SavedConnection {
     readOnly: flag(object, 'readOnly') ?? false,
     keepsUndo: flag(object, 'keepsUndo') ?? true,
     ...optional('folder', text(object, 'folder')),
-    ...optional(
-      'color',
-      connectionColors.find((each): each is ConnectionColor => each === color),
-    ),
+    ...optional('color', colorOfText(object['color'])),
+    ...optional('databaseColors', colorMapOf(object['databaseColors'], 'databases')),
+    ...optional('collectionColors', colorMapOf(object['collectionColors'], 'collections')),
     ...optional('tls', tlsOf(object['tls'])),
     ...optional('ssh', sshOf(object['ssh'])),
     ...optional('queriesFolder', text(object, 'queriesFolder')),

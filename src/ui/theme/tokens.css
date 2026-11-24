@@ -81,6 +81,11 @@
   --color-connection-green: #5bd38c;
   --color-connection-blue: #7db8ff;
   --color-connection-purple: #c4a7ff;
+  --color-connection-pink: #f58cc3;
+  --color-connection-teal: #4fd1c5;
+  --color-connection-indigo: #9fa8ff;
+  --color-connection-brown: #d4a373;
+  --color-connection-gray: #a9b0bb;
 
   /* The syntax colors of mongosh text (query.highlight), one for each role, the same in the editors and the cells: at
    * least 4.5:1 against the canvas, the island, the raised surfaces, a hovered and a selected line. */
@@ -136,6 +141,11 @@
     --color-connection-green: #17703e;
     --color-connection-blue: #1d55c2;
     --color-connection-purple: #7136c8;
+    --color-connection-pink: #a8245c;
+    --color-connection-teal: #00706a;
+    --color-connection-indigo: #4041b5;
+    --color-connection-brown: #7a4a24;
+    --color-connection-gray: #5b6270;
     --color-syntax-key: #0451a5;
     --color-syntax-op: #a14806;
     --color-syntax-string: #17703e;

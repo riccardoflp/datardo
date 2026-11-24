@@ -277,7 +277,6 @@ The colors of the window: dark, light, or as the system.
   with a value for the dark and the light themes, come from Mongoster 0.9.0 (`src/shared/colors.ts ›
   PRESET_DEFAULTS`); Datardo's tokens are its own. Mongoster 0.9.0's seventeen color themes are not ported: Datardo
   keeps dark, light and following the system.
-- **Differs**: (M38) the theme has the tokens of six colors of connections, not eleven.
 
 Acceptance:
 
@@ -292,7 +291,7 @@ Acceptance:
   dark frame.
 - [ ] A system file dialog opened from Datardo with `dark` chosen is dark on a light system.
 - [ ] Switching from dark to light turns a teal connection's marks from `#4fd1c5` to `#00706a` at once, and leaves a
-  connection colored `#1e90ff` in `#1e90ff`. (differs)
+  connection colored `#1e90ff` in `#1e90ff`.
 
 ### `window.zoom` — Zoom in, zoom out, reset the zoom
 

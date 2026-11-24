@@ -50,28 +50,9 @@
   margin-right: var(--space-2);
 }
 
-.group[data-color='red'] {
-  --group-color: var(--color-connection-red, var(--color-danger));
-}
-
-.group[data-color='orange'] {
-  --group-color: var(--color-connection-orange, var(--color-warning));
-}
-
-.group[data-color='yellow'] {
-  --group-color: var(--color-connection-yellow, var(--color-warning));
-}
-
-.group[data-color='green'] {
-  --group-color: var(--color-connection-green, var(--color-success));
-}
-
-.group[data-color='blue'] {
-  --group-color: var(--color-connection-blue, var(--color-accent));
-}
-
-.group[data-color='purple'] {
-  --group-color: var(--color-connection-purple, var(--color-accent));
+/* The connection's color (theme/base.css), a preset's token or a custom color. */
+.group[data-color] {
+  --group-color: var(--connection-color);
 }
 
 .tabs {
@@ -170,6 +151,11 @@
 
 .icon {
   flex: none;
+}
+
+/* The color of the tab (tab.groups): its collection's or its database's own. */
+.icon[data-color] {
+  color: var(--connection-color);
 }
 
 /* The close button of a tab: its icon and the dot of unsaved changes share one cell, one of them visible. */

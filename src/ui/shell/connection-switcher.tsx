@@ -11,6 +11,7 @@ import { ConnectionContextMenu } from '../connection/connection-menu';
 import { FolderMenuButton } from '../connection/folder-menu';
 import { startFeature } from './intent';
 import styles from './explorer.module.css';
+import { colorAttributes } from '../components/color';
 
 /** The narrowest the switcher is, in px (`nav.switch-connection`, Datardo's choice). */
 const switcherMinimum = 320;
@@ -64,7 +65,7 @@ function Row(props: {
           props.choose(row);
         }}
       >
-        <span className={styles['color']} data-color={row.connection.color} aria-hidden="true" />
+        <span className={styles['color']} {...colorAttributes(row.connection.color)} aria-hidden="true" />
         <span className={styles['dot']} data-dot={row.dot} aria-hidden="true" />
         <span className={styles['name']}>{row.connection.name}</span>
         <span className={styles['muted']}>{row.engine}</span>

@@ -133,7 +133,7 @@ export async function compassConnection(
   const { secrets } = found;
   const { connectionString, tls } = tlsFromUri(mergedSecrets(written, secrets));
   const favorite = objectOf(fields['favorite']);
-  const color = colorFrom(favorite?.['color']);
+  const color = colorFrom(favorite?.['color'], 'nearest-preset');
   const { ssh, notes } = sshAndNotes(options, connectionString, secrets);
   const connection = {
     name: textOf(favorite?.['name'])?.trim() || hostOf('mongodb', connectionString),

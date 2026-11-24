@@ -125,9 +125,33 @@ export const text = {
     importKeys: 'Import keys…',
     exportKeys: 'Export keys…',
     deleteByPattern: 'Delete keys by pattern…',
+    setColor: 'Set color…',
   },
   commands: {
     refresh: 'Refresh the tree',
     filter: 'Filter the tree',
+    setCollectionColor: 'Set collection color…',
+    setDatabaseColor: 'Set database color…',
+  },
+  /** The lists of `tree.set-collection-color` and `tree.set-database-color`, and their steps. */
+  colors: {
+    title: (name: string) => `Color of ${name}`,
+    collectionPlaceholder: 'Shown on its icon in the tree and on its tabs',
+    collectionInsteadOf: (database: string) =>
+      `Shown on its icon in the tree and on its tabs, instead of the color of the database ${database}`,
+    databasePlaceholder:
+      'Shown on its icon in the tree, and on its collections without a color of their own and their tabs',
+    redisDatabasePlaceholder: 'Shown on its icon in the tree, and on its namespaces and its tabs',
+    bucket: (database: string, bucket: string) => `the GridFS bucket ${database}.${bucket}`,
+    database: (database: string) => `the database ${database}`,
+    set: (what: string, connection: string, color: string) => `set the color of ${what} on ${connection} to ${color}`,
+    remove: (what: string, connection: string) => `remove the color of ${what} on ${connection}`,
+    cannotUndo: 'Choose the previous color again.',
+    /** What a drop forgets of what Datardo keeps: `forget the color of shop.orders`. */
+    forget: (kept: readonly string[], what: string) =>
+      `forget ${kept.length < 2 ? kept.join('') : `${kept.slice(0, -1).join(', ')} and ${kept.at(-1) ?? ''}`} of ${what}`,
+    theColor: 'the color',
+    theColors: 'the colors',
+    databaseAndCollections: (database: string) => `${database} and its collections`,
   },
 } as const;

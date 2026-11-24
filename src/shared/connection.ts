@@ -3,14 +3,11 @@
  * the connection form sends, and what the server says it is. Nothing here holds a secret except what the form sends
  * to the main process (a typed password goes from the window to the main process, never back: R14.3).
  */
+import type { ColorMap, ConnectionColor } from './color';
 import type { EngineName, Json } from './engine-request';
 import type { ConnectionId } from './ids';
 
-/** The six colors of a connection (glossary, "color"). */
-export type ConnectionColor = 'red' | 'orange' | 'yellow' | 'green' | 'blue' | 'purple';
-
-/** The colors in the order the form lists them after **None**. */
-export const connectionColors: readonly ConnectionColor[] = ['red', 'orange', 'yellow', 'green', 'blue', 'purple'];
+export type { ConnectionColor } from './color';
 
 /** The TLS settings of a connection that are not secret: the files and the two exceptions (connection.secrets). */
 export type TlsSettings = {
@@ -41,6 +38,10 @@ export type SavedConnection = {
   readonly hosts: string;
   readonly folder?: string;
   readonly color?: ConnectionColor;
+  /** The own colors of its databases, a MongoDB database by its name, a Redis one by its number (`tree.color-of`). */
+  readonly databaseColors?: ColorMap;
+  /** The own colors of its collections, views and buckets, by `<database>.<collection>`; MongoDB only. */
+  readonly collectionColors?: ColorMap;
   readonly readOnly: boolean;
   /** Whether the undo history is kept for writes through it (`undo.record`). */
   readonly keepsUndo: boolean;

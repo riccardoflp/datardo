@@ -4,6 +4,7 @@
  */
 import type { StripTab as StripTabView } from '../../../features/tab/strip';
 import { text } from '../../../features/tab/text';
+import { colorAttributes } from '../../components/color';
 import styles from './tab-strip.module.css';
 
 /** What a tab does when it is used. */
@@ -24,7 +25,11 @@ export function TabContent({
 }): React.JSX.Element {
   return (
     <>
-      <span className={`codicon codicon-${tab.icon} ${styles['icon'] ?? ''}`} aria-hidden="true" />
+      <span
+        className={`codicon codicon-${tab.icon} ${styles['icon'] ?? ''}`}
+        {...colorAttributes(tab.color)}
+        aria-hidden="true"
+      />
       <span className={styles['tab-title']}>{tab.title}</span>
       {tab.closable ? (
         <span

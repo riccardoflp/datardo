@@ -48,6 +48,20 @@ function withValue(secrets: Secrets, name: string, value: string | undefined): S
   return value === undefined || value === '' ? secrets : { ...secrets, [name]: value };
 }
 
+/** The maps of colors of an entry, as `tree.color-of` keeps them: `collectionColors` on a MongoDB entry only. */
+function colorMapsOf(connection: FileConnection): Entry {
+  const { databaseColors, collectionColors } = connection;
+  return {
+    ...(databaseColors === undefined ? {} : { databaseColors }),
+    ...(collectionColors === undefined || connection.engine !== 'mongodb' ? {} : { collectionColors }),
+  };
+}
+
+/** Whether a connection has colors of its databases or collections. */
+function hasColorMaps(connection: FileConnection): boolean {
+  return connection.databaseColors !== undefined || connection.collectionColors !== undefined;
+}
+
 function datardoEntry(connection: FileConnection, secrets: ExportSecrets): { entry: Entry; secrets: Secrets } {
   const removed = withoutSecrets(connection.connectionString, 'removed');
   const { certificateKeyFilePassword: keyPassword, ...tls } = connection.tls ?? {};
@@ -62,6 +76,7 @@ function datardoEntry(connection: FileConnection, secrets: ExportSecrets): { ent
     uri: include ? connection.connectionString : removed.connectionString,
     ...(connection.folder === undefined ? {} : { folder: connection.folder }),
     ...(connection.color === undefined ? {} : { color: connection.color }),
+    ...colorMapsOf(connection),
     ...(connection.readOnly === true ? { readOnly: true } : {}),
     ...(connection.noHistory === true ? { noHistory: true } : {}),
     ...(connection.queriesFolder === undefined ? {} : { queriesFolder: connection.queriesFolder }),
@@ -151,6 +166,7 @@ export function exportNotes(connections: readonly FileConnection[], format: Expo
       ...(mongo.some((each) => each.folder !== undefined || each.readOnly === true || each.oplog !== undefined)
         ? [fileText.compassLeftOut]
         : []),
+      ...(mongo.some(hasColorMaps) ? [fileText.colorsLeftOut] : []),
       ...(redis > 0 ? [fileText.redisLeftOut(redis)] : []),
     ];
   }
@@ -162,7 +178,11 @@ export function exportNotes(connections: readonly FileConnection[], format: Expo
     ...(ssh > 0 ? [fileText.sshLeftOut(ssh)] : []),
     ...(connections.some(
       (each) =>
-        each.folder !== undefined || each.color !== undefined || each.readOnly === true || each.oplog !== undefined,
+        each.folder !== undefined ||
+        each.color !== undefined ||
+        hasColorMaps(each) ||
+        each.readOnly === true ||
+        each.oplog !== undefined,
     )
       ? [fileText.listLeftOut]
       : []),

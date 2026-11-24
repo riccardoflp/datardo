@@ -128,6 +128,97 @@ test('colors, folders, a copy and the connection string from the menus of Home',
   expect((await events(window)).includes(password)).toBe(false);
 });
 
+test('connection.custom-color: Choose a color gives a custom color, a swatch a preset, Cancel and Esc nothing', async () => {
+  test.setTimeout(90_000);
+  started = await startApp();
+  const { window } = started;
+  await addCache(window);
+  await home(window);
+  const chooseCustom = async (): Promise<ReturnType<Page['getByRole']>> => {
+    await cardMenu(window, 'Cache', 'Set color…');
+    const list = window.getByRole('dialog', { name: 'Color of Cache' });
+    await list.getByRole('radio', { name: /^Custom color…/u }).check();
+    await list.getByRole('button', { name: 'Choose' }).click();
+    return window.getByRole('dialog', { name: 'Choose a color' });
+  };
+
+  let dialog = await chooseCustom();
+  await expect(dialog.getByText('Color of Cache')).toBeVisible();
+  await expect(dialog.getByRole('radio', { name: 'Blue' })).toHaveAttribute('aria-checked', 'true');
+  for (const scheme of ['dark', 'light'] as const) {
+    await window.emulateMedia({ colorScheme: scheme });
+    await expectAccessible(window);
+  }
+  const field = dialog.getByRole('textbox', { name: 'Color', exact: true });
+  await field.fill('#12345');
+  await expect(dialog.getByText('Enter a color as #rrggbb')).toBeVisible();
+  await expect(dialog.getByRole('button', { name: 'Apply' })).toBeDisabled();
+  await field.fill('#1E90FF');
+  await expect(dialog.getByRole('radio', { name: 'Blue' })).toHaveAttribute('aria-checked', 'false');
+  await expect(dialog.getByLabel('Color picker')).toHaveValue('#1e90ff');
+  await dialog.getByRole('button', { name: 'Apply' }).click();
+  await expect(dialog).toBeHidden();
+  const card = window.locator('[data-card][data-color="custom"]');
+  await expect(card).toHaveCount(1);
+  expect(
+    await card.evaluate((element) => getComputedStyle(element).getPropertyValue('--connection-color').trim()),
+  ).toBe('#1e90ff');
+
+  dialog = await chooseCustom();
+  await expect(dialog.getByRole('textbox', { name: 'Color', exact: true })).toHaveValue('#1e90ff');
+  await dialog.getByRole('textbox', { name: 'Color', exact: true }).fill('#abc');
+  await window.keyboard.press('Escape');
+  await expect(dialog).toBeHidden();
+  await expect(card).toHaveCount(1);
+
+  dialog = await chooseCustom();
+  await dialog.getByRole('radio', { name: 'Teal' }).click();
+  await expect(dialog.getByRole('textbox', { name: 'Color', exact: true })).toHaveValue('teal');
+  await dialog.getByRole('button', { name: 'Cancel' }).click();
+  await expect(card).toHaveCount(1);
+
+  dialog = await chooseCustom();
+  await dialog.getByRole('radio', { name: 'Teal' }).click();
+  await dialog.getByRole('button', { name: 'Apply' }).click();
+  const teal = window.locator('[data-card][data-color="teal"]');
+  await expect(teal).toHaveCount(1);
+  for (const [scheme, value] of [
+    ['dark', '#4fd1c5'],
+    ['light', '#00706a'],
+  ] as const) {
+    await window.emulateMedia({ colorScheme: scheme });
+    expect(
+      await teal.evaluate((element) => getComputedStyle(element).getPropertyValue('--connection-color').trim()),
+    ).toBe(value);
+  }
+});
+
+test('connection.form: Custom color… of Color opens Choose a color, and Save saves the color applied', async () => {
+  test.setTimeout(90_000);
+  started = await startApp();
+  const { window } = started;
+  await window.evaluate(async () => {
+    const bridge = (globalThis as unknown as { datardo: { start: (intent: unknown) => Promise<unknown> } }).datardo;
+    await bridge.start({ feature: 'connection.add', target: { kind: 'app' }, args: 'redis' });
+  });
+  const form = window.getByRole('form', { name: 'New connection' });
+  await form.locator('[data-field="name"]').fill('Cache');
+  const color = form.locator('[data-field="color"]');
+  await color.selectOption('teal');
+  await color.selectOption('custom');
+  const dialog = window.getByRole('dialog', { name: 'Choose a color' });
+  await expect(dialog.getByText('Color of Cache')).toBeVisible();
+  await dialog.getByRole('button', { name: 'Cancel' }).click();
+  await expect(color).toHaveValue('teal');
+  await color.selectOption('custom');
+  await dialog.getByRole('textbox', { name: 'Color', exact: true }).fill('#1e90ff');
+  await dialog.getByRole('button', { name: 'Apply' }).click();
+  await expect(color).toHaveValue('#1e90ff');
+  await form.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(form).toBeHidden();
+  await expect(window.locator('[data-card][data-color="custom"]')).toHaveCount(1);
+});
+
 test('exports without passwords and imports a Mongoster file with a Redis address', async () => {
   test.setTimeout(90_000);
   started = await startApp();

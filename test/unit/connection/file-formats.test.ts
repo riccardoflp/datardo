@@ -1,5 +1,6 @@
 import { createCipheriv, pbkdf2Sync, randomBytes } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
+import { presetColors } from '../../../src/shared/color';
 import { colorFrom, compassColor } from '../../../src/features/connection/color-from-compass';
 import { decryptSecrets, encryptSecrets, fromBase64 } from '../../../src/features/connection/encryption';
 import { connectionsFromList } from '../../../src/features/connection/read-list';
@@ -66,28 +67,50 @@ describe('connection.ssh-tunnel-target', () => {
 });
 
 describe('connection.color-from-compass', () => {
-  it('turns names, codes and hex colors into the six', () => {
-    expect(colorFrom('color3')).toBe('blue');
-    expect(colorFrom('color10')).toBeUndefined();
-    expect(colorFrom(' Blue ')).toBe('blue');
-    expect(colorFrom('#ff0000')).toBe('red');
-    expect(colorFrom('#00f')).toBe('blue');
-    expect(colorFrom('ffa500')).toBe('orange');
-    expect(colorFrom('#808080')).toBeUndefined();
-    expect(colorFrom('#xyz')).toBeUndefined();
-    expect(colorFrom(3)).toBeUndefined();
-    expect(colorFrom('constructor')).toBeUndefined();
+  it('turns names, codes and hex colors into the eleven presets', () => {
+    expect(colorFrom('color3', 'nearest-preset')).toBe('blue');
+    expect(colorFrom('color2', 'nearest-preset')).toBe('teal');
+    expect(colorFrom('iris', 'nearest-preset')).toBe('indigo');
+    expect(colorFrom('color7', 'nearest-preset')).toBe('pink');
+    expect(colorFrom('color10', 'nearest-preset')).toBe('gray');
+    expect(colorFrom(' Blue ', 'nearest-preset')).toBe('blue');
+    expect(colorFrom('#ff0000', 'nearest-preset')).toBe('red');
+    expect(colorFrom('#00f', 'nearest-preset')).toBe('blue');
+    expect(colorFrom('ffa500', 'nearest-preset')).toBe('orange');
+    expect(colorFrom('#808080', 'nearest-preset')).toBe('gray');
+    expect(colorFrom('#xyz', 'nearest-preset')).toBeUndefined();
+    expect(colorFrom(3, 'nearest-preset')).toBeUndefined();
+    expect(colorFrom('constructor', 'nearest-preset')).toBeUndefined();
   });
 
-  it('writes the codes of Compass', () => {
-    expect(['red', 'orange', 'yellow', 'green', 'blue', 'purple'].map((each) => compassColor(each as 'red'))).toEqual([
+  it('keeps a custom color in the formats of Datardo and Mongoster', () => {
+    expect(colorFrom('#12ABEF', 'keep-custom')).toBe('#12abef');
+    expect(colorFrom('color4', 'keep-custom')).toBe('indigo');
+  });
+
+  it('writes the codes of Compass, brown as orange and a custom color as its nearest preset', () => {
+    expect(compassColor('teal')).toBe('color2');
+    expect(compassColor('brown')).toBe('color8');
+    expect(compassColor('#12abef')).toBe('color3');
+    expect(compassColor('#5c6bc0')).toBe('color4');
+    expect(presetColors.map((each) => compassColor(each))).toEqual([
       'color6',
       'color8',
       'color9',
       'color1',
       'color3',
       'color5',
+      'color7',
+      'color2',
+      'color4',
+      'color8',
+      'color10',
     ]);
+  });
+
+  it('reads back every preset written to Compass as itself, and brown as orange', () => {
+    const back = presetColors.map((each) => colorFrom(compassColor(each), 'nearest-preset'));
+    expect(back).toEqual(presetColors.map((each) => (each === 'brown' ? 'orange' : each)));
   });
 });
 
@@ -146,6 +169,20 @@ describe('connection.read-list', () => {
       ['Single', 'mongodb', 'mongodb://h2/db'],
       ['Tabbed', 'mongodb', 'mongodb://h3/db'],
     ]);
+  });
+
+  it('names a line after the // comment right above it, and only that line', () => {
+    const names = (lines: readonly string[]): readonly string[] =>
+      connectionsFromList(lines.join('\n')).connections.map((each) => each.name);
+    expect(names(['// Production', 'mongodb+srv://ada@cluster0.x.mongodb.net/shop'])).toEqual(['Production']);
+    const sessions = connectionsFromList('// Sessions\nrediss://cache.example.com:6380/2').connections[0];
+    expect([sessions?.engine, sessions?.name]).toEqual(['redis', 'Sessions']);
+    expect(names(['// Reports', 'Main = mongodb://r1/db'])).toEqual(['Main']);
+    expect(names(['// Old', '', 'mongodb://h1/db'])).toEqual(['h1']);
+    expect(names(['//', 'mongodb://h2/db'])).toEqual(['h2']);
+    expect(names(['// A', '// B', 'mongodb://h3/db'])).toEqual(['B']);
+    expect(names(['// A', '# note', 'mongodb://h4/db'])).toEqual(['h4']);
+    expect(names(['// A', 'not a connection', 'mongodb://h5/db'])).toEqual(['h5']);
   });
 
   it('skips and counts what is not a connection', () => {

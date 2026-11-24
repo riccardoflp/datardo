@@ -12,6 +12,7 @@ import { TaskDetails } from './task-details';
 import { TaskMenu, type OpenTaskMenu } from './task-menu';
 import { select, toggleDetails } from './tasks-store';
 import styles from './tasks-page.module.css';
+import { colorAttributes } from '../../components/color';
 
 /** `Delete` on the selected item. */
 const deleteKey = 'task.delete@list';
@@ -128,7 +129,7 @@ export function TaskItem(props: { readonly item: ItemView; readonly selected: bo
         </div>
         <span
           className={styles['source']}
-          data-color={item.source.color}
+          {...colorAttributes(item.source.color)}
           data-removed={item.source.removed ? 'true' : undefined}
         >
           {item.source.text}

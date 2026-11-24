@@ -95,6 +95,12 @@ function databaseMenu(built: Built, database: number): readonly MenuEntry[] {
         { args },
       ),
     ],
+    entry(
+      built,
+      text.menu.setColor,
+      { element: 'tree.set-database-color@tree-menu', feature: 'tree.set-database-color' },
+      { args },
+    ),
     entry(built, text.menu.newKey, { element: 'key.new@tree-menu', feature: 'key.new' }, { args, writes: true }),
     [
       ...entry(

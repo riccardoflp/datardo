@@ -208,15 +208,14 @@ One saved connection: what it is, where it leads, how it is, and the button to g
   beside a connection: `src/tree.ts` (`ConnectionNode`). **Excluded from searches** stands for the `excluded`
   Mongoster 0.9.0 writes beside an excluded connection in its tree (`src/tree.ts › markExcluded`); the eleven presets
   and the custom colors are those of Mongoster 0.9.0 (`src/shared/colors.ts`).
-- **Differs**: (M38) the band takes one of six colors, and grey when there is none; (M39) the card has no mark
-  **Excluded from searches**.
+- **Differs**: (M39) the card has no mark **Excluded from searches**.
 
 Acceptance:
 
 - [ ] The card of Production, a red read-only MongoDB connection through an SSH tunnel, shows a red band,
   `Production`, **MongoDB**, its address, **Read-only** and **SSH**, and the button **Connect**.
 - [ ] The card of a connection colored teal has a band of the token of teal in each theme; one colored `#1e90ff`, a
-  band of exactly `#1e90ff`; one colored **Gray** a band unlike that of a connection with no color. (differs)
+  band of exactly `#1e90ff`; one colored **Gray** a band unlike that of a connection with no color.
 - [ ] The card of Archive, excluded from searches, shows **Excluded from searches** after its other marks; after
   **Include in searches** in its menu the mark is gone. (differs)
 - [ ] No card shows a user name, a password or the options of a connection string, in its text or in what is shown

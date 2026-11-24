@@ -2,6 +2,7 @@
  * What the cards of the connection area share: where the connections are in the app's state, the form as the window
  * sends it, what is known of the files the form names, and the connection a feature was started on.
  */
+import { colorOfText, type ColorMap } from '../../shared/color';
 import type {
   ConnectionColor,
   ConnectionForm,
@@ -11,7 +12,6 @@ import type {
   SshSettings,
   TlsSettings,
 } from '../../shared/connection';
-import { connectionColors } from '../../shared/connection';
 import type { EngineName, Json } from '../../shared/engine-request';
 import type { AppStep, Context, Outcome } from '../../shared/feature';
 import { noDanger, run } from '../../shared/feature';
@@ -132,7 +132,7 @@ export function formFromJson(value: unknown): ConnectionForm | undefined {
   if (engine !== 'mongodb' && engine !== 'redis') {
     return undefined;
   }
-  const color = connectionColors.find((each) => each === fields['color']) ?? '';
+  const color = colorOfText(fields['color']) ?? '';
   return {
     engine,
     name: text(fields, 'name'),
@@ -206,6 +206,9 @@ export interface FileConnection {
   readonly connectionString: string;
   readonly folder?: string;
   readonly color?: ConnectionColor;
+  /** The own colors of its databases and, on a MongoDB connection, of its collections (`tree.color-of`). */
+  readonly databaseColors?: ColorMap;
+  readonly collectionColors?: ColorMap;
   readonly readOnly?: boolean;
   readonly noHistory?: boolean;
   readonly queriesFolder?: string;
@@ -303,7 +306,8 @@ function withValue<K extends string>(key: K, value: string | undefined): { [P in
 
 /**
  * A connection of a file as Datardo saves it, with the id, the name and the folder it is given; what it replaces keeps
- * its read-only (D14), its undo setting and its link when the file has none.
+ * its read-only (D14), its undo setting and its link when the file has none, and the colors of its databases and of
+ * its collections, each when the file has none.
  */
 export function connectionOfFile(
   file: FileConnection,
@@ -312,6 +316,8 @@ export function connectionOfFile(
 ): ConnectionToSave {
   const { certificateKeyFilePassword: keyPassword, ...tls } = file.tls ?? {};
   const oplog = file.oplog === undefined ? before?.oplog : (file.oplog.settings as Json);
+  const databaseColors = file.databaseColors ?? before?.databaseColors;
+  const collectionColors = file.collectionColors ?? before?.collectionColors;
   const saved: SavedConnection = {
     id: given.id,
     name: given.name,
@@ -321,6 +327,8 @@ export function connectionOfFile(
     keepsUndo: file.noHistory === true ? false : (before?.keepsUndo ?? true),
     ...(given.folder === undefined ? {} : { folder: given.folder }),
     ...(file.color === undefined ? {} : { color: file.color }),
+    ...(databaseColors === undefined ? {} : { databaseColors }),
+    ...(collectionColors === undefined ? {} : { collectionColors }),
     ...(file.tls === undefined ? {} : { tls }),
     ...(file.ssh === undefined ? {} : { ssh: sshOfFile(file.ssh) }),
     ...(file.queriesFolder === undefined ? {} : { queriesFolder: file.queriesFolder }),
@@ -350,6 +358,8 @@ export function fileOfConnection(
     connectionString,
     ...(saved.folder === undefined ? {} : { folder: saved.folder }),
     ...(saved.color === undefined ? {} : { color: saved.color }),
+    ...(saved.databaseColors === undefined ? {} : { databaseColors: saved.databaseColors }),
+    ...(saved.collectionColors === undefined ? {} : { collectionColors: saved.collectionColors }),
     ...(saved.readOnly ? { readOnly: true } : {}),
     ...(saved.keepsUndo ? {} : { noHistory: true }),
     ...(saved.queriesFolder === undefined ? {} : { queriesFolder: saved.queriesFolder }),

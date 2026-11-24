@@ -1,4 +1,4 @@
-import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { copyFile, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
@@ -92,5 +92,53 @@ describe('the connections file', () => {
   it('holds nothing secret: no field of a connection is a password', () => {
     const written = JSON.stringify(connectionsFile.write(withConnections(connectionsFile.empty(), [local])));
     expect(written).not.toMatch(/password|passphrase|connectionString/i);
+  });
+
+  it('reads the colors of the connections, databases and collections recorded at version 1, and writes them back', async () => {
+    const recorded = join(
+      import.meta.dirname,
+      '..',
+      '..',
+      'fixtures',
+      'stored',
+      'connections',
+      'v1',
+      'connections.json',
+    );
+    await copyFile(recorded, join(folder, 'connections.json'));
+    const store = new Store(folder, connectionsFile);
+    expect(await store.load()).toEqual({ kind: 'current' });
+    const [local, cache, plain] = store.get().connections;
+    expect(local).toMatchObject({
+      color: '#1e90ff',
+      databaseColors: { shop: 'teal', archive: 'none' },
+      collectionColors: { 'shop.orders': 'none', 'shop.logs': '#12abef', 'media.fs.files': 'pink' },
+    });
+    expect(cache).toMatchObject({ color: 'gray', databaseColors: { '3': 'green' } });
+    expect(plain?.databaseColors).toBeUndefined();
+    expect(plain?.collectionColors).toBeUndefined();
+    store.set(withConnections(store.get(), store.get().connections));
+    await store.flush();
+    const again = JSON.parse(await readFile(join(folder, 'connections.json'), 'utf8')) as unknown;
+    expect(again).toEqual(JSON.parse(await readFile(recorded, 'utf8')));
+  });
+
+  it('keeps only the colors it can read: a valid color, none, and a key of the right form', async () => {
+    const connection = {
+      id: 'c-1',
+      name: 'Local',
+      engine: 'mongodb',
+      hosts: 'db1',
+      color: 'chartreuse',
+      databaseColors: { 'a.b': 'red', shop: 'lime' },
+      collectionColors: { orders: 'red', 'shop.orders': '#ABC' },
+    };
+    await writeFile(join(folder, 'connections.json'), JSON.stringify({ version: 1, connections: [connection] }));
+    const store = new Store(folder, connectionsFile);
+    await store.load();
+    const [read] = store.get().connections;
+    expect(read?.color).toBeUndefined();
+    expect(read?.databaseColors).toBeUndefined();
+    expect(read?.collectionColors).toEqual({ 'shop.orders': '#aabbcc' });
   });
 });

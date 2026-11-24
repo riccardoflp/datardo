@@ -12,6 +12,7 @@ import type { TabShows } from '../../shared/state/tabs';
 import { hexOfText, isSamePin, textOfHex } from '../nav/pin';
 import { pinRunArgs } from '../saved-query/connection-list';
 import { setting } from '../settings/read';
+import { iconColored, type ColorTarget } from './color-of';
 import { text } from './text';
 import {
   currentConnection,
@@ -57,6 +58,20 @@ function iconOf(pin: Pin): string {
       return 'bookmark';
     case 'page':
       return 'browser';
+  }
+}
+
+/** What gives a pinned item its color: its collection, or its database for a namespace or a key; a page has none. */
+function colorTargetOf(pin: Pin): ColorTarget | undefined {
+  switch (pin.kind) {
+    case 'collection':
+    case 'saved-query':
+      return { kind: 'collection', database: pin.database, collection: pin.collection };
+    case 'namespace':
+    case 'key':
+      return { kind: 'database', database: pin.database };
+    case 'page':
+      return undefined;
   }
 }
 
@@ -163,6 +178,7 @@ export function view(input: TreeInput): readonly TreeNode[] {
   return pinsOf(input).map((pin): TreeNode => {
     const { name, place } = nameAndPlace(pin);
     const id = nodeId({ kind: 'pin', pin });
+    const target = colorTargetOf(pin);
     return {
       kind: 'node',
       id,
@@ -171,6 +187,7 @@ export function view(input: TreeInput): readonly TreeNode[] {
       ref: { kind: 'pin', pin },
       name,
       icon: iconOf(pin),
+      ...(target === undefined ? {} : iconColored(connection, target)),
       ...(place === undefined ? {} : { after: place }),
       dimmed: false,
       expandable: false,

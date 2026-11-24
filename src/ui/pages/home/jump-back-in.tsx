@@ -9,6 +9,7 @@ import { openArgs } from '../../../features/palette/open-result';
 import { startFeature } from '../../shell/intent';
 import menuStyles from '../../connection/connection-menu.module.css';
 import styles from './home-page.module.css';
+import { colorAttributes } from '../../components/color';
 
 function forget(args: { readonly key: string } | { readonly all: true }): void {
   startFeature('home.forget-recent', { place: 'home', args });
@@ -24,7 +25,7 @@ function Item(props: { readonly item: JumpItem; readonly part: JumpBackInView })
             type="button"
             className={styles['jump']}
             data-feature={item.file === undefined ? 'home.jump-back-in@home' : item.file.element}
-            data-color={item.color}
+            {...colorAttributes(item.color)}
             onClick={() => {
               if (item.file === undefined) {
                 startFeature('palette.open-result', { place: 'home', args: openArgs(item.opens, 'foreground') });

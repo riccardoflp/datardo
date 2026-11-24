@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "connections": [
+    {
+      "id": "c-local",
+      "name": "Local",
+      "engine": "mongodb",
+      "hosts": "db1:27017",
+      "readOnly": false,
+      "keepsUndo": true,
+      "folder": "Work",
+      "color": "#1e90ff",
+      "databaseColors": {
+        "shop": "teal",
+        "archive": "none"
+      },
+      "collectionColors": {
+        "shop.orders": "none",
+        "shop.logs": "#12abef",
+        "media.fs.files": "pink"
+      }
+    },
+    {
+      "id": "c-cache",
+      "name": "Cache local",
+      "engine": "redis",
+      "hosts": "cache:6379",
+      "readOnly": false,
+      "keepsUndo": true,
+      "color": "gray",
+      "databaseColors": {
+        "3": "green"
+      }
+    },
+    {
+      "id": "c-plain",
+      "name": "Plain",
+      "engine": "mongodb",
+      "hosts": "localhost:27017",
+      "readOnly": true,
+      "keepsUndo": true,
+      "color": "red"
+    }
+  ]
+}

@@ -4,8 +4,10 @@
  */
 import { useId } from 'react';
 import type { FormView } from '../../../features/connection/form';
-import type { ConnectionColor, ConnectionForm, FormField, SshAuthentication } from '../../../shared/connection';
+import type { ConnectionForm, FormField, SshAuthentication } from '../../../shared/connection';
 import { startFeature } from '../../shell/intent';
+import { customColorText } from '../../../features/connection/parts/color-text';
+import { ColorField } from './color-field';
 import { CheckField, ChoiceField, TextField } from './form-fields';
 import styles from './connection-pages.module.css';
 
@@ -113,13 +115,13 @@ export function SettingsPart({ view, form, set, enter, browse }: PartProps): Rea
           <option key={folder} value={folder} />
         ))}
       </datalist>
-      <ChoiceField
-        name="color"
+      <ColorField
         field={fields.color}
         value={form.color}
         choices={view.colors}
-        onChange={(value) => {
-          set({ ...form, color: value as ConnectionColor | '' });
+        name={form.name.trim() === '' ? customColorText.newConnection : form.name.trim()}
+        onChange={(color) => {
+          set({ ...form, color });
         }}
       />
       <CheckField

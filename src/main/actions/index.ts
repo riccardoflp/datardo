@@ -38,6 +38,7 @@ import { actions as taskActions } from './task';
 import { actions as schemaActions } from './schema';
 import { actions as chartActions } from './chart';
 import { actions as monitorActions } from './monitor';
+import { actions as treeActions } from './tree';
 
 /** The actions of one area, by name. */
 export type AreaActions = (services: MainServices) => Readonly<Record<string, AppAction>>;
@@ -78,6 +79,7 @@ const areas: readonly AreaActions[] = [
   schemaActions,
   chartActions,
   monitorActions,
+  treeActions,
 ];
 
 /** Every action of every area, by name; two areas never name an action alike. */

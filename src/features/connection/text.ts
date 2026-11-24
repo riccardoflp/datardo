@@ -143,7 +143,6 @@ export const formViewText = {
   folder: 'Folder',
   color: 'Color',
   noColor: 'None',
-  colors: { red: 'Red', orange: 'Orange', yellow: 'Yellow', green: 'Green', blue: 'Blue', purple: 'Purple' },
   readOnly: 'Read-only',
   readOnlyHint: 'Datardo refuses every write through this connection.',
   queriesFolder: 'Queries folder',
@@ -300,6 +299,7 @@ export const fileText = {
   listHeader: '# Connections exported from Datardo: name = connection string',
   withoutPasswords: ' (without passwords)',
   compassLeftOut: "folders, read-only and redis-oplog were left out (Compass doesn't have them)",
+  colorsLeftOut: "colors of databases and collections were left out (Compass doesn't have them)",
   redisLeftOut: (count: number): string =>
     `${wasWere(count, 'Redis connection', 'Redis connections')} left out (Compass doesn't have them)`,
   agent: "Compass can't use the SSH agent: those tunnels have no password or key",

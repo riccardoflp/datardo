@@ -49,6 +49,26 @@
   flex: 1;
 }
 
+/* Color: the swatch of the color in use, then the list (connection.form). */
+.color-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.color-row > select {
+  flex: 1;
+}
+
+.color-swatch {
+  flex: none;
+  width: var(--space-3);
+  height: var(--space-3);
+  border: var(--border-width) solid var(--color-control-border);
+  border-radius: var(--radius-round);
+  background: var(--connection-color, transparent);
+}
+
 .input {
   min-width: 0;
   padding: var(--space-1) var(--space-2);

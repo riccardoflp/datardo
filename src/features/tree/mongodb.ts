@@ -8,6 +8,7 @@
  */
 import type { ConnectionView } from '../../shared/connection';
 import type { TabShows } from '../../shared/state/tabs';
+import { iconColored } from './color-of';
 import { countText, sizeText } from './count';
 import { appliedFilter, filterDatabase, type FilteredDatabase } from './filter';
 import * as nodeStates from './node-states';
@@ -108,6 +109,7 @@ function entryNode(built: Built, database: string, entry: CollectionEntry): Tree
     ref: { kind: 'collection', database, name: entry.name, collectionKind: entry.kind, system: entry.system },
     name: entry.name,
     icon: entryIcon(entry),
+    ...iconColored(built.connection, { kind: 'collection', database, collection: entry.name }),
     ...(after === undefined ? {} : { after }),
     hover: entryHover(database, entry),
     dimmed: entry.system,
@@ -141,6 +143,7 @@ function bucketNode(built: Built, database: string, name: string): TreeNode {
     ref: { kind: 'bucket', database, name },
     name,
     icon: 'files',
+    ...iconColored(built.connection, { kind: 'bucket', database, bucket: name }),
     after: text.mongodb.gridfs,
     hover: text.mongodb.bucketHover(database, name),
     dimmed: false,
@@ -204,6 +207,7 @@ function databaseItems(built: Built, database: MongoDatabase): readonly TreeItem
     ref: { kind: 'database', database: database.name },
     name: database.name,
     icon: 'database',
+    ...iconColored(built.connection, { kind: 'database', database: database.name }),
     ...(size === '' ? {} : { after: size }),
     hover: database.name,
     dimmed: false,

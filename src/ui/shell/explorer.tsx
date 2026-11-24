@@ -14,6 +14,7 @@ import { ConnectionMenuButton } from '../connection/connection-menu';
 import { TreeIsland } from '../tree/tree-island';
 import { startFeature } from './intent';
 import styles from './explorer.module.css';
+import { colorAttributes } from '../components/color';
 
 /** What the explorer is given: the nav input, its width, and how to open the connection switcher. */
 export interface ExplorerProps {
@@ -127,7 +128,7 @@ function ConnectionIsland(props: { readonly input: NavInput; readonly openSwitch
   return (
     <section
       className={styles['connection-island']}
-      data-color={color}
+      {...colorAttributes(color)}
       aria-label={text.islands.connectionIsland}
       data-island="connection"
       data-feature={islandElement}

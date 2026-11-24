@@ -3,7 +3,13 @@
  * is a page tab of the connection, one per connection. Not connected, it shows the header and **Connection** only, and
  * opening it reads nothing and does not connect. **Databases** joins it with the reads of the tree area (M8).
  */
-import type { ConnectionView, MongoServerInfo, RedisServerInfo, ServerInfo } from '../../shared/connection';
+import type {
+  ConnectionColor,
+  ConnectionView,
+  MongoServerInfo,
+  RedisServerInfo,
+  ServerInfo,
+} from '../../shared/connection';
 import type { Json } from '../../shared/engine-request';
 import type { Answers, Context, Outcome } from '../../shared/feature';
 import { noDanger, run } from '../../shared/feature';
@@ -65,7 +71,7 @@ export type ServerSection =
 
 /** The page. */
 export interface OverviewView {
-  readonly color?: string;
+  readonly color?: ConnectionColor;
   readonly name: string;
   readonly engine: string;
   /** The state, and the latency of the current connection: `connected · 4 ms`. */

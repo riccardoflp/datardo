@@ -6,6 +6,7 @@ import type { FieldValue, FieldView } from '../../features/runner/ask';
 import { runnerText } from '../../features/runner/text';
 import { autoFocusAttribute } from '../shell/dialog';
 import styles from './runner.module.css';
+import { colorAttributes } from '../components/color';
 
 /** What the list is given. */
 export interface ChoiceListProps {
@@ -69,7 +70,7 @@ export function ChoiceList({ shown, first, filter, onFilter, onChange, onAnswer 
                   : {})}
               />
               {choice.color === undefined ? null : (
-                <span className={styles['swatch']} data-color={choice.color} aria-hidden="true" />
+                <span className={styles['swatch']} {...colorAttributes(choice.color)} aria-hidden="true" />
               )}
               <span>{choice.label}</span>
               {choice.description === undefined ? null : <span className={styles['muted']}>{choice.description}</span>}

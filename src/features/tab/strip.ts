@@ -4,6 +4,7 @@
  * The open tabs, in groups, one group for each connection, in the first row of the main island. A click makes a tab
  * active, a click with the middle button closes it, a right click opens its menu, a drag reorders it.
  */
+import type { ConnectionColor } from '../../shared/connection';
 import type { TabId } from '../../shared/ids';
 import type { AppState } from '../../shared/state';
 import type { Tab, TabShows } from '../../shared/state/tabs';
@@ -21,6 +22,8 @@ export interface StripTab {
   readonly title: string;
   /** The Codicon of its kind, or of its page. */
   readonly icon: string;
+  /** The color its icon is drawn in (`tab.groups`): that of its collection or database; absent for its usual color. */
+  readonly color?: ConnectionColor;
   readonly active: boolean;
   readonly unsaved: boolean;
   /** Whether it has a close button: every tab but Home while it is the only tab. */
@@ -115,13 +118,14 @@ export function pathOf(state: AppState, shows: TabShows): string {
     .join(' / ');
 }
 
-function stripTab(state: AppState, tab: Tab, title: string): StripTab {
+function stripTab(state: AppState, tab: Tab, title: string, color: ConnectionColor | undefined): StripTab {
   const connection = tab.shows.kind === 'app' ? undefined : connectionName(state, tab.shows.connection);
   const spoken = [title, text.kinds[tab.shows.kind], ...(connection === undefined ? [] : [connection])];
   return {
     id: tab.id,
     title,
     icon: iconOf(tab.shows),
+    ...(color === undefined ? {} : { color }),
     active: tab.id === state.tabs.active,
     unsaved: tab.unsaved === true,
     closable: isCloseOffered(state, tab),
@@ -158,7 +162,7 @@ export function view(state: AppState): StripView {
           }),
       collapsed: group.collapsed,
       count: group.tabs.length,
-      tabs: group.shown.map((tab) => stripTab(state, tab, titles.get(tab.id) ?? '')),
+      tabs: group.shown.map((tab) => stripTab(state, tab, titles.get(tab.id) ?? '', group.colors[tab.id])),
     })),
     allTabs: { label: text.strip.allTabs, element: 'palette.open@tab-strip', feature: 'palette.open', prefix: '=' },
   };

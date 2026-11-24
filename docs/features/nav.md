@@ -1003,7 +1003,6 @@ feature opened it.
   - **A screen reader** is told the title when it opens, and that it is a dialog.
 - **Uses**: `runner.ask`, `runner.confirm`.
 - **Ported from**: *New in Datardo*.
-- **Differs**: (M38) no View opens the dialog **Choose a color** (`connection.custom-color`).
 
 Acceptance:
 

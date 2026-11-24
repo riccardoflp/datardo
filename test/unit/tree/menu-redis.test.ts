@@ -36,6 +36,8 @@ describe('tree.menu-redis', () => {
       'Open keys',
       'Open console here',
       '—',
+      'Set color…',
+      '—',
       'New key…',
       '—',
       'Import keys…',
@@ -75,10 +77,21 @@ describe('tree.menu-redis', () => {
       'Open keys',
       'Open console here',
       '—',
+      'Set color…',
+      '—',
       'Export keys…',
       '—',
       'Refresh',
     ]);
+  });
+
+  it('a database has Set color…, also on a read-only connection; a namespace has none', () => {
+    expect(control(menu({ kind: 'redis-database', database: 3 }), 'Set color…')).toMatchObject({
+      element: 'tree.set-database-color@tree-menu',
+      feature: 'tree.set-database-color',
+      args: { connection: 'c-cache', database: 3 },
+    });
+    expect(labels(menu(namespace('orders:')))).not.toContain('Set color…');
   });
 
   it('Open console here on db2 starts the console on database 2', () => {

@@ -9,6 +9,7 @@ import type { AppState } from '../../../shared/state';
 import { ConnectionContextMenu, ConnectionMenuButton } from '../../connection/connection-menu';
 import { startFeature } from '../../shell/intent';
 import styles from './home-page.module.css';
+import { colorAttributes } from '../../components/color';
 
 /** Goes to the connection: it becomes the current one and connects if it is not connected (`nav.switch-connection`). */
 function goTo(card: CardView): void {
@@ -45,7 +46,7 @@ export function HomeCard(props: { readonly card: CardView; readonly state: AppSt
         aria-label={card.spoken}
         data-card={card.id}
         data-feature={card.element}
-        data-color={card.color}
+        {...colorAttributes(card.color)}
         data-current={card.current ? true : undefined}
         onDoubleClick={(event) => {
           if (!(event.target instanceof Element && event.target.closest('button') !== null)) {

@@ -174,7 +174,20 @@ describe('connection.form', () => {
       'Green',
       'Blue',
       'Purple',
+      'Pink',
+      'Teal',
+      'Indigo',
+      'Brown',
+      'Gray',
+      'Custom color…',
     ]);
+  });
+
+  it('lists None, the eleven presets and Custom color… in Color, and a custom color chosen as its own item', () => {
+    const shown = view(stateOf({ ...formOf('mongodb'), color: '#1e90ff' }));
+    expect(shown.colors.map((color) => color.label).slice(-3)).toEqual(['Gray', '#1e90ff', 'Custom color…']);
+    expect(shown.colors.at(-2)).toEqual({ value: '#1e90ff', label: '#1e90ff', color: '#1e90ff' });
+    expect(shown.colors.at(-1)?.element).toBe('connection.custom-color@form');
   });
 
   it('gives the Read-only checkbox of a read-only connection the element of allow-changes when unchecked', () => {

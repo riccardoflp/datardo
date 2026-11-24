@@ -3,7 +3,8 @@
  * Datardo keeps for `shop.orders` moves to `shop.orders_2024` once MongoDB renamed the collection. The recent queries
  * and the columns with their expanded paths (`state/<connection id>.json`, and the columns in the app's state), the
  * saved queries *for me* (`saved-queries/<connection id>.json`), the pins of the collection and of its saved queries,
- * and the open tab of the collection, which shows the new name with the same query. The saved queries in the folder,
+ * its own color on the connection (`tree.color-of`), and the open tab of the collection, which shows the new name with
+ * the same query. The saved queries in the folder,
  * the undo history and the other tabs stay under the old name (the card's acceptance).
  */
 import type { Json } from '../../shared/engine-request';
@@ -11,6 +12,9 @@ import { connectionId, type ConnectionId } from '../../shared/ids';
 import type { Pin } from '../../shared/state/nav';
 import { columnsKey, nothingRemembered, rememberedColumns } from '../../shared/state/table';
 import { withCollectionRenamed as stateRenamed } from '../../storage/connection-state';
+import { renamedColors } from '../../features/tree/color-of';
+import { findConnection, writeConnection } from '../connections';
+import { withMaps } from './tree';
 import { savedQueriesData } from '../saved-queries';
 import type { MainServices } from '../services';
 import { connectionStateStore } from '../table';
@@ -102,12 +106,30 @@ function moveTab(services: MainServices, renamed: Renamed): void {
   }
 }
 
+/**
+ * The own color of the collection, kept on the connection, moves to the new name; the saved connections are read and
+ * written only when it has one.
+ */
+function moveColor(services: MainServices, renamed: Renamed): void {
+  const shown = services.state.get().connections.saved.find((each) => each.id === renamed.connection);
+  const colors = shown?.collectionColors;
+  if (renamedColors(colors, renamed.database, renamed.from, renamed.to) === colors) {
+    return;
+  }
+  const connection = findConnection(renamed.connection);
+  if (connection !== undefined) {
+    const collectionColors = renamedColors(connection.collectionColors, renamed.database, renamed.from, renamed.to);
+    writeConnection(withMaps(connection, { databaseColors: connection.databaseColors, collectionColors }));
+  }
+}
+
 /** `manage.rename-collection`: what Datardo keeps for a collection follows its new name. */
 export async function moveCollection(services: MainServices, args: Json): Promise<void> {
   const renamed = renamedOf(args);
   await moveConnectionState(services, renamed);
   await moveSavedQueries(renamed);
   movePins(services, renamed);
+  moveColor(services, renamed);
   moveTab(services, renamed);
 }
 
