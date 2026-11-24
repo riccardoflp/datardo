@@ -280,6 +280,23 @@ describe('home.card', () => {
     });
   });
 
+  it('the card of Archive, excluded from searches, shows Excluded from searches after its other marks, and Include in searches removes it', () => {
+    const archive: ConnectionView = { ...production, name: 'Archive', excluded: true };
+    expect(cardOf(harness(cards).state(), archive).marks).toEqual(['Read-only', 'SSH', 'Excluded from searches']);
+    const menu = connectionMenu({
+      connections: harness([archive]).state().connections,
+      connection: archive,
+      place: 'home',
+    });
+    const include = menu.entries.find((entry) => entry.kind === 'item' && entry.label === 'Include in searches');
+    expect(include).toMatchObject({
+      feature: 'tree.exclude-from-searches',
+      args: { action: 'include', scope: 'connection' },
+    });
+    const { excluded: _excluded, ...included } = archive;
+    expect(cardOf(harness(cards).state(), included).marks).toEqual(['Read-only', 'SSH']);
+  });
+
   it('no card shows a user name, a password or the options of a connection string', () => {
     const careless = saved('careless', 'Careless', 'mongodb', {
       hosts: 'mongodb://ann:s3cret@db.example.com:27017/shop?authSource=admin',

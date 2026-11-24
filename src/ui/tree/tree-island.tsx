@@ -9,6 +9,7 @@ import { view as emptyView } from '../../features/nav/empty';
 import { text as navText } from '../../features/nav/text';
 import type { NavInput } from '../../features/nav/types';
 import { runnableFeatures } from '../../features/registry';
+import { view as selectView, withShownSelection } from '../../features/tree/select';
 import { view, type TreeIslandView } from '../../features/tree/show';
 import { currentConnection, type TreeInput } from '../../features/tree/types';
 import type { ConnectionView } from '../../shared/connection';
@@ -21,7 +22,7 @@ import { useTreeActions } from './tree-use-actions';
 import { TreeHeaderBar } from './tree-header';
 import { TreeMenu } from './tree-menu';
 import { RowContent, rowOf, type IslandRow } from './tree-rows';
-import { rememberScroll, scrollOf, useTree, type WindowTree } from './tree-store';
+import { changeIsland, rememberScroll, scrollOf, useTree, type WindowTree } from './tree-store';
 import styles from './tree-island.module.css';
 
 /** The features that are built: an entry of a menu is shown only when the feature it starts is (roadmap, M8). */
@@ -51,6 +52,12 @@ function ConnectionTree(props: ConnectionTreeProps): React.JSX.Element {
       setFilterOpener(undefined);
     };
   }, [openFilter]);
+  const id = props.connection.id;
+  // A node that stops being shown leaves the nodes selected together (`tree.select`).
+  useEffect(() => {
+    changeIsland(id, (island) => withShownSelection(island, shown.items));
+  }, [id, shown.items]);
+  const select = selectView(props.input, shown.items, props.connection.engine);
   const rowContext = { engine: props.connection.engine, press: actions.press, openMenu: actions.openMenu };
   return (
     <div className={styles['island']}>
@@ -65,6 +72,8 @@ function ConnectionTree(props: ConnectionTreeProps): React.JSX.Element {
       <Tree<IslandRow>
         ref={treeRef}
         label={shown.label}
+        multiselectable={select.multiselectable}
+        {...(select.multiselectable ? { element: 'tree.select@tree' } : {})}
         rows={shown.items.map((item) => rowOf(item, props.connection.engine))}
         focus={props.tree.focus}
         {...rowEvents}

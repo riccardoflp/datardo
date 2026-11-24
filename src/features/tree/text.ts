@@ -126,12 +126,16 @@ export const text = {
     exportKeys: 'Export keys…',
     deleteByPattern: 'Delete keys by pattern…',
     setColor: 'Set color…',
+    excludeFromSearches: 'Exclude from searches',
+    includeInSearches: 'Include in searches',
   },
   commands: {
     refresh: 'Refresh the tree',
     filter: 'Filter the tree',
     setCollectionColor: 'Set collection color…',
     setDatabaseColor: 'Set database color…',
+    excludeFromSearches: 'Exclude from searches',
+    includeInSearches: 'Include in searches',
   },
   /** The lists of `tree.set-collection-color` and `tree.set-database-color`, and their steps. */
   colors: {
@@ -152,6 +156,27 @@ export const text = {
       `forget ${kept.length < 2 ? kept.join('') : `${kept.slice(0, -1).join(', ')} and ${kept.at(-1) ?? ''}`} of ${what}`,
     theColor: 'the color',
     theColors: 'the colors',
+    theExclusion: 'the exclusion from searches',
+    theExclusions: 'the exclusions from searches',
     databaseAndCollections: (database: string) => `${database} and its collections`,
+  },
+  /** What a node excluded from searches shows (`tree.mongodb`), and the steps of `tree.exclude-from-searches`. */
+  exclusions: {
+    own: 'excluded',
+    withDatabase: 'excluded with its database',
+    separator: ' · ',
+    hover: 'Excluded from searches',
+    hoverWithDatabase: (database: string) => `Excluded from searches with the database ${database}`,
+    database: (database: string) => `the database ${database}`,
+    collection: (namespace: string) => `the collection ${namespace}`,
+    view: (namespace: string) => `the view ${namespace}`,
+    bucket: (database: string, bucket: string) => `the GridFS bucket ${database}.${bucket}`,
+    exclude: (connection: string, what: readonly string[]) =>
+      `exclude from searches on ${connection}: ${what.join(', ')}`,
+    include: (connection: string, what: readonly string[]) =>
+      `include in searches on ${connection}: ${what.join(', ')}`,
+    excludeConnection: (connection: string) => `exclude the connection ${connection} from searches`,
+    includeConnection: (connection: string) => `include the connection ${connection} in searches`,
+    cannotUndo: { exclude: 'Include in searches puts it back.', include: 'Exclude from searches puts it back.' },
   },
 } as const;

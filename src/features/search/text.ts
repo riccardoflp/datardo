@@ -73,6 +73,8 @@ export const text = {
     found: (documents: number, collections: number) =>
       `${countOf(documents, 'document')} found in ${countOf(collections, 'collection')}`,
     notReadable: (count: number) => `${groupThousands(count)} not readable`,
+    /** Databases and collections left out because they are excluded from searches (`search.collections`). */
+    excluded: (count: number) => `${groupThousands(count)} excluded`,
     seconds: (milliseconds: number) => `${(milliseconds / 1000).toFixed(1)} s`,
     separator: ' · ',
     states: { listing: 'searching…', searching: 'searching…', stopped: 'stopped', done: 'done', error: 'error' },

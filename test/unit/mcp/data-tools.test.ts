@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import type { MongoRequest } from '../../../src/shared/engine-request';
 import { indexLine } from '../../../src/features/mcp/data-tools';
-import { answerOf, drive, failed, failureOf, long, nameOf } from './harness';
+import { connectionId } from '../../../src/shared/ids';
+import { mongoConnection } from '../connection/context';
+import { answerOf, cache, drive, failed, failureOf, local, long, mcpState, nameOf } from './harness';
 
 const orders = { name: 'orders', type: 'collection', options: {} };
 const view = { name: 'paid', type: 'view', options: { viewOn: 'orders', pipeline: [] } };
@@ -198,5 +200,92 @@ describe('mcp.data-tools', () => {
     expect(failureOf(drive('list_databases', { connection: 'Cache local' }))).toBe(
       'Cache local is a Redis connection: use the redis_ tools (redis_scan_keys, redis_key_details).',
     );
+  });
+
+  describe('what is excluded from searches', () => {
+    const staging = mongoConnection({ id: connectionId('c-staging'), name: 'Staging', excluded: true });
+    const excluding = { ...local, exclusions: ['logs', 'shop.audit'] };
+    const state = mcpState({ connections: [excluding, staging, cache] });
+    const databases = (): unknown => ({
+      databases: [
+        { name: 'logs', sizeOnDisk: 10, empty: false },
+        { name: 'shop', sizeOnDisk: 20, empty: false },
+      ],
+      ok: 1,
+    });
+    const collections = (names: readonly string[]) => (): unknown =>
+      names.map((name) => ({ name, type: 'collection', options: {} }));
+
+    it('leaves out the connection Staging, the database logs and the collection shop.audit', () => {
+      const connections = answerOf(drive('list_connections', {}, {}, state));
+      expect(connections).toContain('"name": "Local"');
+      expect(connections).not.toContain('Staging');
+      const listed = answerOf(drive('list_databases', { connection: 'Local' }, { mongo: databases }, state));
+      expect(listed).toContain('"name": "shop"');
+      expect(listed).not.toContain('"name": "logs"');
+      const shop = answerOf(
+        drive(
+          'list_collections',
+          { connection: 'Local', database: 'shop' },
+          { mongo: collections(['audit', 'orders']) },
+          state,
+        ),
+      );
+      expect(shop).toContain('"name": "orders"');
+      expect(shop).not.toContain('"name": "audit"');
+    });
+
+    it('still lists every collection of an excluded database that has no exclusion of its own', () => {
+      const shopExcluded = mcpState({ connections: [{ ...local, exclusions: ['shop', 'shop.audit'] }] });
+      const shop = answerOf(
+        drive(
+          'list_collections',
+          { connection: 'Local', database: 'shop' },
+          { mongo: collections(['audit', 'orders', 'users']) },
+          shopExcluded,
+        ),
+      );
+      expect(JSON.parse(shop)).toEqual([
+        { name: 'orders', type: 'collection' },
+        { name: 'users', type: 'collection' },
+      ]);
+    });
+
+    it('says when every connection, or every collection of shop, is excluded', () => {
+      const none = mcpState({ connections: [{ ...staging }, { ...cache, excluded: true }] });
+      expect(answerOf(drive('list_connections', {}, {}, none))).toBe(
+        'The user excluded every connection saved in Datardo from searches.',
+      );
+      const all = mcpState({ connections: [{ ...local, exclusions: ['shop.audit', 'shop.orders'] }] });
+      expect(
+        answerOf(
+          drive(
+            'list_collections',
+            { connection: 'Local', database: 'shop' },
+            { mongo: collections(['audit', 'orders']) },
+            all,
+          ),
+        ),
+      ).toBe('The user excluded every collection of shop from searches.');
+    });
+
+    it('answers for what is excluded when it is named', () => {
+      const staged = answerOf(drive('list_databases', { connection: 'Staging' }, { mongo: databases }, state));
+      expect(staged).toContain('"name": "logs"');
+      const found = drive(
+        'find_documents',
+        { connection: 'Local', database: 'logs', collection: 'events' },
+        {
+          mongo: (request) =>
+            request.method === 'listCollections'
+              ? [{ name: 'events', type: 'collection', options: {} }]
+              : request.method === 'countDocuments' || request.method === 'count'
+                ? 0
+                : [],
+        },
+        state,
+      );
+      expect(answerOf(found)).toContain('logs.events');
+    });
   });
 });

@@ -4,6 +4,7 @@
 import type { RunnableFeature } from '../../shared/feature';
 import { featureId } from '../../shared/ids';
 import * as count from './count';
+import * as excludeFromSearches from './exclude-from-searches';
 import * as listCollections from './list-collections';
 import * as listDatabases from './list-databases';
 import * as redisDatabases from './redis-databases';
@@ -27,4 +28,5 @@ export const features: readonly RunnableFeature[] = [
   { kind: 'read', id: featureId('tree.refresh'), request: refresh.request, parse: refresh.parse },
   setCollectionColor.feature,
   setDatabaseColor.feature,
+  excludeFromSearches.feature,
 ];

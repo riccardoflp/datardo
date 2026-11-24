@@ -30,7 +30,6 @@ Shows what the current connection holds, in three parts, and follows the active 
   `src/extension.ts`). One connection at a time, **Pinned** and **Pages of** are new in Datardo. The colors of
   databases and collections and several nodes selected: Mongoster 0.9.0 and 0.10.0 (tree.set-collection-color,
   tree.set-database-color, tree.exclude; `src/tree.ts`, `src/standalone/shell/tree.ts`).
-- **Differs**: (M39) one node at a time is selected, and nothing is shown excluded.
 
 What it shows, in this order:
 
@@ -60,7 +59,7 @@ Acceptance:
 - [ ] The island has the role `tree`; each node says its name, its kind, its count when it has one and whether it is
       expanded.
 - [ ] When a tab becomes active, its node is selected alone: nodes selected together before are not any more
-      (`tree.select`). (differs)
+      (`tree.select`).
 
 ### `tree.pinned` — Pinned items
 
@@ -156,7 +155,6 @@ collections.
   `collections`), `src/shared/gridfs.ts › bucketNames`. The time series node and the document counts are new in
   Datardo. The colored icons and the excluded nodes: Mongoster 0.9.0 and 0.10.0 (`src/tree.ts › connectionIcon`,
   `markExcluded`).
-- **Differs**: (M39) no node is dimmed or marked **excluded**.
 
 What each node shows:
 
@@ -197,8 +195,8 @@ Acceptance:
       every node of `crm` plain; no name changes color.
 - [ ] With `exclusions: ["archive", "shop.logs"]`, `archive` shows `excluded · 3.2 MB` after its name, its
       collections **excluded with its database**, `logs` `excluded · 120`, and all of them are dimmed; `shop` and
-      its other collections are not. (differs)
-- [ ] A screen reader says **excluded** with the name of an excluded node. (differs)
+      its other collections are not.
+- [ ] A screen reader says **excluded** with the name of an excluded node.
 
 ### `tree.list-databases` — List the databases
 
@@ -485,7 +483,6 @@ Shows only the databases and the collections, or the namespaces, whose name cont
   `src/tree.ts › MongoTreeProvider.setFilter`, `matches`, `databases`, `collections`; `package.json` (**Filter
   Databases and Collections…**, **Clear Filter**). The filter of Redis is new in Datardo. Skipping what is excluded:
   Mongoster 0.9.0 (tree.excluded; `src/tree.ts › MongoTreeProvider.matches`, `databases`, `collections`).
-- **Differs**: (M39) nothing is excluded: the filter looks into every database and can match any node.
 
 Acceptance:
 
@@ -508,8 +505,8 @@ Acceptance:
       it.
 - [ ] MongoDB, with `exclusions: ["archive", "shop.logs"]`: typing `o` shows `shop` with `orders` and not `logs`, and
       no `archive` nor anything of it; typing `archive` shows **Nothing matches "archive"**; no `listCollections` is
-      sent for `archive`. (differs)
-- [ ] With the field empty, the excluded nodes are shown again, dimmed (`tree.mongodb`). (differs)
+      sent for `archive`.
+- [ ] With the field empty, the excluded nodes are shown again, dimmed (`tree.mongodb`).
 
 ### `tree.match` — Whether a node matches the filter
 
@@ -521,7 +518,6 @@ The rule that decides which names the filter keeps.
 - **Uses**: `tree.excluded`.
 - **Ported from**: `src/tree.ts › MongoTreeProvider.matches`; what is excluded never matches since Mongoster 0.9.0
   (`src/shared/exclusions.ts › isExcluded`).
-- **Differs**: (M39) a node is matched by its text alone: nothing is excluded.
 
 Rules:
 
@@ -555,7 +551,7 @@ Examples with what is excluded:
 Acceptance:
 
 - [ ] The examples give the results shown.
-- [ ] The examples with what is excluded give the results shown. (differs)
+- [ ] The examples with what is excluded give the results shown.
 
 ### `tree.keyboard` — Moving in the tree with the keyboard
 
@@ -570,7 +566,6 @@ Everything the tree island does with the mouse, done with keys.
   `tree.pages`.
 - **Ported from**: *New in Datardo*; the keys are those of the tree pattern of the WAI-ARIA Authoring Practices.
   `Shift+Up` and `Shift+Down`: Mongoster 0.9.0's desktop app (`src/standalone/shell/tree.ts`).
-- **Differs**: (M39) `Shift+Down` and `Shift+Up` move like `Down` and `Up`, and `Escape` does nothing in the tree.
 
 What each key does:
 
@@ -602,7 +597,7 @@ Acceptance:
 - [ ] The buttons a node shows on hover are reached through its context menu, where each has an entry.
 - [ ] No key of the tree writes to a deployment: `Delete` does nothing.
 - [ ] After a click on `orders`, with `shop` expanded, `Shift+Down` twice selects `orders` and the two collections
-      after it; `Escape` then leaves the last one selected alone. (differs)
+      after it; `Escape` then leaves the last one selected alone.
 
 ### `tree.select` — Several nodes selected
 
@@ -1019,9 +1014,10 @@ What each place does with it:
 
 The changes of the list, each returning the list unchanged when there is nothing to change and nothing when it is
 left empty: `withExclusions(list, keys, excluded)` adds or removes keys; `renamedExclusions(list, database, from,
-to)` moves the key of a renamed collection; `droppedExclusions(list, database, collection)` removes the key of a
-dropped collection or view, the keys of a dropped bucket's `.files` and `.chunks` collections, or a dropped database's
-key and every key that starts with `database.`. They are used, after the server's step succeeded, by
+to)` moves the key of a renamed collection; `droppedExclusions(list, dropped)`, `dropped` a collection or view, a
+bucket or a database as for `droppedColors` (`tree.color-of`), removes the key of a dropped collection or view, the
+keys of a dropped bucket's `.files` and `.chunks` collections, or a dropped database's key and every key that starts
+with `database.`. They are used, after the server's step succeeded, by
 `manage.rename-collection`, `manage.drop-collection`, `manage.drop-database` and `gridfs.drop-bucket`; a rename or a
 drop done elsewhere keeps the key, which applies again to a collection of the same name.
 
@@ -1071,8 +1067,6 @@ GridFS bucket. Each entry starts a feature of another area, which says when it i
   **Pin**, **Refresh** on every node and the menu of the heading are new in Datardo. **Set color…**, **Exclude from
   searches** and **Include in searches** (the `.excluded` forms, the group `4_organize`): Mongoster 0.9.0 and
   0.10.0.
-- **Differs**: (M39) no node has **Exclude from searches** or **Include in searches**, and the menu always acts on the
-  node it was opened on.
 
 What it shows, with a line between the groups. In brackets, the feature behind an entry.
 
@@ -1124,10 +1118,10 @@ Acceptance:
 - [ ] A database, a collection, a view, a time series collection and a bucket have **Set color…**, also on a
       read-only connection.
 - [ ] A node with an exclusion of its own has **Include in searches** in place of **Exclude from searches**; a
-      collection of an excluded database has **Exclude from searches**; both stay on a read-only connection. (differs)
+      collection of an excluded database has **Exclude from searches**; both stay on a read-only connection.
 - [ ] With `orders`, `users` and `logs` selected, the menu opened on `users` has only **Exclude from searches**, and
       choosing it excludes the three; opened on `crm`, which is not selected, it is the whole menu of `crm` and acts
-      on `crm` alone. (differs)
+      on `crm` alone.
 
 ### `tree.menu-redis` — The context menu of a Redis node
 

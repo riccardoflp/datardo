@@ -87,7 +87,9 @@ async function startSearch(services: MainServices, args: Json): Promise<void> {
     connection,
     signal: stop.signal,
   });
-  const asked = { id, connection, input, fallback: typeof fallback === 'string' ? fallback : 'test' };
+  // What the connection excludes from searches as the search starts: a change while it runs does not reach it.
+  const exclusions = services.state.get().connections.saved.find((each) => each.id === connection)?.exclusions ?? [];
+  const asked = { id, connection, input, fallback: typeof fallback === 'string' ? fallback : 'test', exclusions };
   void carriedOut(services, ports, { tab, asked, signal: work.signal }).finally(() => {
     work.end();
     if (running.get(tab)?.id === id) {

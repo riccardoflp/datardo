@@ -2,9 +2,10 @@
  * Feature: search.collections
  *
  * The collections a search reads, in the order they are read and shown, each with its estimated number of documents.
- * Started with `{ connection, database?, collections?, views, fallback }` (`collectionsArgs` builds them from the
- * page): **In** (absent for **Every database**), the collections ticked, **Views**, and the database the connection
- * string names, searched alone when the user may not list the databases.
+ * Started with `{ connection, database?, collections?, views, fallback, exclusions? }` (`collectionsArgs` builds them
+ * from the page): **In** (absent for **Every database**), the collections ticked, **Views**, the database the
+ * connection string names, searched alone when the user may not list the databases, and the keys the connection
+ * excludes from searches when the search starts (`tree.excluded`).
  *
  * The read goes in steps, each knowing what the one before answered. The runner (or the worker of the search) carries
  * it out as a loop over pure functions, the replies kept in the order their requests were sent:
@@ -14,7 +15,8 @@
  * 2. `nextRequests(args, replies)` gives what to send next and nothing once the read is complete or has failed: the
  *    `listCollections` of every database searched, then the `estimatedDocumentCount` of every collection that is not a
  *    view;
- * 3. `parse(replies, args)` gives the collections, or the server's message when a database could not be listed.
+ * 3. `parse(replies, args)` gives the collections and how many were left out because they are excluded from searches,
+ *    or the server's message when a database could not be listed.
  *
  * A request that fails reaches the read as an entry of `replies` (`{ kind: 'error', message }` or an `Error`), not as
  * the end of the read: a refused `listDatabases` and a failed count are part of the rules.
@@ -27,6 +29,7 @@ import { savedConnection } from '../../shared/state/connections';
 import { bucketNames } from '../tree/list-collections';
 import { databaseOfAddress } from '../tree/list-databases';
 import { compareNames, failureOf, isObject, numberOf } from '../tree/types';
+import { exclusionsOf } from '../../shared/exclusion';
 import type { SearchCollection, SearchInput } from './types';
 
 /** How long listing the databases, the collections and counting may take, in milliseconds (Datardo's choice, R9.2). */
@@ -48,18 +51,24 @@ export interface CollectionsArgs {
   readonly views: boolean;
   /** The database searched alone when the user may not list the databases. */
   readonly fallback: string;
+  /** The keys the connection excludes from searches (`tree.excluded`), as they were when the search started. */
+  readonly exclusions: readonly string[];
 }
 
-/** What the read gives: the collections, or the server's message when the collections could not be listed. */
+/**
+ * What the read gives: the collections and the number of databases and collections left out because they are excluded
+ * from searches (rule 7), or the server's message when the collections could not be listed.
+ */
 export type CollectionsRead =
-  | { readonly kind: 'collections'; readonly collections: readonly SearchCollection[] }
+  | { readonly kind: 'collections'; readonly collections: readonly SearchCollection[]; readonly excluded: number }
   | { readonly kind: 'error'; readonly message: string };
 
 /** The arguments of the read for a search of `connection` with what the page shows. */
 export function collectionsArgs(state: AppState, connection: ConnectionId, input: SearchInput): Json {
-  const address = savedConnection(state.connections, connection)?.address ?? '';
+  const saved = savedConnection(state.connections, connection);
   const scope = input.database === undefined ? {} : { database: input.database, collections: [...input.collections] };
-  return { connection, ...scope, views: input.views, fallback: databaseOfAddress(address) ?? 'test' };
+  const fallback = databaseOfAddress(saved?.address ?? '') ?? 'test';
+  return { connection, ...scope, views: input.views, fallback, exclusions: [...(saved?.exclusions ?? [])] };
 }
 
 function argsOf(args: Json): CollectionsArgs {
@@ -76,6 +85,7 @@ function argsOf(args: Json): CollectionsArgs {
     collections: Array.isArray(ticked) ? ticked.filter((name): name is string => typeof name === 'string') : [],
     views: fields['views'] === true,
     fallback: text('fallback') ?? 'test',
+    exclusions: exclusionsOf(fields['exclusions']) ?? [],
   };
 }
 
@@ -119,11 +129,8 @@ export function request(_context: Context, args: Json): ReadRequest {
   return { kind: 'engine', requests: [firstRequest(args)] };
 }
 
-/** The databases searched: **In**, or those `listDatabases` answered without the three of the server. */
-function databasesOf(args: CollectionsArgs, replies: readonly unknown[]): readonly string[] {
-  if (args.database !== undefined) {
-    return [args.database];
-  }
+/** The databases `listDatabases` answered without the three of the server; the fallback when it could not answer. */
+function listedDatabases(args: CollectionsArgs, replies: readonly unknown[]): readonly string[] {
   const [reply] = replies;
   const list = isObject(reply) && failureOf(reply) === undefined ? reply['databases'] : undefined;
   if (!Array.isArray(list)) {
@@ -133,6 +140,24 @@ function databasesOf(args: CollectionsArgs, replies: readonly unknown[]): readon
     .flatMap((each): string[] => (isObject(each) && typeof each['name'] === 'string' ? [each['name']] : []))
     .filter((name) => !skippedDatabases.includes(name))
     .sort(compareNames);
+}
+
+/**
+ * The databases searched: **In**, even when it is excluded; or those listed, without those excluded from searches
+ * (rule 6).
+ */
+function databasesOf(args: CollectionsArgs, replies: readonly unknown[]): readonly string[] {
+  if (args.database !== undefined) {
+    return [args.database];
+  }
+  return listedDatabases(args, replies).filter((name) => !args.exclusions.includes(name));
+}
+
+/** The databases rule 6 left out: those listed that are excluded, with **Every database**. */
+function excludedDatabases(args: CollectionsArgs, replies: readonly unknown[]): number {
+  return args.database === undefined
+    ? listedDatabases(args, replies).filter((name) => args.exclusions.includes(name)).length
+    : 0;
 }
 
 interface Listed {
@@ -147,19 +172,25 @@ function listedOf(reply: unknown): readonly Listed[] {
   );
 }
 
-/** Rules 1 to 3: the collections of one database a search reads, sorted by name. */
-function keptOf(args: CollectionsArgs, database: string, reply: unknown): readonly SearchCollection[] {
+/** The collections of one database a search reads, and how many rule 6 left out. */
+interface Kept {
+  readonly collections: readonly SearchCollection[];
+  readonly excluded: number;
+}
+
+/** Rules 1 to 3 and 6: the collections of one database a search reads, sorted by name. */
+function keptOf(args: CollectionsArgs, database: string, reply: unknown): Kept {
   const listed = listedOf(reply);
   const chunks = new Set(bucketNames(listed.map((each) => each.name)).map((bucket) => `${bucket}.chunks`));
-  const kept =
-    args.collections.length > 0
-      ? listed.filter((each) => args.collections.includes(each.name))
-      : listed.filter(
-          (each) => !each.name.startsWith('system.') && !chunks.has(each.name) && (args.views || !each.view),
-        );
-  return [...kept]
+  const ticked = args.collections.length > 0;
+  const searchable = ticked
+    ? listed.filter((each) => args.collections.includes(each.name))
+    : listed.filter((each) => !each.name.startsWith('system.') && !chunks.has(each.name) && (args.views || !each.view));
+  const kept = ticked ? searchable : searchable.filter((each) => !args.exclusions.includes(`${database}.${each.name}`));
+  const collections = [...kept]
     .sort((one, other) => compareNames(one.name, other.name))
     .map((each) => ({ database, collection: each.name, view: each.view }));
+  return { collections, excluded: searchable.length - kept.length };
 }
 
 /** Where the replies of each step start, from the replies so far. */
@@ -175,15 +206,19 @@ function layoutOf(args: CollectionsArgs, replies: readonly unknown[]): Layout {
   return { databases, listedAt, countsAt: listedAt + databases.length };
 }
 
-/** The collections listed, in order, once every database was listed; `undefined` before, or a failure's message. */
-function listedCollections(args: CollectionsArgs, replies: readonly unknown[]): readonly SearchCollection[] | string {
+/** The collections listed, in order, once every database was listed, with how many were left out; or a failure's message. */
+function listedCollections(args: CollectionsArgs, replies: readonly unknown[]): Kept | string {
   const layout = layoutOf(args, replies);
   const listings = replies.slice(layout.listedAt, layout.countsAt);
   const failed = listings.map(failureOf).find((message) => message !== undefined);
   if (failed !== undefined) {
     return failed;
   }
-  return layout.databases.flatMap((database, index) => keptOf(args, database, listings[index]));
+  const kept = layout.databases.map((database, index) => keptOf(args, database, listings[index]));
+  return {
+    collections: kept.flatMap((each) => each.collections),
+    excluded: excludedDatabases(args, replies) + kept.reduce((sum, each) => sum + each.excluded, 0),
+  };
 }
 
 /** Feature: search.collections — what to send next, given every reply so far; nothing once the read is complete. */
@@ -196,20 +231,24 @@ export function nextRequests(args: Json, replies: readonly unknown[]): readonly 
   if (replies.length === layout.listedAt && asked.database === undefined) {
     return layout.databases.map((database) => collectionsRequest(asked, database));
   }
-  const collections = replies.length === layout.countsAt ? listedCollections(asked, replies) : [];
-  return typeof collections === 'string'
+  const listed = replies.length === layout.countsAt ? listedCollections(asked, replies) : undefined;
+  return listed === undefined || typeof listed === 'string'
     ? []
-    : collections.filter((each) => !each.view).map((each) => countRequest(asked, each));
+    : listed.collections.filter((each) => !each.view).map((each) => countRequest(asked, each));
 }
 
-/** Feature: search.collections — the collections with their estimated counts, or the message of a listing that failed. */
+/**
+ * Feature: search.collections — the collections with their estimated counts and how many were left out because they
+ * are excluded from searches, or the message of a listing that failed.
+ */
 export function parse(replies: readonly unknown[], args: Json = null): CollectionsRead {
   const asked = argsOf(args);
   const layout = layoutOf(asked, replies);
-  const collections = listedCollections(asked, replies);
-  if (typeof collections === 'string') {
-    return { kind: 'error', message: collections };
+  const listed = listedCollections(asked, replies);
+  if (typeof listed === 'string') {
+    return { kind: 'error', message: listed };
   }
+  const { collections, excluded } = listed;
   const counts = replies.slice(layout.countsAt);
   let next = 0;
   const counted = collections.map((each): SearchCollection => {
@@ -220,7 +259,7 @@ export function parse(replies: readonly unknown[], args: Json = null): Collectio
     next += 1;
     return count === undefined ? each : { ...each, estimate: count };
   });
-  return { kind: 'collections', collections: counted };
+  return { kind: 'collections', collections: counted, excluded };
 }
 
 /** The feature, as the runner starts it. */

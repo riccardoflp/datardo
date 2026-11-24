@@ -10,10 +10,13 @@ import type { ConnectionView } from '../../shared/connection';
 import type { TabShows } from '../../shared/state/tabs';
 import { iconColored } from './color-of';
 import { countText, sizeText } from './count';
+import { exclusionOf, type ExclusionTarget } from './excluded';
 import { appliedFilter, filterDatabase, type FilteredDatabase } from './filter';
 import * as nodeStates from './node-states';
+import { isSelected } from './select';
 import { text } from './text';
 import {
+  currentConnection,
   nodeId,
   nodeLabel,
   openControl,
@@ -47,6 +50,40 @@ function refreshOf(connection: ConnectionView, database?: string): Control {
 
 function isShown(built: Built, feature: string): boolean {
   return !built.connection.readOnly && built.input.isAvailable(feature);
+}
+
+/** What a node excluded from searches shows instead (`tree.excluded`): dimmed, marked, and a last line of its hover. */
+interface Marked {
+  readonly after?: string;
+  readonly hover: string;
+  readonly dimmed: boolean;
+  /** The mark and what follows it, as the screen reader says them after the name. */
+  readonly count?: string;
+  readonly color?: TreeNode['color'];
+}
+
+/**
+ * The parts of a node that its exclusion changes: after its name, **excluded** or **excluded with its database**
+ * before what the tree says (`excluded · 1,204`); its hover's last line; dimmed, its icon too, whatever its color.
+ */
+function marked(
+  built: Built,
+  target: Exclude<ExclusionTarget, { kind: 'connection' }>,
+  shown: { readonly after?: string; readonly hover: string; readonly dimmed: boolean; readonly count?: string },
+): Marked {
+  const exclusion = exclusionOf(built.connection, target);
+  const colored = iconColored(built.connection, target);
+  if (exclusion === 'not-excluded') {
+    return { ...shown, ...colored };
+  }
+  const mark = exclusion === 'own' ? text.exclusions.own : text.exclusions.withDatabase;
+  const line = exclusion === 'own' ? text.exclusions.hover : text.exclusions.hoverWithDatabase(target.database);
+  return {
+    after: [mark, ...(shown.after === undefined ? [] : [shown.after])].join(text.exclusions.separator),
+    hover: `${shown.hover}\n${line}`,
+    dimmed: true,
+    count: [mark, ...(shown.count === undefined ? [] : [shown.count])].join(', '),
+  };
 }
 
 function databaseButtons(built: Built, database: string): readonly Control[] {
@@ -101,6 +138,15 @@ function entryNode(built: Built, database: string, entry: CollectionEntry): Tree
     connection: built.connection.id,
     args: { connection: built.connection.id, database, collection: entry.name },
   });
+  const shown = marked(
+    built,
+    { kind: 'collection', database, collection: entry.name },
+    {
+      ...(after === undefined ? {} : { after, count: text.label.documents(after) }),
+      hover: entryHover(database, entry),
+      dimmed: entry.system,
+    },
+  );
   return {
     kind: 'node',
     id,
@@ -109,17 +155,17 @@ function entryNode(built: Built, database: string, entry: CollectionEntry): Tree
     ref: { kind: 'collection', database, name: entry.name, collectionKind: entry.kind, system: entry.system },
     name: entry.name,
     icon: entryIcon(entry),
-    ...iconColored(built.connection, { kind: 'collection', database, collection: entry.name }),
-    ...(after === undefined ? {} : { after }),
-    hover: entryHover(database, entry),
-    dimmed: entry.system,
+    ...(shown.color === undefined ? {} : { color: shown.color }),
+    ...(shown.after === undefined ? {} : { after: shown.after }),
+    hover: shown.hover,
+    dimmed: shown.dimmed,
     expandable: false,
     expanded: false,
-    selected: built.input.island.selected === id,
+    selected: isSelected(built.input.island, id),
     label: nodeLabel({
       name: entry.name,
       kind: text.kinds[entry.kind],
-      ...(after === undefined ? {} : { count: text.label.documents(after) }),
+      ...(shown.count === undefined ? {} : { count: shown.count }),
     }),
     click: openControl(entry.name, 'tree.mongodb@tree', shows),
     buttons: entry.kind !== 'view' && isShown(built, 'document.insert') ? [insert] : [],
@@ -135,6 +181,11 @@ function bucketNode(built: Built, database: string, name: string): TreeNode {
     connection,
     args: { connection, database, bucket: name },
   });
+  const shown = marked(
+    built,
+    { kind: 'bucket', database, bucket: name },
+    { after: text.mongodb.gridfs, hover: text.mongodb.bucketHover(database, name), dimmed: false },
+  );
   return {
     kind: 'node',
     id,
@@ -143,14 +194,14 @@ function bucketNode(built: Built, database: string, name: string): TreeNode {
     ref: { kind: 'bucket', database, name },
     name,
     icon: 'files',
-    ...iconColored(built.connection, { kind: 'bucket', database, bucket: name }),
-    after: text.mongodb.gridfs,
-    hover: text.mongodb.bucketHover(database, name),
-    dimmed: false,
+    ...(shown.color === undefined ? {} : { color: shown.color }),
+    after: shown.after ?? text.mongodb.gridfs,
+    hover: shown.hover,
+    dimmed: shown.dimmed,
     expandable: false,
     expanded: false,
-    selected: built.input.island.selected === id,
-    label: nodeLabel({ name, kind: text.kinds.bucket }),
+    selected: isSelected(built.input.island, id),
+    label: nodeLabel({ name, kind: text.kinds.bucket, ...(shown.count === undefined ? {} : { count: shown.count }) }),
     click: openControl(name, 'gridfs.show@tree', shows),
     buttons: isShown(built, 'gridfs.upload') ? [upload] : [],
     hasMenu: true,
@@ -193,12 +244,22 @@ function childrenOf(built: Built, database: string, filtered: FilteredDatabase):
 
 function databaseItems(built: Built, database: MongoDatabase): readonly TreeItem[] {
   const id = nodeId({ kind: 'database', database: database.name });
-  const filtered = filterDatabase(built.filter, database.name, built.input.island.mongodb.contents[database.name]);
+  const filtered = filterDatabase(
+    built.filter,
+    database.name,
+    built.input.island.mongodb.contents[database.name],
+    built.connection,
+  );
   if (!filtered.shown) {
     return [];
   }
   const expanded = built.input.island.expanded.includes(id) || filtered.expanded;
   const size = sizeText(database.sizeOnDisk ?? 0);
+  const shown = marked(
+    built,
+    { kind: 'database', database: database.name },
+    { ...(size === '' ? {} : { after: size, count: size }), hover: database.name, dimmed: false },
+  );
   const node: TreeNode = {
     kind: 'node',
     id,
@@ -207,17 +268,17 @@ function databaseItems(built: Built, database: MongoDatabase): readonly TreeItem
     ref: { kind: 'database', database: database.name },
     name: database.name,
     icon: 'database',
-    ...iconColored(built.connection, { kind: 'database', database: database.name }),
-    ...(size === '' ? {} : { after: size }),
-    hover: database.name,
-    dimmed: false,
+    ...(shown.color === undefined ? {} : { color: shown.color }),
+    ...(shown.after === undefined ? {} : { after: shown.after }),
+    hover: shown.hover,
+    dimmed: shown.dimmed,
     expandable: true,
     expanded,
-    selected: built.input.island.selected === id,
+    selected: isSelected(built.input.island, id),
     label: nodeLabel({
       name: database.name,
       kind: text.kinds.database,
-      ...(size === '' ? {} : { count: size }),
+      ...(shown.count === undefined ? {} : { count: shown.count }),
       expanded,
     }),
     buttons: databaseButtons(built, database.name),
@@ -274,7 +335,11 @@ export function expandedByFilter(input: TreeInput): readonly string[] {
   const filter = appliedFilter(input.island);
   const loadable = input.island.mongodb.databases;
   const databases = loadable.kind === 'loaded' ? loadable.value : [];
+  const connection = currentConnection(input.state) ?? {};
   return databases
-    .filter((database) => filterDatabase(filter, database.name, input.island.mongodb.contents[database.name]).expanded)
+    .filter(
+      (database) =>
+        filterDatabase(filter, database.name, input.island.mongodb.contents[database.name], connection).expanded,
+    )
     .map((database) => nodeId({ kind: 'database', database: database.name }));
 }

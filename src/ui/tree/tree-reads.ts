@@ -22,6 +22,7 @@ import type { IntentResult } from '../../shared/bridge';
 import type { Json } from '../../shared/engine-request';
 import { featureId, type ConnectionId } from '../../shared/ids';
 import type { AppState } from '../../shared/state';
+import { savedConnection } from '../../shared/state/connections';
 import { changeIsland, treeOf } from './tree-store';
 
 /** Starts a Read of the tree on a connection, from the tree island. */
@@ -172,7 +173,8 @@ export async function listForFilter(state: AppState, connection: ConnectionId): 
   const tried = new Set<string>();
   try {
     for (;;) {
-      const database = databasesToList(treeOf(connection).island).find((each) => !tried.has(each));
+      const saved = savedConnection(state.connections, connection);
+      const database = databasesToList(treeOf(connection).island, saved).find((each) => !tried.has(each));
       if (database === undefined) {
         return;
       }

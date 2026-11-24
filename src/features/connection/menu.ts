@@ -5,7 +5,8 @@
  *
  * The entries of the undo history (**Stop keeping undo history**, **Keep undo history**; `undo.per-connection`) are
  * in the third group; those of the backup area (**Back up…**, **Restore from backup…**) in the fourth, with **Schedule…** (`task.edit`) on the connection island. **Create database…**
- * (`manage.create-database`) follows **Open overview** on the connection island.
+ * (`manage.create-database`) follows **Open overview** on the connection island. **Exclude from searches** or
+ * **Include in searches** (`tree.exclude-from-searches`) follows **Set color…**.
  */
 import type { ConnectionStateName, ConnectionView } from '../../shared/connection';
 import type { Json } from '../../shared/engine-request';
@@ -15,6 +16,7 @@ import { isVariantOffered, variantTitle, type KeepVariant } from '../undo/per-co
 import { text as manageText } from '../manage/text';
 import { createText, restoreText } from '../backup/text';
 import { menuText as taskMenuText } from '../task/text';
+import { text as treeText } from '../tree/text';
 import { menuText } from './text';
 
 /** The places the menu is drawn in. */
@@ -26,7 +28,10 @@ export interface MenuItem {
   readonly label: string;
   readonly feature: string;
   readonly element: string;
-  /** What the feature is started with: the variant of `undo.per-connection`. */
+  /**
+   * What the feature is started with: the variant of `undo.per-connection`; `{ connection, action, scope }` of
+   * `tree.exclude-from-searches`.
+   */
   readonly args?: Json;
 }
 
@@ -111,6 +116,11 @@ const elements = {
     'connection-switcher': 'connection.set-color@connection-switcher',
     'connection-island': 'connection.set-color@connection-island',
   },
+  excludeFromSearches: {
+    home: 'tree.exclude-from-searches@home',
+    'connection-switcher': 'tree.exclude-from-searches@connection-switcher',
+    'connection-island': 'tree.exclude-from-searches@connection-island',
+  },
   linkRedis: {
     home: 'connection.link-redis@home',
     'connection-switcher': 'connection.link-redis@connection-switcher',
@@ -159,6 +169,21 @@ function undoEntries(connection: ConnectionView, place: MenuPlace): readonly Men
 }
 
 /**
+ * **Exclude from searches**, or **Include in searches** on a connection excluded from searches, on the whole
+ * connection, read-only or not (`tree.exclude-from-searches`).
+ */
+function exclusionEntry(connection: ConnectionView, place: MenuPlace): MenuEntry {
+  const excluded = connection.excluded === true;
+  return {
+    kind: 'item',
+    label: excluded ? treeText.menu.includeInSearches : treeText.menu.excludeFromSearches,
+    feature: 'tree.exclude-from-searches',
+    element: elements.excludeFromSearches[place],
+    args: { connection: connection.id, action: excluded ? 'include' : 'exclude', scope: 'connection' },
+  };
+}
+
+/**
  * **Create database…** (`manage.create-database`), on the connection island only: for a MongoDB connection, connected
  * and not read-only.
  */
@@ -184,7 +209,10 @@ function stateEntries(state: ConnectionStateName, place: MenuPlace): readonly Me
   ];
 }
 
-/** The third group: folder, color, read-only, the undo history, and for MongoDB the redis-oplog link. */
+/**
+ * The third group: folder, color, exclusion from searches, read-only, the undo history, and for MongoDB the
+ * redis-oplog link.
+ */
 function organizeEntries(
   connections: ConnectionsState,
   connection: ConnectionView,
@@ -195,6 +223,7 @@ function organizeEntries(
   return [
     item(menuText.moveToFolder, 'connection.move-to-folder', elements.moveToFolder[place]),
     item(menuText.setColor, 'connection.set-color', elements.setColor[place]),
+    exclusionEntry(connection, place),
     connection.readOnly
       ? item(menuText.allowChanges, 'connection.allow-changes', elements.allowChanges[place])
       : item(menuText.readOnly, 'connection.read-only', elements.readOnly[place]),

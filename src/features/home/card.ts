@@ -70,6 +70,7 @@ export function marksOf(connection: ConnectionView): readonly string[] {
     ...(connection.readOnly ? [text.card.marks.readOnly] : []),
     ...(connection.ssh === undefined ? [] : [text.card.marks.ssh]),
     ...(connection.engine === 'mongodb' && connection.publishesTo !== undefined ? [text.card.marks.oplog] : []),
+    ...(connection.excluded === true ? [text.card.marks.excluded] : []),
   ];
 }
 

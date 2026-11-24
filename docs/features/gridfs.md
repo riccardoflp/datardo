@@ -786,7 +786,7 @@ Drops the two collections of a bucket, with every file in it.
 - **Ported from**: `src/gridfs.ts` (`dropBucket`); `src/extension.ts` (the command that drops a bucket). The color and
   the exclusion that go: Mongoster 0.9.0 (tree.collection-color-follows, tree.exclusion-follows; the
   `mongoster.dropGridFSBucket` handler). The formatting rules that go are Datardo's choice.
-- **Differs**: (M39) the plan forgets no exclusion from searches; (M41) nor formatting rules.
+- **Differs**: (M41) the plan forgets no formatting rules.
 
 Acceptance:
 
@@ -803,6 +803,6 @@ Acceptance:
   is read-only.* and the code `gridfs.drop-bucket/read-only`.
 - [ ] Dropping `fs` of `shop`, pink and excluded, shows a third step `forget the color and the exclusion from
   searches of the GridFS bucket shop.fs`; after it, `collectionColors` and `exclusions` have neither `shop.fs.files`
-  nor `shop.fs.chunks`, and a new bucket `fs` is plain and not excluded. (differs)
+  nor `shop.fs.chunks`, and a new bucket `fs` is plain and not excluded.
 - [ ] Dropping a bucket that has no color, no exclusion and no formatting rule shows the two drops alone.
 - [ ] When a drop fails, the color and the exclusion stay.

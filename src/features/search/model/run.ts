@@ -12,6 +12,8 @@ export type SearchEvent =
       readonly kind: 'listed';
       readonly search: number;
       readonly collections: readonly SearchCollection[];
+      /** How many databases and collections were left out because they are excluded from searches. */
+      readonly excluded?: number;
       readonly at: number;
     }
   | { readonly kind: 'list-failed'; readonly search: number; readonly message: string; readonly at: number }
@@ -66,8 +68,10 @@ export function runAfter(run: SearchRun, event: SearchEvent): SearchRun {
     return run;
   }
   switch (event.kind) {
-    case 'listed':
-      return ended({ ...run, state: 'searching', scans: event.collections.map(waiting) }, event.at);
+    case 'listed': {
+      const excluded = event.excluded === undefined || event.excluded === 0 ? {} : { excluded: event.excluded };
+      return ended({ ...run, state: 'searching', scans: event.collections.map(waiting), ...excluded }, event.at);
+    }
     case 'list-failed':
       return { ...run, state: 'error', error: event.message, endedAt: event.at };
     case 'scanned': {

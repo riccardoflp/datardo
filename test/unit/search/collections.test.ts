@@ -76,6 +76,7 @@ describe('search.collections', () => {
         { database: 'shop', collection: 'orders', view: false, estimate: 5000 },
         { database: 'shop', collection: 'recent', view: true },
       ],
+      excluded: 0,
     });
   });
 
@@ -102,6 +103,7 @@ describe('search.collections', () => {
       connection: local.id,
       views: false,
       fallback: 'app',
+      exclusions: [],
     });
     expect(
       collectionsArgs(context.state, local.id, { ...firstInput, database: 'shop', collections: ['orders'] }),
@@ -116,6 +118,7 @@ describe('search.collections', () => {
     expect(read).toEqual({
       kind: 'collections',
       collections: [{ database: 'shop', collection: 'orders', view: false }],
+      excluded: 0,
     });
   });
 
@@ -136,10 +139,80 @@ describe('search.collections', () => {
         { database: 'search-record', collection: 'orders', view: false, estimate: 4 },
         { database: 'search-record', collection: 'recent', view: true },
       ],
+      excluded: 0,
     });
   });
 
   it('sends nothing more once the counts have answered', () => {
     expect(nextRequests(shopArgs(), [listed, int(1), int(2)])).toEqual([]);
+  });
+
+  it('with exclusions crm and shop.orders and Every database, sends nothing to crm, reads fs.files of shop alone, and leaves 2 out', () => {
+    const args = {
+      connection: local.id,
+      collections: [],
+      views: false,
+      fallback: 'app',
+      exclusions: ['crm', 'shop.orders'],
+    };
+    const databases = ['admin', 'crm', 'shop'].map((name) => ({ name }));
+    const sent = nextRequests(args, [{ databases, ok: int(1) }]).map(mongo);
+    expect(sent.map((each) => `${each.method} ${each.database}`)).toEqual(['listCollections shop']);
+    const read = parse([{ databases, ok: int(1) }, listed, int(1)], args);
+    expect(read).toEqual({
+      kind: 'collections',
+      collections: [{ database: 'shop', collection: 'fs.files', view: false, estimate: 1 }],
+      excluded: 2,
+    });
+  });
+
+  it('with In at crm, excluded, reads the collections of crm and leaves none out', () => {
+    const args = {
+      connection: local.id,
+      database: 'crm',
+      collections: [],
+      views: false,
+      fallback: 'app',
+      exclusions: ['crm'],
+    };
+    expect(first(args)).toMatchObject({ database: 'crm', method: 'listCollections' });
+    const read = parse([[{ name: 'users', type: 'collection' }], int(3)], args);
+    expect(read).toEqual({
+      kind: 'collections',
+      collections: [{ database: 'crm', collection: 'users', view: false, estimate: 3 }],
+      excluded: 0,
+    });
+  });
+
+  it('counts a view left out by Views before its exclusion as not excluded', () => {
+    const args = shopArgs({ exclusions: ['shop.fs.files', 'shop.recent'] });
+    const read = parse([listed, int(5)], args);
+    expect(read).toEqual({
+      kind: 'collections',
+      collections: [{ database: 'shop', collection: 'orders', view: false, estimate: 5 }],
+      excluded: 1,
+    });
+  });
+
+  it('reads a ticked collection whatever its exclusion, and leaves nothing out', () => {
+    const read = parse([listed, int(5)], shopArgs({ collections: ['orders'], exclusions: ['shop.orders'] }));
+    expect(read).toEqual({
+      kind: 'collections',
+      collections: [{ database: 'shop', collection: 'orders', view: false, estimate: 5 }],
+      excluded: 0,
+    });
+  });
+
+  it('takes the exclusions of the connection as the search starts', () => {
+    const state = {
+      ...context.state,
+      connections: {
+        ...context.state.connections,
+        saved: context.state.connections.saved.map((each) =>
+          each.id === local.id ? { ...each, exclusions: ['archive', 'shop.logs'] } : each,
+        ),
+      },
+    };
+    expect(collectionsArgs(state, local.id, firstInput)).toMatchObject({ exclusions: ['archive', 'shop.logs'] });
   });
 });

@@ -39,6 +39,8 @@ export interface SearchAsked {
   readonly input: SearchInput;
   /** The database searched alone when the user may not list the databases. */
   readonly fallback: string;
+  /** The keys the connection excluded from searches when the search started (`tree.excluded`). */
+  readonly exclusions?: readonly string[];
 }
 
 /** The search as it goes, and the cursors open now. */
@@ -100,9 +102,9 @@ function failureMessage(error: unknown): string {
 
 /** The replies of the listing, each request after the replies before it; a failure is a reply of its own. */
 async function listed(search: Search, signal: AbortSignal): Promise<ReturnType<typeof parseCollections>> {
-  const { input, connection, fallback } = search.asked;
+  const { input, connection, fallback, exclusions = [] } = search.asked;
   const scope = input.database === undefined ? {} : { database: input.database, collections: [...input.collections] };
-  const args: Json = { connection, ...scope, views: input.views, fallback };
+  const args: Json = { connection, ...scope, views: input.views, fallback, exclusions: [...exclusions] };
   const replies: unknown[] = [];
   let next: readonly ConnectionRequest[] = [firstRequest(args)];
   while (next.length > 0) {
@@ -268,7 +270,8 @@ export async function runSearch(ports: SearchRunPorts, asked: SearchAsked, signa
       search.apply({ kind: 'list-failed', search: asked.id, message: collections.message, at: ports.now() });
       return search.run;
     }
-    search.apply({ kind: 'listed', search: asked.id, collections: collections.collections, at: ports.now() });
+    const { collections: listedCollections, excluded } = collections;
+    search.apply({ kind: 'listed', search: asked.id, collections: listedCollections, excluded, at: ports.now() });
     await readAll(search, { wanted: looking, fieldNames: asked.input.fieldNames }, signal);
   } catch (error: unknown) {
     if (!signal.aborted) {

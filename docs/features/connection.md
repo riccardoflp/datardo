@@ -515,7 +515,6 @@ Saves a copy of a connection, with everything it has, under a new name.
 - **Uses**: `connection.secrets`, `connection.edit`, `connection.menu`, `runner.notify`, `tree.color-of`,
   `tree.excluded`.
 - **Ported from**: *New in Datardo*.
-- **Differs**: (M39) the copy has nothing excluded from searches.
 
 Acceptance:
 
@@ -525,7 +524,7 @@ Acceptance:
       linked connection.
 - [ ] The copy has the colors of the databases and collections of the original (`tree.color-of`) and, when the
       original is excluded from searches, is excluded too, with the same databases and collections excluded
-      (`tree.excluded`). (differs)
+      (`tree.excluded`).
 - [ ] The copy has a new id, an empty undo history, no pins and no open tabs.
 - [ ] The secrets are copied in the main process: the window process never receives them.
 - [ ] Changing or removing the copy changes nothing of the original.
@@ -919,7 +918,6 @@ The entries offered on a saved connection, the same wherever the connection is s
   that create, back up and restore are in the tree island's own menu. **Exclude from searches** and **Include in
   searches** come from tree.exclude of Mongoster 0.9.0 (`package.json`, `mongoster.exclude`, `mongoster.include`),
   which offers them on the connection's node of its tree.
-- **Differs**: (M39) the menu has no **Exclude from searches** and no **Include in searches**.
 
 What it shows, in this order, with a line between the groups:
 
@@ -949,7 +947,7 @@ Acceptance:
 - [ ] Every entry can be reached with the keyboard: `Shift+F10` on a card or a line opens the menu, the arrows move,
       `Enter` chooses, `Escape` closes.
 - [ ] A MongoDB connection and a Redis connection both show **Exclude from searches** after **Set color…**; once
-      excluded, the menu shows **Include in searches** in its place, also on a read-only connection. (differs)
+      excluded, the menu shows **Include in searches** in its place, also on a read-only connection.
 
 ### `connection.folder-menu` — The menu of a folder
 
@@ -1481,7 +1479,6 @@ and cannot go.
   `src/standalone/vscode/storage.ts`). The colors of databases and collections and the exclusions from searches
   are kept on the connection as Mongoster 0.9.0 keeps them (`src/shared/collectionColors.ts`,
   `src/shared/exclusions.ts`).
-- **Differs**: (M39) the saved connections keep nothing excluded from searches.
 
 What is kept where:
 
@@ -1577,7 +1574,6 @@ either engine, from a file or the clipboard.
   (`src/shared/connectionsFile.ts › securityNotes`, `urlHost`; `src/connectionsTransfer.ts › summary`, and the
   **Replace** of `importConnections`). The queries folder in the detail is new in Datardo, which keeps one per
   connection.
-- **Differs**: (M39) it says nothing of the exclusions from searches, and **Replace** carries none.
 
 Acceptance:
 
@@ -1586,7 +1582,7 @@ Acceptance:
       folder, the color, **<n> database color(s)**, **<n> collection color(s)**, **excluded from searches**, **<n>
       database(s) or collection(s) excluded from searches**, **read-only**, what the connection does beyond its
       host (below) and the notes (**no password**, **no SSH password**, **passwords not imported (encrypted)**,
-      **In-Use Encryption settings not imported**…). (differs)
+      **In-Use Encryption settings not imported**…).
 - [ ] What the connection does beyond its host, since the file may come from someone else, in this order and each
       only when it applies: **TLS**; **invalid certificates allowed** and **invalid host names allowed**, from the
       TLS settings or from the options `tlsInsecure`, `tlsAllowInvalidCertificates` and `tlsAllowInvalidHostnames`
@@ -1607,7 +1603,7 @@ Acceptance:
       `"collectionColors": { "shop.orders": "none", "shop.logs": "#12abef" }`, `"excluded": true` and
       `"exclusions": ["archive"]` has in its detail `#1e90ff`, **1 database color**, **2 collection colors**,
       **excluded from searches** and **1 database or collection excluded from searches**, and is imported with
-      them. (differs)
+      them.
 - [ ] Connections already there with the same name and the same connection string start unchecked; all others start
       checked.
 - [ ] **Skip** leaves out the chosen connections whose name is taken; **Keep both** adds them as `name (2)`, `name
@@ -1618,7 +1614,7 @@ Acceptance:
 - [ ] With **Replace**, the colors of databases, the colors of collections and the databases and collections
       excluded from searches are replaced by the file's, each kept when the file has none (a Compass file or a list
       never has them); the connection stays excluded from searches if it was, and becomes excluded if the imported
-      one is. (differs)
+      one is.
 - [ ] A connection is never replaced by one of the other engine: with **Replace**, an imported Redis connection
       whose name belongs to a MongoDB connection is added as `name (2)`.
 - [ ] Started on a folder, every imported connection goes to that folder without asking; **Folders from the file**
@@ -1671,7 +1667,6 @@ without their passwords.
   Mongoster's. The colors of databases and collections, the custom colors and the exclusions from searches, with
   their notes, come from connection.export of Mongoster 0.9.0 (`src/connectionsTransfer.ts › portable`,
   `src/shared/connectionsFile.ts › serializeConnections`).
-- **Differs**: (M39) it writes no exclusions from searches, and no note says that the other formats left them out.
 
 Acceptance:
 
@@ -1693,11 +1688,11 @@ Acceptance:
       can't hold them)**.
 - [ ] Datardo's format carries the color of each connection, a custom `#rrggbb` included, the colors of its
       databases and collections, and what is excluded from searches; importing the file gives them back
-      (`connection.write-file`). (differs)
+      (`connection.write-file`).
 - [ ] The Compass format adds, as they apply, the notes **colors of databases and collections were left out (Compass
       doesn't have them)** and **exclusions from searches were left out (Compass doesn't have them)**; the list
       counts the colors of databases and collections in **folders, colors, read-only and redis-oplog were left out**
-      and adds **exclusions from searches were left out**. (differs)
+      and adds **exclusions from searches were left out**.
 - [ ] No secret passes through the window process: the questions carry names and choices, and the main process
       reads the secrets and writes the file.
 
@@ -1720,7 +1715,6 @@ Tells the format of the text to import, and reads Datardo's and Mongoster's own 
   from connection.read-file of Mongoster 0.9.0 (`src/shared/connectionsFile.ts › fromMongoster`,
   `src/shared/collectionColors.ts › readDatabaseColors`, `readCollectionColors`, `src/shared/exclusions.ts ›
   readExclusions`); the colors of Redis databases are new in Datardo.
-- **Differs**: (M39) `excluded` and `exclusions` are not read.
 
 Rules:
 
@@ -1792,7 +1786,6 @@ Examples:
   "shop.fs.files": "pink", "nodot": "red", "shop.logs": "chartreuse" }, "excluded": true, "exclusions":
   ["shop.logs", "archive", "archive", 7] }` → color `#1e90ff`, database colors `{ "shop": "teal" }`, collection
   colors `{ "shop.orders": "none", "shop.fs.files": "pink" }`, excluded, exclusions `["archive", "shop.logs"]`.
-  (differs)
 - A Mongoster file of an earlier version, without these fields → no colors of databases or collections and nothing
   excluded, as before.
 
@@ -1910,7 +1903,6 @@ Gives the text of an exported file, in Datardo's format, in Compass's, or as a l
   taking every secret out of the connection string is new. The custom colors, `databaseColors`,
   `collectionColors`, `excluded`, `exclusions` and their notes come from connection.write-file of Mongoster 0.9.0
   (`serializeConnections`).
-- **Differs**: (M39) Datardo's format writes no `excluded` and `exclusions`, and the other formats no note about them.
 
 Rules:
 
@@ -1971,7 +1963,7 @@ Examples:
   - List, `include` → `Cache = redis://:r3dis@cache`.
 - `mongodb://ada:pw@h/?proxyHost=p&proxyPassword=pp`, Datardo, `remove` → `"uri": "mongodb://ada@h/?proxyHost=p"`.
 - `Shop`, MongoDB, `mongodb://db1/shop`, colored `#1e90ff`, the database `shop` teal, the collection `shop.orders`
-  with **None**, `shop.logs` excluded from searches, and the connection excluded too (differs):
+  with **None**, `shop.logs` excluded from searches, and the connection excluded too:
   - Datardo → `"color": "#1e90ff"`, `"databaseColors": { "shop": "teal" }`, `"collectionColors": { "shop.orders":
     "none" }`, `"excluded": true`, `"exclusions": ["shop.logs"]`.
   - Compass → `favorite: { name: "Shop", color: "color3" }`, notes **colors of databases and collections were left
