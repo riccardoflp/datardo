@@ -43,7 +43,7 @@ STANDARD_EXIT = [
 # its cards, or a pair of an area and the names of some of them, or of an area and "rest"), what it builds beyond
 # the cards, its own exit criteria, and what is left out on purpose.
 # The status of each milestone that is not planned: in progress, or done (its exit criteria are then ticked).
-STATUS: dict[int, str] = {0: "done", 1: "done", 2: "done", 3: "done", 4: "done", 5: "done", 6: "done", 7: "done", 8: "done", 9: "done", 10: "done", 11: "done", 12: "done", 13: "done", 14: "done", 15: "done", 16: "done", 17: "done", 18: "done", 19: "done", 20: "done", 21: "done", 22: "done", 23: "done", 24: "done", 25: "done", 26: "done", 27: "done", 28: "done", 29: "done", 30: "done", 31: "done", 32: "done", 33: "done", 34: "done", 35: "done", 36: "done", 37: "done", 38: "done", 39: "done", 40: "done", 41: "done"}
+STATUS: dict[int, str] = {0: "done", 1: "done", 2: "done", 3: "done", 4: "done", 5: "done", 6: "done", 7: "done", 8: "done", 9: "done", 10: "done", 11: "done", 12: "done", 13: "done", 14: "done", 15: "done", 16: "done", 17: "done", 18: "done", 19: "done", 20: "done", 21: "done", 22: "done", 23: "done", 24: "done", 25: "done", 26: "done", 27: "done", 28: "done", 29: "done", 30: "done", 31: "done", 32: "done", 33: "done", 34: "done", 35: "done", 36: "done", 37: "done", 38: "done", 39: "done", 40: "done", 41: "done", 42: "done"}
 
 MILESTONES = [
     dict(n=1, title="A window of its own",
@@ -679,15 +679,17 @@ MILESTONES = [
                  "**Decisions**: D72.",
                  "**Stored data**: the rules of a database, of a connection and of everywhere, in the file of M41."],
          exit=["A file of formatting rules exported by Datardo and imported again adds nothing; one exported by "
-               "Mongoster 0.10.0 imports with its field rules, pinned values and palettes."],
+               "Mongoster 0.10.0 imports with its field rules, pinned values and palettes. The groups and rules of "
+               "Datardo's file are Mongoster's, byte for byte (Mongoster refuses the file only for its version "
+               "property, `datardoFormatting`)."],
          notin=[]),
 ]
 
 HEAD = """# Roadmap
 
-M0 to M36 are done; M37 to M42 are planned, and M37 is the next. A new milestone is planned here first. A milestone is
-taken by reading its section, then every card it lists, in order; nothing outside it is built without asking. The
-[index of the catalog](features/README.md) shows each card's milestone and status.
+M0 to M42 are done. A new milestone is planned here first. A milestone is taken by reading its section, then every
+card it lists, in order; nothing outside it is built without asking. The [index of the catalog](features/README.md)
+shows each card's milestone and status.
 
 The milestones come in three stages. **M0 to M12** make a MongoDB client that browses, queries and edits documents
 safely. **M13 to M18** add Redis: keys, values, the console, the server, Pub/Sub. **M19 to M35** bring the rest of

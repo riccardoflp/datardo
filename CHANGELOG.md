@@ -273,6 +273,18 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
 - A collection's formatting rules follow it when it is renamed from Datardo, and go with a drop of the collection, its
   database or its GridFS bucket, and with the removal of the connection.
 - Datardo reopens with the inspector island on the view it last showed.
+- A field can color the table by its values, with no condition to write: **Color by this field** in a column header's
+  menu and in Go to, or **Add rule…** › **By field…** in the Formatting view. Its values show as true and false, as a
+  scale for numbers and dates (one color, red to green or green to red, with its two ends), or as one color per value,
+  with values pinned to a color and a palette of shades; a field rule shows the legend of the page.
+- Formatting rules can apply to one collection, its database, its connection or everywhere. The Formatting view shows
+  the four sections with their counts; a section's checkbox leaves its rules out of one collection; a rule is dragged
+  between sections or moved with **Move to** and **Copy to**. **Formatting (n)** in the toolbar counts the rules of all
+  four sections.
+- **Export formatting…** writes the rules of the sections you choose to a `.datardo-formatting.json` file that holds
+  nothing of the connection; **Import formatting…** adds the rules of a file, Datardo's or Mongoster's, where you
+  choose, skipping those already there.
+- **Drop database…** made from Datardo also forgets the formatting rules of the database's own section.
 
 ### Changed
 

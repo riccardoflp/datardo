@@ -1,8 +1,8 @@
 # Roadmap
 
-M0 to M36 are done; M37 to M42 are planned, and M37 is the next. A new milestone is planned here first. A milestone is
-taken by reading its section, then every card it lists, in order; nothing outside it is built without asking. The
-[index of the catalog](features/README.md) shows each card's milestone and status.
+M0 to M42 are done. A new milestone is planned here first. A milestone is taken by reading its section, then every
+card it lists, in order; nothing outside it is built without asking. The [index of the catalog](features/README.md)
+shows each card's milestone and status.
 
 The milestones come in three stages. **M0 to M12** make a MongoDB client that browses, queries and edits documents
 safely. **M13 to M18** add Redis: keys, values, the console, the server, Pub/Sub. **M19 to M35** bring the rest of
@@ -3020,7 +3020,7 @@ lines must keep passing.
 with pinned values and palettes); rules apply to a collection, a database, a connection or everywhere; they are moved
 and copied between these, and exported to a file and imported from one.
 **Depends on**: M41.
-**Status**: planned
+**Status**: done
 
 ### Features
 
@@ -3058,13 +3058,14 @@ lines must keep passing.
 
 ### Exit criteria
 
-- [ ] A file of formatting rules exported by Datardo and imported again adds nothing; one exported by Mongoster 0.10.0
-      imports with its field rules, pinned values and palettes.
-- [ ] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
+- [x] A file of formatting rules exported by Datardo and imported again adds nothing; one exported by Mongoster 0.10.0
+      imports with its field rules, pinned values and palettes. The groups and rules of Datardo's file are
+      Mongoster's, byte for byte (Mongoster refuses the file only for its version property, `datardoFormatting`).
+- [x] Every acceptance line of the cards above has a test named after its card, and they pass: `npm run check`,
       `npm run test:integration`, `npm run test:ui`; `catalog.py --tests` reports none missing for these cards.
-- [ ] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
+- [x] Every page and dialog this milestone adds passes the accessibility check in both themes, and can be used from
       the keyboard alone (QA15, QA16).
-- [ ] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
+- [x] The cards above are *Built* in the [index](features/README.md), `CHANGELOG.md` says what the user can now do,
       and this milestone's **Status** is *done*.
 
 ### Not in this milestone

@@ -1322,12 +1322,12 @@ Acceptance:
 
 Formatting rules color the rows and the cells of the table, as conditional formatting does in a spreadsheet: every
 document stays in the page, and the ones that matter stand out. A **condition rule** has a condition written as a
-filter (`{ status: "failed" }`), a color and what it colors, the row or one field's cell (M41); a **field rule** colors
-by the values of one field with no condition (M42). The rules are edited in the Formatting view of the inspector
+filter (`{ status: "failed" }`), a color and what it colors, the row or one field's cell; a **field rule** colors
+by the values of one field with no condition. The rules are edited in the Formatting view of the inspector
 island (`table.formatting`), beside the table they color, and the table follows each change at once.
 
-The rules are Datardo's own data, in the file `formatting.json` of the data folder: a collection's own rules (M41),
-and from M42 those of its database, of its connection and those for everywhere (`table.format-scopes`). Nothing of
+The rules are Datardo's own data, in the file `formatting.json` of the data folder: a collection's own rules,
+and those of its database, of its connection and those for everywhere (`table.format-scopes`). Nothing of
 them is written to a deployment, so formatting works on a view, through a read-only connection and on the output of
 **Aggregate**; nothing of them is in the undo history, which is for writes to deployments. MongoDB only.
 
@@ -1444,7 +1444,7 @@ a cell's color over its row's.
 
 Rules of the result:
 
-- The inputs are the rules that reach the collection in the order they are tried (its own in M41; from M42 those of
+- The inputs are the rules that reach the collection in the order they are tried (those of
   the four formatting scopes, `table.format-scopes`), the documents of the page (of **Find** or of the output of
   **Aggregate**), whether formatting is hidden (`table.toggle-formatting`) and the time the page was read, which
   `ISODate()`, `new Date()` and `ObjectId()` in a condition stand for (`query.parse`). The result is, for each
@@ -1462,7 +1462,7 @@ Rules of the result:
   document with the array replaced by that element alone: `{ "items.qty": { $gt: 5 } }` colors the `qty` of the
   elements over 5, not every `qty` of a document where one element is. A row rule colors all the sub-rows of its
   document. The cell with *… more elements* and the cells that fill a group take no cell color.
-- **Field rules** (M42): a field rule gives a color when its field has a value it can color (`table.format-field`),
+- **Field rules**: a field rule gives a color when its field has a value it can color (`table.format-field`),
   and gives none to the other documents, which the rules after it may color. Rules of both kinds are in one order: the
   first that gives a color wins. In an expanded array, a field rule of a field of the elements colors each element's
   cell by that element's value.
@@ -1540,23 +1540,23 @@ follows each change while the user watches it.
 What it shows, from the top:
 
 1. The head: **Add rule…**, a menu of **Condition…** (tooltip *Color the row or a cell of the documents matching a
-   filter*, `table.add-format-rule`) and, from M42, **By field…** (tooltip *Color by a field's values: true and
+   filter*, `table.add-format-rule`) and **By field…** (tooltip *Color by a field's values: true and
    false, a scale for numbers and dates, a color per value*, `table.color-by-field`); **Hide formatting** or **Show
-   formatting** (`table.toggle-formatting`); from M42, `…`, a menu of **Export formatting…** and **Import
+   formatting** (`table.toggle-formatting`); `…`, a menu of **Export formatting…** and **Import
    formatting…** (`table.export-formatting`, `table.import-formatting`).
 2. A line at the top of the list for what a change could not do, such as *A collection keeps at most 100 formatting
    rules.*, until the next change.
-3. The rules. In M41, the collection's own, in their order. From M42, four sections, **This collection**, **Database
+3. The rules, in four sections, **This collection**, **Database
    \<name\>**, **Connection \<name\>** and **Everywhere**, in that order (`table.format-scopes`), each with its count of
    rules, a checkbox and its rules; a section without rules is its head alone, dimmed.
 4. A rule's line: a handle to drag it; a checkbox that turns it on and off (tooltip *Turn off* or *Turn on*); its
    color, a swatch whose name is the color's (*Red*), or for a field rule the bar of its scale or the swatches of its
    first values; **Row**, or the field whose cell it colors; its name, or else its condition on one line (`{ status:
    "failed" }`) or `by <field>`, cut with `…`; `⚠` when its condition cannot be used; `…`, a menu of **Move up**,
-   **Move down**, from M42 **Move to** and **Copy to** (`table.move-format-rule`), and **Remove**; and **Remove
+   **Move down**, **Move to** and **Copy to** (`table.move-format-rule`), and **Remove**; and **Remove
    rule** (`✕`). The line's tooltip has the name, then *The row when the document matches { status: "failed" }*,
    *The cell of amount when the document matches …*, *The row by the value of status* or *The cell of status by the
-   value of status*, then why it cannot be used, *No \<field\> in this table.* (M42), and *Drag to reorder, or into
+   value of status*, then why it cannot be used, *No \<field\> in this table.*, and *Drag to reorder, or into
    another section: the first rule that gives a color wins · click to edit · F2 to name*.
 5. The open rule, under its line: one rule at a time is open, by a click on its line or `Enter` on it; what it shows
    is `table.edit-format-rule`'s, and for a field rule `table.edit-field-rule`'s, with its legend.
@@ -1564,11 +1564,10 @@ What it shows, from the top:
 Its states:
 
 - *No rules*: *No formatting rules. Add one, or use Color by this field or Format cells… in a column header's menu.*
-  (in M41, without *Color by this field or*).
 - *Hidden*: the head reads **Show formatting**; the rules are listed as they are, and the table shows no color.
 - *A rule that cannot be used*: `⚠` on its line, with the reason in its tooltip and, when it is open, under its
   condition.
-- *A rule about a field the table does not have* (M42): its line is dimmed, with *No \<field\> in this table.* in its
+- *A rule about a field the table does not have*: its line is dimmed, with *No \<field\> in this table.* in its
   tooltip. For a rule of a wider section that is the usual case, not an error.
 - *Running again*: the view stays as it is; the legends follow when the new page arrives.
 - On a view, through a read-only connection and in **Aggregate**, the view is the same: nothing it does writes to a
@@ -1661,7 +1660,7 @@ Changes the rules in the Formatting view, in place, while the table shows what e
 - **Entry points**: in the Formatting view (`@inspector`): on a rule's line, its checkbox, its handle dragged to
   another place of its section, `Alt+Up` and `Alt+Down`, **Move up**, **Move down** and **Remove** in its `…` menu,
   **Remove rule** (`✕`); in the open rule, **Name** (`F2` on the line goes to it) and, for a condition rule, **Color
-  the cell of**, **When the document matches** and the eleven colors; from M42, the checkbox of a section.
+  the cell of**, **When the document matches** and the eleven colors; the checkbox of a section.
 - **Offered when**: as `table.formatting`.
 - **Asks**: nothing: every change is made in place. The open condition rule shows, from the top:
   - **Name**, with the placeholder of its condition (or *Name*) and the tooltip *A name for the rule, shown in place of
@@ -1672,7 +1671,7 @@ Changes the rules in the Formatting view, in place, while the table shows what e
     suggestions of `query.autocomplete`, with the placeholder *{ status: "failed" } — a filter, as in the query bar*;
     under it, why it cannot be used, when it cannot;
   - **Color**: the eleven presets as swatches, each a button named by its color, the rule's own marked.
-- **Plan**: one app step for each change: `save the formatting rules of Local / shop / orders`; from M42, for the
+- **Plan**: one app step for each change: `save the formatting rules of Local / shop / orders`, or for the
   section that changed, `save the formatting rules of the database Local / shop`, `… of the connection Local` or
   `save the formatting rules for everywhere`, and for a section's checkbox `leave the rules of the database shop out of
   Local / shop / orders` or `color Local / shop / orders by the rules of the database shop again`. Text typed is saved

@@ -374,7 +374,7 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [`manage.create-collection`](manage.md#managecreate-collection--create-a-collection) | Create a collection | Operation | M21 | Built |
 | [`manage.rename-collection`](manage.md#managerename-collection--rename-a-collection) | Rename a collection | Operation | M21, M38 (changed), M39 (changed), M41 (changed) | Built |
 | [`manage.drop-collection`](manage.md#managedrop-collection--drop-a-collection-or-a-view) | Drop a collection or a view | Operation | M21, M38 (changed), M39 (changed), M41 (changed) | Built |
-| [`manage.drop-database`](manage.md#managedrop-database--drop-a-database) | Drop a database | Operation | M21, M38 (changed), M39 (changed), M41 (changed), M42 (changed) | Differs |
+| [`manage.drop-database`](manage.md#managedrop-database--drop-a-database) | Drop a database | Operation | M21, M38 (changed), M39 (changed), M41 (changed), M42 (changed) | Built |
 | [`manage.name-rules`](manage.md#managename-rules--valid-names-of-databases-and-collections) | Valid names of databases and collections | Derivation | M21 | Built |
 | [`manage.read-options`](manage.md#manageread-options--the-options-of-a-collection-or-a-view) | The options of a collection or a view | Read | M21 | Built |
 | [`manage.definition`](manage.md#managedefinition--the-definition-section-of-a-view) | The Definition section of a view | View | M21 | Built |
@@ -709,7 +709,7 @@ earns it, and run the script again after adding or renaming a card; the statuses
 
 | Feature | Title | Kind | Milestone | Status |
 | --- | --- | --- | --- | --- |
-| [`table.show`](table.md#tableshow--the-documents-section) | The Documents section | View | M10, M40 (changed), M41 (changed), M42 (changed) | Differs |
+| [`table.show`](table.md#tableshow--the-documents-section) | The Documents section | View | M10, M40 (changed), M41 (changed), M42 (changed) | Built |
 | [`table.detect-columns`](table.md#tabledetect-columns--the-columns-of-a-page-of-documents) | The columns of a page of documents | Derivation | M10 | Built |
 | [`table.cell-text`](table.md#tablecell-text--how-a-value-is-written-in-a-cell) | How a value is written in a cell | Derivation | M10 | Built |
 | [`table.rows`](table.md#tablerows--the-rows-of-the-table) | The rows of the table | Derivation | M10, M41 (changed) | Built |
@@ -730,7 +730,7 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [`table.copy-path`](table.md#tablecopy-path--copy-a-field-path) | Copy a field path | Operation | M10 | Built |
 | [`table.row-menu`](table.md#tablerow-menu--the-context-menu-of-a-row) | The context menu of a row | View | M10 | Built |
 | [`table.cell-menu`](table.md#tablecell-menu--the-context-menu-of-a-cell) | The context menu of a cell | View | M10 | Built |
-| [`table.column-menu`](table.md#tablecolumn-menu--the-context-menu-of-a-column-header) | The context menu of a column header | View | M10, M41 (changed), M42 (changed) | Differs |
+| [`table.column-menu`](table.md#tablecolumn-menu--the-context-menu-of-a-column-header) | The context menu of a column header | View | M10, M41 (changed), M42 (changed) | Built |
 | [`table.refresh`](table.md#tablerefresh--refresh-the-documents) | Refresh the documents | Read | M10 | Built |
 | [`table.match`](table.md#tablematch--whether-a-document-matches-a-filter) | Whether a document matches a filter | Derivation | M41 | Built |
 | [`table.format-table`](table.md#tableformat-table--what-colors-each-row-and-cell) | What colors each row and cell | Derivation | M41 | Built |
@@ -738,14 +738,14 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [`table.add-format-rule`](table.md#tableadd-format-rule--add-a-condition-rule) | Add a condition rule | Operation | M41 | Built |
 | [`table.edit-format-rule`](table.md#tableedit-format-rule--edit-name-turn-off-reorder-and-remove-formatting-rules) | Edit, name, turn off, reorder and remove formatting rules | Operation | M41 | Built |
 | [`table.toggle-formatting`](table.md#tabletoggle-formatting--hide-and-show-formatting) | Hide and show formatting | Operation | M41 | Built |
-| [`table.format-field`](table.md#tableformat-field--the-color-a-field-rule-gives-a-value) | The color a field rule gives a value | Derivation | M42 | Specified |
-| [`table.color-by-field`](table.md#tablecolor-by-field--color-by-this-field) | Color by this field | Operation | M42 | Specified |
-| [`table.edit-field-rule`](table.md#tableedit-field-rule--edit-a-field-rule) | Edit a field rule | Operation | M42 | Specified |
-| [`table.format-scopes`](table.md#tableformat-scopes--the-rules-a-collection-tab-uses) | The rules a collection tab uses | Derivation | M42 | Specified |
-| [`table.move-format-rule`](table.md#tablemove-format-rule--move-or-copy-a-rule-to-another-section) | Move or copy a rule to another section | Operation | M42 | Specified |
-| [`table.export-formatting`](table.md#tableexport-formatting--export-formatting-rules-to-a-file) | Export formatting rules to a file | Operation | M42 | Specified |
-| [`table.import-formatting`](table.md#tableimport-formatting--import-formatting-rules-from-a-file) | Import formatting rules from a file | Operation | M42 | Specified |
-| [`table.formatting-file`](table.md#tableformatting-file--the-file-of-formatting-rules) | The file of formatting rules | Derivation | M42 | Specified |
+| [`table.format-field`](table.md#tableformat-field--the-color-a-field-rule-gives-a-value) | The color a field rule gives a value | Derivation | M42 | Built |
+| [`table.color-by-field`](table.md#tablecolor-by-field--color-by-this-field) | Color by this field | Operation | M42 | Built |
+| [`table.edit-field-rule`](table.md#tableedit-field-rule--edit-a-field-rule) | Edit a field rule | Operation | M42 | Built |
+| [`table.format-scopes`](table.md#tableformat-scopes--the-rules-a-collection-tab-uses) | The rules a collection tab uses | Derivation | M42 | Built |
+| [`table.move-format-rule`](table.md#tablemove-format-rule--move-or-copy-a-rule-to-another-section) | Move or copy a rule to another section | Operation | M42 | Built |
+| [`table.export-formatting`](table.md#tableexport-formatting--export-formatting-rules-to-a-file) | Export formatting rules to a file | Operation | M42 | Built |
+| [`table.import-formatting`](table.md#tableimport-formatting--import-formatting-rules-from-a-file) | Import formatting rules from a file | Operation | M42 | Built |
+| [`table.formatting-file`](table.md#tableformatting-file--the-file-of-formatting-rules) | The file of formatting rules | Derivation | M42 | Built |
 
 ## Scheduled tasks
 
