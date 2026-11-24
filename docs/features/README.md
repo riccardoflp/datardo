@@ -170,7 +170,7 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [`connection.move-to-folder`](connection.md#connectionmove-to-folder--move-a-connection-to-a-folder) | Move a connection to a folder | Operation | M7 | Built |
 | [`connection.rename-folder`](connection.md#connectionrename-folder--rename-a-folder) | Rename a folder | Operation | M7 | Built |
 | [`connection.remove-folder`](connection.md#connectionremove-folder--remove-a-folder-keeping-its-connections) | Remove a folder, keeping its connections | Operation | M7 | Built |
-| [`connection.remove`](connection.md#connectionremove--remove-a-connection) | Remove a connection | Operation | M6, M41 (changed) | Differs |
+| [`connection.remove`](connection.md#connectionremove--remove-a-connection) | Remove a connection | Operation | M6, M41 (changed) | Built |
 | [`connection.read-only`](connection.md#connectionread-only--make-a-connection-read-only) | Make a connection read-only | Operation | M6 | Built |
 | [`connection.allow-changes`](connection.md#connectionallow-changes--allow-changes-through-a-read-only-connection) | Allow changes through a read-only connection | Operation | M6 | Built |
 | [`connection.link-redis`](connection.md#connectionlink-redis--link-a-redis-connection-to-a-mongodb-connection) | Link a Redis connection to a MongoDB connection | Operation | M7 | Built |
@@ -280,7 +280,7 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [`gridfs.rename`](gridfs.md#gridfsrename--rename-a-file) | Rename a file | Operation | M33 | Built |
 | [`gridfs.edit-metadata`](gridfs.md#gridfsedit-metadata--edit-the-files-document-of-a-file) | Edit the files document of a file | Operation | M33 | Built |
 | [`gridfs.delete`](gridfs.md#gridfsdelete--delete-a-file) | Delete a file | Operation | M33 | Built |
-| [`gridfs.drop-bucket`](gridfs.md#gridfsdrop-bucket--delete-a-bucket) | Delete a bucket | Operation | M33, M38 (changed), M39 (changed), M41 (changed) | Differs |
+| [`gridfs.drop-bucket`](gridfs.md#gridfsdrop-bucket--delete-a-bucket) | Delete a bucket | Operation | M33, M38 (changed), M39 (changed), M41 (changed) | Built |
 
 ## Document history
 
@@ -372,8 +372,8 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | --- | --- | --- | --- | --- |
 | [`manage.create-database`](manage.md#managecreate-database--create-a-database) | Create a database | Operation | M21 | Built |
 | [`manage.create-collection`](manage.md#managecreate-collection--create-a-collection) | Create a collection | Operation | M21 | Built |
-| [`manage.rename-collection`](manage.md#managerename-collection--rename-a-collection) | Rename a collection | Operation | M21, M38 (changed), M39 (changed), M41 (changed) | Differs |
-| [`manage.drop-collection`](manage.md#managedrop-collection--drop-a-collection-or-a-view) | Drop a collection or a view | Operation | M21, M38 (changed), M39 (changed), M41 (changed) | Differs |
+| [`manage.rename-collection`](manage.md#managerename-collection--rename-a-collection) | Rename a collection | Operation | M21, M38 (changed), M39 (changed), M41 (changed) | Built |
+| [`manage.drop-collection`](manage.md#managedrop-collection--drop-a-collection-or-a-view) | Drop a collection or a view | Operation | M21, M38 (changed), M39 (changed), M41 (changed) | Built |
 | [`manage.drop-database`](manage.md#managedrop-database--drop-a-database) | Drop a database | Operation | M21, M38 (changed), M39 (changed), M41 (changed), M42 (changed) | Differs |
 | [`manage.name-rules`](manage.md#managename-rules--valid-names-of-databases-and-collections) | Valid names of databases and collections | Derivation | M21 | Built |
 | [`manage.read-options`](manage.md#manageread-options--the-options-of-a-collection-or-a-view) | The options of a collection or a view | Read | M21 | Built |
@@ -462,8 +462,8 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [`nav.path`](nav.md#navpath--the-path-of-the-active-tab) | The path of the active tab | View | M2 | Built |
 | [`nav.copy-path`](nav.md#navcopy-path--copy-the-path) | Copy the path | Operation | M2 | Built |
 | [`nav.open-on-another-connection`](nav.md#navopen-on-another-connection--open-on-another-connection) | Open on another connection | Operation | M2 | Built |
-| [`nav.inspector`](nav.md#navinspector--the-inspector-island) | The inspector island | View | M2, M41 (changed) | Differs |
-| [`nav.toggle-inspector`](nav.md#navtoggle-inspector--show-or-hide-the-inspector-island) | Show or hide the inspector island | Operation | M2, M41 (changed) | Differs |
+| [`nav.inspector`](nav.md#navinspector--the-inspector-island) | The inspector island | View | M2, M41 (changed) | Built |
+| [`nav.toggle-inspector`](nav.md#navtoggle-inspector--show-or-hide-the-inspector-island) | Show or hide the inspector island | Operation | M2, M41 (changed) | Built |
 | [`nav.status-line`](nav.md#navstatus-line--the-status-line) | The status line | View | M2 | Built |
 | [`nav.dialog`](nav.md#navdialog--how-every-dialog-behaves) | How every dialog behaves | View | M2, M38 (changed) | Built |
 | [`nav.empty`](nav.md#navempty--the-window-with-no-connection) | The window with no connection | View | M2 | Built |
@@ -491,7 +491,7 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [`palette.find-keys`](palette.md#palettefind-keys--the-keys-of-the-current-redis-connection-for-go-to) | The keys of the current Redis connection for Go to | Read | M5 | Built |
 | [`palette.rank`](palette.md#paletterank--how-go-to-ranks-what-it-finds) | How Go to ranks what it finds | Derivation | M5 | Built |
 | [`palette.open-result`](palette.md#paletteopen-result--open-a-result) | Open a result | Operation | M5 | Built |
-| [`palette.commands`](palette.md#palettecommands--every-command-with-its-title-and-its-key) | Every command, with its title and its key | Derivation | M5, M41 (changed) | Differs |
+| [`palette.commands`](palette.md#palettecommands--every-command-with-its-title-and-its-key) | Every command, with its title and its key | Derivation | M5, M41 (changed) | Built |
 | [`palette.run-command`](palette.md#paletterun-command--run-a-command) | Run a command | Operation | M5 | Built |
 | [`palette.key-press`](palette.md#palettekey-press--which-command-a-key-starts) | Which command a key starts | Derivation | M5 | Built |
 
@@ -712,7 +712,7 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [`table.show`](table.md#tableshow--the-documents-section) | The Documents section | View | M10, M40 (changed), M41 (changed), M42 (changed) | Differs |
 | [`table.detect-columns`](table.md#tabledetect-columns--the-columns-of-a-page-of-documents) | The columns of a page of documents | Derivation | M10 | Built |
 | [`table.cell-text`](table.md#tablecell-text--how-a-value-is-written-in-a-cell) | How a value is written in a cell | Derivation | M10 | Built |
-| [`table.rows`](table.md#tablerows--the-rows-of-the-table) | The rows of the table | Derivation | M10, M41 (changed) | Differs |
+| [`table.rows`](table.md#tablerows--the-rows-of-the-table) | The rows of the table | Derivation | M10, M41 (changed) | Built |
 | [`table.expand`](table.md#tableexpand--expand-a-field-into-columns-or-sub-rows) | Expand a field into columns or sub-rows | Operation | M10 | Built |
 | [`table.collapse`](table.md#tablecollapse--collapse-an-expanded-field) | Collapse an expanded field | Operation | M10 | Built |
 | [`table.columns`](table.md#tablecolumns--the-columns-layout) | The columns' layout | View | M10 | Built |
@@ -732,12 +732,12 @@ earns it, and run the script again after adding or renaming a card; the statuses
 | [`table.cell-menu`](table.md#tablecell-menu--the-context-menu-of-a-cell) | The context menu of a cell | View | M10 | Built |
 | [`table.column-menu`](table.md#tablecolumn-menu--the-context-menu-of-a-column-header) | The context menu of a column header | View | M10, M41 (changed), M42 (changed) | Differs |
 | [`table.refresh`](table.md#tablerefresh--refresh-the-documents) | Refresh the documents | Read | M10 | Built |
-| [`table.match`](table.md#tablematch--whether-a-document-matches-a-filter) | Whether a document matches a filter | Derivation | M41 | Specified |
-| [`table.format-table`](table.md#tableformat-table--what-colors-each-row-and-cell) | What colors each row and cell | Derivation | M41 | Specified |
-| [`table.formatting`](table.md#tableformatting--the-formatting-view-of-the-inspector-island) | The Formatting view of the inspector island | View | M41 | Specified |
-| [`table.add-format-rule`](table.md#tableadd-format-rule--add-a-condition-rule) | Add a condition rule | Operation | M41 | Specified |
-| [`table.edit-format-rule`](table.md#tableedit-format-rule--edit-name-turn-off-reorder-and-remove-formatting-rules) | Edit, name, turn off, reorder and remove formatting rules | Operation | M41 | Specified |
-| [`table.toggle-formatting`](table.md#tabletoggle-formatting--hide-and-show-formatting) | Hide and show formatting | Operation | M41 | Specified |
+| [`table.match`](table.md#tablematch--whether-a-document-matches-a-filter) | Whether a document matches a filter | Derivation | M41 | Built |
+| [`table.format-table`](table.md#tableformat-table--what-colors-each-row-and-cell) | What colors each row and cell | Derivation | M41 | Built |
+| [`table.formatting`](table.md#tableformatting--the-formatting-view-of-the-inspector-island) | The Formatting view of the inspector island | View | M41 | Built |
+| [`table.add-format-rule`](table.md#tableadd-format-rule--add-a-condition-rule) | Add a condition rule | Operation | M41 | Built |
+| [`table.edit-format-rule`](table.md#tableedit-format-rule--edit-name-turn-off-reorder-and-remove-formatting-rules) | Edit, name, turn off, reorder and remove formatting rules | Operation | M41 | Built |
+| [`table.toggle-formatting`](table.md#tabletoggle-formatting--hide-and-show-formatting) | Hide and show formatting | Operation | M41 | Built |
 | [`table.format-field`](table.md#tableformat-field--the-color-a-field-rule-gives-a-value) | The color a field rule gives a value | Derivation | M42 | Specified |
 | [`table.color-by-field`](table.md#tablecolor-by-field--color-by-this-field) | Color by this field | Operation | M42 | Specified |
 | [`table.edit-field-rule`](table.md#tableedit-field-rule--edit-a-field-rule) | Edit a field rule | Operation | M42 | Specified |

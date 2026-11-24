@@ -2,7 +2,8 @@
  * What an entry of a context menu of the table does once chosen (`table.row-menu`, `table.cell-menu`,
  * `table.column-menu`): the Operations of the table started through the bridge on the tab's collection, those of the
  * document area (`table-entries`), and what the
- * window carries out itself: the **Columns** panel, the selection, and the conditions, sorts and projections written
+ * window carries out itself: the **Columns** panel, **Format cells…** (`table.add-format-rule`), the selection, and the
+ * conditions, sorts and projections written
  * into the bar as a drop writes them (`query.add-condition`, `query.add-sort`, `query.add-projection`).
  */
 import type { Dragged, Zone, ZoneAction } from '../../features/query/drag';
@@ -19,6 +20,7 @@ import { featureOfElement } from '../query/built';
 import type { CollectionRef } from '../query/collection-reads';
 import { changeQuery, type CollectionTab } from '../query/collection-store';
 import { openColumnsPanel } from './columns-panel-store';
+import { openNewRule } from './formatting-start';
 import type { TableColumns } from './table-columns';
 import { arrange, collapseColumn, copyDocuments, expandColumn, startOnCollection } from './table-start';
 import { chooseReferenceEntry } from '../pages/relation/table-links';
@@ -111,6 +113,11 @@ export function chooseEntry(context: EntryContext, entry: ChosenEntry): void {
     case 'table.columns':
       openColumnsPanel(ref.tab);
       return;
+    case 'table.add-format-rule': {
+      const value = 'value' in args ? { value: args['value'] ?? null } : {};
+      openNewRule(ref, { field: textArg(args, 'field'), ...value }, 'column-menu');
+      return;
+    }
     case 'table.selection':
       changeQuery(ref.tab, (query) => ({ ...query, selection: { keys: [] } }));
       return;

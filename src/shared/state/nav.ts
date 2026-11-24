@@ -68,6 +68,9 @@ export interface Latency {
   readonly milliseconds?: number;
 }
 
+/** The two views of the inspector island (`nav.inspector`): the thing selected, or the formatting rules. */
+export type InspectorView = 'selection' | 'formatting';
+
 /** What the nav area keeps. */
 export interface NavState {
   /** The connection made current last (`nav.current-connection`). */
@@ -76,6 +79,8 @@ export interface NavState {
   readonly explorerHidden: boolean;
   /** Whether the user hid the inspector island (`nav.toggle-inspector`). */
   readonly inspectorHidden: boolean;
+  /** The view of the inspector island the user chose last, one for every tab (`nav.toggle-inspector`). */
+  readonly inspectorView: InspectorView;
   readonly widths: IslandWidths;
   /** The width the user gave the query pane at the right of the table, in px (`query.position`). */
   readonly queryPaneWidth: number;
@@ -97,6 +102,7 @@ export const homePlace: NavPlace = { shows: 'page:home', path: 'Home', page: 'ho
 export const initialNavState: NavState = {
   explorerHidden: false,
   inspectorHidden: false,
+  inspectorView: 'selection',
   widths: defaultIslandWidths,
   queryPaneWidth: defaultQueryPaneWidth,
   page: 'home',

@@ -1,8 +1,9 @@
 /**
  * The commands of the table, carried out by the window on the active collection tab, the same way for their rows in
  * Go to (`palette.run-command`): **Documents**, **Refresh documents**, **Columns…**, the commands on the column of the
- * selected cell (expand, collapse, arrange, sort, copy its value or its path), the pages, the selection, and the copies
- * of the selected documents, or of the document of the selected cell.
+ * selected cell (expand, collapse, arrange, sort, copy its value or its path, **Format cells…**), **Add formatting
+ * rule…** and **Hide formatting**, the pages, the selection, and the copies of the selected documents, or of the
+ * document of the selected cell.
  */
 import type { LayoutChange } from '../../features/table/arrange-columns';
 import type { CopyFormat } from '../../features/table/copy-text';
@@ -16,6 +17,7 @@ import { collectionRefOf, runQuery, type CollectionRef } from '../query/collecti
 import { changeQuery, collectionOf, type CollectionTab } from '../query/collection-store';
 import { pagingStateOf } from '../query/collection-view';
 import { openColumnsPanel } from './columns-panel-store';
+import { addRuleCommand } from './formatting-start';
 import { selectedCell } from './selected-cell';
 import { sortByHeader } from './table-actions';
 import { tableColumnsOf, type TableColumns } from './table-columns';
@@ -140,6 +142,17 @@ export function runTableCommand(id: string, state: AppState): void {
       } else {
         onColumn(on, id);
       }
+      return;
+    case 'table.add-format-rule': {
+      const cell = variant === 'cells' ? cellOf(on) : undefined;
+      if (variant === 'cells' && cell?.column === undefined) {
+        return;
+      }
+      addRuleCommand(on.ref, cell?.column?.key, cell?.value);
+      return;
+    }
+    case 'table.toggle-formatting':
+      void startOnCollection(on.ref, feature, {});
       return;
     case 'table.copy-value': {
       const cell = cellOf(on);

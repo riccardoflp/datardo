@@ -122,6 +122,42 @@ function failures(theme: Map<string, string>): string[] {
   return failed;
 }
 
+/** The colors of the formatting rules (`table.format-table`), mixed into the canvas of the table. */
+const formatColors = ['red', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink', 'teal', 'indigo', 'brown', 'gray'];
+
+/** The text colors of a cell: its text, the muted text of a row number or a missing value, the syntax colors. */
+const cellTexts = texts.filter((name) => name === 'text' || name === 'text-muted' || name.startsWith('syntax-'));
+
+/** `color-mix(in srgb, color share%, surface)`: each 8-bit channel mixed linearly. */
+function mixed(front: string, back: string, share: number): string {
+  const channels = (hex: string): number[] => [1, 3, 5].map((at) => Number.parseInt(hex.slice(at, at + 2), 16));
+  const [a, b] = [channels(front), channels(back)];
+  const mix = a.map((value, index) => Math.round((value * share + (b[index] ?? 0) * (100 - share)) / 100));
+  return `#${mix.map((value) => value.toString(16).padStart(2, '0')).join('')}`;
+}
+
+/** Every text color under 4.5:1 over a formatting color mixed into the canvas, at every share up to a cell's 45%. */
+function formatFailures(theme: Map<string, string>): string[] {
+  const shares = Array.from({ length: 46 }, (_each, share) => share);
+  return formatColors.flatMap((name) =>
+    shares.flatMap((share) => {
+      const back = mixed(color(theme, `format-${name}`), color(theme, 'canvas'), share);
+      return cellTexts
+        .map((text) => ({ text, ratio: contrast(color(theme, text), back) }))
+        .filter(({ ratio }) => ratio < 4.5)
+        .map(({ text, ratio }) => `${text} on format-${name} at ${String(share)}%: ${ratio.toFixed(2)}`);
+    }),
+  );
+}
+
+describe('table.format-table', () => {
+  it('keeps every text of a cell at 4.5:1 over each formatting color at 22% and 45% of the canvas, in both themes', () => {
+    expect(mixed('#ffffff', '#000000', 45)).toBe('#737373');
+    expect(formatFailures(dark)).toEqual([]);
+    expect(formatFailures(light)).toEqual([]);
+  });
+});
+
 describe('the contrast of the tokens (R10.10)', () => {
   it('computes the ratios of WCAG 2.2', () => {
     expect(contrast('#000000', '#ffffff')).toBeCloseTo(21, 5);

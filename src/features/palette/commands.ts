@@ -18,6 +18,7 @@ import { text as tabText } from '../tab/text';
 import { fullScreenTitle } from '../window/full-screen';
 import { text as navText } from '../nav/text';
 import { exclusionTitle } from '../tree/commands';
+import { toggleTitle } from '../table/toggle-formatting';
 import { text } from './text';
 
 /** The commands of the palette area, each on the Commands line of its card (R2.3). */
@@ -157,6 +158,8 @@ function titleNow(registered: Command, state: AppState | undefined): string {
       return state.nav.explorerHidden ? navText.commands.showExplorer : navText.commands.hideExplorer;
     case 'nav.toggle-inspector':
       return state.nav.inspectorHidden ? navText.commands.showInspector : navText.commands.hideInspector;
+    case 'table.toggle-formatting':
+      return toggleTitle(state.table.formatting.hidden);
     case 'window.full-screen':
       return fullScreenTitle(state.window);
     case 'nav.pin':

@@ -14,6 +14,7 @@ import { droppedExclusions, renamedExclusions, withExclusions } from '../../feat
 import type { Exclusions } from '../../shared/exclusion';
 import { jsonFields } from '../../features/connection/types';
 import { findConnection, writeConnection } from '../connections';
+import { forgetDroppedFormatting } from '../formatting';
 import type { MainServices } from '../services';
 import type { AreaActions } from '.';
 
@@ -124,21 +125,38 @@ function droppedOf(args: Json): Dropped {
     : { kind: 'database', database };
 }
 
+/** The collections whose formatting rules a drop forgets: a collection, the two of a bucket, or the whole database. */
+function droppedCollections(dropped: Dropped): readonly string[] | 'whole-database' {
+  switch (dropped.kind) {
+    case 'collection':
+      return [dropped.collection];
+    case 'bucket':
+      return [`${dropped.bucket}.files`, `${dropped.bucket}.chunks`];
+    case 'database':
+      return 'whole-database';
+  }
+}
+
 /**
  * `tree.forget-colors` `{ connection, database, collection? | bucket? }`: the entries of colors and the exclusions of
- * what was dropped, as the connection holds them now.
+ * what was dropped, as the connection holds them now, and its formatting rules (`table.format-scopes`).
  */
-function forgetColors(args: Json): Promise<void> {
+function forgetColors(services: MainServices, args: Json): Promise<void> {
   const connection = connectionOf(args);
   const dropped = droppedOf(args);
   const kept = withMaps(connection, droppedColors(connection, dropped));
   writeConnection(withList(kept, droppedExclusions(connection.exclusions, dropped)));
+  forgetDroppedFormatting(services, {
+    connection: connection.id,
+    database: dropped.database,
+    collections: droppedCollections(dropped),
+  });
   return Promise.resolve();
 }
 
 /** The actions of this area, by name. */
-export const actions: AreaActions = () => ({
+export const actions: AreaActions = (services) => ({
   'tree.set-color': setColor,
-  'tree.forget-colors': forgetColors,
+  'tree.forget-colors': (args) => forgetColors(services, args),
   'tree.exclude-from-searches': setExcluded,
 });

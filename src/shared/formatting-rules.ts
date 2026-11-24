@@ -6,28 +6,13 @@
  */
 import type { Json } from './engine-request';
 
-/** The eleven presets, in the order every list shows them (`connection.color-presets`); never a custom color. */
-export const presetColors = [
-  'red',
-  'orange',
-  'yellow',
-  'green',
-  'blue',
-  'purple',
-  'pink',
-  'teal',
-  'indigo',
-  'brown',
-  'gray',
-] as const;
+import { isPresetColor, presetColors, type PresetColor } from './color';
 
-/** One of the eleven presets. */
-export type PresetColor = (typeof presetColors)[number];
-
-/** Whether a value is the name of a preset. */
-export function isPresetColor(value: Json | undefined): value is PresetColor {
-  return typeof value === 'string' && (presetColors as readonly string[]).includes(value);
-}
+/**
+ * The eleven presets of `connection.color-presets` (D69), the only colors of a formatting rule; never a custom color,
+ * which would be unreadable under the text of one theme or the other (D72). One list for the whole of Datardo.
+ */
+export { isPresetColor, presetColors, type PresetColor };
 
 /** The rules a formatting scope keeps at most *(as in Mongoster)*. */
 export const mostFormattingRules = 100;
@@ -300,4 +285,38 @@ export function readStoredFormatting(value: Json | undefined): StoredFormatting 
     ]),
   );
   return { hidden: stored['hidden'] === true, global: readFormatRules(stored['global']).rules, connections };
+}
+
+/** A rule as it is written: its properties in a stated order, `enabled` only as `false`. */
+function writtenRule(rule: FormatRule): Json {
+  const common = {
+    ...(rule.name === undefined ? {} : { name: rule.name }),
+    ...(rule.enabled === false ? { enabled: false } : {}),
+  };
+  if (!isFieldRule(rule)) {
+    const field = rule.field === undefined ? {} : { field: rule.field };
+    return { id: rule.id, condition: rule.condition, ...field, color: rule.color, ...common };
+  }
+  const { id, kind, field, target, mode, min, max, scale, pinned, palette } = rule;
+  return {
+    id,
+    kind,
+    field,
+    target,
+    mode,
+    ...(min === undefined ? {} : { min }),
+    ...(max === undefined ? {} : { max }),
+    ...(scale === undefined ? {} : { scale: { ...scale } }),
+    ...(pinned === undefined ? {} : { pinned: pinned.map((pin) => ({ value: pin.value, color: pin.color })) }),
+    ...(palette === undefined ? {} : { palette }),
+    ...common,
+  };
+}
+
+/**
+ * Rules as `formatting.json` and a formatting file write them (`table.formatting-file`): their properties in a stated
+ * order, `enabled` only as `false`, which `readFormatRules` reads back to the same rules.
+ */
+export function writtenRules(rules: readonly FormatRule[]): readonly Json[] {
+  return rules.map(writtenRule);
 }

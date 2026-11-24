@@ -3,6 +3,7 @@
  *
  * What can be done with a column and with its field in the documents: the context menu of a column header.
  */
+import type { Json } from '../../shared/engine-request';
 import { view as dragView, type Zone } from '../query/drag';
 import type { QueryTexts } from '../query/types';
 import { topOf } from './arrange-columns';
@@ -27,6 +28,8 @@ export interface ColumnMenuState {
   readonly target: TableTarget;
   /** The path of the expanded array the column is in. */
   readonly within?: string;
+  /** The value of the selected cell, when it is a cell of this column: **Format cells…** proposes it. */
+  readonly selectedValue?: Json;
 }
 
 function zoneEntries(label: string, element: string, zones: readonly Zone[]): MenuEntry {
@@ -84,6 +87,20 @@ function arrangeEntries(state: ColumnMenuState, column: ColumnNode): readonly Me
   ];
 }
 
+/** **Format cells…**, which opens a new rule for the cells of the column (`table.add-format-rule`). */
+function formatEntries(state: ColumnMenuState, column: ColumnNode): readonly MenuEntry[] {
+  const value = state.selectedValue === undefined ? {} : { value: state.selectedValue };
+  return [
+    {
+      kind: 'entry',
+      label: text.formatting.formatCells,
+      element: 'table.add-format-rule@column-menu',
+      tip: text.formatting.formatCellsTip(column.key),
+      args: { field: column.key, ...value },
+    },
+  ];
+}
+
 const columnsEntries: readonly MenuEntry[] = [
   { kind: 'entry', label: text.columns.menuEntry, element: 'table.columns@column-menu' },
   {
@@ -129,7 +146,8 @@ function fieldEntries(state: ColumnMenuState, column: ColumnNode): readonly Menu
 /**
  * Feature: table.column-menu
  *
- * **Sort**, **Add to filter**, **Project**, **Copy field path**; the expand entries; **Hide**, **Pin** or **Unpin**,
+ * **Sort**, **Add to filter**, **Project**, **Copy field path**; **Format cells…**, in Find and in Aggregate, on a
+ * view and through a read-only connection too; the expand entries; **Hide**, **Pin** or **Unpin**,
  * **Reset width**, **Columns…**, **Reset all columns**; the entries of the field area in Find on a collection that can
  * be changed, not on `_id`. The row number column has **Columns…** and **Reset all columns** only; Aggregate has no
  * **Sort** and no **Project**.
@@ -141,6 +159,7 @@ export function view(state: ColumnMenuState): readonly MenuEntry[] {
   }
   return menuOf([
     queryEntries(state, column),
+    formatEntries(state, column),
     [...expandEntries(column, 'column-menu'), ...arrangeEntries(state, column), ...columnsEntries],
     fieldEntries(state, column),
   ]);

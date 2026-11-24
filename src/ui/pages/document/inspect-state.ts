@@ -87,14 +87,18 @@ export function inspectionOf(ref: CollectionRef, collection: CollectionTab): Ins
 }
 
 /**
- * Shows the document of a row in the inspector: the row selected alone, the island shown when it was hidden, and the
- * focus moved into it (`Enter`, **Inspect document**).
+ * Shows the document of a row in the inspector: the row selected alone, the island shown when it was hidden, on its
+ * Selection view, and the focus moved into it (`Enter`, **Inspect document**).
  */
 export function showInInspector(ref: CollectionRef, row: number | undefined): void {
   if (row !== undefined) {
     changeSelection(ref, { kind: 'only', index: row });
   }
-  if (currentAppState().nav.inspectorHidden) {
+  const { nav } = currentAppState();
+  if (nav.inspectorView === 'formatting') {
+    // The Formatting view gives way to the selection asked for (`nav.inspector`).
+    startFeature('nav.toggle-inspector', { place: 'table', args: { view: 'selection' } });
+  } else if (nav.inspectorHidden) {
     startFeature('nav.toggle-inspector', { place: 'table', args: { hidden: false } });
   }
   changeInspect(ref.tab, (before) => ({ ...before, focus: before.focus + 1 }));

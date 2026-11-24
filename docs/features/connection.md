@@ -1269,7 +1269,6 @@ Removes a saved connection, with its secrets and everything Datardo keeps for it
   `src/history.ts › UndoHistory.clear`, `src/redisOplog.ts`). Mongoster left the state it kept for the
   connection's collections behind, and its collection tabs open; Datardo deletes the one and closes the others. It
   also left the formatting rules of the connection (Mongoster 0.10.0); Datardo deletes them.
-- **Differs**: (M41) there are no formatting rules to delete.
 
 Acceptance:
 
@@ -1287,7 +1286,6 @@ Acceptance:
       its operations and has none of their files.
 - [ ] A connection with 2 rules in its section **Connection Local** and 3 rules of its collections lists **5
       formatting rules**; afterwards `formatting.json` holds none of them, and the rules of **Everywhere** stay.
-      (differs)
 - [ ] Every tab of the connection closes, the collection tabs, keys tabs, document tabs and playground tabs
       included, and a page that compares it with another connection.
 - [ ] Kept: the files of its queries folder, the backups and the exports it wrote, the known hosts, and its

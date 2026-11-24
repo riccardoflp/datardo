@@ -1,6 +1,7 @@
 /**
  * The toolbar of the Documents section (`table.show`, `@toolbar`): **Refresh** (`table.refresh`), **Columns**
- * (`table.columns`), which reads **Columns (2 hidden)** while columns are hidden and opens its panel, the buttons of
+ * (`table.columns`), which reads **Columns (2 hidden)** while columns are hidden and opens its panel, **Formatting**,
+ * pressed while the Formatting view of the inspector island is shown (`nav.toggle-inspector`), the buttons of
  * the other areas once they are built, with their icons, alone while the main island is narrower than 900 px, and the
  * marks **view**, **time series** and **read-only** at the right end.
  */
@@ -16,6 +17,8 @@ import { useWidthOf } from '../query/query-layout';
 import { ColumnsPanel } from './columns-panel';
 import { toggleColumnsPanel, useColumnsPanel } from './columns-panel-store';
 import { refreshTab } from './table-start';
+import { toolbarFormatting, useCollectionFormatting } from './formatting-rules';
+import { useAppState } from '../state/store';
 import type { TablePartProps } from './table-parts';
 import styles from './table-panels.module.css';
 
@@ -27,6 +30,9 @@ function pressed(props: TablePartProps, button: ToolbarButton): void {
       return;
     case 'table.columns@toolbar':
       toggleColumnsPanel(ref.tab);
+      return;
+    case 'nav.toggle-inspector@toolbar':
+      startFeature('nav.toggle-inspector', { place: 'toolbar', args: { view: 'formatting', toggle: true } });
       return;
     case 'document.insert@toolbar':
       void startOnDocuments(ref, button.element);
@@ -47,14 +53,16 @@ function pressed(props: TablePartProps, button: ToolbarButton): void {
 /** The toolbar. */
 export function TableToolbar(props: TablePartProps): React.JSX.Element {
   const { collection, columns, target, collectionRef } = props;
-  const shown = showView(
-    showStateOf(collection, {
+  const formatting = toolbarFormatting(useAppState(), useCollectionFormatting(collectionRef, collection.ranAt));
+  const shown = showView({
+    ...showStateOf(collection, {
       view: target.view,
       readOnly: target.readOnly,
       columns: columns.columns,
       layout: columns.layout,
     }),
-  );
+    formatting,
+  });
   const panelOpen = useColumnsPanel(collectionRef.tab);
   const wrap = useRef<HTMLDivElement>(null);
   // The toolbar is as wide as the main island: under 900 px the buttons with an icon show it alone.
@@ -77,6 +85,7 @@ export function TableToolbar(props: TablePartProps): React.JSX.Element {
                 aria-label={iconsAlone && button.icon !== undefined ? button.label : undefined}
                 aria-expanded={columnsButton ? panelOpen : undefined}
                 aria-haspopup={columnsButton ? 'dialog' : undefined}
+                aria-pressed={button.pressed}
                 onClick={() => {
                   pressed(props, button);
                 }}

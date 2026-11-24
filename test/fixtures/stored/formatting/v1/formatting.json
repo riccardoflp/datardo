@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "hidden": true,
+  "global": [],
+  "connections": {
+    "c-local": {
+      "rules": [],
+      "databases": {
+        "shop": {
+          "rules": [],
+          "collections": {
+            "orders": {
+              "rules": [
+                {
+                  "id": "6b0d4f0e-2d4b-4c1e-9a43-3f1f6f6f1a01",
+                  "condition": "{ status: \"failed\" }",
+                  "color": "red",
+                  "name": "Failed payments"
+                },
+                {
+                  "id": "6b0d4f0e-2d4b-4c1e-9a43-3f1f6f6f1a02",
+                  "condition": "{ amount: { $gt: 1000 } }",
+                  "field": "amount",
+                  "color": "orange",
+                  "enabled": false
+                }
+              ]
+            },
+            "people": {
+              "rules": [
+                {
+                  "id": "6b0d4f0e-2d4b-4c1e-9a43-3f1f6f6f1a03",
+                  "condition": "{ \"address.city\": \"Milano\" }",
+                  "field": "address.city",
+                  "color": "teal"
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

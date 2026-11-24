@@ -37,4 +37,7 @@ export const commands: readonly Command[] = [
   command('table.copy-as:csv', text.commands.copyAsCsv),
   command('table.copy-value', text.commands.copyValue),
   command('table.copy-path', text.commands.copyPath),
+  command('table.add-format-rule', text.formatting.commandAdd),
+  command('table.add-format-rule:cells', text.formatting.formatCells),
+  command('table.toggle-formatting', text.formatting.hide),
 ];

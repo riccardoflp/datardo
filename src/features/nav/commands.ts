@@ -8,6 +8,8 @@ import { text } from './text';
 export const commands: readonly Command[] = [
   command('nav.toggle-explorer', text.commands.toggleExplorer, 'Ctrl+B'),
   command('nav.toggle-inspector', text.commands.toggleInspector, 'Ctrl+Shift+B'),
+  command('nav.toggle-inspector:formatting', text.commands.formattingRules, 'Ctrl+Shift+F'),
+  command('nav.toggle-inspector:selection', text.commands.inspectSelection),
   command('nav.switch-connection', text.commands.switchConnection, 'Ctrl+Shift+O'),
   command('nav.back:back', text.commands.back, 'Alt+Left'),
   command('nav.back:forward', text.commands.forward, 'Alt+Right'),

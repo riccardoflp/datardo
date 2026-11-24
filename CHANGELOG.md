@@ -263,6 +263,16 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
 - Renaming or dropping a collection, a database or a bucket from Datardo moves or forgets its exclusion with its
   color, and Datardo's connection files carry the exclusions; imports from Compass files and lists say they were
   left out.
+- The rows or the cells of a collection's table can be colored by formatting rules: a condition written as a filter,
+  one of eleven colors and a name; the table follows each change as it is typed. The rules are edited in the new
+  **Formatting** view of the inspector island (its **Selection** and **Formatting** tabs, **Formatting** in the
+  toolbar, `Ctrl+Shift+F`, **Formatting rules** in Go to), turned off, reordered by dragging or with `Alt+Up` and
+  `Alt+Down`, and removed.
+- **Format cells…** in the menu of a column's header opens a rule for that column, proposing the selected cell's value.
+- **Hide formatting** shows every table without colors until **Show formatting**; the choice is remembered.
+- A collection's formatting rules follow it when it is renamed from Datardo, and go with a drop of the collection, its
+  database or its GridFS bucket, and with the removal of the connection.
+- Datardo reopens with the inspector island on the view it last showed.
 
 ### Changed
 
@@ -279,6 +289,7 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
   their icon alone.
 - Compass colors are read as their own presets (teal, indigo, pink, gray) instead of the closest of six.
 - In a list of connection strings, a `// name` comment names only the line right below it.
+- A right click on a column's header no longer moves the selected cell to the header.
 
 ### Fixed
 

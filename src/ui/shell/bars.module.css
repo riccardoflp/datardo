@@ -111,6 +111,32 @@
   gap: var(--space-2);
 }
 
+.inspector-tabs {
+  display: flex;
+  flex: 1;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.inspector-tab {
+  padding: var(--space-0) var(--space-2);
+  border: none;
+  border-bottom: var(--focus-width) solid transparent;
+  background: transparent;
+  color: var(--color-text-muted);
+  font: inherit;
+  cursor: pointer;
+}
+
+.inspector-tab:hover {
+  color: var(--color-text);
+}
+
+.inspector-tab[aria-selected='true'] {
+  border-bottom-color: var(--color-accent);
+  color: var(--color-text);
+}
+
 .inspector-empty {
   display: flex;
   flex-direction: column;

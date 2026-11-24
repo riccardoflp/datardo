@@ -3,9 +3,9 @@
  * Datardo keeps for `shop.orders` moves to `shop.orders_2024` once MongoDB renamed the collection. The recent queries
  * and the columns with their expanded paths (`state/<connection id>.json`, and the columns in the app's state), the
  * saved queries *for me* (`saved-queries/<connection id>.json`), the pins of the collection and of its saved queries,
- * its own color on the connection (`tree.color-of`), and the open tab of the collection, which shows the new name with
- * the same query. The saved queries in the folder,
- * the undo history and the other tabs stay under the old name (the card's acceptance).
+ * its own color on the connection (`tree.color-of`), its formatting rules (`table.format-scopes`), and the open tab of
+ * the collection, which shows the new name with the same query. The saved queries in the folder, the undo history and
+ * the other tabs stay under the old name (the card's acceptance).
  */
 import type { Json } from '../../shared/engine-request';
 import { connectionId, type ConnectionId } from '../../shared/ids';
@@ -14,6 +14,7 @@ import { columnsKey, nothingRemembered, rememberedColumns } from '../../shared/s
 import { withCollectionRenamed as stateRenamed } from '../../storage/connection-state';
 import { renamedColors } from '../../features/tree/color-of';
 import { findConnection, writeConnection } from '../connections';
+import { moveFormatting } from '../formatting';
 import { moveExclusion, withMaps } from './tree';
 import { savedQueriesData } from '../saved-queries';
 import type { MainServices } from '../services';
@@ -131,6 +132,7 @@ export async function moveCollection(services: MainServices, args: Json): Promis
   movePins(services, renamed);
   moveColor(services, renamed);
   moveExclusion(services, renamed);
+  moveFormatting(services, { ...renamed, collection: renamed.from }, renamed.to);
   moveTab(services, renamed);
 }
 

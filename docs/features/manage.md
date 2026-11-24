@@ -143,7 +143,6 @@ color, its exclusion from searches and its formatting rules follow the new name.
   (`moveCollectionState`), `src/queryHistory.ts`. The color, the exclusion and the formatting rules that follow:
   Mongoster 0.9.0 (tree.collection-color-follows, tree.exclusion-follows; `src/extension.ts`, the
   `mongoster.renameCollection` handler; `src/collectionPanel.ts › moveCollectionState`, `formattingStateKey`).
-- **Differs**: (M41) the collection's formatting rules do not move.
 
 Acceptance:
 
@@ -161,7 +160,7 @@ Acceptance:
   `shop.orders` in `collectionColors`, and the reopened tab's icon is teal.
 - [ ] After renaming the excluded `shop.logs` to `logs_old`, `exclusions` holds `shop.logs_old` and not `shop.logs`.
 - [ ] After a rename, the collection tab under the new name colors its rows by the formatting rules the old name had;
-  the old name has none. (differs)
+  the old name has none.
 - [ ] A collection renamed outside Datardo keeps its color, its exclusion and its formatting rules under the old name.
 
 ### `manage.drop-collection` — Drop a collection or a view
@@ -202,7 +201,6 @@ confirmation.
 - **Ported from**: manage.drop-collection; `src/manage.ts`, `src/extension.ts`. The color and the exclusion that go:
   Mongoster 0.9.0 (tree.collection-color-follows, tree.exclusion-follows; the `mongoster.dropCollection` handler).
   The formatting rules that go are Datardo's choice: Mongoster keeps them.
-- **Differs**: (M41) the plan forgets no formatting rules.
 
 Acceptance:
 
@@ -223,7 +221,6 @@ Acceptance:
   exclusion from searches of shop.logs`; after it, `collectionColors` and `exclusions` have no `shop.logs`, and a new
   `logs` is plain and not excluded.
 - [ ] Dropping a collection with formatting rules forgets them: a new collection with the same name has none.
-  (differs)
 - [ ] Dropping a collection that has no color, no exclusion and no formatting rule shows one step.
 - [ ] When MongoDB refuses the drop, the color, the exclusion and the formatting rules stay.
 
@@ -263,7 +260,7 @@ Drops a database with all its collections, after the user types its name.
 - **Ported from**: manage.drop-database; `src/manage.ts`, `src/extension.ts`. The colors and the exclusions that go:
   Mongoster 0.9.0 and 0.10.0 (tree.collection-color-follows, tree.exclusion-follows; the `mongoster.dropDatabase`
   handler). The formatting rules that go are Datardo's choice.
-- **Differs**: (M41) the plan forgets no formatting rules of collections; (M42) nor formatting rules of a database.
+- **Differs**: (M42) the plan forgets no formatting rules of a database.
 
 Acceptance:
 
@@ -281,7 +278,7 @@ Acceptance:
 - [ ] Dropping `shop`, teal, with `shop.orders` `#1e90ff` and `shop.logs` excluded, shows the step `forget the colors
   and the exclusions from searches of shop and its collections`; after it, `databaseColors`, `collectionColors` and
   `exclusions` have no `shop` nor any key that starts with `shop.`, and the entries of `crm` stay.
-- [ ] Dropping a database forgets the formatting rules of its collections. (differs)
+- [ ] Dropping a database forgets the formatting rules of its collections.
 - [ ] Dropping a database forgets the formatting rules of its section **Database shop**; those of the connection and
   of **Everywhere** stay. (differs)
 

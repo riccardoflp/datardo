@@ -158,6 +158,7 @@ export const text = {
     theColors: 'the colors',
     theExclusion: 'the exclusion from searches',
     theExclusions: 'the exclusions from searches',
+    theFormattingRules: 'the formatting rules',
     databaseAndCollections: (database: string) => `${database} and its collections`,
   },
   /** What a node excluded from searches shows (`tree.mongodb`), and the steps of `tree.exclude-from-searches`. */

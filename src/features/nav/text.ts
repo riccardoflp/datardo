@@ -111,6 +111,9 @@ export const text = {
   },
   inspector: {
     hide: 'Hide inspector',
+    selection: 'Selection',
+    formatting: 'Formatting',
+    views: 'Views of the inspector',
     nothingSelected: 'Nothing selected',
     selected: (count: number) => `${String(count)} selected`,
     retry: 'Retry',
@@ -132,6 +135,8 @@ export const text = {
     toggleInspector: 'Show or hide the inspector island',
     showInspector: 'Show inspector',
     hideInspector: 'Hide inspector',
+    formattingRules: 'Formatting rules',
+    inspectSelection: 'Inspect the selection',
     resetWidths: 'Reset island widths',
     focusNext: 'Focus next island',
     focusPrevious: 'Focus previous island',
