@@ -222,8 +222,8 @@ A change that needs to break a rule changes this page first, in its own commit, 
 - **R13.1** One commit per piece of work, with its card, its tests and its changelog entry. The message is one
   imperative sentence on what changes for the user, with no prefix. *Source: project choice.* *Review.*
 - **R13.2** A commit passes `npm run check`. *Source: project choice.* *Enforced: the CI on every pull request.*
-- **R13.3** Committing is done when asked; pushing and publishing are the author's. *Source: project choice.*
-  *Review.*
+- **R13.3** Committing and pushing to `origin` are done when asked, never with `--force`; publishing a release is the
+  author's. *Source: project choice.* *Review.*
 
 ## R14 — Secrets and untrusted input
 

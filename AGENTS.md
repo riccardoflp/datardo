@@ -31,8 +31,8 @@ of its own and Redis added. The product is described in [docs/product.md](docs/p
   …)`, `describe('document.delete', …)`, `command('document.delete', …)`. Never build one from parts: the checks and
   a search must find it.
 - **English** in the repository: code, comments, documents, text of the interface.
-- **Commit only when asked**, one commit per piece of work, with a message that is one imperative sentence on what
-  changes for the user. Never push.
+- **Commit and push only when asked**, one commit per piece of work, with a message that is one imperative sentence on
+  what changes for the user. A push goes to `origin`, never with `--force`; publishing a release stays the author's.
 - **Decisions are not edited away.** A decision that changes is replaced by a new one; an idea that changes several
   areas, a decision, a dependency or a stored format is proposed to the author before it is built.
 
