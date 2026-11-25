@@ -337,6 +337,9 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
   the header.
 - The MCP server offers `open_explain`, `open_watch`, `describe_relations` and `open_search`, which were left out of
   its list although the pages and reads they use are built.
+- `npm run dev` shows Datardo's window again instead of an empty one: from the sources, the window's policy lets the
+  development server start the page; a packaged Datardo keeps the policy as it was. Arguments after `--` go to
+  Electron (`npm run dev -- --password-store=gnome-libsecret`).
 
 ### Security
 

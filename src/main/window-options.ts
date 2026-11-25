@@ -9,18 +9,32 @@ import { defaultSize, type Rectangle } from '../features/window/placement';
 import { appName } from '../features/window/text';
 
 /** The Content Security Policy of every page of the window: only the application's own files. */
-export const contentSecurityPolicy = [
-  "default-src 'self'",
-  "script-src 'self'",
-  "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data:",
-  "font-src 'self' data:",
-  "connect-src 'self'",
-  "object-src 'none'",
-  "base-uri 'none'",
-  "form-action 'none'",
-  "frame-ancestors 'none'",
-].join('; ');
+export const contentSecurityPolicy = policyOf({ script: [], connect: [] });
+
+/**
+ * The policy while Datardo runs from the sources on Vite's development server (`npm run dev`, never in a packaged
+ * Datardo): the page also runs the inline script the server writes into it, which starts React's refresh, and reaches
+ * the server's socket for the changes of the sources (R14.6).
+ */
+export function developmentPolicy(server: string): string {
+  const { host } = new URL(server);
+  return policyOf({ script: ["'unsafe-inline'"], connect: [`ws://${host}`] });
+}
+
+function policyOf(more: { readonly script: readonly string[]; readonly connect: readonly string[] }): string {
+  return [
+    "default-src 'self'",
+    ["script-src 'self'", ...more.script].join(' '),
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data:",
+    "font-src 'self' data:",
+    ["connect-src 'self'", ...more.connect].join(' '),
+    "object-src 'none'",
+    "base-uri 'none'",
+    "form-action 'none'",
+    "frame-ancestors 'none'",
+  ].join('; ');
+}
 
 /** The options of the window, with the bridge at `preload`, its frame and its bounds. */
 export function windowOptions(

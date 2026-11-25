@@ -6,7 +6,7 @@ import { session, type BrowserWindow } from 'electron';
 import type { Intent } from '../shared/bridge';
 import { featureId } from '../shared/ids';
 import { appTarget } from '../shared/target';
-import { contentSecurityPolicy } from './window-options';
+import { contentSecurityPolicy, developmentPolicy } from './window-options';
 
 /** The intent of opening a link the page asked for. */
 function openLink(address: string): Intent {
@@ -16,11 +16,15 @@ function openLink(address: string): Intent {
 /** The permissions the window may have: writing text to the clipboard (**Copy**), and nothing else. */
 const allowedPermissions = new Set(['clipboard-sanitized-write']);
 
-/** Sets the content policy and the permissions of every page of the window: once, before the window opens. */
-export function guardTheSession(): void {
+/**
+ * Sets the content policy and the permissions of every page of the window: once, before the window opens. `server` is
+ * Vite's development server when Datardo runs from the sources, never in a packaged Datardo.
+ */
+export function guardTheSession(server?: string): void {
+  const policy = server === undefined ? contentSecurityPolicy : developmentPolicy(server);
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     callback({
-      responseHeaders: { ...details.responseHeaders, 'Content-Security-Policy': [contentSecurityPolicy] },
+      responseHeaders: { ...details.responseHeaders, 'Content-Security-Policy': [policy] },
     });
   });
   session.defaultSession.setPermissionRequestHandler((_contents, permission, callback) => {

@@ -115,10 +115,16 @@ function systemName(): string {
   }
 }
 
+/** Vite's development server when Datardo runs from the sources (`npm run dev`); never in a packaged Datardo. */
+function developmentServer(): string | undefined {
+  const server = process.env['ELECTRON_RENDERER_URL'];
+  return server !== undefined && !app.isPackaged ? server : undefined;
+}
+
 /** Datardo's page, from the development server or from the build. */
 async function loadThePage(window: Electron.BrowserWindow): Promise<void> {
-  const devServer = process.env['ELECTRON_RENDERER_URL'];
-  if (devServer !== undefined && !app.isPackaged) {
+  const devServer = developmentServer();
+  if (devServer !== undefined) {
     await window.loadURL(devServer);
   } else {
     await window.loadFile(join(import.meta.dirname, '../ui/index.html'));
@@ -175,7 +181,7 @@ async function startDatardo(): Promise<void> {
     },
   });
   answerTheBridge(sharedPorts(), state, dialogs);
-  guardTheSession();
+  guardTheSession(developmentServer());
   setTheMenuBar(platform, state, (asked) => void startFeature(asked));
   followTheLook(state, () => windowHost.current(), platform);
   await windowHost.open();
