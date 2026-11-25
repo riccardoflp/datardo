@@ -89,6 +89,7 @@ function argumentsOf(tool: (typeof builtTools)[number]): Record<string, Json> {
     id: 'none',
     pattern: 'm29:*',
     waitSeconds: 0,
+    text: 'active',
   };
   const required = new Set(tool.inputSchema.required ?? []);
   const properties = Object.keys(tool.inputSchema.properties).filter((name) => name !== 'id' || required.has(name));
@@ -119,7 +120,7 @@ beforeEach(async () => {
 });
 
 describe('mcp.protocol', () => {
-  it('initializes and lists the tools offered, not those of features still to be built', async () => {
+  it('initializes and lists the tools offered, every one now that their features are built', async () => {
     const init = await live.rpc('initialize', {
       protocolVersion: '2025-06-18',
       capabilities: {},

@@ -120,22 +120,17 @@ describe('mcp.read-data', () => {
     expect(toolsOffered(off)).toHaveLength(builtTools.length - hiddenBuilt.length);
   });
 
-  it('counts 42 tools, 32 for MongoDB and Datardo, 10 for Redis, and offers those whose cards are built', () => {
+  it('counts 42 tools, 32 for MongoDB and Datardo, 10 for Redis, and offers every one, their cards being built', () => {
     expect(allTools).toHaveLength(42);
     expect(
       allTools.filter((tool) => tool.name.startsWith('redis_') && tool.name !== 'redis_oplog_status'),
     ).toHaveLength(10);
-    expect([...waitingTools.keys()].sort()).toEqual([
-      'describe_relations',
-      'open_explain',
-      'open_search',
-      'open_watch',
-    ]);
-    expect(builtTools).toHaveLength(38);
+    expect([...waitingTools.keys()]).toEqual([]);
+    expect(builtTools).toHaveLength(42);
     const offered = toolsOffered(on).map((tool) => tool.name);
-    for (const name of waitingTools.keys()) {
-      expect(offered).not.toContain(name);
-      expect(serverInstructions()).not.toContain(name);
+    for (const name of ['open_explain', 'open_watch', 'describe_relations', 'open_search']) {
+      expect(offered).toContain(name);
+      expect(serverInstructions()).toContain(name);
     }
   });
 

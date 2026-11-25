@@ -171,6 +171,9 @@ export const toolActions: ReadonlySet<string> = new Set([
   'advisor.analyze',
   // The reads of the Sharding section through a mongos, for `sharding_status`: it never starts or stops the balancer.
   'monitor.sharding',
+  // The references of a database sampled again for `describe_relations` (`relation.detect`): reads only, kept for the
+  // tabs as a diagram's sample is.
+  'relation.detect',
 ]);
 
 /** The kinds of tab no tool opens: a console or a playground, where a command or a script would run. */

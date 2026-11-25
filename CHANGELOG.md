@@ -335,6 +335,8 @@ Every change the user can see, by version (R8.3). The format is [Keep a Changelo
 - A menu of the tree taller than the window scrolls, instead of leaving its first entries out of reach.
 - A table of the Server page with a horizontal scroll bar and few rows shows its last row, instead of hiding it under
   the header.
+- The MCP server offers `open_explain`, `open_watch`, `describe_relations` and `open_search`, which were left out of
+  its list although the pages and reads they use are built.
 
 ### Security
 

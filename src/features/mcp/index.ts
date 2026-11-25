@@ -48,15 +48,11 @@ export const toolGroups: readonly ToolGroupOf[] = [
 export const allTools: readonly ToolDefinition[] = toolGroups.flatMap((group) => group.tools);
 
 /**
- * The tools that wait for the card whose page or read they use: a tool is offered only once its feature is built
- * (the roadmap, M29, "Beyond the cards"). Each is added in the milestone that builds its card.
+ * The tools that wait for the card whose page or read they use, by the card: a tool is offered only once its feature
+ * is built (the roadmap, M29, "Beyond the cards"). Every card is built, so none waits now; a new tool whose card is
+ * not built yet is named here until its milestone.
  */
-export const waitingTools: ReadonlyMap<string, string> = new Map([
-  ['open_explain', 'explain.show'],
-  ['open_watch', 'watch.show'],
-  ['describe_relations', 'relation.detect'],
-  ['open_search', 'search.show'],
-]);
+export const waitingTools: ReadonlyMap<string, string> = new Map<string, string>();
 
 /** The tools whose cards are built. */
 export const builtTools: readonly ToolDefinition[] = allTools.filter((tool) => !waitingTools.has(tool.name));

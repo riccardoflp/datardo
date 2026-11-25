@@ -18,6 +18,8 @@ import { isToolTab } from '../../../src/features/mcp/tool/read-only';
 import { mcpActions } from '../../../src/features/mcp/types';
 import { runnableFeatures } from '../../../src/features/registry';
 import { analyzeForTool } from '../../../src/main/advisor';
+import { readReferences } from '../../../src/main/relation-read';
+import { detectReply } from '../../../src/main/relations';
 import { shardingForTool } from '../../../src/main/sharding';
 import { McpHost, tokenKey } from '../../../src/main/mcp/host';
 import type { RunnerPorts } from '../../../src/runner/ports';
@@ -300,6 +302,19 @@ export async function liveMcp(options: { readonly settings?: Readonly<Record<str
             { startedBy: 'mcp' },
           ),
         );
+      case 'relation.detect': {
+        // As the main process does, without keeping the graph for the tabs: the reads go through the recorded engines.
+        const graph = await readReferences(
+          { send: (asked, signal) => recorded.send(asked, signal), progress: () => undefined },
+          {
+            connection: connectionId(textOf(fields['connection'])),
+            database: textOf(fields['database']),
+            size: Number(fields['sample'] ?? 100),
+          },
+          new AbortController().signal,
+        );
+        return detectReply(graph);
+      }
       default:
         throw new Error(`No action ${action}.`);
     }

@@ -197,6 +197,7 @@ describe('mcp.server', () => {
       'mcp.undo-history',
       'mcp.undo-write',
       'monitor.sharding',
+      'relation.detect',
       'saved-query.list',
     ]);
     expect(isToolTab({ feature: 'tab.open', args: { shows: { kind: 'collection' } } })).toBe(true);

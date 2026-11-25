@@ -1307,7 +1307,9 @@ Raised while the catalog was written; each names the cards that hold the current
   relations and the search; the explain and watch tabs are held back by the same rule. The server's instructions name
   only the tools offered. Each milestone that builds one of these features adds its tool back to
   `src/features/mcp/index.ts › waitingTools`. (`mcp.read-data`, `mcp.performance-tools`, `mcp.deployment-tools`,
-  `mcp.data-model-tools`, `mcp.tab-tools`).
+  `mcp.data-model-tools`, `mcp.tab-tools`). *On 2026-11-25, after M42, the four still waiting although their cards
+  were built (`open_explain`, `open_watch`, `describe_relations`, `open_search`) were offered, and `relation.detect`
+  became an app action the tools may ask for: M23, M27 and M34 had not added them back.*
 - **Q92** — The MCP server in the main process as built in M29, where the cards say nothing: the tools of Redis use
   the connection's own client, which names the database of each request (Q65), so that the database of the user's
   tabs never moves; every request a tool sends passes a guard of its own before it leaves (the methods and commands

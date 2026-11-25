@@ -212,6 +212,11 @@ async function detect(services: Holder, args: Json): Promise<Json> {
     () => undefined,
   );
   change(services, { kind: 'found', graph, connection });
+  return detectReply(graph);
+}
+
+/** What `relation.detect` gives the MCP tool `describe_relations`: the collections and the relations of a graph. */
+export function detectReply(graph: ReferenceGraph): Json {
   return {
     collections: graph.collections.map((collection) => collection.name),
     relations: graph.relations.map((relation) => ({

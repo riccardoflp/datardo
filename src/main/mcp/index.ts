@@ -20,6 +20,7 @@ import { start as startFeature } from '../../runner/start';
 import { readOperationFile } from '../../storage/undo';
 import { actions as savedQueryActions } from '../actions/saved-query';
 import { analyzeForTool } from '../advisor';
+import { relationActions } from '../relations';
 import { shardingForTool } from '../sharding';
 import { whenRunnerReady } from '../bridge';
 import { appSecret, connectionEngines, isConnected, keepAppSecret } from '../connections';
@@ -77,6 +78,7 @@ function toolActions(
   services: MainServices,
 ): Readonly<Record<string, (args: Json, signal: AbortSignal) => Promise<unknown>>> {
   const savedQueries = savedQueryActions(services);
+  const relations = relationActions(services);
   return {
     [mcpActions.connect]: connect,
     [mcpActions.undoHistory]: (args) => {
@@ -108,6 +110,11 @@ function toolActions(
           { startedBy: 'mcp', signal },
         ),
       );
+    },
+    // The references of a database sampled again, for `describe_relations`: reads only.
+    'relation.detect': (args) => {
+      const detect = relations['relation.detect'];
+      return detect === undefined ? Promise.reject(new Error('No relation.detect.')) : detect(args);
     },
     [shardingAction]: async (args, signal) => {
       const ports = await whenRunnerReady();
