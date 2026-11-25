@@ -250,8 +250,10 @@ Each rule answers a threat of [security.md](security.md).
   *Enforced: ESLint (`react/no-danger`).*
 - **R14.6** The window process is sandboxed (`sandbox`, `contextIsolation`, no `nodeIntegration`), has a Content
   Security Policy that allows only the application's own files, cannot navigate or open windows, and a link opens in
-  the system's browser only when it is `https`. *Answers T7.* *Enforced: a test of the window's options and of the
-  policy; ESLint for the options.*
+  the system's browser only when it is `https`. Only while Datardo runs from the sources on Vite's development server
+  (`npm run dev`, never in a packaged Datardo), the policy also lets the page run the inline script that server writes
+  into it and reach its socket: without them the page does not start. *Answers T7.* *Enforced: a test of the policy
+  (`test/unit/window/content-policy.test.ts`); ESLint for the options.*
 - **R14.7** The MCP server listens only on `127.0.0.1` and refuses a request without the token, from another host or
   from another origin, or with a body over 1 MB, and answers at most 20 messages of a JSON-RPC batch. *Answers T8.*
   *Enforced: integration tests of the HTTP server.*
